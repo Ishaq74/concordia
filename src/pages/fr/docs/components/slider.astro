@@ -1,0 +1,515 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import SliderComponent from "@components/ui/Slider/Slider.astro";
+import SliderItem from "@components/ui/Slider/SliderItem.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Alert from "@components/ui/Alert.astro";
+import Badge from "@components/ui/Badge.astro";
+import TOC from "@components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+
+const productImages = [
+  { src: "https://picsum.photos/400/300?random=1", title: "Produit 1", price: "29,99 €" },
+  { src: "https://picsum.photos/400/300?random=2", title: "Produit 2", price: "39,99 €" },
+  { src: "https://picsum.photos/400/300?random=3", title: "Produit 3", price: "49,99 €" },
+  { src: "https://picsum.photos/400/300?random=4", title: "Produit 4", price: "59,99 €" },
+  { src: "https://picsum.photos/400/300?random=5", title: "Produit 5", price: "69,99 €" },
+  { src: "https://picsum.photos/400/300?random=6", title: "Produit 6", price: "79,99 €" },
+];
+
+const testimonials = [
+  { name: "Alice Martin", role: "Designer", text: "Un composant incroyable ! Facile à utiliser et très personnalisable.", avatar: "https://i.pravatar.cc/150?img=1" },
+  { name: "Bob Dupont", role: "Développeur", text: "J'adore les différents variants. Le mode futuriste est magnifique !", avatar: "https://i.pravatar.cc/150?img=2" },
+  { name: "Charlie Bernard", role: "Product Manager", text: "Performance excellente et design responsive parfait.", avatar: "https://i.pravatar.cc/150?img=3" },
+  { name: "Diana Laurent", role: "UX Designer", text: "Les animations sont fluides et l'accessibilité est au rendez-vous.", avatar: "https://i.pravatar.cc/150?img=4" },
+];
+---
+
+<DocLayout 
+  title="Slider Component" 
+  description="Composant de carrousel horizontal responsive avec variants CSS et contrôles avancés" 
+  variant="initial"
+>
+  <h1 id="slider-component">Slider Component</h1>
+
+  <p>
+    Le composant <code class="inline-code">Slider</code> offre un carrousel horizontal entièrement responsive avec 4 variants visuels, 
+    navigation par boutons, indicateurs, support du tactile et du clavier, et défilement automatique optionnel.
+  </p>
+
+  <TOC
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "Utilisation de base", href: "#basic-usage" },
+      { label: "Variants", href: "#variants" },
+      { label: "Couleurs", href: "#colors" },
+      { label: "Défilement automatique", href: "#auto-scroll" },
+      { label: "Personnalisation", href: "#customization" },
+      { label: "API Reference", href: "#api" },
+    ]}
+    title="Table des matières"
+  />
+
+  <h2 id="installation">Installation</h2>
+
+  <Code
+    lang="astro"
+    code={`import { Slider, SliderItem } from '@components/ui/Slider';`}
+  />
+
+  <h2 id="basic-usage">Utilisation de base</h2>
+  <p>Slider simple avec des cartes produits.</p>
+
+  <div class="demo-section">
+    <SliderComponent>
+      {productImages.map((product) => (
+        <SliderItem>
+          <Card>
+            <CardHeader>
+              <img src={product.src} alt={product.title} style="width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem;" />
+            </CardHeader>
+            <CardContent>
+              <h3 style="margin: 0 0 0.5rem 0; font-size: 1.125rem;">{product.title}</h3>
+              <p style="margin: 0; color: var(--color-primary); font-weight: bold; font-size: 1.25rem;">{product.price}</p>
+            </CardContent>
+          </Card>
+        </SliderItem>
+      ))}
+    </SliderComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SliderComponent>
+  {products.map((product) => (
+    <SliderItem>
+      <Card>
+        <CardHeader>
+          <img src={product.src} alt={product.title} />
+        </CardHeader>
+        <CardContent>
+          <h3>{product.title}</h3>
+          <p>{product.price}</p>
+        </CardContent>
+      </Card>
+    </SliderItem>
+  ))}
+</SliderComponent>`}
+  />
+
+  <h2 id="variants">Variants</h2>
+  
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+    <Badge>initial</Badge>
+    <Badge>retro</Badge>
+    <Badge>modern</Badge>
+    <Badge>futuristic</Badge>
+  </div>
+
+  <Alert variant="initial" status="info">
+    <strong>🎨 Variants disponibles :</strong> Le Slider supporte 4 variants visuels. Chaque variant applique un style unique aux contrôles, indicateurs et animations.
+  </Alert>
+
+  <h3 id="initial">Initial (Par défaut)</h3>
+  <p>Design épuré et minimaliste.</p>
+
+  <div class="demo-section">
+    <SliderComponent variant="initial">
+      {testimonials.slice(0, 4).map((testimonial) => (
+        <SliderItem>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <img src={testimonial.avatar} alt={testimonial.name} style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;" />
+              <div>
+                <h4 style="margin: 0; font-size: 1rem;">{testimonial.name}</h4>
+                <p style="margin: 0; color: var(--text-muted); font-size: 0.875rem;">{testimonial.role}</p>
+              </div>
+            </div>
+            <p style="margin: 0; font-style: italic;">"{testimonial.text}"</p>
+          </div>
+        </SliderItem>
+      ))}
+    </SliderComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SliderComponent variant="initial">
+  <SliderItem>...</SliderItem>
+</SliderComponent>`}
+  />
+
+  <h3 id="retro">Retro</h3>
+  <p>Style rétro avec bordures épaisses et ombres portées.</p>
+
+  <div class="demo-section">
+    <SliderComponent variant="retro">
+      {testimonials.slice(0, 4).map((testimonial) => (
+        <SliderItem>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <img src={testimonial.avatar} alt={testimonial.name} style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;" />
+              <div>
+                <h4 style="margin: 0; font-size: 1rem;">{testimonial.name}</h4>
+                <p style="margin: 0; font-size: 0.875rem;">{testimonial.role}</p>
+              </div>
+            </div>
+            <p style="margin: 0; font-style: italic;">"{testimonial.text}"</p>
+          </div>
+        </SliderItem>
+      ))}
+    </SliderComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SliderComponent variant="retro">
+  <SliderItem>...</SliderItem>
+</SliderComponent>`}
+  />
+
+  <h3 id="modern">Modern</h3>
+  <p>Design moderne avec glassmorphism et dégradés.</p>
+
+  <div class="demo-section">
+    <SliderComponent variant="modern">
+      {productImages.slice(0, 5).map((product) => (
+        <SliderItem>
+          <div style="text-align: center;">
+            <img src={product.src} alt={product.title} style="width: 100%; height: 180px; object-fit: cover; border-radius: 0.75rem; margin-bottom: 1rem;" />
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.125rem;">{product.title}</h3>
+            <p style="margin: 0; color: var(--color-primary); font-weight: bold; font-size: 1.25rem;">{product.price}</p>
+          </div>
+        </SliderItem>
+      ))}
+    </SliderComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SliderComponent variant="modern">
+  <SliderItem>...</SliderItem>
+</SliderComponent>`}
+  />
+
+  <h3 id="futuristic">Futuristic</h3>
+  <p>Design futuriste avec néons et effets lumineux.</p>
+
+  <div class="demo-section">
+    <SliderComponent variant="futuristic">
+      {productImages.slice(0, 5).map((product) => (
+        <SliderItem>
+          <div style="text-align: center;">
+            <img src={product.src} alt={product.title} style="width: 100%; height: 180px; object-fit: cover; border-radius: 0.75rem; margin-bottom: 1rem;" />
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.125rem;">{product.title}</h3>
+            <p style="margin: 0; color: #8b5cf6; font-weight: bold; font-size: 1.25rem;">{product.price}</p>
+          </div>
+        </SliderItem>
+      ))}
+    </SliderComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SliderComponent variant="futuristic">
+  <SliderItem>...</SliderItem>
+</SliderComponent>`}
+  />
+
+  <h2 id="colors">Couleurs</h2>
+  
+  <Alert variant="initial" status="success">
+    <strong>🎨 Personnalisation :</strong> Les couleurs affectent les boutons de navigation et les indicateurs. Compatible avec tous les variants.
+  </Alert>
+
+  <h3>Primary</h3>
+  <div class="demo-section">
+    <SliderComponent color="primary" itemMinWidth="250px">
+      {productImages.slice(0, 4).map((product) => (
+        <SliderItem>
+          <div style="text-align: center;">
+            <img src={product.src} alt={product.title} style="width: 100%; height: 160px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 0.75rem;" />
+            <h4 style="margin: 0; font-size: 1rem;">{product.title}</h4>
+          </div>
+        </SliderItem>
+      ))}
+    </SliderComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SliderComponent color="primary">
+  <SliderItem>...</SliderItem>
+</SliderComponent>`}
+  />
+
+  <h3>Secondary</h3>
+  <div class="demo-section">
+    <SliderComponent color="secondary" itemMinWidth="250px">
+      {productImages.slice(0, 4).map((product) => (
+        <SliderItem>
+          <div style="text-align: center;">
+            <img src={product.src} alt={product.title} style="width: 100%; height: 160px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 0.75rem;" />
+            <h4 style="margin: 0; font-size: 1rem;">{product.title}</h4>
+          </div>
+        </SliderItem>
+      ))}
+    </SliderComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SliderComponent color="secondary">
+  <SliderItem>...</SliderItem>
+</SliderComponent>`}
+  />
+
+  <h3>Accent</h3>
+  <div class="demo-section">
+    <SliderComponent color="accent" itemMinWidth="250px">
+      {productImages.slice(0, 4).map((product) => (
+        <SliderItem>
+          <div style="text-align: center;">
+            <img src={product.src} alt={product.title} style="width: 100%; height: 160px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 0.75rem;" />
+            <h4 style="margin: 0; font-size: 1rem;">{product.title}</h4>
+          </div>
+        </SliderItem>
+      ))}
+    </SliderComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SliderComponent color="accent">
+  <SliderItem>...</SliderItem>
+</SliderComponent>`}
+  />
+
+  <h2 id="auto-scroll">Défilement automatique</h2>
+  
+  <Alert variant="initial" status="warning">
+    <strong>⚡ Auto-scroll :</strong> Le slider peut défiler automatiquement avec pause au survol. Ajustez la vitesse avec la prop <code>scrollSpeed</code>.
+  </Alert>
+
+  <div class="demo-section">
+    <SliderComponent autoScroll={true} pauseOnHover={true} scrollSpeed={30} itemMinWidth="220px">
+      {productImages.map((product) => (
+        <SliderItem>
+          <div style="text-align: center;">
+            <img src={product.src} alt={product.title} style="width: 100%; height: 140px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 0.5rem;" />
+            <h4 style="margin: 0; font-size: 0.875rem;">{product.title}</h4>
+          </div>
+        </SliderItem>
+      ))}
+    </SliderComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SliderComponent 
+  autoScroll={true} 
+  pauseOnHover={true} 
+  scrollSpeed={30}
+>
+  <SliderItem>...</SliderItem>
+</SliderComponent>`}
+  />
+
+  <h2 id="customization">Personnalisation</h2>
+  
+  <h3>Espacement et largeur personnalisés</h3>
+  <div class="demo-section">
+    <SliderComponent gap="2rem" itemMinWidth="320px">
+      {testimonials.map((testimonial) => (
+        <SliderItem>
+          <div style="padding: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+              <img src={testimonial.avatar} alt={testimonial.name} style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" />
+              <div>
+                <h4 style="margin: 0; font-size: 0.95rem;">{testimonial.name}</h4>
+                <p style="margin: 0; color: var(--text-muted); font-size: 0.8rem;">{testimonial.role}</p>
+              </div>
+            </div>
+            <p style="margin: 0; font-size: 0.875rem; font-style: italic;">"{testimonial.text}"</p>
+          </div>
+        </SliderItem>
+      ))}
+    </SliderComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SliderComponent gap="2rem" itemMinWidth="320px">
+  <SliderItem>...</SliderItem>
+</SliderComponent>`}
+  />
+
+  <h3>Sans contrôles</h3>
+  <p>Slider sans boutons de navigation (navigation tactile uniquement).</p>
+
+  <div class="demo-section">
+    <SliderComponent showControls={false} showScrollbar={true}>
+      {productImages.slice(0, 5).map((product) => (
+        <SliderItem>
+          <img src={product.src} alt={product.title} style="width: 100%; height: 200px; object-fit: cover; border-radius: 0.5rem;" />
+        </SliderItem>
+      ))}
+    </SliderComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SliderComponent showControls={false} showScrollbar={true}>
+  <SliderItem>...</SliderItem>
+</SliderComponent>`}
+  />
+
+  <Alert variant="initial" status="success">
+    <strong>♿ Accessibilité :</strong> Le Slider est entièrement accessible au clavier (flèches gauche/droite), supporte les lecteurs d'écran et inclut les attributs ARIA appropriés.
+  </Alert>
+
+  <h2 id="api">API Reference</h2>
+
+  <h3>Slider Props</h3>
+  
+  <Table variant="initial">
+    <TableHead>
+      <TableRow>
+        <TableHeader>Prop</TableHeader>
+        <TableHeader>Type</TableHeader>
+        <TableHeader>Défaut</TableHeader>
+        <TableHeader>Description</TableHeader>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      <TableRow>
+        <TableCell><code>variant</code></TableCell>
+        <TableCell><code>'initial' | 'retro' | 'modern' | 'futuristic'</code></TableCell>
+        <TableCell><code>'initial'</code></TableCell>
+        <TableCell>Style visuel du slider</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>color</code></TableCell>
+        <TableCell><code>'default' | 'primary' | 'secondary' | 'accent'</code></TableCell>
+        <TableCell><code>'default'</code></TableCell>
+        <TableCell>Couleur du slider</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>gap</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>'1rem'</code></TableCell>
+        <TableCell>Espacement entre les items</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>itemMinWidth</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>'280px'</code></TableCell>
+        <TableCell>Largeur minimale des items</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>showScrollbar</code></TableCell>
+        <TableCell><code>boolean</code></TableCell>
+        <TableCell><code>false</code></TableCell>
+        <TableCell>Afficher la barre de défilement</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>autoScroll</code></TableCell>
+        <TableCell><code>boolean</code></TableCell>
+        <TableCell><code>false</code></TableCell>
+        <TableCell>Activer le défilement automatique</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>scrollSpeed</code></TableCell>
+        <TableCell><code>number</code></TableCell>
+        <TableCell><code>50</code></TableCell>
+        <TableCell>Vitesse de défilement (en secondes)</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>pauseOnHover</code></TableCell>
+        <TableCell><code>boolean</code></TableCell>
+        <TableCell><code>true</code></TableCell>
+        <TableCell>Mettre en pause au survol</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>showControls</code></TableCell>
+        <TableCell><code>boolean</code></TableCell>
+        <TableCell><code>true</code></TableCell>
+        <TableCell>Afficher les boutons de navigation</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>snapAlign</code></TableCell>
+        <TableCell><code>boolean</code></TableCell>
+        <TableCell><code>true</code></TableCell>
+        <TableCell>Activer le snap-scroll</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>className</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>''</code></TableCell>
+        <TableCell>Classes CSS supplémentaires</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <h3>SliderItem Props</h3>
+  
+  <Table variant="initial">
+    <TableHead>
+      <TableRow>
+        <TableHeader>Prop</TableHeader>
+        <TableHeader>Type</TableHeader>
+        <TableHeader>Défaut</TableHeader>
+        <TableHeader>Description</TableHeader>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      <TableRow>
+        <TableCell><code>className</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>''</code></TableCell>
+        <TableCell>Classes CSS supplémentaires</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <h3>Fonctionnalités</h3>
+  <ul>
+    <li>✅ Navigation par boutons gauche/droite</li>
+    <li>✅ Navigation au clavier (flèches gauche/droite)</li>
+    <li>✅ Support tactile (swipe)</li>
+    <li>✅ Support du drag avec la souris</li>
+    <li>✅ Indicateurs de pagination</li>
+    <li>✅ Défilement automatique optionnel</li>
+    <li>✅ Pause au survol</li>
+    <li>✅ Snap-scroll pour alignement précis</li>
+    <li>✅ Entièrement responsive</li>
+    <li>✅ Support du mode sombre</li>
+    <li>✅ Accessibilité ARIA</li>
+    <li>✅ 4 variants visuels</li>
+    <li>✅ 4 options de couleur</li>
+  </ul>
+
+  <h3>Accessibilité</h3>
+  <ul>
+    <li>Navigation au clavier complète</li>
+    <li>Labels ARIA sur les contrôles</li>
+    <li>Focus visible sur les éléments interactifs</li>
+    <li>Support des lecteurs d'écran</li>
+  </ul>
+
+  <h3>Performance</h3>
+  <ul>
+    <li>Scroll natif du navigateur</li>
+    <li>Animations CSS optimisées</li>
+    <li>Lazy loading des images recommandé</li>
+    <li>Pas de dépendances externes</li>
+  </ul>
+</DocLayout>

@@ -1,0 +1,53 @@
+---
+interface Props {
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  width?: string;
+  height?: string;
+  circle?: boolean;
+  rounded?: boolean;
+  animated?: boolean;
+  count?: number;
+  className?: string;
+}
+
+const {
+  variant = "initial",
+  width,
+  height,
+  circle = false,
+  rounded = false,
+  animated = true,
+  count = 1,
+  className = "",
+} = Astro.props;
+
+const classes = [
+  "skeleton",
+  variant !== "initial" && variant,
+  circle && "circle",
+  rounded && "rounded",
+  animated && "animated",
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+
+const style = [
+  width && `width: ${width}`,
+  height && `height: ${height}`,
+]
+  .filter(Boolean)
+  .join("; ");
+
+const skeletons = Array.from({ length: count }, (_, i) => i);
+---
+
+{count === 1 ? (
+  <div class={classes} style={style} aria-busy="true" aria-label="Chargement en cours"></div>
+) : (
+  <div class="skeleton-group">
+    {skeletons.map(() => (
+      <div class={classes} style={style} aria-busy="true" aria-label="Chargement en cours"></div>
+    ))}
+  </div>
+)}

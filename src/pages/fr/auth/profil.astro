@@ -1,0 +1,1312 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import translations from "@i18n/fr.json";
+import { getAuth } from "@lib/auth/auth";
+import Button from "@components/ui/Button.astro";
+import Alert from "@components/ui/Alert.astro";
+import Dialog from "@components/ui/Dialog/Dialog.astro";
+import DialogTrigger from "@components/ui/Dialog/DialogTrigger.astro";
+import DialogContent from "@components/ui/Dialog/DialogContent.astro";
+import DialogHeader from "@components/ui/Dialog/DialogHeader.astro";
+import DialogTitle from "@components/ui/Dialog/DialogTitle.astro";
+import DialogFooter from "@components/ui/Dialog/DialogFooter.astro";
+import FormGroup from "@components/ui/Form/FormGroup.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Checkbox from "@components/ui/Form/Checkbox.astro";
+
+const { user, session } = Astro.locals;
+const request = Astro.request;
+const response = Astro.response;
+const url = new URL(request.url);
+
+if (!user) {
+  return Astro.redirect("/fr/connexion");
+}
+
+const pageTitle = translations.auth.profile ?? "Profil utilisateur";
+const lastSignIn = session?.updatedAt
+  ? new Date(session.updatedAt).toLocaleString("fr-FR")
+  : null;
+
+type Status = {
+  type: "success" | "error";
+  message: string;
+};
+
+type OrganizationRecord = {
+  id: string;
+  name?: string | null;
+  slug?: string | null;
+  logo?: string | null;
+  createdAt?: string | null;
+  metadata?: Record<string, unknown> | null;
+  role?: string | null;
+};
+
+type OrganizationMember = {
+  id: string;
+  userId: string;
+  role: string;
+  organizationId?: string;
+  email?: string | null;
+  user?: {
+    name?: string | null;
+    email?: string | null;
+  } | null;
+};
+
+type InvitationRecord = {
+  id: string;
+  email: string;
+  role?: string | null;
+  status?: string | null;
+  expiresAt?: string | null;
+  organization?: { name?: string | null; slug?: string | null } | null;
+  inviter?: {
+    user?: { name?: string | null; email?: string | null } | null;
+  } | null;
+};
+
+// Fonction utilitaire locale pour slugifier une chaîne
+const slugify = (value: string) =>
+  value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "")
+    .slice(0, 60);
+
+const resolveErrorMessage = (error: unknown) => {
+  if (typeof error === "string" && error.trim().length > 0) {
+    return error;
+  }
+  if (error && typeof error === "object") {
+    const body = (error as { body?: { error?: string; message?: string } })
+      .body;
+    const code = body?.error ?? (error as { message?: string }).message;
+    if (typeof code === "string" && code.trim().length > 0) {
+      return code;
+    }
+    if (body?.message) {
+      return body.message;
+    }
+  }
+  return translations.auth.serverError ?? "Erreur inattendue.";
+};
+
+const forwardSetCookies = (source: Response) => {
+  const headerProxy = source.headers as unknown as {
+    getSetCookie?: () => string[];
+  };
+  const cookies = headerProxy.getSetCookie?.();
+  if (Array.isArray(cookies)) {
+    cookies.forEach((cookie) => response.headers.append("set-cookie", cookie));
+    return;
+  }
+  for (const [key, value] of source.headers.entries()) {
+    if (key.toLowerCase() === "set-cookie") {
+      response.headers.append("set-cookie", value);
+    }
+  }
+};
+
+let status: Status | null = null;
+
+const flash = url.searchParams.get("status");
+if (flash === "org-created")
+  status = { type: "success", message: "Organisation créée." };
+if (flash === "active-set")
+  status = { type: "success", message: "Organisation active mise à jour." };
+if (flash === "active-unset")
+  status = { type: "success", message: "Organisation active supprimée." };
+if (flash === "org-updated")
+  status = { type: "success", message: "Organisation mise à jour." };
+if (flash === "org-deleted")
+  status = { type: "success", message: "Organisation supprimée." };
+if (flash === "invited")
+  status = {
+    type: "success",
+    message: "Invitation envoyée (si email configuré).",
+  };
+if (flash === "member-updated")
+  status = { type: "success", message: "Rôle du membre mis à jour." };
+if (flash === "member-removed")
+  status = { type: "success", message: "Membre supprimé." };
+if (flash === "left")
+  status = { type: "success", message: "Vous avez quitté l'organisation." };
+
+const auth = (await getAuth()) as any;
+if (request.method === "POST") {
+  const formData = await request.formData();
+  const intent = formData.get("intent")?.toString();
+
+  try {
+    if (!intent) {
+      throw new Error("ACTION_INCOMPLETE");
+    }
+
+    if (intent === "create-organization") {
+      const name = formData.get("name")?.toString().trim();
+      let slug = formData.get("slug")?.toString().trim();
+      if (!name) throw new Error("NAME_REQUIRED");
+      slug = slug ? slugify(slug) : slugify(name);
+      if (!slug) throw new Error("SLUG_REQUIRED");
+      const createResponse = await auth.organizationApi.create({
+        headers: request.headers,
+        body: { name, slug },
+        asResponse: true,
+      });
+      forwardSetCookies(createResponse);
+      const created = await createResponse.json().catch(() => ({}));
+      if (!createResponse.ok) {
+        throw new Error(
+          (created as { error?: string; message?: string })?.error ??
+            (created as { message?: string })?.message ??
+            "SERVER_ERROR",
+        );
+      }
+
+      const createdOrgId =
+        (created as { organizationId?: string })?.organizationId ??
+        (created as { organization?: { id?: string } })?.organization?.id ??
+        (created as { id?: string })?.id ??
+        null;
+
+      if (createdOrgId) {
+        const setActiveResponse = await auth.organizationApi.setActive({
+          headers: request.headers,
+          body: { organizationId: createdOrgId },
+          asResponse: true,
+        });
+        forwardSetCookies(setActiveResponse);
+      }
+
+      return Astro.redirect("/fr/profil?status=org-created", 303);
+    } else if (intent === "set-active-organization") {
+      const organizationId = formData.get("organizationId")?.toString();
+      if (!organizationId) throw new Error("ORG_REQUIRED");
+      const setActiveResponse = await auth.organizationApi.setActive({
+        headers: request.headers,
+        body: { organizationId },
+        asResponse: true,
+      });
+      forwardSetCookies(setActiveResponse);
+      if (!setActiveResponse.ok) {
+        const payload = await setActiveResponse.json().catch(() => ({}));
+        throw new Error(
+          (payload as { error?: string; message?: string })?.error ??
+            (payload as { message?: string })?.message ??
+            "SERVER_ERROR",
+        );
+      }
+      return Astro.redirect("/fr/profil?status=active-set", 303);
+    } else if (intent === "unset-active-organization") {
+      const unsetActiveResponse = await auth.organizationApi.setActive({
+        headers: request.headers,
+        body: { organizationId: null },
+        asResponse: true,
+      });
+      forwardSetCookies(unsetActiveResponse);
+      if (!unsetActiveResponse.ok) {
+        const payload = await unsetActiveResponse.json().catch(() => ({}));
+        throw new Error(
+          (payload as { error?: string; message?: string })?.error ??
+            (payload as { message?: string })?.message ??
+            "SERVER_ERROR",
+        );
+      }
+      return Astro.redirect("/fr/profil?status=active-unset", 303);
+    } else if (intent === "update-active-organization") {
+      const name = formData.get("name")?.toString().trim() ?? "";
+      const slugRaw = formData.get("slug")?.toString().trim() ?? "";
+      const logo = formData.get("logo")?.toString().trim() ?? "";
+      const data: Record<string, unknown> = {};
+      if (name) data.name = name;
+      if (slugRaw) data.slug = slugify(slugRaw);
+      if (logo) data.logo = logo;
+      if (Object.keys(data).length === 0) throw new Error("NO_CHANGES");
+      const updateResponse = await auth.organizationApi.update({
+        headers: request.headers,
+        body: { ...data },
+        asResponse: true,
+      });
+      forwardSetCookies(updateResponse);
+      if (!updateResponse.ok) {
+        const payload = await updateResponse.json().catch(() => ({}));
+        throw new Error(
+          (payload as { error?: string; message?: string })?.error ??
+            (payload as { message?: string })?.message ??
+            "SERVER_ERROR",
+        );
+      }
+      return Astro.redirect("/fr/profil?status=org-updated", 303);
+    } else if (intent === "delete-organization") {
+      const organizationId = formData.get("organizationId")?.toString();
+      const confirm = formData.get("confirm")?.toString();
+      if (!organizationId) throw new Error("ORG_REQUIRED");
+      if (confirm !== "SUPPRIMER") throw new Error("CONFIRMATION_REQUIRED");
+      const deleteResponse = await auth.organizationApi.delete({
+        headers: request.headers,
+        body: { organizationId },
+        asResponse: true,
+      });
+      forwardSetCookies(deleteResponse);
+      if (!deleteResponse.ok) {
+        const payload = await deleteResponse.json().catch(() => ({}));
+        throw new Error(
+          (payload as { error?: string; message?: string })?.error ??
+            (payload as { message?: string })?.message ??
+            "SERVER_ERROR",
+        );
+      }
+      return Astro.redirect("/fr/profil?status=org-deleted", 303);
+    } else if (intent === "invite-member") {
+      const email = formData.get("email")?.toString().trim();
+      const role = formData.get("role")?.toString().trim() || "member";
+      const resend = formData.get("resend")?.toString() === "on";
+      if (!email) throw new Error("EMAIL_REQUIRED");
+      await auth.organizationApi.inviteMember({
+        headers: request.headers,
+        body: { email, role, resend },
+      });
+      return Astro.redirect("/fr/profil?status=invited", 303);
+    } else if (intent === "update-member-role") {
+      const memberId = formData.get("memberId")?.toString();
+      const role = formData.get("role")?.toString();
+      if (!memberId || !role) throw new Error("MEMBER_UPDATE_INCOMPLETE");
+      await auth.organizationApi.updateMemberRole({
+        headers: request.headers,
+        body: { memberId, role },
+      });
+      return Astro.redirect("/fr/profil?status=member-updated", 303);
+    } else if (intent === "remove-member") {
+      const memberId = formData.get("memberId")?.toString();
+      if (!memberId) throw new Error("MEMBER_REQUIRED");
+      await auth.organizationApi.removeMember({
+        headers: request.headers,
+        body: { memberIdOrEmail: memberId },
+      });
+      return Astro.redirect("/fr/profil?status=member-removed", 303);
+    } else if (intent === "leave-organization") {
+      const organizationId = formData.get("organizationId")?.toString();
+      if (!organizationId) throw new Error("ORG_REQUIRED");
+      const leaveResponse = await auth.organizationApi.leave({
+        headers: request.headers,
+        body: { organizationId },
+        asResponse: true,
+      });
+
+      if (!leaveResponse.ok) {
+        const payload = await leaveResponse.json().catch(() => ({}));
+        throw new Error(
+          (payload as { error?: string; message?: string })?.error ??
+            (payload as { message?: string })?.message ??
+            "SERVER_ERROR",
+        );
+      }
+      return Astro.redirect("/fr/profil?status=left", 303);
+    } else {
+      throw new Error("UNKNOWN_ACTION");
+    }
+  } catch (error) {
+    status = { type: "error", message: resolveErrorMessage(error) };
+  }
+}
+
+const organizationListing = await auth.organizationApi.list({
+  headers: request.headers,
+});
+const organizationsSource = Array.isArray(organizationListing)
+  ? organizationListing
+  : Array.isArray(
+        (organizationListing as { organizations?: OrganizationRecord[] })
+          ?.organizations,
+      )
+    ? (organizationListing as { organizations: OrganizationRecord[] })
+        .organizations
+    : [];
+const organizations = organizationsSource as OrganizationRecord[];
+
+let activeOrganization: any = null;
+try {
+  activeOrganization = await auth.organizationApi.getFull({
+    headers: request.headers,
+  });
+} catch {
+  activeOrganization = null;
+}
+
+let memberRole: string | null = null;
+
+let members: OrganizationMember[] = [];
+try {
+  const memberResult = await auth.organizationApi.listMembers({
+    headers: request.headers,
+  });
+  const memberSource = Array.isArray(memberResult)
+    ? memberResult
+    : Array.isArray(
+          (memberResult as { members?: OrganizationMember[] })?.members,
+        )
+      ? (memberResult as { members: OrganizationMember[] }).members
+      : [];
+  members = memberSource as OrganizationMember[];
+} catch {
+  members = [];
+}
+
+memberRole =
+  members.find(
+    (member) => member.userId === (user as { id?: string | null })?.id,
+  )?.role ?? null;
+const canManageOrganization = memberRole === "owner" || memberRole === "admin";
+const isOwner = memberRole === "owner";
+
+const activeOrganizationId = (session as any)?.activeOrganizationId ?? null;
+const hasOrganizations = organizations.length > 0;
+const hasActiveOrganization = Boolean(activeOrganizationId);
+
+let invitationCount = 0;
+try {
+  const invitationResult = await auth.organizationApi.listUserInvitations({
+    headers: request.headers,
+  });
+  const invitationSource = Array.isArray(invitationResult)
+    ? invitationResult
+    : Array.isArray(
+          (invitationResult as { invitations?: InvitationRecord[] })
+            ?.invitations,
+        )
+      ? (invitationResult as { invitations: InvitationRecord[] }).invitations
+      : [];
+  invitationCount = invitationSource.length;
+} catch {
+  invitationCount = 0;
+}
+---
+
+<BaseLayout lang="fr" title={pageTitle}>
+  <header>
+    <a href="#maincontent" class="sr-only focus:not-sr-only"
+      >Aller au contenu principal</a
+    >
+  </header>
+  <main
+    id="maincontent"
+    class="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 py-12"
+    tabindex="-1"
+  >
+    <header class="space-y-2">
+      <p class="text-sm uppercase tracking-wide text-slate-500">
+        {translations.auth.profile ?? "Mon profil"}
+      </p>
+      <h1 class="text-3xl font-bold text-slate-900">{pageTitle}</h1>
+      <p class="text-slate-600">
+        {
+          translations.auth.updateProfile ??
+            "Gérez vos informations personnelles et suivez vos connexions."
+        }
+      </p>
+    </header>
+
+    {
+      status && (
+        <Alert
+          status={status.type === "success" ? "success" : "error"}
+          variant="modern"
+          message={status.message}
+          className="mb-4"
+          dismissible
+        />
+      )
+    }
+
+    <div class="rounded-2xl border border-slate-200 bg-white/80 p-6 shadow-sm">
+      <dl
+        class="grid gap-6 md:grid-cols-2"
+        aria-label="{translations.auth.profileDetails ?? 'Détails du profil'}"
+      >
+        <div>
+          <dt
+            id="profile-name-label"
+            class="text-sm font-medium text-slate-500"
+          >
+            {translations.auth.nameLabel ?? "Nom complet"}
+          </dt>
+          <dd
+            class="text-lg font-semibold text-slate-900"
+            aria-labelledby="profile-name-label"
+          >
+            {user.name ?? "Utilisateur"}
+          </dd>
+        </div>
+        <div>
+          <dt
+            id="profile-email-label"
+            class="text-sm font-medium text-slate-500"
+          >
+            {translations.auth.email ?? "Adresse e-mail"}
+          </dt>
+          <dd
+            class="text-lg font-semibold text-slate-900"
+            aria-labelledby="profile-email-label"
+          >
+            {user.email}
+          </dd>
+        </div>
+        <div>
+          <dt
+            id="profile-role-label"
+            class="text-sm font-medium text-slate-500"
+          >
+            {translations.auth.admin ?? "Rôle"}
+          </dt>
+          <dd
+            class="text-lg font-semibold text-slate-900"
+            aria-labelledby="profile-role-label"
+          >
+            {memberRole ?? "Utilisateur"}
+          </dd>
+        </div>
+        <div>
+          <dt id="profile-org-label" class="text-sm font-medium text-slate-500">
+            {translations.auth.organization ?? "Organisation active"}
+          </dt>
+          <dd
+            class="text-lg font-semibold text-slate-900"
+            aria-labelledby="profile-org-label"
+          >
+            {
+              organizations.length === 0 ? (
+                <Dialog id="dialog-create-org">
+                  <DialogTrigger for="dialog-create-org">
+                    <Button variant="modern" color="primary">
+                      Créer une organisation
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Créer une organisation</DialogTitle>
+                    </DialogHeader>
+                    <form method="POST" class="mt-3 space-y-3">
+                      <input
+                        type="hidden"
+                        name="intent"
+                        value="create-organization"
+                      />
+                      <FormGroup>
+                        <Label htmlFor="org-create-name" required>
+                          Nom
+                        </Label>
+                        <Input
+                          id="org-create-name"
+                          name="name"
+                          required
+                          placeholder="Ex: Studio Montréal"
+                        />
+                      </FormGroup>
+                      <FormGroup>
+                        <Label htmlFor="org-create-slug">
+                          Slug (optionnel)
+                        </Label>
+                        <Input
+                          id="org-create-slug"
+                          name="slug"
+                          placeholder="studio-montreal"
+                        />
+                      </FormGroup>
+                      <DialogFooter>
+                        <Button type="submit" variant="modern" color="primary">
+                          Créer
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              ) : (
+                <>
+                  <span class="text-slate-900">
+                    {activeOrganization?.organization?.name ??
+                      activeOrganization?.name ??
+                      activeOrganizationId}
+                  </span>
+                  <Dialog id="dialog-create-org2">
+                    <DialogTrigger for="dialog-create-org2">
+                      <Button variant="modern" color="primary" class="ml-4">
+                        Créer une organisation
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Créer une organisation</DialogTitle>
+                      </DialogHeader>
+                      <form method="POST" class="mt-3 space-y-3">
+                        <input
+                          type="hidden"
+                          name="intent"
+                          value="create-organization"
+                        />
+                        <FormGroup>
+                          <Label htmlFor="org-create2-name" required>
+                            Nom
+                          </Label>
+                          <Input
+                            id="org-create2-name"
+                            name="name"
+                            required
+                            placeholder="Ex: Studio Montréal"
+                          />
+                        </FormGroup>
+                        <FormGroup>
+                          <Label htmlFor="org-create2-slug">
+                            Slug (optionnel)
+                          </Label>
+                          <Input
+                            id="org-create2-slug"
+                            name="slug"
+                            placeholder="studio-montreal"
+                          />
+                        </FormGroup>
+                        <DialogFooter>
+                          <Button
+                            type="submit"
+                            variant="modern"
+                            color="primary"
+                          >
+                            Créer
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )
+            }
+          </dd>
+        </div>
+        <div>
+          <dt id="profile-inv-label" class="text-sm font-medium text-slate-500">
+            {translations.auth.invitation ?? "Invitations"}
+          </dt>
+          <dd
+            class="text-lg font-semibold text-slate-900"
+            aria-labelledby="profile-inv-label"
+          >
+            <a
+              class="text-slate-900 underline decoration-slate-300 underline-offset-2 hover:decoration-slate-600"
+              href="/fr/invitations"
+            >
+              {invitationCount > 0 ? `${invitationCount} en attente` : "Aucune"}
+            </a>
+          </dd>
+        </div>
+        <div>
+          <dt
+            id="profile-last-label"
+            class="text-sm font-medium text-slate-500"
+          >
+            {translations.auth.lastActivity ?? "Dernière activité"}
+          </dt>
+          <dd
+            class="text-lg font-semibold text-slate-900"
+            aria-labelledby="profile-last-label"
+          >
+            {lastSignIn ?? translations.auth.lastActivity ?? "Non disponible"}
+          </dd>
+        </div>
+        <div>
+          <dt
+            id="profile-orgs-label"
+            class="text-sm font-medium text-slate-500"
+          >
+            {translations.auth.organizations ?? "Organisations"}
+          </dt>
+          <dd aria-labelledby="profile-orgs-label">
+            {
+              organizations.length === 0 ? (
+                <span class="text-slate-700">Aucune organisation</span>
+              ) : (
+                <>
+                  <ul class="space-y-2">
+                    {organizations.map((org) => (
+                      <li class="flex items-center gap-2">
+                        <span class="font-semibold text-slate-900">
+                          {org.name ?? org.slug ?? org.id}
+                        </span>
+                        <span class="text-xs text-slate-500">
+                          ({org.role ?? "—"})
+                        </span>
+                        {(session as any)?.activeOrganizationId === org.id ? (
+                          <span class="ml-2 rounded bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
+                            Active
+                          </span>
+                        ) : (
+                          <form method="POST" class="inline">
+                            <input
+                              type="hidden"
+                              name="intent"
+                              value="set-active-organization"
+                            />
+                            <input
+                              type="hidden"
+                              name="organizationId"
+                              value={org.id}
+                            />
+                            <Button
+                              type="submit"
+                              size="sm"
+                              variant="modern"
+                              color="secondary"
+                            >
+                              Activer
+                            </Button>
+                          </form>
+                        )}
+                        <Dialog id={`dialog-org-${org.id}`}>
+                          <DialogTrigger for={`dialog-org-${org.id}`}>
+                            <Button
+                              size="sm"
+                              variant="modern"
+                              color="secondary"
+                            >
+                              Gérer
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Gérer l'organisation</DialogTitle>
+                            </DialogHeader>
+                            {/* CRUD update org */}
+                            <form method="POST" class="mt-3 space-y-3">
+                              <input
+                                type="hidden"
+                                name="intent"
+                                value="update-active-organization"
+                              />
+                              <input
+                                type="hidden"
+                                name="organizationId"
+                                value={org.id}
+                              />
+                              <FormGroup>
+                                <Label
+                                  htmlFor={`org-update-name-${org.id}`}
+                                  required
+                                >
+                                  Nouveau nom
+                                </Label>
+                                <Input
+                                  id={`org-update-name-${org.id}`}
+                                  name="name"
+                                  required
+                                  placeholder="Nom"
+                                />
+                              </FormGroup>
+                              <FormGroup>
+                                <Label htmlFor={`org-update-slug-${org.id}`}>
+                                  Nouveau slug
+                                </Label>
+                                <Input
+                                  id={`org-update-slug-${org.id}`}
+                                  name="slug"
+                                  placeholder="slug"
+                                />
+                              </FormGroup>
+                              <FormGroup>
+                                <Label htmlFor={`org-update-logo-${org.id}`}>
+                                  Logo (URL)
+                                </Label>
+                                <Input
+                                  id={`org-update-logo-${org.id}`}
+                                  name="logo"
+                                  placeholder="https://..."
+                                />
+                              </FormGroup>
+                              <DialogFooter>
+                                <Button
+                                  type="submit"
+                                  variant="modern"
+                                  color="primary"
+                                >
+                                  Mettre à jour
+                                </Button>
+                              </DialogFooter>
+                            </form>
+                            {/* INVITER UN MEMBRE */}
+                            <form method="POST" class="mt-6 space-y-3">
+                              <input
+                                type="hidden"
+                                name="intent"
+                                value="invite-member"
+                              />
+                              <input
+                                type="hidden"
+                                name="organizationId"
+                                value={org.id}
+                              />
+                              <FormGroup>
+                                <Label
+                                  htmlFor={`org-invite-email-${org.id}`}
+                                  required
+                                >
+                                  {translations.auth.email ?? "Email"}
+                                </Label>
+                                <Input
+                                  id={`org-invite-email-${org.id}`}
+                                  type="email"
+                                  name="email"
+                                  required
+                                  placeholder="membre@exemple.com"
+                                />
+                              </FormGroup>
+                              <FormGroup>
+                                <Label htmlFor={`org-invite-role-${org.id}`}>
+                                  {translations.auth.admin ?? "Rôle"}
+                                </Label>
+                                <Select
+                                  id={`org-invite-role-${org.id}`}
+                                  name="role"
+                                  className="rounded border border-slate-300 px-2 py-1 text-sm"
+                                >
+                                  <option value="member">Membre</option>
+                                  <option value="admin">Admin</option>
+                                  <option value="owner">Owner</option>
+                                </Select>
+                              </FormGroup>
+                              <FormGroup>
+                                <Checkbox
+                                  id={`org-invite-resend-${org.id}`}
+                                  name="resend"
+                                >
+                                  {translations.auth.resendInvite ??
+                                    "Renvoyer si déjà invité"}
+                                </Checkbox>
+                              </FormGroup>
+                              <DialogFooter>
+                                <Button
+                                  type="submit"
+                                  variant="modern"
+                                  color="primary"
+                                >
+                                  Inviter
+                                </Button>
+                              </DialogFooter>
+                            </form>
+                            {/* MEMBRES */}
+                            <div class="mt-6">
+                              <h4 class="text-base font-semibold text-slate-900 mb-2">
+                                Membres
+                              </h4>
+                              {members.filter(
+                                (m) => m.organizationId === org.id,
+                              ).length === 0 ? (
+                                <p class="text-sm text-slate-600">
+                                  Aucun membre à afficher.
+                                </p>
+                              ) : (
+                                <ul class="space-y-2">
+                                  {members
+                                    .filter((m) => m.organizationId === org.id)
+                                    .map((member) => (
+                                      <li class="flex items-center gap-2">
+                                        <span class="font-semibold text-slate-900">
+                                          {member.user?.name ??
+                                            member.user?.email ??
+                                            member.email ??
+                                            member.userId}
+                                        </span>
+                                        <span class="text-xs text-slate-500">
+                                          {member.role}
+                                        </span>
+                                        <form
+                                          method="POST"
+                                          class="flex items-center gap-2"
+                                        >
+                                          <input
+                                            type="hidden"
+                                            name="intent"
+                                            value="update-member-role"
+                                          />
+                                          <input
+                                            type="hidden"
+                                            name="memberId"
+                                            value={member.id}
+                                          />
+                                          <input
+                                            type="hidden"
+                                            name="organizationId"
+                                            value={org.id}
+                                          />
+                                          <Select
+                                            id={`member-edit-role-inline-${member.id}`}
+                                            name="role"
+                                            className="rounded border border-slate-300 px-2 py-1 text-sm"
+                                            value={member.role}
+                                          >
+                                            <option value="member">
+                                              Membre
+                                            </option>
+                                            <option value="admin">Admin</option>
+                                            <option value="owner">Owner</option>
+                                          </Select>
+                                          <Button
+                                            type="submit"
+                                            size="sm"
+                                            variant="modern"
+                                            color="primary"
+                                          >
+                                            Appliquer
+                                          </Button>
+                                        </form>
+                                        <form method="POST">
+                                          <input
+                                            type="hidden"
+                                            name="intent"
+                                            value="remove-member"
+                                          />
+                                          <input
+                                            type="hidden"
+                                            name="memberId"
+                                            value={member.id}
+                                          />
+                                          <input
+                                            type="hidden"
+                                            name="organizationId"
+                                            value={org.id}
+                                          />
+                                          <Button
+                                            type="submit"
+                                            size="sm"
+                                            variant="modern"
+                                            color="error"
+                                          >
+                                            Retirer
+                                          </Button>
+                                        </form>
+                                      </li>
+                                    ))}
+                                </ul>
+                              )}
+                            </div>
+                            {/* QUITTER ORG */}
+                            <form method="POST" class="mt-6">
+                              <input
+                                type="hidden"
+                                name="intent"
+                                value="leave-organization"
+                              />
+                              <input
+                                type="hidden"
+                                name="organizationId"
+                                value={org.id}
+                              />
+                              <DialogFooter>
+                                <Button
+                                  type="submit"
+                                  variant="modern"
+                                  color="secondary"
+                                >
+                                  Quitter l'organisation
+                                </Button>
+                              </DialogFooter>
+                            </form>
+                            {/* SUPPRIMER ORG */}
+                            <form method="POST" class="mt-6 space-y-3">
+                              <input
+                                type="hidden"
+                                name="intent"
+                                value="delete-organization"
+                              />
+                              <input
+                                type="hidden"
+                                name="organizationId"
+                                value={org.id}
+                              />
+                              <Label htmlFor={`org-delete-confirm-${org.id}`}>
+                                Tapez SUPPRIMER pour confirmer
+                              </Label>
+                              <Input
+                                id={`org-delete-confirm-${org.id}`}
+                                name="confirm"
+                                placeholder="SUPPRIMER"
+                              />
+                              <DialogFooter>
+                                <Button
+                                  type="submit"
+                                  variant="modern"
+                                  color="error"
+                                >
+                                  Supprimer
+                                </Button>
+                              </DialogFooter>
+                            </form>
+                          </DialogContent>
+                        </Dialog>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )
+            }
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <section
+      class="grid gap-6"
+      aria-label="{translations.auth.organizationSection ?? 'Section organisation'}"
+    >
+      {
+        hasActiveOrganization && (
+          <dialog
+            class="w-full max-w-3xl rounded-2xl border border-slate-200 bg-white p-0 shadow-sm backdrop:bg-black/40"
+            data-org-dialog
+            aria-modal="true"
+            aria-label="{translations.auth.organizationDialog ?? 'Organisation'}"
+          >
+            <div class="p-6">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <p class="text-sm uppercase tracking-wide text-slate-500">
+                    Organisation
+                  </p>
+                  <h2 class="text-xl font-semibold text-slate-900">
+                    {activeOrganization?.organization?.name ??
+                      activeOrganization?.name ??
+                      activeOrganizationId}
+                  </h2>
+                  <p class="mt-1 text-sm text-slate-600">
+                    Membres, invitations, mise à jour et suppression.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="modern"
+                  color="secondary"
+                  data-close-org-dialog
+                >
+                  Fermer
+                </Button>
+              </div>
+
+              <div class="mt-6 grid gap-6 lg:grid-cols-2">
+                <div class="rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 class="text-base font-semibold text-slate-900">
+                    Mettre à jour
+                  </h3>
+                  <form method="POST" class="mt-3 space-y-3">
+                    <input
+                      type="hidden"
+                      name="intent"
+                      value="update-active-organization"
+                    />
+                    <Label htmlFor="org-update-main-name">Nouveau nom</Label>
+                    <Input
+                      id="org-update-main-name"
+                      name="name"
+                      placeholder="Nom"
+                    />
+                    <Label htmlFor="org-update-main-slug">Nouveau slug</Label>
+                    <Input
+                      id="org-update-main-slug"
+                      name="slug"
+                      placeholder="slug"
+                    />
+                    <Label htmlFor="org-update-main-logo">Logo (URL)</Label>
+                    <Input
+                      id="org-update-main-logo"
+                      name="logo"
+                      placeholder="https://..."
+                    />
+                    <Button
+                      type="submit"
+                      variant="modern"
+                      color="primary"
+                      disabled={!canManageOrganization}
+                    >
+                      Mettre à jour
+                    </Button>
+                  </form>
+                </div>
+
+                {/* INVITATION MEMBRE */}
+                <div class="rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 class="text-base font-semibold text-slate-900">
+                    Inviter un membre
+                  </h3>
+                  <Dialog id="dialog-invite-main">
+                    <DialogTrigger for="dialog-invite-main">
+                      <Button variant="modern" color="secondary">
+                        Inviter un membre
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Inviter un membre</DialogTitle>
+                      </DialogHeader>
+                      <form method="POST" class="mt-3 space-y-3">
+                        <input
+                          type="hidden"
+                          name="intent"
+                          value="invite-member"
+                        />
+                        <Label htmlFor="org-invite-main2-email">
+                          {translations.auth.email ?? "Email"}
+                        </Label>
+                        <Input
+                          id="org-invite-main2-email"
+                          type="email"
+                          name="email"
+                          required
+                          placeholder="membre@exemple.com"
+                        />
+                        <Label htmlFor="org-invite-main2-role">
+                          {translations.auth.admin ?? "Rôle"}
+                        </Label>
+                        <Select
+                          id="org-invite-main2-role"
+                          name="role"
+                          className="rounded border border-slate-300 px-2 py-1 text-sm"
+                        >
+                          <option value="member">Membre</option>
+                          <option value="admin">Admin</option>
+                          <option value="owner">Owner</option>
+                        </Select>
+                        <Checkbox id="org-invite-main2-resend" name="resend">
+                          {translations.auth.resendInvite ??
+                            "Renvoyer si déjà invité"}
+                        </Checkbox>
+                        <DialogFooter>
+                          <Button
+                            type="submit"
+                            variant="modern"
+                            color="primary"
+                            disabled={!canManageOrganization}
+                          >
+                            Inviter
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+
+              <div class="mt-6 rounded-xl border border-slate-200 bg-white p-4">
+                <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <h3 class="text-base font-semibold text-slate-900">
+                    Membres
+                  </h3>
+                  {activeOrganizationId && (
+                    <form method="POST">
+                      <input
+                        type="hidden"
+                        name="intent"
+                        value="leave-organization"
+                      />
+                      <input
+                        type="hidden"
+                        name="organizationId"
+                        value={activeOrganizationId}
+                      />
+                      <Button type="submit" variant="modern" color="secondary">
+                        Quitter l'organisation
+                      </Button>
+                    </form>
+                  )}
+                </div>
+
+                {members.length === 0 ? (
+                  <p class="mt-3 text-sm text-slate-600">
+                    Aucun membre à afficher.
+                  </p>
+                ) : (
+                  <ul class="mt-3 space-y-2">
+                    {members.map((member) => (
+                      <li class="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <p class="font-semibold text-slate-900">
+                            {member.user?.name ??
+                              member.user?.email ??
+                              member.email ??
+                              member.userId}
+                          </p>
+                          <p class="text-xs text-slate-500">{member.role}</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                          {/* MODIFIER ROLE MEMBRE */}
+                          <Dialog id={`dialog-member-edit-${member.id}`}>
+                            <DialogTrigger
+                              for={`dialog-member-edit-${member.id}`}
+                            >
+                              <Button variant="modern" color="secondary">
+                                Modifier rôle
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>
+                                  Modifier le rôle du membre
+                                </DialogTitle>
+                              </DialogHeader>
+                              <form
+                                method="POST"
+                                class="flex items-center gap-2"
+                              >
+                                <input
+                                  type="hidden"
+                                  name="intent"
+                                  value="update-member-role"
+                                />
+                                <input
+                                  type="hidden"
+                                  name="memberId"
+                                  value={member.id}
+                                />
+                                <Label
+                                  htmlFor={`member-edit-role-${member.id}`}
+                                >
+                                  {translations.auth.admin ?? "Rôle"}
+                                </Label>
+                                <Select
+                                  id={`member-edit-role-${member.id}`}
+                                  name="role"
+                                  value={member.role}
+                                  disabled={!canManageOrganization}
+                                  className="rounded border border-slate-300 px-2 py-1 text-sm"
+                                >
+                                  <option value="member">Membre</option>
+                                  <option value="admin">Admin</option>
+                                  <option value="owner">Owner</option>
+                                </Select>
+                                <DialogFooter>
+                                  <Button
+                                    type="submit"
+                                    variant="modern"
+                                    color="primary"
+                                    disabled={!canManageOrganization}
+                                  >
+                                    Appliquer
+                                  </Button>
+                                </DialogFooter>
+                              </form>
+                            </DialogContent>
+                          </Dialog>
+
+                          {/* SUPPRIMER MEMBRE */}
+                          <Dialog id={`dialog-member-remove-${member.id}`}>
+                            <DialogTrigger
+                              for={`dialog-member-remove-${member.id}`}
+                            >
+                              <Button variant="modern" color="error">
+                                Retirer
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Retirer le membre</DialogTitle>
+                              </DialogHeader>
+                              <form method="POST">
+                                <input
+                                  type="hidden"
+                                  name="intent"
+                                  value="remove-member"
+                                />
+                                <input
+                                  type="hidden"
+                                  name="memberId"
+                                  value={member.id}
+                                />
+                                <DialogFooter>
+                                  <Button
+                                    type="submit"
+                                    variant="modern"
+                                    color="error"
+                                    disabled={!canManageOrganization}
+                                  >
+                                    Confirmer le retrait
+                                  </Button>
+                                </DialogFooter>
+                              </form>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {/* SUPPRESSION ORG */}
+              <div class="mt-6 rounded-xl border border-slate-200 bg-white p-4">
+                <h3 class="text-base font-semibold text-slate-900">
+                  {translations.auth.deleteOrganization ??
+                    "Supprimer l'organisation"}
+                </h3>
+                <p class="mt-1 text-sm text-slate-600">
+                  {translations.auth.deleteOrganizationHint ??
+                    "Disponible uniquement si vous êtes owner."}
+                </p>
+                <Dialog id="dialog-delete-org">
+                  <DialogTrigger for="dialog-delete-org">
+                    <Button variant="modern" color="error">
+                      Supprimer l'organisation
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>
+                        {translations.auth.deleteOrganization ??
+                          "Supprimer l'organisation"}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <form method="POST" class="mt-3 space-y-3">
+                      <input
+                        type="hidden"
+                        name="intent"
+                        value="delete-organization"
+                      />
+                      <input
+                        type="hidden"
+                        name="organizationId"
+                        value={activeOrganizationId ?? ""}
+                      />
+                      <Label htmlFor="org-delete-main-confirm">
+                        {translations.auth.confirmDeleteLabel ??
+                          "Tapez SUPPRIMER pour confirmer"}
+                      </Label>
+                      <Input
+                        id="org-delete-main-confirm"
+                        name="confirm"
+                        placeholder={
+                          translations.auth.confirmDeletePlaceholder ??
+                          "SUPPRIMER"
+                        }
+                      />
+                      <DialogFooter>
+                        <Button
+                          type="submit"
+                          variant="modern"
+                          color="error"
+                          disabled={!isOwner}
+                        >
+                          {translations.auth.deleteOrganization ?? "Supprimer"}
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
+          </dialog>
+        )
+      }
+    </section>
+  </main>
+</BaseLayout>

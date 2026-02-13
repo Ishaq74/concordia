@@ -1,0 +1,343 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import ProgressBar from "@components/ui/ProgressBar.astro";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+---
+
+<DocLayout 
+  title="ProgressBar Component" 
+  description="Progress bar with variants and colors" 
+  variant="initial"
+>
+  <h1 id="progressbar-component">ProgressBar Component</h1>
+
+  <p>
+     The <code class="inline-code">ProgressBar</code> component displays a progress bar
+     with support for design variants, colors, sizes, and visual effects like stripes and animations.
+  </p>
+
+  <TableOfContents
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "Props", href: "#props" },
+      { label: "Basic usage", href: "#basic" },
+      { label: "Variants", href: "#variants" },
+      { label: "Colors", href: "#colors" },
+      { label: "Sizes", href: "#sizes" },
+      { label: "With labels", href: "#labels" },
+      { label: "Stripes and animations", href: "#striped" },
+      { label: "Accessibility", href: "#accessibility" },
+    ]}
+    title="Table of contents"
+  />
+    <h2 id="installation">Installation</h2>
+
+    <Code
+      lang="astro"
+      code={`import ProgressBar from '@components/ui/ProgressBar.astro';`}
+    />
+  <h2 id="installation">Installation</h2>
+
+  <Code
+    lang="astro"
+    code={`import ProgressBar from '@components/ui/ProgressBar.astro';`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <Table variant="initial">
+    <TableHeader>
+      <TableRow>
+        <TableHead>Prop</TableHead>
+        <TableHead>Type</TableHead>
+        <TableHead>Default</TableHead>
+        <TableHead>Description</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow>
+        <TableCell><code class="inline-code">variant</code></TableCell>
+        <TableCell><code class="inline-code">"initial" | "retro" | "modern" | "futuristic"</code></TableCell>
+        <TableCell><code class="inline-code">"initial"</code></TableCell>
+          <TableCell>The visual style of the progress bar</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">color</code></TableCell>
+        <TableCell><code class="inline-code">"default" | "primary" | "secondary" | "accent"</code></TableCell>
+        <TableCell><code class="inline-code">"default"</code></TableCell>
+          <TableCell>The color of the progress bar</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">value</code></TableCell>
+        <TableCell><code class="inline-code">number</code></TableCell>
+        <TableCell><em>Requis</em></TableCell>
+          <TableCell>The current progress value</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">max</code></TableCell>
+        <TableCell><code class="inline-code">number</code></TableCell>
+        <TableCell><code class="inline-code">100</code></TableCell>
+          <TableCell>The maximum value</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">size</code></TableCell>
+        <TableCell><code class="inline-code">"sm" | "md" | "lg"</code></TableCell>
+        <TableCell><code class="inline-code">"md"</code></TableCell>
+          <TableCell>The height of the bar</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">showLabel</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">false</code></TableCell>
+          <TableCell>Show percentage</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">label</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><code class="inline-code">undefined</code></TableCell>
+          <TableCell>Custom label to display</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">striped</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">false</code></TableCell>
+          <TableCell>Show diagonal stripes</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">animated</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">false</code></TableCell>
+          <TableCell>Animate stripes (requires striped)</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">className</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><code class="inline-code">""</code></TableCell>
+          <TableCell>Additional CSS classes</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">ariaLabel</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><code class="inline-code">undefined</code></TableCell>
+          <TableCell>Custom accessibility label</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <h2 id="basic">Basic usage</h2>
+
+  <div class="demo-section">
+    <ProgressBar value={30} />
+    <ProgressBar value={60} />
+    <ProgressBar value={100} />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar value={30} />
+<ProgressBar value={60} />
+<ProgressBar value={100} />`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <h3>Initial</h3>
+  <div class="demo-section">
+    <ProgressBar variant="initial" value={65} />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar variant="initial" value={65} />`}
+  />
+
+  <h3>Retro</h3>
+  <div class="demo-section">
+    <ProgressBar variant="retro" value={65} />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar variant="retro" value={65} />`}
+  />
+
+  <h3>Modern</h3>
+  <div class="demo-section">
+    <ProgressBar variant="modern" value={65} />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar variant="modern" value={65} />`}
+  />
+
+  <h3>Futuristic</h3>
+  <div class="demo-section">
+    <ProgressBar variant="futuristic" value={65} />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar variant="futuristic" value={65} />`}
+  />
+
+  <h2 id="colors">Colors</h2>
+
+  <div class="demo-section">
+    <ProgressBar color="default" value={50} />
+    <ProgressBar color="primary" value={50} />
+    <ProgressBar color="secondary" value={50} />
+    <ProgressBar color="accent" value={50} />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar color="default" value={50} />
+<ProgressBar color="primary" value={50} />
+<ProgressBar color="secondary" value={50} />
+<ProgressBar color="accent" value={50} />`}
+  />
+
+  <h2 id="sizes">Sizes</h2>
+
+  <div class="demo-section">
+    <ProgressBar size="sm" value={60} />
+    <ProgressBar size="md" value={60} />
+    <ProgressBar size="lg" value={60} />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar size="sm" value={60} />
+<ProgressBar size="md" value={60} />
+<ProgressBar size="lg" value={60} />`}
+  />
+
+  <h2 id="labels">With labels</h2>
+
+  <h3>Automatic percentage</h3>
+  <div class="demo-section">
+    <ProgressBar value={75} showLabel />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar value={75} showLabel />`}
+  />
+
+  <h3>Custom label</h3>
+  <div class="demo-section">
+    <ProgressBar value={45} label="45 of 100 files" />
+    <ProgressBar value={3} max={10} label="3 / 10 steps" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar value={45} label="45 sur 100 fichiers" />
+<ProgressBar value={3} max={10} label="3 / 10 étapes" />`}
+  />
+
+  <h2 id="striped">Stripes and animations</h2>
+
+  <h3>With stripes</h3>
+  <div class="demo-section">
+    <ProgressBar value={70} striped />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar value={70} striped />`}
+  />
+
+  <h3>Animated stripes</h3>
+  <div class="demo-section">
+    <ProgressBar value={70} striped animated />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar value={70} striped animated />`}
+  />
+
+  <h3>Combinations</h3>
+  <div class="demo-section">
+    <ProgressBar 
+      variant="modern" 
+      color="primary" 
+      value={80} 
+      striped 
+      animated 
+      showLabel 
+    />
+    <ProgressBar 
+      variant="futuristic" 
+      color="accent" 
+      value={60} 
+      size="lg"
+      striped 
+      animated 
+      label="Downloading..."
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar 
+  variant="modern" 
+  color="primary" 
+  value={80} 
+  striped 
+  animated 
+  showLabel 
+/>
+<ProgressBar 
+  variant="futuristic" 
+  color="accent" 
+  value={60} 
+  size="lg"
+  striped 
+  animated 
+  label="Téléchargement en cours..."
+/>`}
+  />
+
+  <h2 id="accessibility">Accessibility</h2>
+
+  <p>
+    The <code class="inline-code">ProgressBar</code> component uses the ARIA role
+    <code class="inline-code">progressbar</code> and includes the required attributes:
+  </p>
+
+  <ul>
+    <li>
+      <code class="inline-code">role="progressbar"</code>: indicates a progress bar
+    </li>
+    <li>
+      <code class="inline-code">aria-valuenow</code>: the current value
+    </li>
+    <li>
+      <code class="inline-code">aria-valuemin</code>: the minimum value (0)
+    </li>
+    <li>
+      <code class="inline-code">aria-valuemax</code>: the maximum value
+    </li>
+    <li>
+      <code class="inline-code">aria-label</code>: textual description of the progress
+    </li>
+  </ul>
+
+  <Code
+    lang="astro"
+    code={`<ProgressBar 
+  value={75} 
+  ariaLabel="File download: 75% complete"
+/>`}
+  />
+</DocLayout>

@@ -1,0 +1,68 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  tag?: 'a' | 'button';
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  style?: 'link' | 'button';
+  color?: 'default' | 'primary' | 'secondary' | 'accent';
+  external?: boolean;
+  ariaLabel?: string;
+  text?: string;
+  icon?: {
+    name: string;
+    side?: 'left' | 'right';
+  };
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  tag = 'a',
+  href,
+  type = 'button',
+  variant = 'initial',
+  style = 'link',
+  color = 'default',
+  external = false,
+  ariaLabel,
+  text,
+  icon,
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+const Tag = tag;
+
+// Classes CSS basées sur le style et le variant
+const linkClass = style === 'button' ? 'button' : 'link';
+const variantClass = variant !== 'initial' ? variant : '';
+const colorClass = color !== 'default' ? color : '';
+
+const classes = [
+  linkClass,
+  variantClass && (style === 'button' ? variantClass : `link-${variantClass}`),
+  colorClass,
+  className,
+].filter(Boolean).join(' ');
+
+// Attributs pour liens externes
+const target = external ? '_blank' : undefined;
+const rel = external ? 'noopener noreferrer' : undefined;
+---
+
+<Tag
+  class={classes}
+  href={tag === 'a' ? href : undefined}
+  type={tag === 'button' ? type : undefined}
+  target={target}
+  rel={rel}
+  aria-label={ariaLabel}
+  {...htmlAttributes}
+>
+  {icon?.side === 'left' && <Icon name={icon.name} />}
+  {text ? text : <slot />}
+  {icon?.side === 'right' && <Icon name={icon.name} />}
+</Tag>

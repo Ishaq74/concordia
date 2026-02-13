@@ -1,0 +1,49 @@
+---
+interface Props {
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  src?: string;
+  alt?: string;
+  fallback?: string;
+  size?: "sm" | "md" | "lg" | "xl";
+  className?: string;
+}
+
+const {
+  variant = "initial",
+  src,
+  alt = "Avatar",
+  fallback,
+  size = "md",
+  className = "",
+} = Astro.props;
+
+const classes = [
+  "avatar",
+  variant !== "initial" && variant,
+  size !== "md" && `avatar-${size}`,
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+
+// Générer les initiales du fallback si c'est un nom complet
+const getInitials = (text: string | undefined): string => {
+  if (!text) return "?";
+  return text
+    .split(" ")
+    .map(word => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+};
+
+const displayFallback = fallback ? getInitials(fallback) : undefined;
+---
+
+<div class={classes}>
+  {src ? (
+    <img src={src} alt={alt} />
+  ) : (
+    displayFallback || "?"
+  )}
+</div>

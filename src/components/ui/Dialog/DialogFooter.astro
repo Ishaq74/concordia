@@ -1,0 +1,13 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const footerClass = ["dialog-footer", className].filter(Boolean).join(" ");
+---
+
+<div class={footerClass}>
+  <slot />
+</div>

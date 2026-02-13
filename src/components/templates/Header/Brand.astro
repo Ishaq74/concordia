@@ -1,0 +1,26 @@
+---
+interface Props {
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  siteName?: string;
+  logoUrl?: string;
+  class?: string;
+}
+
+const {
+  variant = 'initial',
+  siteName = 'Mon Site',
+  logoUrl,
+  class: className = '',
+} = Astro.props;
+
+const brandClass = [
+  'brand',
+  variant !== 'initial' && variant,
+  className
+].filter(Boolean).join(' ');
+---
+
+<a href="/" class={brandClass}>
+  {logoUrl && <img src={logoUrl} alt={siteName} class="brand-logo" />}
+  <span class="brand-name">{siteName}</span>
+</a>

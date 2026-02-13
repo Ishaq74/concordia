@@ -1,0 +1,21 @@
+---
+interface Props {
+  asChild?: boolean;
+  for: string;
+  class?: string;
+}
+
+const { asChild = false, for: dialogFor, class: className } = Astro.props;
+
+const triggerClass = ["dialog-trigger", className].filter(Boolean).join(" ");
+---
+
+{asChild ? (
+  <label for={dialogFor} class={className}>
+    <slot />
+  </label>
+) : (
+  <label for={dialogFor} class={triggerClass}>
+    <slot />
+  </label>
+)}

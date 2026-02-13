@@ -1,0 +1,17 @@
+---
+interface Props {
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+const classes = ['card-header', className].filter(Boolean).join(' ');
+---
+
+<header class={classes} {...htmlAttributes}>
+  <slot />
+</header>

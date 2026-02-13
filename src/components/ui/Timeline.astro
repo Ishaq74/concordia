@@ -1,0 +1,61 @@
+---
+interface TimelineEvent {
+  year?: string;
+  title: string;
+  description: string;
+  icon?: string;
+  date?: string;
+}
+
+interface Props {
+  events: TimelineEvent[];
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  orientation?: "vertical" | "horizontal" | "alternate";
+  iconShape?: "circle" | "square" | "diamond" | "hexagon";
+  class?: string;
+}
+
+const {
+  events,
+  variant = "initial",
+  orientation = "vertical",
+  iconShape = "circle",
+  class: className,
+} = Astro.props;
+
+const timelineClass = [
+  "timeline",
+  `timeline-${orientation}`,
+  variant !== "initial" && variant,
+  className,
+].filter(Boolean).join(" ");
+---
+
+<div class={timelineClass}>
+  {events.map((event, index) => (
+    <div 
+      class:list={[
+        "timeline-item",
+        { "timeline-item-last": index === events.length - 1 }
+      ]}
+      data-index={index}
+    >
+      <div class:list={["timeline-icon", `icon-${iconShape}`]}>
+        {event.icon ? (
+          <span class="icon-content">{event.icon}</span>
+        ) : (
+          <span class="icon-dot"></span>
+        )}
+      </div>
+      <div class="timeline-content">
+        {(event.year || event.date) && (
+          <span class="timeline-badge">
+            {event.year || event.date}
+          </span>
+        )}
+        <h3 class="timeline-title">{event.title}</h3>
+        <p class="timeline-description">{event.description}</p>
+      </div>
+    </div>
+  ))}
+</div>

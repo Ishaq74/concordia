@@ -1,0 +1,59 @@
+---
+interface Props {
+  id: string;
+  name?: string;
+  value?: string;
+  placeholder?: string;
+  required?: boolean;
+  disabled?: boolean;
+  readonly?: boolean;
+  rows?: number;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  error?: string;
+  className?: string;
+}
+
+const {
+  id,
+  name,
+  value,
+  placeholder,
+  required = false,
+  disabled = false,
+  readonly = false,
+  rows = 4,
+  variant = "initial",
+  error,
+  className = "",
+} = Astro.props;
+
+const variantClass = variant !== 'initial' ? variant : '';
+const textareaClasses = [
+  error && "input-error",
+  variantClass,
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<div class="input-wrapper">
+  <textarea
+    id={id}
+    name={name || id}
+    placeholder={placeholder}
+    required={required}
+    disabled={disabled}
+    readonly={readonly}
+    rows={rows}
+    aria-invalid={error ? "true" : undefined}
+    aria-describedby={error ? `${id}-error` : undefined}
+    class={textareaClasses}
+  >{value}</textarea>
+  
+  {error && (
+    <span class="input-error-message" id={`${id}-error`} role="alert">
+      {error}
+    </span>
+  )}
+</div>

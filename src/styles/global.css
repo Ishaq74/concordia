@@ -1,0 +1,9 @@
+/* Global CSS - Tous les styles (base + variants) */
+
+/* Import de base (inclut tokens + initial + styles de base) */
+@import './base.css';
+
+/* Variants supplémentaires */
+@import './components/retro.css';
+@import './components/modern.css';
+@import './components/futuristic.css';

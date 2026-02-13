@@ -1,0 +1,747 @@
+---
+/**
+ * Slider - Composant de carrousel horizontal responsive
+ * 
+ * @param {string} variant - Style variant (initial|retro|modern|futuristic)
+ * @param {string} color - Couleur (default|primary|secondary|accent)
+ * @param {string} gap - Espacement entre les items
+ * @param {string} itemMinWidth - Largeur minimale des items
+ * @param {boolean} showScrollbar - Afficher la scrollbar
+ * @param {boolean} autoScroll - Défilement automatique
+ * @param {number} scrollSpeed - Vitesse de défilement automatique (en secondes)
+ * @param {boolean} pauseOnHover - Pause au survol
+ * @param {boolean} showControls - Afficher les boutons de navigation
+ * @param {boolean} snapAlign - Activer le snap-scroll
+ * @param {string} className - Classes CSS supplémentaires
+ */
+
+interface Props {
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  color?: 'default' | 'primary' | 'secondary' | 'accent';
+  gap?: string;
+  itemMinWidth?: string;
+  showScrollbar?: boolean;
+  autoScroll?: boolean;
+  scrollSpeed?: number;
+  pauseOnHover?: boolean;
+  showControls?: boolean;
+  snapAlign?: boolean;
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  variant = 'initial',
+  color = 'default',
+  gap = '1rem',
+  itemMinWidth = '280px',
+  showScrollbar = false,
+  autoScroll = false,
+  scrollSpeed = 50,
+  pauseOnHover = true,
+  showControls = true,
+  snapAlign = true,
+  className = '',
+  ...htmlAttributes
+} = Astro.props;
+
+// Classes CSS basées sur le variant et la couleur
+const variantClass = variant !== 'initial' ? variant : '';
+const colorClass = color !== 'default' ? color : '';
+
+const classes = [
+  'slider-wrapper',
+  variantClass,
+  colorClass,
+  className,
+].filter(Boolean).join(' ');
+
+const sliderId = `slider-${Math.random().toString(36).substring(2, 11)}`;
+---
+
+<div
+  id={sliderId}
+  class={classes}
+  style={`
+    --slider-gap: ${gap};
+    --slider-item-min-width: ${itemMinWidth};
+    --slider-scroll-speed: ${scrollSpeed}s;
+  `}
+  data-auto-scroll={autoScroll}
+  data-pause-on-hover={pauseOnHover}
+  data-snap-align={snapAlign}
+  data-show-scrollbar={showScrollbar}
+  {...htmlAttributes}
+>
+  <div class="slider-container">
+    <ul class="slider-list">
+      <slot />
+    </ul>
+  </div>
+  
+  {showControls && (
+    <div class="slider-controls">
+      <button 
+        class="slider-button slider-button--prev" 
+        aria-label="Défiler vers la gauche"
+        type="button"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18L9 12L15 6"></path>
+        </svg>
+      </button>
+      <button 
+        class="slider-button slider-button--next" 
+        aria-label="Défiler vers la droite"
+        type="button"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18L15 12L9 6"></path>
+        </svg>
+      </button>
+    </div>
+  )}
+
+  <div class="slider-indicators" role="tablist" aria-label="Navigation du slider"></div>
+</div>
+
+<style>
+  /* Base Styles */
+  .slider-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: var(--spacing-4, 1rem);
+    border-radius: var(--radius-md, 0.5rem);
+    background: var(--bg-default);
+    transition: all 0.3s ease;
+  }
+
+  .slider-container {
+    position: relative;
+    overflow: hidden;
+    margin: 0 -0.25rem;
+  }
+
+  .slider-list {
+    display: flex;
+    overflow-x: auto;
+    gap: var(--slider-gap);
+    padding: 0.25rem;
+    margin: 0;
+    list-style: none;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .slider-wrapper[data-snap-align="true"] .slider-list {
+    scroll-snap-type: x mandatory;
+  }
+
+  .slider-wrapper[data-show-scrollbar="true"] .slider-list {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) var(--bg-subtle);
+  }
+
+  .slider-list::-webkit-scrollbar {
+    display: none;
+    height: 8px;
+  }
+
+  .slider-wrapper[data-show-scrollbar="true"] .slider-list::-webkit-scrollbar {
+    display: block;
+  }
+
+  .slider-list::-webkit-scrollbar-thumb {
+    background-color: var(--border-strong);
+    border-radius: var(--radius-sm, 0.25rem);
+  }
+
+  .slider-list::-webkit-scrollbar-track {
+    background-color: var(--bg-subtle);
+  }
+
+  .slider-list > :global(*) {
+    flex: 0 0 var(--slider-item-min-width);
+    min-width: var(--slider-item-min-width);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    box-sizing: border-box;
+  }
+
+  /* Controls */
+  .slider-controls {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0.25rem;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .slider-button {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-full, 9999px);
+    border: 1px solid var(--border-default);
+    background: var(--bg-default);
+    color: var(--text-default);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    opacity: 0.9;
+  }
+
+  .slider-button:hover:not(:disabled) {
+    opacity: 1;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--border-strong);
+  }
+
+  .slider-button:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  .slider-button:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .slider-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .slider-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* Indicators */
+  .slider-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .slider-indicators:empty {
+    display: none;
+  }
+
+  .slider-indicators :global(.indicator) {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--radius-full, 9999px);
+    background: var(--border-default);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    padding: 0;
+  }
+
+  .slider-indicators :global(.indicator.active) {
+    background: var(--color-primary);
+    width: 1.5rem;
+  }
+
+  .slider-indicators :global(.indicator:hover) {
+    background: var(--border-strong);
+    transform: scale(1.2);
+  }
+
+  .slider-indicators :global(.indicator.active:hover) {
+    background: var(--color-primary);
+  }
+
+  /* Auto-scroll Animation */
+  .slider-wrapper[data-auto-scroll="true"] .slider-list {
+    animation: slider-auto-scroll var(--slider-scroll-speed) linear infinite;
+  }
+
+  .slider-wrapper[data-pause-on-hover="true"]:hover .slider-list {
+    animation-play-state: paused;
+  }
+
+  @keyframes slider-auto-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-50% - var(--slider-gap) / 2)); }
+  }
+
+  /* Color Variants */
+  .slider-wrapper.primary {
+    background: var(--bg-subtle);
+    border: 1px solid var(--color-primary);
+  }
+
+  .slider-wrapper.primary .slider-button {
+    background: var(--color-primary);
+    color: var(--text-inverted);
+    border-color: var(--color-primary);
+  }
+
+  .slider-wrapper.primary .slider-button:hover:not(:disabled) {
+    background: var(--color-primary);
+    opacity: 0.9;
+  }
+
+  .slider-wrapper.secondary {
+    background: var(--bg-subtle);
+    border: 1px solid var(--color-secondary);
+  }
+
+  .slider-wrapper.secondary .slider-button {
+    background: var(--color-secondary);
+    color: var(--text-inverted);
+    border-color: var(--color-secondary);
+  }
+
+  .slider-wrapper.secondary .slider-button:hover:not(:disabled) {
+    background: var(--color-secondary);
+    opacity: 0.9;
+  }
+
+  .slider-wrapper.accent {
+    background: var(--bg-subtle);
+    border: 1px solid var(--color-accent);
+  }
+
+  .slider-wrapper.accent .slider-button {
+    background: var(--color-accent);
+    color: var(--text-inverted);
+    border-color: var(--color-accent);
+  }
+
+  .slider-wrapper.accent .slider-button:hover:not(:disabled) {
+    background: var(--color-accent);
+    opacity: 0.9;
+  }
+
+  /* Retro Variant */
+  .slider-wrapper.retro {
+    background: var(--retro-card-bg, #fff);
+    border: 3px solid var(--text-default);
+    box-shadow: 4px 4px 0 var(--retro-shadow-color, #000);
+    border-radius: 0;
+  }
+
+  .slider-wrapper.retro .slider-button {
+    border: 2px solid var(--text-default);
+    border-radius: 0;
+    background: var(--retro-button-bg);
+    color: var(--text-default);
+    box-shadow: 2px 2px 0 var(--retro-shadow-color, #000);
+  }
+
+  .slider-wrapper.retro .slider-button:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--retro-shadow-color, #000);
+  }
+
+  .slider-wrapper.retro .slider-button:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 var(--retro-shadow-color, #000);
+  }
+
+  .slider-wrapper.retro .slider-indicators :global(.indicator) {
+    border: 2px solid var(--text-default);
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .slider-wrapper.retro .slider-indicators :global(.indicator.active) {
+    background: var(--text-default);
+  }
+
+  /* Modern Variant */
+  .slider-wrapper.modern {
+    background: linear-gradient(135deg, var(--bg-default) 0%, var(--bg-subtle) 100%);
+    border: 1px solid var(--border-default);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-lg, 0.75rem);
+  }
+
+  .slider-wrapper.modern .slider-button {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .slider-wrapper.modern .slider-button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  .slider-wrapper.modern .slider-indicators :global(.indicator) {
+    background: linear-gradient(135deg, var(--border-default), var(--border-strong));
+  }
+
+  .slider-wrapper.modern .slider-indicators :global(.indicator.active) {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  }
+
+  /* Futuristic Variant */
+  .slider-wrapper.futuristic {
+    background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+    box-shadow: 
+      0 0 20px rgba(139, 92, 246, 0.3),
+      inset 0 0 20px rgba(139, 92, 246, 0.1);
+    border-radius: var(--radius-lg, 0.75rem);
+  }
+
+  .slider-wrapper.futuristic::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #8b5cf6, #ec4899, #06b6d4, #8b5cf6);
+    border-radius: var(--radius-lg, 0.75rem);
+    z-index: -1;
+    animation: futuristic-border 3s linear infinite;
+  }
+
+  @keyframes futuristic-border {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .slider-wrapper.futuristic .slider-button {
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+    border: 1px solid rgba(139, 92, 246, 0.5);
+    color: white;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  }
+
+  .slider-wrapper.futuristic .slider-button:hover:not(:disabled) {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.8);
+    border-color: rgba(139, 92, 246, 0.8);
+  }
+
+  .slider-wrapper.futuristic .slider-indicators :global(.indicator) {
+    background: rgba(139, 92, 246, 0.3);
+    border: 1px solid rgba(139, 92, 246, 0.5);
+  }
+
+  .slider-wrapper.futuristic .slider-indicators :global(.indicator.active) {
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .slider-wrapper {
+      --slider-item-min-width: 250px;
+      padding: var(--spacing-3, 0.75rem);
+    }
+
+    .slider-button {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    .slider-button svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .slider-controls {
+      padding: 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .slider-wrapper {
+      --slider-item-min-width: 200px;
+      padding: var(--spacing-2, 0.5rem);
+    }
+
+    .slider-button {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .slider-button svg {
+      width: 0.875rem;
+      height: 0.875rem;
+    }
+
+    .slider-indicators {
+      gap: 0.375rem;
+      margin-top: 0.75rem;
+    }
+  }
+
+  /* Dark Mode Support */
+  @media (prefers-color-scheme: dark) {
+    .slider-wrapper {
+      background: var(--bg-default);
+    }
+
+    .slider-button {
+      background: var(--bg-inset);
+      border-color: var(--border-strong);
+    }
+
+    .slider-button:hover:not(:disabled) {
+      background: var(--bg-subtle);
+    }
+  }
+</style>
+
+<script is:inline>
+  class SliderComponent {
+    constructor(slider) {
+      this.slider = slider;
+      this.list = slider.querySelector('.slider-list');
+      this.prevButton = slider.querySelector('.slider-button--prev');
+      this.nextButton = slider.querySelector('.slider-button--next');
+      this.indicators = slider.querySelector('.slider-indicators');
+      
+      this.scrollAmount = 0;
+      this.autoScrollInterval = null;
+      this.isAutoScrolling = false;
+      
+      this.init();
+    }
+
+    init() {
+      this.calculateScrollAmount();
+      this.bindEvents();
+      this.updateButtons();
+      this.createIndicators();
+      this.setupAutoScroll();
+      
+      // Observe resize
+      const resizeObserver = new ResizeObserver(() => {
+        this.calculateScrollAmount();
+        this.createIndicators();
+      });
+      resizeObserver.observe(this.list);
+    }
+
+    calculateScrollAmount() {
+      const item = this.list.querySelector(':scope > *');
+      if (item) {
+        const gap = parseFloat(getComputedStyle(this.list).gap) || 0;
+        this.scrollAmount = item.offsetWidth + gap;
+      }
+    }
+
+    bindEvents() {
+      // Button navigation
+      this.prevButton?.addEventListener('click', () => this.scrollLeft());
+      this.nextButton?.addEventListener('click', () => this.scrollRight());
+
+      // Update button states on scroll
+      this.list.addEventListener('scroll', () => {
+        this.updateButtons();
+        this.updateIndicators();
+      });
+
+      // Keyboard navigation
+      this.slider.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          this.scrollLeft();
+        }
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          this.scrollRight();
+        }
+      });
+
+      // Touch/swipe support
+      let startX = 0;
+      let scrollLeft = 0;
+      let isDragging = false;
+
+      this.list.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].pageX - this.list.offsetLeft;
+        scrollLeft = this.list.scrollLeft;
+        isDragging = true;
+      }, { passive: true });
+
+      this.list.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const x = e.touches[0].pageX - this.list.offsetLeft;
+        const walk = (x - startX) * 2;
+        this.list.scrollLeft = scrollLeft - walk;
+      }, { passive: true });
+
+      this.list.addEventListener('touchend', () => {
+        isDragging = false;
+      });
+
+      // Mouse drag support
+      let isMouseDragging = false;
+      this.list.addEventListener('mousedown', (e) => {
+        isMouseDragging = true;
+        startX = e.pageX - this.list.offsetLeft;
+        scrollLeft = this.list.scrollLeft;
+        this.list.style.cursor = 'grabbing';
+        e.preventDefault();
+      });
+
+      this.list.addEventListener('mouseleave', () => {
+        isMouseDragging = false;
+        this.list.style.cursor = 'grab';
+      });
+
+      this.list.addEventListener('mouseup', () => {
+        isMouseDragging = false;
+        this.list.style.cursor = 'grab';
+      });
+
+      this.list.addEventListener('mousemove', (e) => {
+        if (!isMouseDragging) return;
+        e.preventDefault();
+        const x = e.pageX - this.list.offsetLeft;
+        const walk = (x - startX) * 2;
+        this.list.scrollLeft = scrollLeft - walk;
+      });
+
+      // Pause auto-scroll on hover
+      if (this.slider.dataset.pauseOnHover === 'true') {
+        this.slider.addEventListener('mouseenter', () => this.pauseAutoScroll());
+        this.slider.addEventListener('mouseleave', () => this.resumeAutoScroll());
+      }
+    }
+
+    scrollLeft() {
+      this.list.scrollBy({
+        left: -this.scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+
+    scrollRight() {
+      this.list.scrollBy({
+        left: this.scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+
+    updateButtons() {
+      if (!this.prevButton || !this.nextButton) return;
+
+      const isAtStart = this.list.scrollLeft <= 1;
+      const isAtEnd = this.list.scrollLeft >= this.list.scrollWidth - this.list.clientWidth - 1;
+
+      this.prevButton.disabled = isAtStart;
+      this.nextButton.disabled = isAtEnd;
+    }
+
+    createIndicators() {
+      if (!this.indicators) return;
+
+      const itemCount = this.list.children.length;
+      const visibleCount = Math.floor(this.list.clientWidth / this.scrollAmount);
+      const indicatorCount = Math.ceil(itemCount / visibleCount);
+
+      if (indicatorCount <= 1) {
+        this.indicators.innerHTML = '';
+        return;
+      }
+
+      this.indicators.innerHTML = '';
+      
+      for (let i = 0; i < indicatorCount; i++) {
+        const indicator = document.createElement('button');
+        indicator.classList.add('indicator');
+        indicator.setAttribute('role', 'tab');
+        indicator.setAttribute('aria-label', `Aller à la page ${i + 1}`);
+        indicator.addEventListener('click', () => {
+          const scrollTo = i * this.scrollAmount * visibleCount;
+          this.list.scrollTo({
+            left: scrollTo,
+            behavior: 'smooth'
+          });
+        });
+        this.indicators.appendChild(indicator);
+      }
+
+      this.updateIndicators();
+    }
+
+    updateIndicators() {
+      if (!this.indicators) return;
+
+      const indicators = this.indicators.querySelectorAll('.indicator');
+      if (indicators.length === 0) return;
+
+      const visibleCount = Math.floor(this.list.clientWidth / this.scrollAmount);
+      const currentIndex = Math.round(this.list.scrollLeft / (this.scrollAmount * visibleCount));
+
+      indicators.forEach((indicator, index) => {
+        indicator.classList.toggle('active', index === currentIndex);
+        indicator.setAttribute('aria-selected', String(index === currentIndex));
+      });
+    }
+
+    setupAutoScroll() {
+      if (this.slider.dataset.autoScroll !== 'true') return;
+
+      const scrollSpeed = parseFloat(this.slider.style.getPropertyValue('--slider-scroll-speed')) || 50;
+      const scrollInterval = scrollSpeed * 1000 / this.list.children.length;
+
+      this.autoScrollInterval = window.setInterval(() => {
+        if (this.isAutoScrolling) return;
+
+        const isAtEnd = this.list.scrollLeft >= this.list.scrollWidth - this.list.clientWidth - 1;
+        
+        if (isAtEnd) {
+          this.list.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          this.scrollRight();
+        }
+      }, scrollInterval);
+    }
+
+    pauseAutoScroll() {
+      this.isAutoScrolling = true;
+    }
+
+    resumeAutoScroll() {
+      this.isAutoScrolling = false;
+    }
+
+    destroy() {
+      if (this.autoScrollInterval) {
+        clearInterval(this.autoScrollInterval);
+      }
+    }
+  }
+
+  // Initialize all sliders
+  function initSliders() {
+    const sliders = document.querySelectorAll('.slider-wrapper');
+    sliders.forEach(slider => new SliderComponent(slider));
+  }
+
+  // Initialize on DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSliders);
+  } else {
+    initSliders();
+  }
+
+  // Reinitialize on Astro page transitions
+  document.addEventListener('astro:page-load', initSliders);
+</script>

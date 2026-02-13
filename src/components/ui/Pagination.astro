@@ -1,0 +1,355 @@
+---
+/**
+ * Pagination - Composant de navigation entre pages
+ * 
+ * Composant universel de pagination avec toutes les fonctionnalités :
+ * - Gestion automatique des boutons précédent/suivant
+ * - Affichage intelligent des numéros de page avec "..."
+ * - Désactivation automatique selon le contexte
+ * - Support des variants, couleurs et tailles
+ * 
+ * @param {number} currentPage - Page actuelle (1-based)
+ * @param {number} totalPages - Nombre total de pages
+ * @param {string} baseUrl - URL de base pour les liens (ex: "/blog/page/")
+ * @param {string} variant - Style variant (initial|retro|modern|futuristic)
+ * @param {string} color - Couleur (default|primary|secondary|accent)
+ * @param {string} size - Taille (sm|md|lg)
+ * @param {boolean} showPrevNext - Afficher les boutons précédent/suivant
+ * @param {number} siblingCount - Nombre de pages à afficher de chaque côté de la page courante
+ * @param {boolean} showFirstLast - Afficher les boutons première/dernière page
+ * @param {string} className - Classes CSS additionnelles
+ */
+
+import Link from './Link.astro';
+
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl?: string;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  color?: 'default' | 'primary' | 'secondary' | 'accent';
+  size?: 'sm' | 'md' | 'lg';
+  showPrevNext?: boolean;
+  siblingCount?: number;
+  showFirstLast?: boolean;
+  className?: string;
+}
+
+const {
+  currentPage,
+  totalPages,
+  baseUrl = '#',
+  variant = 'initial',
+  color = 'default',
+  size = 'md',
+  showPrevNext = true,
+  siblingCount = 1,
+  showFirstLast = false,
+  className = '',
+} = Astro.props;
+
+// Validation et normalisation
+const validCurrentPage = Math.max(1, Math.min(currentPage, totalPages));
+const hasPrevPage = validCurrentPage > 1;
+const hasNextPage = validCurrentPage < totalPages;
+
+// Génération des numéros de page à afficher
+const generatePageNumbers = () => {
+  // Cas spéciaux
+  if (totalPages <= 0) return [];
+  if (totalPages === 1) return [1];
+  
+  const pages: (number | string)[] = [];
+  
+  // Si peu de pages, afficher toutes
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+  
+  // Logique avancée avec "..."
+  const leftSiblingIndex = Math.max(validCurrentPage - siblingCount, 1);
+  const rightSiblingIndex = Math.min(validCurrentPage + siblingCount, totalPages);
+  
+  const shouldShowLeftDots = leftSiblingIndex > 2;
+  const shouldShowRightDots = rightSiblingIndex < totalPages - 1;
+  
+  // Toujours afficher la première page
+  pages.push(1);
+  
+  // Dots à gauche
+  if (shouldShowLeftDots) {
+    pages.push('...');
+  } else if (leftSiblingIndex === 2) {
+    pages.push(2);
+  }
+  
+  // Pages autour de la page courante
+  for (let i = leftSiblingIndex; i <= rightSiblingIndex; i++) {
+    if (i !== 1 && i !== totalPages) {
+      pages.push(i);
+    }
+  }
+  
+  // Dots à droite
+  if (shouldShowRightDots) {
+    pages.push('...');
+  } else if (rightSiblingIndex === totalPages - 1) {
+    pages.push(totalPages - 1);
+  }
+  
+  // Toujours afficher la dernière page
+  if (totalPages > 1) {
+    pages.push(totalPages);
+  }
+  
+  return pages;
+};
+
+const pageNumbers = generatePageNumbers();
+
+// Classes CSS
+const variantClass = variant !== 'initial' ? variant : '';
+const colorClass = color !== 'default' ? color : '';
+const sizeClass = size !== 'md' ? size : '';
+
+const containerClasses = [
+  'pagination',
+  variantClass,
+  colorClass,
+  sizeClass,
+  className,
+].filter(Boolean).join(' ');
+
+// Helper pour générer l'URL de page
+const getPageUrl = (page: number) => {
+  if (baseUrl.includes('[page]')) {
+    return baseUrl.replace('[page]', page.toString());
+  }
+  return `${baseUrl}${page}`;
+};
+---
+
+{totalPages > 0 && (
+  <nav class={containerClasses} aria-label="Pagination">
+    <ul class="pagination-list">
+      {/* Bouton Première page */}
+      {showFirstLast && (
+        <li>
+          {hasPrevPage ? (
+            <Link
+              href={getPageUrl(1)}
+              variant={variant}
+              style="button"
+              ariaLabel="Première page"
+            >
+              «
+            </Link>
+          ) : (
+            <Link
+              tag="button"
+              variant={variant}
+              style="button"
+              disabled
+              ariaLabel="Première page"
+            >
+              «
+            </Link>
+          )}
+        </li>
+      )}
+
+      {/* Bouton Précédent */}
+      {showPrevNext && (
+        <li>
+          {hasPrevPage ? (
+            <Link
+              href={getPageUrl(validCurrentPage - 1)}
+              variant={variant}
+              style="button"
+              className="pagination-prev"
+              ariaLabel="Page précédente"
+            >
+              <span aria-hidden="true">‹</span>
+              <span class="pagination-text">Précédent</span>
+            </Link>
+          ) : (
+            <Link
+              tag="button"
+              variant={variant}
+              style="button"
+              className="pagination-prev"
+              disabled
+              ariaLabel="Page précédente"
+            >
+              <span aria-hidden="true">‹</span>
+              <span class="pagination-text">Précédent</span>
+            </Link>
+          )}
+        </li>
+      )}
+
+      {/* Numéros de page */}
+      {pageNumbers.map((page) => (
+        <li>
+          {typeof page === 'number' ? (
+            page === validCurrentPage ? (
+              <Link
+                tag="button"
+                variant={variant}
+                style="button"
+                color={color}
+                className="pagination-number active"
+                ariaLabel={`Page ${page}`}
+                aria-current="page"
+              >
+                {page}
+              </Link>
+            ) : (
+              <Link
+                href={getPageUrl(page)}
+                variant={variant}
+                style="button"
+                className="pagination-number"
+                ariaLabel={`Page ${page}`}
+              >
+                {page}
+              </Link>
+            )
+          ) : (
+            <span class="pagination-dots" aria-hidden="true">
+              {page}
+            </span>
+          )}
+        </li>
+      ))}
+
+      {/* Bouton Suivant */}
+      {showPrevNext && (
+        <li>
+          {hasNextPage ? (
+            <Link
+              href={getPageUrl(validCurrentPage + 1)}
+              variant={variant}
+              style="button"
+              className="pagination-next"
+              ariaLabel="Page suivante"
+            >
+              <span class="pagination-text">Suivant</span>
+              <span aria-hidden="true">›</span>
+            </Link>
+          ) : (
+            <Link
+              tag="button"
+              variant={variant}
+              style="button"
+              className="pagination-next"
+              disabled
+              ariaLabel="Page suivante"
+            >
+              <span class="pagination-text">Suivant</span>
+              <span aria-hidden="true">›</span>
+            </Link>
+          )}
+        </li>
+      )}
+
+      {/* Bouton Dernière page */}
+      {showFirstLast && (
+        <li>
+          {hasNextPage ? (
+            <Link
+              href={getPageUrl(totalPages)}
+              variant={variant}
+              style="button"
+              ariaLabel="Dernière page"
+            >
+              »
+            </Link>
+          ) : (
+            <Link
+              tag="button"
+              variant={variant}
+              style="button"
+              disabled
+              ariaLabel="Dernière page"
+            >
+              »
+            </Link>
+          )}
+        </li>
+      )}
+    </ul>
+  </nav>
+)}
+
+<style>
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .pagination-list {
+    display: flex;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    align-items: center;
+  }
+
+  /* Ajustements pour la taille */
+  .pagination.sm .pagination-list {
+    gap: 0.25rem;
+  }
+
+  .pagination.sm :global(button),
+  .pagination.sm :global(a) {
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .pagination.lg .pagination-list {
+    gap: 0.75rem;
+  }
+
+  .pagination.lg :global(button),
+  .pagination.lg :global(a) {
+    min-width: 3rem;
+    height: 3rem;
+    padding: 0.75rem 1rem;
+    font-size: 1.125rem;
+  }
+
+  /* Bouton actif (page courante) */
+  .pagination :global(.active) {
+    pointer-events: none;
+  }
+
+  /* Dots */
+  .pagination-dots {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    color: var(--text-muted);
+    user-select: none;
+  }
+
+  /* Texte Précédent/Suivant caché sur mobile */
+  .pagination-text {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .pagination-prev .pagination-text,
+    .pagination-next .pagination-text {
+      display: inline;
+    }
+  }
+</style>

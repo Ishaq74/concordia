@@ -1,0 +1,67 @@
+---
+import Dropdown from "@components/ui/Dropdown.astro";
+import { getRelativeLocaleUrl } from "astro:i18n";
+
+interface Props {
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  class?: string;
+  lang?: string;
+  isMenu?: boolean;
+}
+
+const {
+  variant = "initial",
+  class: className = "",
+  lang,
+  isMenu = false,
+} = Astro.props;
+
+// Detect current locale from URL
+const currentLocale = lang || Astro.currentLocale || "fr";
+
+// Get current path without locale prefix
+const pathWithoutLocale = Astro.url.pathname.replace(
+  /^\/(fr|en|ar|es)(\/|$)/,
+  "/",
+);
+
+const languages = [
+  {
+    label: "Français",
+    icon: "🇫🇷",
+    href: getRelativeLocaleUrl("fr", pathWithoutLocale),
+    value: "fr",
+  },
+  {
+    label: "English",
+    icon: "🇬🇧",
+    href: getRelativeLocaleUrl("en", pathWithoutLocale),
+    value: "en",
+  },
+  {
+    label: "العربية",
+    icon: "🇸🇦",
+    href: getRelativeLocaleUrl("ar", pathWithoutLocale),
+    value: "ar",
+  },
+  {
+    label: "Español",
+    icon: "🇪🇸",
+    href: getRelativeLocaleUrl("es", pathWithoutLocale),
+    value: "es",
+  },
+];
+
+// Determine current language display
+const currentLang =
+  languages.find((lang) => lang.value === currentLocale) || languages[0];
+---
+
+<Dropdown
+  items={languages}
+  variant={variant}
+  position="bottom-right"
+  triggerLabel={currentLang.icon}
+  ismenu={isMenu}
+  class={className}
+/>

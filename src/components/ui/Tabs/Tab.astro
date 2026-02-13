@@ -1,0 +1,39 @@
+---
+import { Icon } from 'astro-icon/components';
+
+/**
+ * Tab - Label pour tabs CSS-only (ZERO SCRIPT)
+ * 
+ * Position détermine le matching avec TabPanel (pas d'ID en dur)
+ * 
+ * @param {string} name - Nom du groupe radio (pour regrouper les tabs)
+ * @param {boolean} checked - Tab actif par défaut
+ * @param {string} icon - Nom de l'icône (optionnel)
+ * @param {string} className - Classes CSS additionnelles
+ */
+
+interface Props {
+  name: string;
+  checked?: boolean;
+  icon?: string;
+  className?: string;
+}
+
+const {
+  name,
+  checked = false,
+  icon,
+  className = '',
+} = Astro.props;
+
+const classes = [
+  'tab',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<input type="radio" name={name} checked={checked} class="tab-radio" />
+<label class={classes}>
+  {icon && <Icon name={icon} />}
+  <slot />
+</label>

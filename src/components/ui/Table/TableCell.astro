@@ -1,0 +1,32 @@
+---
+/**
+ * TableCell - Cellule de données
+ * 
+ * Wraps <td> pour les cellules de données.
+ * 
+ * @param {number} colspan - Nombre de colonnes à fusionner
+ * @param {number} rowspan - Nombre de lignes à fusionner
+ * @param {string} className - Classes CSS additionnelles
+ */
+
+interface Props {
+  colspan?: number;
+  rowspan?: number;
+  className?: string;
+}
+
+const {
+  colspan,
+  rowspan,
+  className = '',
+} = Astro.props;
+
+const classes = [
+  'table-cell',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<td class={classes} colspan={colspan} rowspan={rowspan}>
+  <slot />
+</td>

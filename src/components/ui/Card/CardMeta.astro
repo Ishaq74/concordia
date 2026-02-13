@@ -1,0 +1,37 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  items?: Array<{
+    icon?: string;
+    text: string;
+    label?: string;
+  }>;
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  items = [],
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+const classes = ['card-meta', className].filter(Boolean).join(' ');
+---
+
+<div class={classes} {...htmlAttributes}>
+  {items.length > 0 ? (
+    <ul class="card-meta-list">
+      {items.map((item) => (
+        <li class="card-meta-item">
+          {item.icon && <Icon name={item.icon} class="card-meta-icon" />}
+          {item.label && <span class="card-meta-label">{item.label}:</span>}
+          <span class="card-meta-text">{item.text}</span>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <slot />
+  )}
+</div>

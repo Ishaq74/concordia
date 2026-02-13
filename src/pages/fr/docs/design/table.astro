@@ -1,0 +1,673 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import TableComponent from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import TableCaption from "@components/ui/Table/TableCaption.astro";
+import TableFoot from "@components/ui/Table/TableFoot.astro";
+import Badge from "@components/ui/Badge.astro";
+---
+
+<DocLayout 
+  title="Table Component" 
+  description="Documentation du composant Table pour afficher des données tabulaires avec support des 4 variants et responsive"
+  variant="initial"
+>
+  <h1 id="table-component">Table Component</h1>
+  
+  <p>
+    Le composant <code class="inline-code">Table</code> permet d'afficher des données tabulaires 
+    de manière élégante et accessible, avec support du responsive (scroll horizontal automatique).
+  </p>
+
+  <h2>Démo rapide</h2>
+  
+  <div class="demo-section">
+    <TableComponent variant="initial">
+      <TableCaption>Liste des utilisateurs récents</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Nom</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Rôle</TableHead>
+          <TableHead>Status</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>John Doe</TableCell>
+          <TableCell>john@example.com</TableCell>
+          <TableCell>Admin</TableCell>
+          <TableCell><Badge color="primary">Actif</Badge></TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Jane Smith</TableCell>
+          <TableCell>jane@example.com</TableCell>
+          <TableCell>Éditeur</TableCell>
+          <TableCell><Badge color="primary">Actif</Badge></TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Bob Johnson</TableCell>
+          <TableCell>bob@example.com</TableCell>
+          <TableCell>Utilisateur</TableCell>
+          <TableCell><Badge color="secondary">Inactif</Badge></TableCell>
+        </TableRow>
+      </TableBody>
+    </TableComponent>
+  </div>
+
+  <TableOfContents
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "Utilisation basique", href: "#basic-usage" },
+      { label: "Avec caption", href: "#with-caption" },
+      { label: "Avec footer", href: "#with-footer" },
+      { label: "Table striped", href: "#striped" },
+      { label: "Responsive", href: "#responsive" },
+      { label: "Variants", href: "#variants" },
+      { label: "Composants", href: "#components" },
+      { label: "Accessibilité", href: "#accessibility" },
+      { label: "Exemples avancés", href: "#examples" },
+    ]}
+    title="Table des matières"
+  />
+
+  <h2 id="installation">Installation</h2>
+  
+  <p>Les composants sont disponibles dans <code class="inline-code">src/components/ui/Table/</code></p>
+  
+  <Code
+    lang="typescript"
+    code={`import Table from '@components/ui/Table/Table.astro';
+import TableHeader from '@components/ui/Table/TableHeader.astro';
+import TableBody from '@components/ui/Table/TableBody.astro';
+import TableRow from '@components/ui/Table/TableRow.astro';
+import TableHead from '@components/ui/Table/TableHead.astro';
+import TableCell from '@components/ui/Table/TableCell.astro';
+import TableCaption from '@components/ui/Table/TableCaption.astro';
+import TableFoot from '@components/ui/Table/TableFoot.astro';`}
+  />
+
+  <h2 id="basic-usage">Utilisation basique</h2>
+
+  <p>Table simple avec en-têtes et données :</p>
+
+  <div class="example-section">
+    <TableComponent variant="initial">
+      <TableHeader>
+        <TableRow>
+          <TableHead>Produit</TableHead>
+          <TableHead>Prix</TableHead>
+          <TableHead>Stock</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>Clavier</TableCell>
+          <TableCell>89.99€</TableCell>
+          <TableCell>24</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Souris</TableCell>
+          <TableCell>29.99€</TableCell>
+          <TableCell>156</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Écran</TableCell>
+          <TableCell>299.99€</TableCell>
+          <TableCell>8</TableCell>
+        </TableRow>
+      </TableBody>
+    </TableComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<TableComponent variant="initial">
+  <TableHeader>
+    <TableRow>
+      <TableHead>Produit</TableHead>
+      <TableHead>Prix</TableHead>
+      <TableHead>Stock</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableCell>Clavier</TableCell>
+      <TableCell>89.99€</TableCell>
+      <TableCell>24</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>Souris</TableCell>
+      <TableCell>29.99€</TableCell>
+      <TableCell>156</TableCell>
+    </TableRow>
+  </TableBody>
+</TableComponent>`}
+  />
+
+  <h2 id="with-caption">Avec caption</h2>
+
+  <p>Utilisez <code class="inline-code">TableCaption</code> pour ajouter une description de la table :</p>
+
+  <div class="example-section">
+    <TableComponent variant="initial">
+      <TableCaption>Ventes du mois de Décembre 2025</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Date</TableHead>
+          <TableHead>Montant</TableHead>
+          <TableHead>Client</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>01/12/2025</TableCell>
+          <TableCell>1,234.56€</TableCell>
+          <TableCell>Entreprise A</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>15/12/2025</TableCell>
+          <TableCell>2,567.89€</TableCell>
+          <TableCell>Entreprise B</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>28/12/2025</TableCell>
+          <TableCell>890.12€</TableCell>
+          <TableCell>Entreprise C</TableCell>
+        </TableRow>
+      </TableBody>
+    </TableComponent>
+  </div>
+
+  <h2 id="with-footer">Avec footer</h2>
+
+  <p>Utilisez <code class="inline-code">TableFoot</code> pour ajouter des totaux ou résumés :</p>
+
+  <div class="example-section">
+    <TableComponent variant="initial">
+      <TableCaption>Facture #INV-2025-001</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Article</TableHead>
+          <TableHead>Quantité</TableHead>
+          <TableHead>Prix unitaire</TableHead>
+          <TableHead>Total</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>Développement web</TableCell>
+          <TableCell>40h</TableCell>
+          <TableCell>80€</TableCell>
+          <TableCell>3,200€</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Design UI/UX</TableCell>
+          <TableCell>20h</TableCell>
+          <TableCell>90€</TableCell>
+          <TableCell>1,800€</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Hébergement</TableCell>
+          <TableCell>1</TableCell>
+          <TableCell>50€</TableCell>
+          <TableCell>50€</TableCell>
+        </TableRow>
+      </TableBody>
+      <TableFoot>
+        <TableRow>
+          <TableCell colspan={3}><strong>Total HT</strong></TableCell>
+          <TableCell><strong>5,050€</strong></TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell colspan={3}><strong>TVA (20%)</strong></TableCell>
+          <TableCell><strong>1,010€</strong></TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell colspan={3}><strong>Total TTC</strong></TableCell>
+          <TableCell><strong>6,060€</strong></TableCell>
+        </TableRow>
+      </TableFoot>
+    </TableComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<TableComponent variant="initial">
+  <TableCaption>Facture #INV-2025-001</TableCaption>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Article</TableHead>
+      <TableHead>Total</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableCell>Développement</TableCell>
+      <TableCell>3,200€</TableCell>
+    </TableRow>
+  </TableBody>
+  <TableFoot>
+    <TableRow>
+      <TableCell><strong>Total TTC</strong></TableCell>
+      <TableCell><strong>6,060€</strong></TableCell>
+    </TableRow>
+  </TableFoot>
+</TableComponent>`}
+  />
+
+  <h2 id="striped">Table striped (zebra)</h2>
+
+  <p>Ajoutez le prop <code class="inline-code">striped</code> pour activer les lignes alternées et améliorer la lisibilité :</p>
+
+  <div class="example-section">
+    <TableComponent variant="initial" striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>ID</TableHead>
+          <TableHead>Nom</TableHead>
+          <TableHead>Département</TableHead>
+          <TableHead>Salaire</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>001</TableCell>
+          <TableCell>Alice Martin</TableCell>
+          <TableCell>Dev Frontend</TableCell>
+          <TableCell>45,000€</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>002</TableCell>
+          <TableCell>Bob Dupont</TableCell>
+          <TableCell>Dev Backend</TableCell>
+          <TableCell>48,000€</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>003</TableCell>
+          <TableCell>Charlie Durand</TableCell>
+          <TableCell>DevOps</TableCell>
+          <TableCell>52,000€</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>004</TableCell>
+          <TableCell>Diana Chen</TableCell>
+          <TableCell>Designer</TableCell>
+          <TableCell>42,000€</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>005</TableCell>
+          <TableCell>Ethan Brown</TableCell>
+          <TableCell>Product Manager</TableCell>
+          <TableCell>55,000€</TableCell>
+        </TableRow>
+      </TableBody>
+    </TableComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<TableComponent variant="initial" striped>
+  <TableHeader>
+    <TableRow>
+      <TableHead>ID</TableHead>
+      <TableHead>Nom</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <!-- rows -->
+  </TableBody>
+</TableComponent>`}
+  />
+
+  <h2 id="responsive">Responsive (scroll horizontal)</h2>
+
+  <p>Les tables larges défilent automatiquement horizontalement sur petits écrans :</p>
+
+  <div class="example-section">
+    <TableComponent variant="initial">
+      <TableCaption>Large table - scrollez horizontalement sur mobile</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Colonne 1</TableHead>
+          <TableHead>Colonne 2</TableHead>
+          <TableHead>Colonne 3</TableHead>
+          <TableHead>Colonne 4</TableHead>
+          <TableHead>Colonne 5</TableHead>
+          <TableHead>Colonne 6</TableHead>
+          <TableHead>Colonne 7</TableHead>
+          <TableHead>Colonne 8</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>Data 1</TableCell>
+          <TableCell>Data 2</TableCell>
+          <TableCell>Data 3</TableCell>
+          <TableCell>Data 4</TableCell>
+          <TableCell>Data 5</TableCell>
+          <TableCell>Data 6</TableCell>
+          <TableCell>Data 7</TableCell>
+          <TableCell>Data 8</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Data 1</TableCell>
+          <TableCell>Data 2</TableCell>
+          <TableCell>Data 3</TableCell>
+          <TableCell>Data 4</TableCell>
+          <TableCell>Data 5</TableCell>
+          <TableCell>Data 6</TableCell>
+          <TableCell>Data 7</TableCell>
+          <TableCell>Data 8</TableCell>
+        </TableRow>
+      </TableBody>
+    </TableComponent>
+  </div>
+
+  <h2 id="variants">Tous les variants</h2>
+
+  <h3>Initial (défaut)</h3>
+  <div class="example-section">
+    <TableComponent variant="initial" striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Framework</TableHead>
+          <TableHead>Version</TableHead>
+          <TableHead>Release</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>Astro</TableCell>
+          <TableCell>5.0</TableCell>
+          <TableCell>2025</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>React</TableCell>
+          <TableCell>19.0</TableCell>
+          <TableCell>2024</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Vue</TableCell>
+          <TableCell>3.4</TableCell>
+          <TableCell>2024</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Svelte</TableCell>
+          <TableCell>5.0</TableCell>
+          <TableCell>2024</TableCell>
+        </TableRow>
+      </TableBody>
+    </TableComponent>
+  </div>
+
+  <h3>Retro</h3>
+  <div class="example-section">
+    <TableComponent variant="retro" striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Jeu</TableHead>
+          <TableHead>Console</TableHead>
+          <TableHead>Année</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>Super Mario</TableCell>
+          <TableCell>NES</TableCell>
+          <TableCell>1985</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Zelda</TableCell>
+          <TableCell>SNES</TableCell>
+          <TableCell>1991</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Sonic</TableCell>
+          <TableCell>Genesis</TableCell>
+          <TableCell>1991</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Pokémon</TableCell>
+          <TableCell>Game Boy</TableCell>
+          <TableCell>1996</TableCell>
+        </TableRow>
+      </TableBody>
+    </TableComponent>
+  </div>
+
+  <h3>Modern</h3>
+  <div class="example-section">
+    <TableComponent variant="modern" striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Service</TableHead>
+          <TableHead>Prix</TableHead>
+          <TableHead>Période</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>Starter</TableCell>
+          <TableCell>9€/mois</TableCell>
+          <TableCell>Mensuel</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Pro</TableCell>
+          <TableCell>29€/mois</TableCell>
+          <TableCell>Mensuel</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Business</TableCell>
+          <TableCell>49€/mois</TableCell>
+          <TableCell>Mensuel</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Enterprise</TableCell>
+          <TableCell>99€/mois</TableCell>
+          <TableCell>Annuel</TableCell>
+        </TableRow>
+      </TableBody>
+    </TableComponent>
+  </div>
+
+  <h3>Futuristic</h3>
+  <div class="example-section">
+    <TableComponent variant="futuristic" striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Module</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>CPU</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>Neural Net</TableCell>
+          <TableCell><Badge variant="futuristic" color="primary">ONLINE</Badge></TableCell>
+          <TableCell>87%</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Quantum Core</TableCell>
+          <TableCell><Badge variant="futuristic" color="primary">ONLINE</Badge></TableCell>
+          <TableCell>42%</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>AI Engine</TableCell>
+          <TableCell><Badge variant="futuristic" color="secondary">STANDBY</Badge></TableCell>
+          <TableCell>12%</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Data Matrix</TableCell>
+          <TableCell><Badge variant="futuristic" color="accent">ACTIVE</Badge></TableCell>
+          <TableCell>65%</TableCell>
+        </TableRow>
+      </TableBody>
+    </TableComponent>
+  </div>
+
+  <h2 id="components">Composants disponibles</h2>
+
+  <h3>Table</h3>
+  <p>Composant racine qui contient la table dans un conteneur scrollable.</p>
+  <div class="props-table">
+    <TableComponent>
+      <thead>
+        <tr>
+          <th>Prop</th>
+          <th>Type</th>
+          <th>Défaut</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code class="inline-code">variant</code></td>
+          <td>initial | retro | modern | futuristic</td>
+          <td>initial</td>
+          <td>Style visuel de la table</td>
+        </tr>
+        <tr>
+          <td><code class="inline-code">striped</code></td>
+          <td>boolean</td>
+          <td>false</td>
+          <td>Active les lignes alternées (zebra) pour meilleure lisibilité</td>
+        </tr>
+        <tr>
+          <td><code class="inline-code">className</code></td>
+          <td>string</td>
+          <td>""</td>
+          <td>Classes CSS additionnelles</td>
+        </tr>
+      </tbody>
+    </TableComponent>
+  </div>
+
+  <h3>TableHeader</h3>
+  <p>Encapsule <code class="inline-code">&lt;thead&gt;</code> pour les en-têtes de colonnes.</p>
+
+  <h3>TableBody</h3>
+  <p>Encapsule <code class="inline-code">&lt;tbody&gt;</code> pour les lignes de données.</p>
+
+  <h3>TableFoot</h3>
+  <p>Encapsule <code class="inline-code">&lt;tfoot&gt;</code> pour les totaux/résumés.</p>
+
+  <h3>TableRow</h3>
+  <p>Encapsule <code class="inline-code">&lt;tr&gt;</code> pour chaque ligne.</p>
+
+  <h3>TableHead</h3>
+  <p>Encapsule <code class="inline-code">&lt;th&gt;</code> pour les cellules d'en-tête.</p>
+
+  <h3>TableCell</h3>
+  <p>Encapsule <code class="inline-code">&lt;td&gt;</code> pour les cellules de données.</p>
+  <p><strong>Props spécifiques :</strong></p>
+  <ul>
+    <li><code class="inline-code">colspan</code> : Nombre de colonnes à fusionner</li>
+    <li><code class="inline-code">rowspan</code> : Nombre de lignes à fusionner</li>
+  </ul>
+
+  <h3>TableCaption</h3>
+  <p>Encapsule <code class="inline-code">&lt;caption&gt;</code> pour la description de la table.</p>
+
+  <h2 id="accessibility">Accessibilité</h2>
+
+  <ul>
+    <li><strong>Sémantique HTML :</strong> Utilise les balises natives <code class="inline-code">&lt;table&gt;</code>, <code class="inline-code">&lt;thead&gt;</code>, <code class="inline-code">&lt;tbody&gt;</code>, <code class="inline-code">&lt;th&gt;</code>, <code class="inline-code">&lt;td&gt;</code></li>
+    <li><strong>Caption :</strong> Toujours ajouter un <code class="inline-code">TableCaption</code> pour décrire la table</li>
+    <li><strong>Scope :</strong> Les <code class="inline-code">&lt;th&gt;</code> ont automatiquement <code class="inline-code">scope="col"</code></li>
+    <li><strong>Responsive :</strong> Scroll horizontal préservé avec focus clavier</li>
+    <li><strong>Contraste :</strong> Couleurs conformes WCAG AA</li>
+    <li><strong>Hover :</strong> États de survol clairs pour la navigation</li>
+  </ul>
+
+  <h2 id="examples">Exemples avancés</h2>
+
+  <h3>Table avec actions</h3>
+
+  <div class="example-section">
+    <TableComponent variant="initial" striped>
+      <TableCaption>Gestion des utilisateurs</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>ID</TableHead>
+          <TableHead>Nom</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Rôle</TableHead>
+          <TableHead>Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>1</TableCell>
+          <TableCell>John Doe</TableCell>
+          <TableCell>john@example.com</TableCell>
+          <TableCell><Badge color="primary">Admin</Badge></TableCell>
+          <TableCell>
+            <button class="button primary" style="font-size: 0.875rem; padding: 0.25rem 0.75rem;">Éditer</button>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>2</TableCell>
+          <TableCell>Jane Smith</TableCell>
+          <TableCell>jane@example.com</TableCell>
+          <TableCell><Badge color="secondary">Éditeur</Badge></TableCell>
+          <TableCell>
+            <button class="button primary" style="font-size: 0.875rem; padding: 0.25rem 0.75rem;">Éditer</button>
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </TableComponent>
+  </div>
+
+  <h3>Table avec colspan/rowspan</h3>
+
+  <div class="example-section">
+    <TableComponent variant="initial">
+      <TableCaption>Horaires de cours</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Heure</TableHead>
+          <TableHead>Lundi</TableHead>
+          <TableHead>Mardi</TableHead>
+          <TableHead>Mercredi</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>9h-11h</TableCell>
+          <TableCell>Math</TableCell>
+          <TableCell rowspan={2}>Projet</TableCell>
+          <TableCell>Physique</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>11h-13h</TableCell>
+          <TableCell>Français</TableCell>
+          <TableCell>Chimie</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>14h-16h</TableCell>
+          <TableCell colspan={3}>Sport</TableCell>
+        </TableRow>
+      </TableBody>
+    </TableComponent>
+  </div>
+
+  <h2>Meilleures pratiques</h2>
+
+  <ul>
+    <li><strong>Caption obligatoire :</strong> Toujours ajouter un <code class="inline-code">TableCaption</code> pour l'accessibilité</li>
+    <li><strong>En-têtes clairs :</strong> Utiliser des libellés descriptifs dans <code class="inline-code">TableHead</code></li>
+    <li><strong>Données cohérentes :</strong> Aligner les types de données (nombres à droite, texte à gauche)</li>
+    <li><strong>Striped pour listes :</strong> Utiliser <code class="inline-code">striped</code> pour tables avec beaucoup de lignes</li>
+    <li><strong>Limiter les colonnes :</strong> Maximum 8-10 colonnes pour la lisibilité</li>
+    <li><strong>Responsive :</strong> Tester sur mobile - le scroll horizontal doit fonctionner</li>
+    <li><strong>Actions inline :</strong> Placer les boutons d'action en dernière colonne</li>
+    <li><strong>Footer pour totaux :</strong> Utiliser <code class="inline-code">TableFoot</code> pour les résumés</li>
+  </ul>
+</DocLayout>

@@ -1,0 +1,116 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+---
+
+<DocLayout 
+  title="Introduction" 
+  description="Bienvenue dans le système de design - Guide complet des composants, variants et bonnes pratiques"
+  variant="initial"
+>
+  <h1 id="introduction">Introduction</h1>
+  
+  <p>
+    Bienvenue dans la documentation du système de design. Cette bibliothèque propose une collection complète 
+    de composants UI avec plusieurs variants visuels pour s'adapter à différents styles et besoins.
+  </p>
+
+  <h2 id="quest-ce-que-ce-systeme">Qu'est-ce que ce système de design ?</h2>
+  
+  <p>
+    Ce système de design est construit avec Astro et CSS natif, offrant :
+  </p>
+
+  <ul>
+    <li><strong>Des composants réutilisables</strong> - Link, Button, Input, Card, Badge, Alert, etc.</li>
+    <li><strong>Plusieurs variants visuels</strong> - Initial, Retro, Modern, Futuristic</li>
+    <li><strong>CSS natif avec variables</strong> - Personnalisation facile via CSS custom properties</li>
+    <li><strong>Design tokens</strong> - Couleurs, typographie, spacing et composants</li>
+    <li><strong>Accessibilité</strong> - Construit avec les meilleures pratiques d'accessibilité</li>
+    <li><strong>Performance optimale</strong> - Chargement progressif et CSS minimal</li>
+  </ul>
+
+  <h2 id="structure-du-projet">Structure du projet</h2>
+  
+  <p>Le projet est organisé de manière logique pour faciliter la navigation et la maintenance :</p>
+
+  <Code
+    lang="plaintext"
+    code={`src/
+├── components/
+│   ├── ui/           # Composants UI réutilisables
+│   └── templates/    # Templates et structures de pages
+├── layouts/          # Layouts de base
+├── pages/            # Pages du site
+│   └── docs/         # Documentation
+│       └── design/   # Documentation du design system
+├── styles/
+│   ├── base.css      # Styles de base
+│   ├── global.css    # Styles globaux
+│   ├── tokens/       # Design tokens
+│   │   ├── colors.css
+│   │   ├── typography.css
+│   │   ├── spacing.css
+│   │   └── components.css
+│   └── components/   # Styles des variants
+│       ├── initial.css
+│       ├── retro.css
+│       ├── modern.css
+│       └── futuristic.css
+└── fonts/            # Polices personnalisées`}
+  />
+
+  <h2 id="les-variants">Les variants</h2>
+  
+  <p>
+    Chaque composant peut être affiché dans différents styles visuels appelés <strong>variants</strong>. 
+    Les quatre variants disponibles sont :
+  </p>
+
+  <div class="variants-grid">
+    <div class="variant-card">
+      <h3>Initial</h3>
+      <p>Design épuré et moderne avec des lignes nettes et des couleurs subtiles.</p>
+    </div>
+    
+    <div class="variant-card">
+      <h3>Retro</h3>
+      <p>Inspiration vintage avec des polices caractère et des couleurs nostalgiques.</p>
+    </div>
+    
+    <div class="variant-card">
+      <h3>Modern</h3>
+      <p>Style contemporain avec des dégradés et des effets visuels élégants.</p>
+    </div>
+    
+    <div class="variant-card">
+      <h3>Futuristic</h3>
+      <p>Design avant-gardiste avec néon, glassmorphism et effets cyberpunk.</p>
+    </div>
+  </div>
+
+  <h2 id="premiers-pas">Premiers pas</h2>
+  
+  <p>Pour commencer à utiliser les composants :</p>
+
+  <ol>
+    <li>Explorez les composants du <strong>Design System</strong> dans la navigation de gauche</li>
+    <li>Consultez les exemples de code pour chaque composant</li>
+    <li>Testez les différents variants pour voir celui qui convient le mieux</li>
+    <li>Copiez et adaptez le code à vos besoins</li>
+  </ol>
+
+  <h2 id="design-tokens">Design Tokens</h2>
+  
+  <p>
+    Le système utilise des design tokens (variables CSS) pour maintenir la cohérence à travers tous les composants :
+  </p>
+
+  <ul>
+    <li><strong>Couleurs</strong> - Palette de couleurs avec variants clairs/foncés</li>
+    <li><strong>Typographie</strong> - Échelle de tailles, familles de polices et hauteurs de ligne</li>
+    <li><strong>Spacing</strong> - Système d'espacement cohérent (4px, 8px, 16px, etc.)</li>
+    <li><strong>Composants</strong> - Variables spécifiques aux composants (borders, shadows, etc.)</li>
+  </ul>
+
+</DocLayout>

@@ -1,0 +1,21 @@
+---
+interface Props {
+  asChild?: boolean;
+  for: string;
+  class?: string;
+}
+
+const { asChild = false, for: dialogFor, class: className } = Astro.props;
+
+const closeClass = ["dialog-close", className].filter(Boolean).join(" ");
+---
+
+{asChild ? (
+  <label for={dialogFor} class={className}>
+    <slot />
+  </label>
+) : (
+  <label for={dialogFor} class={closeClass} aria-label="Fermer">
+    <slot>×</slot>
+  </label>
+)}

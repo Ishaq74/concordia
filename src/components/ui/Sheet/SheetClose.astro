@@ -1,0 +1,163 @@
+---
+/**
+ * SheetClose - Label pour fermer le sheet (Pure CSS)
+ * 
+ * @param {string} htmlFor - ID du checkbox (doit correspondre à Sheet.id)
+ * @param {string} variant - Style variant (initial|retro|modern|futuristic)
+ * @param {string} color - Couleur (default|primary|secondary|accent)
+ * @param {string} className - Classes CSS supplémentaires
+ */
+
+interface Props {
+  htmlFor: string;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  color?: 'default' | 'primary' | 'secondary' | 'accent';
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  htmlFor,
+  variant = 'initial',
+  color = 'default',
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+const variantClass = variant !== 'initial' ? variant : '';
+const colorClass = color !== 'default' ? color : '';
+
+const classes = [
+  'sheet-close',
+  variantClass,
+  colorClass,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<label for={htmlFor} class={classes} tabindex="0" role="button" aria-label="Close sheet" {...htmlAttributes}>
+  <slot />
+</label>
+
+<style>
+  /* Base styles - identiques au bouton */
+  .sheet-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    font-size: var(--button-font-size);
+    padding: var(--button-padding-y) var(--button-padding-x);
+    border-width: var(--button-border-width);
+    border-style: solid;
+    border-radius: var(--button-border-radius);
+    cursor: pointer;
+    background-color: var(--button-default-bg);
+    color: var(--button-default-color);
+    border-color: var(--button-default-border-color);
+    line-height: 1.5;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+
+  .sheet-close:hover {
+    background-color: var(--button-default-bg-hover);
+  }
+
+  .sheet-close:focus {
+    outline: 2px solid var(--button-default-bg);
+    outline-offset: 2px;
+  }
+
+  .sheet-close:active {
+    transform: translateY(1px);
+  }
+
+  /* Colors */
+  .sheet-close.primary {
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-color);
+    border-color: transparent;
+  }
+
+  .sheet-close.secondary {
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-color);
+    border-color: transparent;
+  }
+
+  .sheet-close.accent {
+    background-color: var(--button-accent-bg);
+    color: var(--button-accent-color);
+    border-color: transparent;
+  }
+
+  /* Variant Modern */
+  .sheet-close.modern {
+    border-radius: var(--modern-radius);
+    border: 1px solid var(--modern-button-border-color);
+    background-color: var(--modern-button-bg);
+    color: var(--modern-button-color);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .sheet-close.modern:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--modern-button-hover-shadow);
+  }
+
+  .sheet-close.modern.primary {
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-color);
+    box-shadow: 0 4px 6px -1px color-mix(in srgb, var(--button-primary-bg) 50%, transparent);
+  }
+
+  /* Variant Retro */
+  .sheet-close.retro {
+    border-radius: 0;
+    border: 2px solid currentColor;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .sheet-close.retro:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .sheet-close.retro:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  /* Variant Futuristic */
+  .sheet-close.futuristic {
+    border-radius: var(--border-radius-lg);
+    background: linear-gradient(135deg, var(--button-default-bg), var(--bg-subtle));
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    box-shadow: 
+      var(--shadow-md),
+      0 0 20px rgba(99, 102, 241, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .sheet-close.futuristic:hover {
+    box-shadow: 
+      var(--shadow-lg),
+      0 0 30px rgba(99, 102, 241, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .sheet-close.futuristic.primary {
+    background: linear-gradient(135deg, var(--button-primary-bg), var(--color-primary-light, var(--button-primary-bg)));
+    border-color: rgba(99, 102, 241, 0.5);
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .sheet-close {
+      font-size: var(--font-size-sm);
+      padding: var(--space-2) var(--space-3);
+    }
+  }
+</style>

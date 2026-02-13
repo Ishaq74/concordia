@@ -1,0 +1,389 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import BadgeComponent from "@components/ui/Badge.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import { Code } from "astro:components";
+---
+
+<DocLayout 
+  title="Badge Component" 
+  description="Documentation du composant Badge pour afficher des étiquettes, statuts et informations compactes"
+  variant="initial"
+>
+  <h1 id="badge-component">Badge Component</h1>
+  
+  <p>
+    Le composant <code class="inline-code">Badge</code> permet d'afficher des étiquettes, statuts, 
+    compteurs et autres informations compactes avec support des variants, icônes et mode dismissible.
+  </p>
+
+  <h2 id="installation">Installation</h2>
+  
+  <p>Le composant est disponible dans <code class="inline-code">src/components/ui/Badge.astro</code></p>
+  
+  <Code
+    lang="typescript"
+    code={`import Badge from '@components/ui/Badge.astro';`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Défaut</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">variant</code></TableCell>
+          <TableCell>initial | retro | modern | futuristic</TableCell>
+          <TableCell>initial</TableCell>
+          <TableCell>Style visuel du badge</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">color</code></TableCell>
+          <TableCell>default | primary | secondary | accent</TableCell>
+          <TableCell>default</TableCell>
+          <TableCell>Couleur du badge</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">text</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Texte du badge</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">icon</code></TableCell>
+          <TableCell>{`{ name: string, side?: 'left' | 'right' }`}</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Icône et position</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">dismissible</code></TableCell>
+          <TableCell>boolean</TableCell>
+          <TableCell>false</TableCell>
+          <TableCell>Affiche un bouton de fermeture</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">ariaLabel</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Label d'accessibilité</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Classes CSS supplémentaires</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h2 id="exemples-basiques">Exemples basiques</h2>
+
+  <h3 id="badges-simples">Badges simples</h3>
+  
+  <div class="demo-box">
+    <BadgeComponent text="Nouveau" />
+    <BadgeComponent text="Beta" />
+    <BadgeComponent text="v2.0" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BadgeComponent text="Nouveau" />
+<BadgeComponent text="Beta" />
+<BadgeComponent text="v2.0" />`}
+  />
+
+  <h3 id="avec-slot">Avec slot</h3>
+  
+  <div class="demo-box">
+    <BadgeComponent>Custom Text</BadgeComponent>
+    <BadgeComponent>🎉 Promo</BadgeComponent>
+    <BadgeComponent>3</BadgeComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BadgeComponent>Custom Text</BadgeComponent>
+<BadgeComponent>🎉 Promo</BadgeComponent>
+<BadgeComponent>3</BadgeComponent>`}
+  />
+
+  <h2 id="couleurs">Couleurs</h2>
+
+  <h3 id="initial-colors">Initial</h3>
+  
+  <div class="demo-box">
+    <BadgeComponent text="Default" />
+    <BadgeComponent text="Primary" color="primary" />
+    <BadgeComponent text="Secondary" color="secondary" />
+    <BadgeComponent text="Accent" color="accent" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BadgeComponent text="Default" />
+<BadgeComponent text="Primary" color="primary" />
+<BadgeComponent text="Secondary" color="secondary" />
+<BadgeComponent text="Accent" color="accent" />`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <h3 id="variant-retro">Retro</h3>
+  
+  <div class="demo-box">
+    <BadgeComponent text="Default" variant="retro" />
+    <BadgeComponent text="Primary" variant="retro" color="primary" />
+    <BadgeComponent text="Secondary" variant="retro" color="secondary" />
+    <BadgeComponent text="Accent" variant="retro" color="accent" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BadgeComponent text="Primary" variant="retro" color="primary" />`}
+  />
+
+  <h3 id="variant-modern">Modern</h3>
+  
+  <div class="demo-box">
+    <BadgeComponent text="Default" variant="modern" />
+    <BadgeComponent text="Primary" variant="modern" color="primary" />
+    <BadgeComponent text="Secondary" variant="modern" color="secondary" />
+    <BadgeComponent text="Accent" variant="modern" color="accent" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BadgeComponent text="Primary" variant="modern" color="primary" />`}
+  />
+
+  <h3 id="variant-futuristic">Futuristic</h3>
+  
+  <div class="demo-box">
+    <BadgeComponent text="Default" variant="futuristic" />
+    <BadgeComponent text="Primary" variant="futuristic" color="primary" />
+    <BadgeComponent text="Secondary" variant="futuristic" color="secondary" />
+    <BadgeComponent text="Accent" variant="futuristic" color="accent" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BadgeComponent text="Primary" variant="futuristic" color="primary" />`}
+  />
+
+  <h2 id="avec-icones">Avec icônes</h2>
+
+  <h3 id="icone-gauche">Icône à gauche</h3>
+  
+  <div class="demo-box">
+    <BadgeComponent 
+      text="Nouveau" 
+      color="primary"
+      icon={{ name: "mdi:star", side: "left" }}
+    />
+    <BadgeComponent 
+      text="En cours" 
+      color="accent"
+      icon={{ name: "mdi:clock", side: "left" }}
+    />
+    <BadgeComponent 
+      text="Validé" 
+      color="secondary"
+      icon={{ name: "mdi:check", side: "left" }}
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BadgeComponent 
+  text="Nouveau" 
+  color="primary"
+  icon={{ name: "mdi:star", side: "left" }}
+/>`}
+  />
+
+  <h3 id="icone-droite">Icône à droite</h3>
+  
+  <div class="demo-box">
+    <BadgeComponent 
+      text="Télécharger" 
+      color="primary"
+      icon={{ name: "mdi:download", side: "right" }}
+    />
+    <BadgeComponent 
+      text="Externe" 
+      icon={{ name: "mdi:open-in-new", side: "right" }}
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BadgeComponent 
+  text="Télécharger" 
+  color="primary"
+  icon={{ name: "mdi:download", side: "right" }}
+/>`}
+  />
+
+  <h2 id="dismissible">Badges dismissible</h2>
+
+  <p>Les badges peuvent être fermés par l'utilisateur avec la prop <code class="inline-code">dismissible</code>.</p>
+
+  <div class="demo-box">
+    <BadgeComponent text="Nouveau" color="primary" dismissible />
+    <BadgeComponent text="Promo -20%" color="accent" dismissible />
+    <BadgeComponent 
+      text="Notification" 
+      color="secondary"
+      icon={{ name: "mdi:bell", side: "left" }}
+      dismissible
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BadgeComponent text="Nouveau" color="primary" dismissible />
+<BadgeComponent 
+  text="Notification" 
+  color="secondary"
+  icon={{ name: "mdi:bell", side: "left" }}
+  dismissible
+/>`}
+  />
+
+  <h2 id="cas-usage">Cas d'usage</h2>
+
+  <h3 id="compteurs">Compteurs</h3>
+  
+  <div class="demo-box">
+    <span>
+      Messages
+      <BadgeComponent text="3" color="primary" />
+    </span>
+    <span>
+      Panier
+      <BadgeComponent text="12" color="accent" />
+    </span>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<span>
+  Messages
+  <BadgeComponent text="3" color="primary" />
+</span>`}
+  />
+
+  <h3 id="statuts">Statuts</h3>
+  
+  <div class="demo-box">
+    <BadgeComponent text="En ligne" color="primary" icon={{ name: "mdi:circle", side: "left" }} />
+    <BadgeComponent text="Hors ligne" icon={{ name: "mdi:circle", side: "left" }} />
+    <BadgeComponent text="Occupé" color="accent" icon={{ name: "mdi:circle", side: "left" }} />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BadgeComponent text="En ligne" color="primary" icon={{ name: "mdi:circle", side: "left" }} />`}
+  />
+
+  <h3 id="tags">Tags</h3>
+  
+  <div class="demo-box">
+    <BadgeComponent text="JavaScript" variant="modern" />
+    <BadgeComponent text="TypeScript" variant="modern" color="primary" />
+    <BadgeComponent text="React" variant="modern" color="secondary" />
+    <BadgeComponent text="Astro" variant="modern" color="accent" />
+    <BadgeComponent text="CSS" variant="modern" />
+    <BadgeComponent text="HTML" variant="modern" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BadgeComponent text="JavaScript" variant="modern" />
+<BadgeComponent text="TypeScript" variant="modern" color="primary" />
+<BadgeComponent text="React" variant="modern" color="secondary" />`}
+  />
+
+  <h3 id="versions">Versions</h3>
+  
+  <div class="demo-box">
+    <BadgeComponent text="v1.0.0" />
+    <BadgeComponent text="v2.0.0" color="primary" />
+    <BadgeComponent text="Beta" color="accent" />
+    <BadgeComponent text="Alpha" color="secondary" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BadgeComponent text="v2.0.0" color="primary" />
+<BadgeComponent text="Beta" color="accent" />`}
+  />
+
+  <h2 id="combinaisons">Combinaisons variants + couleurs</h2>
+
+  <div class="demo-box">
+    <div>
+      <BadgeComponent text="Initial" />
+      <BadgeComponent text="Initial Primary" color="primary" />
+      <BadgeComponent text="Initial Secondary" color="secondary" />
+      <BadgeComponent text="Initial Accent" color="accent" />
+    </div>
+    
+    <div>
+      <BadgeComponent text="Retro" variant="retro" />
+      <BadgeComponent text="Retro Primary" variant="retro" color="primary" />
+      <BadgeComponent text="Retro Secondary" variant="retro" color="secondary" />
+      <BadgeComponent text="Retro Accent" variant="retro" color="accent" />
+    </div>
+    
+    <div>
+      <BadgeComponent text="Modern" variant="modern" />
+      <BadgeComponent text="Modern Primary" variant="modern" color="primary" />
+      <BadgeComponent text="Modern Secondary" variant="modern" color="secondary" />
+      <BadgeComponent text="Modern Accent" variant="modern" color="accent" />
+    </div>
+    
+    <div>
+      <BadgeComponent text="Futuristic" variant="futuristic" />
+      <BadgeComponent text="Futuristic Primary" variant="futuristic" color="primary" />
+      <BadgeComponent text="Futuristic Secondary" variant="futuristic" color="secondary" />
+      <BadgeComponent text="Futuristic Accent" variant="futuristic" color="accent" />
+    </div>
+  </div>
+
+  <h2 id="accessibilite">Accessibilité</h2>
+
+  <ul>
+    <li>Utilisez <code class="inline-code">ariaLabel</code> pour les badges avec icônes uniquement</li>
+    <li>Le bouton de fermeture a un label "Fermer" par défaut</li>
+    <li>Les badges utilisent <code class="inline-code">&lt;span&gt;</code> sémantique</li>
+    <li>Les icônes sont décoratives et n'affectent pas la lisibilité</li>
+  </ul>
+
+  <h2 id="bonnes-pratiques">Bonnes pratiques</h2>
+
+  <ul>
+    <li>Utilisez des badges pour les informations compactes et non critiques</li>
+    <li>Limitez le nombre de badges affichés simultanément pour éviter la surcharge visuelle</li>
+    <li>Utilisez des couleurs cohérentes pour les statuts (ex: primary pour actif, accent pour warning)</li>
+    <li>Préférez le texte court (1-3 mots maximum)</li>
+    <li>Utilisez <code class="inline-code">dismissible</code> pour les notifications temporaires</li>
+    <li>Combinez avec des icônes pour renforcer le sens visuel</li>
+  </ul>
+
+</DocLayout>

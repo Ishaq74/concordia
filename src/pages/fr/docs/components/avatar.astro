@@ -1,0 +1,385 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import AvatarComponent from "@components/ui/Avatar/Avatar.astro";
+import AvatarGroup from "@components/ui/Avatar/AvatarGroup.astro";
+import AvatarCard from "@components/ui/Avatar/AvatarCard.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import { Code } from "astro:components";
+---
+
+<DocLayout 
+  title="Avatar Component" 
+  description="Documentation du composant Avatar pour afficher des images de profil utilisateur avec fallback aux initiales"
+  variant="initial"
+>
+  <h1 id="avatar-component">Avatar Component</h1>
+  
+  <p>
+    Le composant <code class="inline-code">Avatar</code> permet d'afficher des images de profil 
+    avec gestion automatique des initiales en cas d'absence d'image.
+  </p>
+
+  <h2 id="installation">Installation</h2>
+  
+  <p>Les composants sont disponibles dans <code class="inline-code">src/components/ui/Avatar/</code></p>
+  
+  <Code
+    lang="typescript"
+    code={`import Avatar from '@components/ui/Avatar/Avatar.astro';
+import AvatarGroup from '@components/ui/Avatar/AvatarGroup.astro';
+import AvatarCard from '@components/ui/Avatar/AvatarCard.astro';`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Défaut</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">variant</code></TableCell>
+          <TableCell>initial | retro | modern | futuristic</TableCell>
+          <TableCell>initial</TableCell>
+          <TableCell>Style visuel de l'avatar</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">src</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>URL de l'image</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">alt</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>Avatar</TableCell>
+          <TableCell>Texte alternatif de l'image</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">fallback</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Nom pour générer les initiales (si pas d'image)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">size</code></TableCell>
+          <TableCell>sm | md | lg | xl</TableCell>
+          <TableCell>md</TableCell>
+          <TableCell>Taille de l'avatar</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Classes CSS supplémentaires</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h2 id="exemples-basiques">Exemples basiques</h2>
+
+  <h3 id="avec-image">Avec image</h3>
+  
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <AvatarComponent src="https://i.pravatar.cc/150?img=1" alt="User 1" />
+    <AvatarComponent src="https://i.pravatar.cc/150?img=2" alt="User 2" />
+    <AvatarComponent src="https://i.pravatar.cc/150?img=3" alt="User 3" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<AvatarComponent src="https://i.pravatar.cc/150?img=1" alt="User 1" />`}
+  />
+
+  <h3 id="avec-initiales">Avec initiales (fallback)</h3>
+  
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <AvatarComponent fallback="John Doe" />
+    <AvatarComponent fallback="Marie Curie" />
+    <AvatarComponent fallback="A" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<AvatarComponent fallback="John Doe" />
+<AvatarComponent fallback="Marie Curie" />
+<AvatarComponent fallback="A" />`}
+  />
+
+  <h2 id="tailles">Tailles</h2>
+
+  <p>Quatre tailles sont disponibles : <code class="inline-code">sm</code>, <code class="inline-code">md</code> (défaut), <code class="inline-code">lg</code>, et <code class="inline-code">xl</code>.</p>
+
+  <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+    <AvatarComponent size="sm" fallback="SM" />
+    <AvatarComponent size="md" fallback="MD" />
+    <AvatarComponent size="lg" fallback="LG" />
+    <AvatarComponent size="xl" fallback="XL" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<AvatarComponent size="sm" fallback="SM" />
+<AvatarComponent size="md" fallback="MD" />
+<AvatarComponent size="lg" fallback="LG" />
+<AvatarComponent size="xl" fallback="XL" />`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <h3 id="variant-initial">Initial (Default)</h3>
+  
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <AvatarComponent src="https://i.pravatar.cc/150?img=4" />
+    <AvatarComponent fallback="John Doe" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<AvatarComponent src="https://i.pravatar.cc/150?img=4" />
+<AvatarComponent fallback="John Doe" />`}
+  />
+
+  <h3 id="variant-retro">Retro</h3>
+  
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <AvatarComponent variant="retro" src="https://i.pravatar.cc/150?img=5" />
+    <AvatarComponent variant="retro" fallback="Retro User" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<AvatarComponent variant="retro" src="https://i.pravatar.cc/150?img=5" />
+<AvatarComponent variant="retro" fallback="Retro User" />`}
+  />
+
+  <h3 id="variant-modern">Modern</h3>
+  
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <AvatarComponent variant="modern" src="https://i.pravatar.cc/150?img=6" />
+    <AvatarComponent variant="modern" fallback="Modern User" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<AvatarComponent variant="modern" src="https://i.pravatar.cc/150?img=6" />
+<AvatarComponent variant="modern" fallback="Modern User" />`}
+  />
+
+  <h3 id="variant-futuristic">Futuristic</h3>
+  
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <AvatarComponent variant="futuristic" src="https://i.pravatar.cc/150?img=7" />
+    <AvatarComponent variant="futuristic" fallback="Future User" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<AvatarComponent variant="futuristic" src="https://i.pravatar.cc/150?img=7" />
+<AvatarComponent variant="futuristic" fallback="Future User" />`}
+  />
+
+  <h2 id="avatar-group">AvatarGroup - Groupes d'avatars chevauchés</h2>
+
+  <p>Utilisez <code class="inline-code">AvatarGroup</code> pour afficher des avatars qui se chevauchent (style moderne 2025).</p>
+
+  <AvatarGroup>
+    <AvatarComponent src="https://i.pravatar.cc/150?img=8" size="lg" />
+    <AvatarComponent src="https://i.pravatar.cc/150?img=9" size="lg" />
+    <AvatarComponent src="https://i.pravatar.cc/150?img=10" size="lg" />
+    <AvatarComponent src="https://i.pravatar.cc/150?img=11" size="lg" />
+    <AvatarComponent src="https://i.pravatar.cc/150?img=12" size="lg" />
+    <AvatarComponent fallback="+5" size="lg" />
+  </AvatarGroup>
+
+  <Code
+    lang="astro"
+    code={`<AvatarGroup>
+  <AvatarComponent src="https://i.pravatar.cc/150?img=8" size="lg" />
+  <AvatarComponent src="https://i.pravatar.cc/150?img=9" size="lg" />
+  <AvatarComponent src="https://i.pravatar.cc/150?img=10" size="lg" />
+  <AvatarComponent fallback="+5" size="lg" />
+</AvatarGroup>`}
+  />
+
+  <h3 id="avatar-group-variants">AvatarGroup avec variants</h3>
+
+  <p>Variant <strong>retro</strong></p>
+  <AvatarGroup>
+    <AvatarComponent variant="retro" src="https://i.pravatar.cc/150?img=1" />
+    <AvatarComponent variant="retro" src="https://i.pravatar.cc/150?img=2" />
+    <AvatarComponent variant="retro" src="https://i.pravatar.cc/150?img=3" />
+    <AvatarComponent variant="retro" fallback="AB" />
+  </AvatarGroup>
+
+  <p>Variant <strong>modern</strong></p>
+  <AvatarGroup>
+    <AvatarComponent variant="modern" src="https://i.pravatar.cc/150?img=4" />
+    <AvatarComponent variant="modern" src="https://i.pravatar.cc/150?img=5" />
+    <AvatarComponent variant="modern" src="https://i.pravatar.cc/150?img=6" />
+    <AvatarComponent variant="modern" fallback="+3" />
+  </AvatarGroup>
+
+  <p>Variant <strong>futuristic</strong></p>
+  <AvatarGroup>
+    <AvatarComponent variant="futuristic" src="https://i.pravatar.cc/150?img=13" />
+    <AvatarComponent variant="futuristic" src="https://i.pravatar.cc/150?img=14" />
+    <AvatarComponent variant="futuristic" src="https://i.pravatar.cc/150?img=15" />
+  </AvatarGroup>
+
+  <Code
+    lang="astro"
+    code={`<AvatarGroup>
+  <AvatarComponent variant="modern" src="..." />
+  <AvatarComponent variant="modern" src="..." />
+  <AvatarComponent variant="modern" fallback="+3" />
+</AvatarGroup>`}
+  />
+
+  <h2 id="avatar-card">AvatarCard - Carte de profil</h2>
+
+  <p>Utilisez <code class="inline-code">AvatarCard</code> pour créer des cartes de profil élégantes.</p>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+    <AvatarCard
+      src="https://i.pravatar.cc/150?img=20"
+      name="John Doe"
+      description="Frontend Developer"
+    />
+    
+    <AvatarCard
+      variant="retro"
+      fallback="Marie Curie"
+      name="Marie Curie"
+      description="Physicist & Chemist"
+    />
+    
+    <AvatarCard
+      variant="modern"
+      src="https://i.pravatar.cc/150?img=21"
+      name="Alice Johnson"
+      description="UX Designer"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<AvatarCard
+  src="https://i.pravatar.cc/150?img=20"
+  name="John Doe"
+  description="Frontend Developer"
+/>
+
+<AvatarCard
+  variant="modern"
+  fallback="Alice"
+  name="Alice Johnson"
+  description="UX Designer"
+/>`}
+  />
+
+  <h2 id="cas-usage">Cas d'usage</h2>
+
+  <h3 id="profil-utilisateur">Profil utilisateur</h3>
+  
+  <div style="display: flex; align-items: center; gap: 1rem;">
+    <AvatarComponent variant="modern" src="https://i.pravatar.cc/150?img=22" size="xl" />
+    <div>
+      <h4 style="margin: 0;">John Doe</h4>
+      <p style="margin: 0; opacity: 0.7;">john.doe@example.com</p>
+    </div>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<div style="display: flex; align-items: center; gap: 1rem;">
+  <AvatarComponent variant="modern" src="..." size="xl" />
+  <div>
+    <h4>John Doe</h4>
+    <p>john.doe@example.com</p>
+  </div>
+</div>`}
+  />
+
+  <h3 id="liste-utilisateurs">Liste d'utilisateurs</h3>
+  
+  <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <AvatarComponent src="https://i.pravatar.cc/150?img=23" />
+      <span>Alice Johnson</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <AvatarComponent src="https://i.pravatar.cc/150?img=24" />
+      <span>Bob Smith</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <AvatarComponent fallback="Charlie Brown" />
+      <span>Charlie Brown</span>
+    </div>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<div style="display: flex; align-items: center; gap: 0.75rem;">
+  <AvatarComponent src="..." />
+  <span>Alice Johnson</span>
+</div>`}
+  />
+
+  <h3 id="commentaires">Système de commentaires</h3>
+  
+  <div style="border: 1px solid var(--color-outline); border-radius: var(--radius-md); padding: 1rem;">
+    <div style="display: flex; gap: 1rem;">
+      <AvatarComponent variant="retro" fallback="Marie Curie" size="sm" />
+      <div>
+        <strong>Marie Curie</strong>
+        <p style="margin: 0.25rem 0 0 0; opacity: 0.8;">
+          Excellent travail ! J'adore le design du composant.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<div style="display: flex; gap: 1rem;">
+  <AvatarComponent variant="retro" fallback="Marie Curie" size="sm" />
+  <div>
+    <strong>Marie Curie</strong>
+    <p>Excellent travail !</p>
+  </div>
+</div>`}
+  />
+
+  <h2 id="accessibilite">Accessibilité</h2>
+
+  <ul>
+    <li>L'attribut <code class="inline-code">alt</code> est requis pour les images</li>
+    <li>Les initiales sont générées automatiquement depuis le fallback</li>
+    <li>Le texte alternatif est lisible par les lecteurs d'écran</li>
+    <li>Les contrastes de couleurs respectent les normes WCAG</li>
+  </ul>
+
+  <h2 id="bonnes-pratiques">Bonnes pratiques</h2>
+
+  <ul>
+    <li>Utilisez toujours un <code class="inline-code">fallback</code> pour les avatars sans image</li>
+    <li>Fournissez un <code class="inline-code">alt</code> descriptif pour les images</li>
+    <li>Utilisez des tailles cohérentes dans un même contexte</li>
+    <li>Préférez des images carrées pour éviter les déformations</li>
+    <li>Les initiales sont limitées à 2 caractères maximum</li>
+  </ul>
+
+</DocLayout>

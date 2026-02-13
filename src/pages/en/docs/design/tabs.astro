@@ -1,0 +1,657 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import TabsComponent from "@components/ui/Tabs/Tabs.astro";
+import TabComponent from "@components/ui/Tabs/Tab.astro";
+import TabPanelComponent from "@components/ui/Tabs/TabPanel.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+---
+
+<DocLayout 
+  title="Tabs Component" 
+  description="Documentation for the CSS-only Tabs component for tab navigation with all variants"
+  variant="initial"
+>
+  <h1 id="tabs-component">Tabs Component</h1>
+  
+  <p>
+    The <code class="inline-code">Tabs</code> component allows you to create tabbed interfaces
+    <strong>in pure CSS (ZERO JavaScript)</strong> with support for 4 variants and ARIA accessibility.
+  </p>
+
+  <h2>Interactive demo</h2>
+  
+  <div class="demo-section">
+    <p>
+      <strong>Try it now!</strong> Click the tabs below.
+      <strong>ZERO JavaScript - Pure CSS with :nth-of-type()!</strong>
+    </p>
+    
+    <TabsComponent variant="modern">
+      <div class="tabs">
+        <TabComponent name="demo-tabs" icon="mdi:eye" checked>Overview</TabComponent>
+        <TabComponent name="demo-tabs" icon="mdi:code-tags">Code</TabComponent>
+        <TabComponent name="demo-tabs" icon="mdi:star">Features</TabComponent>
+                <TableHead>Default</TableHead>
+      </div>
+      
+      <div class="tabs-panels">
+        <TabPanelComponent>
+          <h3>👋 Welcome to the Tabs demo!</h3>
+          <p>
+            This component lets you organize your content in interactive tabs.
+            Switch between the different sections to discover all its capabilities.
+          </p>
+          <ul>
+            <li>✨ Intuitive and elegant interface</li>
+            <li>🎨 4 variants available (Initial, Retro, Modern, Futuristic)</li>
+            <li>⚡ ZERO JavaScript - CSS :nth-of-type() only</li>
+            <li>♻️ Reusable design system - NO hardcoded IDs in the CSS</li>
+                <TableCell>Additional CSS classes</TableCell>
+        </TabPanelComponent>
+
+        <TabPanelComponent>
+          <h3>💻 Code example</h3>
+          <p>Here is how to use the Tabs component - <strong>Note the simplicity!</strong></p>
+          <Code
+            lang="astro"
+            code={`<TabsComponent variant="modern">
+  <div class="tabs">
+    <TabComponent name="my-tabs" icon="mdi:home" checked>Home</TabComponent>
+    <TabComponent name="my-tabs" icon="mdi:cog">Settings</TabComponent>
+  </div>
+  
+  <div class="tabs-panels">
+    <TabPanelComponent>
+      <h3>Home content</h3>
+    </TabPanelComponent>
+    
+    <TabPanelComponent>
+      <h3>Settings content</h3>
+    </TabPanelComponent>
+  </div>
+</TabsComponent>`}
+          />
+        </TabPanelComponent>
+
+        <TabPanelComponent>
+          <h3>🚀 Main features</h3>
+          <ul>
+            <li>
+              <strong>4 styled variants:</strong> Initial, Retro, Modern, Futuristic
+            </li>
+            <li>
+              <strong>Icon support:</strong> Add MDI icons to your tabs
+            </li>
+            <li>
+              <strong>ZERO JavaScript:</strong> Reusable CSS :nth-of-type() technique
+            </li>
+            <li>
+              <strong>Clean design system:</strong> No hardcoded IDs in the CSS
+            </li>
+            <li>
+              <strong>Smooth animation:</strong> Soft transition between panels
+            </li>
+            <li>
+              <strong>Responsive:</strong> Adapts to all screens
+            </li>
+          </ul>
+        </TabPanelComponent>
+
+        <TabPanelComponent>
+          <h3>📚 About the documentation</h3>
+          <p>
+            This documentation page guides you through all the features of the Tabs component.
+            You will find:
+          </p>
+          <ul>
+            <li>Ready-to-use code examples</li>
+            <li>All variants with interactive demos</li>
+            <li>Reference of available props</li>
+            <li>Best usage practices</li>
+          </ul>
+          <p>
+            Keep scrolling to explore all the examples! 👇
+          </p>
+        </TabPanelComponent>
+      </div>
+    </TabsComponent>
+  </div>
+
+  <TableOfContents
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "Basic usage", href: "#basic-usage" },
+      { label: "Variants", href: "#variants" },
+      { label: "With icons", href: "#icons" },
+      { label: "Props", href: "#props" },
+    ]}
+    title="Table of contents"
+  />
+
+  <h2 id="installation">Installation</h2>
+  
+  <p>The components are available in <code class="inline-code">src/components/ui/Tabs/</code></p>
+  
+  <Code
+    lang="typescript"
+    code={`import Tabs from '@components/ui/Tabs/Tabs.astro';
+import Tab from '@components/ui/Tabs/Tab.astro';
+import TabPanel from '@components/ui/Tabs/TabPanel.astro';`}
+  />
+
+  <h2 id="basic-usage">Basic usage</h2>
+
+  <p><strong>IMPORTANT:</strong> The order of Tab and TabPanel determines the matching (no IDs!) - Reusable design system.</p>
+
+  <div class="example-section">
+    <TabsComponent variant="initial">
+      <div class="tabs">
+        <TabComponent name="basic-tabs" checked>Overview</TabComponent>
+        <TabComponent name="basic-tabs">Features</TabComponent>
+        <TabComponent name="basic-tabs">Pricing</TabComponent>
+      </div>
+      
+      <div class="tabs-panels">
+        <TabPanelComponent>
+          <h3>Overview</h3>
+          <p>
+            Welcome to the overview section. Here you will find a general introduction to our product and its main capabilities.
+          </p>
+          <ul>
+            <li>Intuitive and modern interface</li>
+            <li>Optimized performance</li>
+            <li>Cross-platform support</li>
+          </ul>
+        </TabPanelComponent>
+
+        <TabPanelComponent>
+          <h3>Features</h3>
+          <p>Discover all the powerful features of our solution:</p>
+          <ul>
+            <li><strong>Adaptive design:</strong> Works on all devices</li>
+            <li><strong>Dark mode:</strong> Built-in dark theme support</li>
+            <li><strong>Accessibility:</strong> WCAG 2.1 AA compliant</li>
+            <li><strong>Customization:</strong> 4 style variants available</li>
+          </ul>
+        </TabPanelComponent>
+
+        <TabPanelComponent>
+          <h3>Pricing</h3>
+          <p>Choose the plan that suits you:</p>
+          <Card variant="initial">
+            <CardContent>
+              <h4>Free Plan</h4>
+              <p><strong>0€/month</strong> - Ideal to get started</p>
+              <ul>
+                <li>Access to basic features</li>
+                <li>Community support</li>
+                <li>1 GB storage</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </TabPanelComponent>
+      </div>
+    </TabsComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<TabsComponent variant="initial">
+  <div class="tabs">
+    <TabComponent name="my-tabs" checked>Vue d'ensemble</TabComponent>
+    <TabComponent name="my-tabs">Fonctionnalités</TabComponent>
+    <TabComponent name="my-tabs">Tarifs</TabComponent>
+  </div>
+  
+  <div class="tabs-panels">
+    <TabPanelComponent>
+      <h3>Vue d'ensemble</h3>
+      <p>Contenu de l'onglet overview...</p>
+    </TabPanelComponent>
+
+    <TabPanelComponent>
+      <h3>Fonctionnalités</h3>
+      <p>Contenu de l'onglet features...</p>
+    </TabPanelComponent>
+
+    <TabPanelComponent>
+      <h3>Tarifs</h3>
+      <p>Contenu de l'onglet pricing...</p>
+    </TabPanelComponent>
+  </div>
+</TabsComponent>
+
+<!-- The first Tab matches the first TabPanel, the second with the second, etc. -->
+<!-- NO hardcoded IDs in the CSS - Reusable design system! -->`}
+  />
+
+  <h2 id="variants">All variants</h2>
+
+  <h3>Initial (default)</h3>
+  <div class="example-section">
+    <TabsComponent variant="initial">
+      <div class="tabs">
+        <TabComponent name="tabs-initial" checked>Profile</TabComponent>
+        <TabComponent name="tabs-initial">Settings</TabComponent>
+        <TabComponent name="tabs-initial">Notifications</TabComponent>
+      </div>
+      
+      <div class="tabs-panels">
+        <TabPanelComponent>
+          <p>Manage your personal profile and public information.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Configure your account settings and preferences.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Control your notifications and email alerts.</p>
+        </TabPanelComponent>
+      </div>
+    </TabsComponent>
+  </div>
+
+  <h3>Retro</h3>
+  <div class="example-section">
+    <TabsComponent variant="retro">
+      <div class="tabs">
+        <TabComponent name="tabs-retro" checked>Documents</TabComponent>
+        <TabComponent name="tabs-retro">Images</TabComponent>
+        <TabComponent name="tabs-retro">Videos</TabComponent>
+      </div>
+      
+      <div class="tabs-panels">
+        <TabPanelComponent>
+          <p>Access all your documents and text files.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Browse your photo and image gallery.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>View and manage your video content.</p>
+        </TabPanelComponent>
+      </div>
+    </TabsComponent>
+  </div>
+
+  <h3>Modern</h3>
+  <div class="example-section">
+    <TabsComponent variant="modern">
+      <div class="tabs">
+        <TabComponent name="tabs-modern" checked>Dashboard</TabComponent>
+        <TabComponent name="tabs-modern">Analytics</TabComponent>
+        <TabComponent name="tabs-modern">Reports</TabComponent>
+      </div>
+      
+      <div class="tabs-panels">
+        <TabPanelComponent>
+          <p>Dashboard with an overview of your key metrics.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Detailed analytics and performance statistics.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Generate and download your custom reports.</p>
+        </TabPanelComponent>
+      </div>
+    </TabsComponent>
+  </div>
+
+  <h3>Futuristic</h3>
+  <div class="example-section">
+    <TabsComponent variant="futuristic">
+      <div class="tabs">
+        <TabComponent name="tabs-futuristic" checked>Neural Net</TabComponent>
+        <TabComponent name="tabs-futuristic">Quantum</TabComponent>
+        <TabComponent name="tabs-futuristic">Cyber Space</TabComponent>
+      </div>
+      
+      <div class="tabs-panels">
+        <TabPanelComponent>
+          <p>Configure neural networks and advanced AI.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Access quantum systems and parallel computing.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Explore cyberspace and the metaverse.</p>
+        </TabPanelComponent>
+      </div>
+    </TabsComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<!-- Initial -->
+<TabsComponent variant="initial">
+  <div class="tabs">
+    <TabComponent name="my-tabs" checked>Profile</TabComponent>
+    <TabComponent name="my-tabs">Settings</TabComponent>
+  </div>
+  <div class="tabs-panels">
+    <TabPanelComponent>...</TabPanelComponent>
+    <TabPanelComponent>...</TabPanelComponent>
+  </div>
+</TabsComponent>
+
+<!-- Modern -->
+<TabsComponent variant="modern">
+  <div class="tabs">
+    <TabComponent name="my-tabs" checked>Dashboard</TabComponent>
+    <TabComponent name="my-tabs">Analytics</TabComponent>
+  </div>
+  <div class="tabs-panels">
+    <TabPanelComponent>...</TabPanelComponent>
+    <TabPanelComponent>...</TabPanelComponent>
+  </div>
+</TabsComponent>`}
+  />
+
+  <h2 id="icons">Tabs with icons</h2>
+
+  <div class="example-section">
+    <h3>Initial with icons</h3>
+    <TabsComponent variant="initial">
+      <div class="tabs">
+        <TabComponent name="tabs-icon-init" icon="mdi:home" checked>Home</TabComponent>
+        <TabComponent name="tabs-icon-init" icon="mdi:account">Profile</TabComponent>
+        <TabComponent name="tabs-icon-init" icon="mdi:cog">Settings</TabComponent>
+        <TabComponent name="tabs-icon-init" icon="mdi:bell">Notifications</TabComponent>
+      </div>
+      
+      <div class="tabs-panels">
+        <TabPanelComponent>
+          <h4>🏠 Home page</h4>
+          <p>Welcome to your personalized home page.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <h4>👤 Your profile</h4>
+          <p>Manage your personal information and avatar.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <h4>⚙️ Settings</h4>
+          <p>Configure your account and system preferences.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <h4>🔔 Notifications</h4>
+          <p>Check your recent alerts and messages.</p>
+        </TabPanelComponent>
+      </div>
+    </TabsComponent>
+  </div>
+
+  <div class="example-section">
+    <h3>Retro with icons</h3>
+    <TabsComponent variant="retro">
+      <div class="tabs">
+        <TabComponent name="tabs-icon-retro" icon="mdi:code-tags" checked>Code</TabComponent>
+        <TabComponent name="tabs-icon-retro" icon="mdi:palette">Design</TabComponent>
+        <TabComponent name="tabs-icon-retro" icon="mdi:database">Data</TabComponent>
+      </div>
+      
+      <div class="tabs-panels">
+        <TabPanelComponent>
+          <p>Code editor and development environment.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Design tools and graphical interface.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Database and API management.</p>
+        </TabPanelComponent>
+      </div>
+    </TabsComponent>
+  </div>
+
+  <div class="example-section">
+    <h3>Modern with icons</h3>
+    <TabsComponent variant="modern">
+      <div class="tabs">
+        <TabComponent name="tabs-icon-modern" icon="mdi:chart-line" checked>Analytics</TabComponent>
+        <TabComponent name="tabs-icon-modern" icon="mdi:account-group">Team</TabComponent>
+        <TabComponent name="tabs-icon-modern" icon="mdi:rocket-launch">Deploy</TabComponent>
+      </div>
+      
+      <div class="tabs-panels">
+        <TabPanelComponent>
+          <p>Real-time metrics and performance analytics.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Team management and collaboration.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Deployment and production release.</p>
+        </TabPanelComponent>
+      </div>
+    </TabsComponent>
+  </div>
+
+  <div class="example-section">
+    <h3>Futuristic with icons</h3>
+    <TabsComponent variant="futuristic">
+      <div class="tabs">
+        <TabComponent name="tabs-icon-futur" icon="mdi:brain" checked>AI Brain</TabComponent>
+        <TabComponent name="tabs-icon-futur" icon="mdi:chip">Neural Chip</TabComponent>
+        <TabComponent name="tabs-icon-futur" icon="mdi:eye-circle">Vision</TabComponent>
+      </div>
+      
+      <div class="tabs-panels">
+        <TabPanelComponent>
+          <p>Artificial intelligence and machine learning.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Neural processors and quantum chips.</p>
+        </TabPanelComponent>
+        <TabPanelComponent>
+          <p>Computer vision systems.</p>
+        </TabPanelComponent>
+      </div>
+    </TabsComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<TabsComponent variant="initial">
+  <div class="tabs">
+    <TabComponent name="my-tabs" icon="mdi:home" checked>Home</TabComponent>
+    <TabComponent name="my-tabs" icon="mdi:account">Profile</TabComponent>
+    <TabComponent name="my-tabs" icon="mdi:cog">Settings</TabComponent>
+  </div>
+  
+  <div class="tabs-panels">
+    <TabPanelComponent>
+      <p>Home tab content...</p>
+    </TabPanelComponent>
+    <TabPanelComponent>
+      <p>Profile tab content...</p>
+    </TabPanelComponent>
+    <TabPanelComponent>
+      <p>Settings tab content...</p>
+    </TabPanelComponent>
+  </div>
+</TabsComponent>`}
+  />
+
+  <h2 id="accessibility">Accessibility</h2>
+
+  <p>
+    The Tabs component follows best accessibility practices:
+  </p>
+
+  <ul>
+    <li><strong>ARIA roles</strong>: Uses <code class="inline-code">role="tablist"</code>, <code class="inline-code">role="tab"</code>, and <code class="inline-code">role="tabpanel"</code></li>
+    <li><strong>CSS-only technique</strong>: Hidden radios manage the active state without JavaScript</li>
+    <li><strong>:checked pseudo-class</strong>: Native CSS for the active tab state</li>
+    <li><strong>Visible focus</strong>: Clear focus states for keyboard navigation</li>
+    <li><strong>HTML semantics</strong>: Accessible and understandable DOM structure</li>
+  </ul>
+
+  <h2 id="props">Props</h2>
+
+  <h3>Tabs (Container)</h3>
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Default</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">variant</code></TableCell>
+          <TableCell>initial | retro | modern | futuristic</TableCell>
+          <TableCell>initial</TableCell>
+          <TableCell>Visual style of the tabs system</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>""</TableCell>
+          <TableCell>Additional CSS classes</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3>Tab</h3>
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Default</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">name</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Radio group name (required, same for all tabs in the group)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">checked</code></TableCell>
+          <TableCell>boolean</TableCell>
+          <TableCell>false</TableCell>
+          <TableCell>Default active tab (only one per group)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">icon</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>MDI icon name (optional)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>""</TableCell>
+          <TableCell>Additional CSS classes</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3>TabPanel</h3>
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Default</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>""</TableCell>
+          <TableCell>Additional CSS classes</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h2>CSS operation - Reusable Design System</h2>
+  <p><strong>🎯 The magic of :nth-of-type()!</strong></p>
+  <p>This component uses a modern CSS technique that matches the <strong>position</strong> of radios with the <strong>position</strong> of panels:</p>
+  
+    <h2>CSS operation - Reusable Design System</h2>
+  
+    <p><strong>🎯 The magic of :nth-of-type()!</strong></p>
+  
+    <p>This component uses a modern CSS technique that matches the <strong>position</strong> of radios with the <strong>position</strong> of panels:</p>
+  
+    <Code
+      lang="css"
+      code={`/* NO hardcoded IDs! Generic, reusable design system */
+    .tab-radio:nth-of-type(1):checked ~ .tabs-panels > .tab-panel:nth-of-type(1),
+    .tab-radio:nth-of-type(2):checked ~ .tabs-panels > .tab-panel:nth-of-type(2),
+    .tab-radio:nth-of-type(3):checked ~ .tabs-panels > .tab-panel:nth-of-type(3)
+    /* ... up to 15 tabs supported ... */ {
+      display: block;
+    }`}
+    />
+  
+    <p>✅ <strong>Advantages:</strong></p>
+    <ul>
+      <li><strong>Reusable everywhere</strong>: Works with any content</li>
+      <li><strong>No hardcoded IDs</strong>: Clean CSS without specific selector pollution</li>
+      <li><strong>Consistent design system</strong>: Generically applicable CSS pattern</li>
+      <li><strong>ZERO JavaScript</strong>: All pure CSS with :checked and ~</li>
+    </ul>
+
+  <p>✅ <strong>Advantages:</strong></p>
+  <ul>
+    <li><strong>Reusable everywhere</strong>: Works with any content</li>
+    <li><strong>No hardcoded IDs</strong>: Clean CSS without specific selector pollution</li>
+    <li><strong>Consistent design system</strong>: Generically applicable CSS pattern</li>
+    <li><strong>ZERO JavaScript</strong>: All pure CSS with :checked and ~</li>
+  </ul>
+
+  <h2>Best practices</h2>
+  <ul>
+    <li><strong>Order = Matching</strong>: The 1st Tab matches the 1st TabPanel, the 2nd to the 2nd, etc.</li>
+    <li><strong>Unique group name</strong>: All Tabs in a group must have the same <code class="inline-code">name</code></li>
+    <li><strong>Default checked</strong>: Always set one tab with <code class="inline-code">checked</code> to avoid empty display</li>
+    <li><strong>Slot structure</strong>: Use <code class="inline-code">slot="tabs"</code> for tabs and <code class="inline-code">slot="panels"</code> for content</li>
+    <li><strong>Logical order</strong>: Organize tabs left to right by importance</li>
+    <li><strong>Number of tabs</strong>: Limit to 5-7 tabs to avoid cognitive overload</li>
+    <li><strong>Clear labels</strong>: Use short, descriptive labels</li>
+    <li><strong>Relevant icons</strong>: Add icons to improve visual recognition</li>
+    <li><strong>Consistent variant</strong>: Use the same variant as the rest of the interface</li>
+    <li><strong>Distinct content</strong>: Each panel should have sufficiently distinct content</li>
+    <li><strong>ZERO JavaScript</strong>: The system works entirely in pure CSS</li>
+  </ul>
+
+  <h2>CSS-only architecture</h2>
+  <p>The Tabs system uses the <strong>radio button technique</strong> for 100% CSS operation:</p>
+  <ul>
+    <li><code class="inline-code">&lt;input type=\"radio\"&gt;</code> are hidden with <code class="inline-code">opacity: 0</code></li>
+    <li><code class="inline-code">&lt;label&gt;</code> elements act as styled clickable buttons</li>
+    <li>The <code class="inline-code">:checked</code> pseudo-class detects the active tab</li>
+    <li>The sibling selector <code class="inline-code">~</code> shows the corresponding panel</li>
+    <li>CSS pattern: <code class="inline-code">#id:checked ~ .tabs-panels > [data-tab=\"id\"]</code></li>
+  </ul>
+
+  <h2>Available components</h2>
+  <ul>
+    <li><code class="inline-code">Tabs</code>: Main container with slots for tabs and panels</li>
+    <li><code class="inline-code">Tab</code>: Hidden radio input + styled label with icon support</li>
+    <li><code class="inline-code">TabPanel</code>: Content panel for each tab</li>
+  </ul>
+</DocLayout>

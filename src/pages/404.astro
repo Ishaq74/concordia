@@ -1,0 +1,315 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Button from "@components/ui/Button.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import { getRelativeLocaleUrl } from "astro:i18n";
+
+const currentLocale = Astro.currentLocale || "fr";
+const translations = await import(`../i18n/${currentLocale}.json`);
+const t = translations.default.errors || {
+    notFound: {
+        title: "Page non trouvée",
+        subtitle: "Erreur 404",
+        message:
+            "Désolé, la page que vous recherchez n'existe pas ou a été déplacée.",
+        suggestions: "Suggestions :",
+        checkUrl: "Vérifiez l'URL saisie",
+        returnHome: "Retourner à l'accueil",
+        contactSupport: "Contactez le support",
+        searchSite: "Rechercher sur le site",
+    },
+};
+
+const error = t.notFound;
+---
+
+<BaseLayout
+    title={`${error.title} - ${error.subtitle}`}
+    description={error.message}
+>
+    <div class="error-page">
+        <Card className="error-card">
+            <CardContent>
+                <div class="error-content">
+                    <!-- Error Icon/Number -->
+                    <div class="error-visual">
+                        <span class="error-code">404</span>
+                        <div class="error-icon">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="120"
+                                height="120"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Error Text -->
+                    <div class="error-text">
+                        <p class="error-subtitle">{error.subtitle}</p>
+                        <h1 class="error-title">{error.title}</h1>
+                        <p class="error-message">{error.message}</p>
+                    </div>
+
+                    <!-- Suggestions -->
+                    <div class="error-suggestions">
+                        <h2 class="suggestions-title">{error.suggestions}</h2>
+                        <ul class="suggestions-list">
+                            <li>{error.checkUrl}</li>
+                            <li>
+                                <a
+                                    href={getRelativeLocaleUrl(
+                                        currentLocale,
+                                        "",
+                                    )}
+                                    class="inline-link">{error.returnHome}</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href={getRelativeLocaleUrl(
+                                        currentLocale,
+                                        "contact",
+                                    )}
+                                    class="inline-link"
+                                    >{error.contactSupport}</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="error-actions">
+                        <Button
+                            href={getRelativeLocaleUrl(currentLocale, "")}
+                            color="primary"
+                            variant="initial"
+                        >
+                            {error.returnHome}
+                        </Button>
+                        <Button
+                            href={getRelativeLocaleUrl(
+                                currentLocale,
+                                "contact",
+                            )}
+                            color="secondary"
+                            variant="initial"
+                        >
+                            {error.contactSupport}
+                        </Button>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+</BaseLayout>
+
+<style>
+    .error-page {
+        min-height: calc(100vh - 128px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-6);
+        background: linear-gradient(
+            135deg,
+            var(--bg-subtle) 0%,
+            var(--bg-default) 50%,
+            var(--bg-subtle) 100%
+        );
+    }
+
+    .error-card {
+        max-width: 48rem;
+        width: 100%;
+    }
+
+    .error-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: var(--space-8);
+        padding: var(--space-8);
+    }
+
+    .error-visual {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .error-code {
+        font-size: 10rem;
+        font-weight: 900;
+        line-height: 1;
+        background: linear-gradient(
+            135deg,
+            var(--color-primary),
+            var(--color-accent)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        opacity: 0.2;
+        position: absolute;
+        z-index: 0;
+    }
+
+    .error-icon {
+        position: relative;
+        z-index: 1;
+        color: var(--color-primary);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+    }
+
+    .error-text {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .error-subtitle {
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--color-primary);
+        margin: 0;
+    }
+
+    .error-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-default);
+        margin: 0;
+    }
+
+    .error-message {
+        font-size: 1.125rem;
+        color: var(--text-muted);
+        max-width: 32rem;
+        margin: 0;
+    }
+
+    .error-suggestions {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        padding: var(--space-6);
+        background: var(--bg-subtle);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-default);
+        width: 100%;
+    }
+
+    .suggestions-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-default);
+        margin: 0;
+    }
+
+    .suggestions-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        text-align: left;
+    }
+
+    .suggestions-list li {
+        padding-left: 1.5rem;
+        position: relative;
+        color: var(--text-muted);
+    }
+
+    .suggestions-list li::before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        color: var(--color-primary);
+    }
+
+    .inline-link {
+        color: var(--color-primary);
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.2s;
+    }
+
+    .inline-link:hover {
+        border-color: currentColor;
+    }
+
+    .error-actions {
+        display: flex;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .error-page {
+            padding: var(--space-4);
+        }
+
+        .error-content {
+            padding: var(--space-6);
+            gap: var(--space-6);
+        }
+
+        .error-code {
+            font-size: 6rem;
+        }
+
+        .error-title {
+            font-size: 2rem;
+        }
+
+        .error-message {
+            font-size: 1rem;
+        }
+
+        .error-icon svg {
+            width: 80px;
+            height: 80px;
+        }
+
+        .error-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .error-actions :global(.button) {
+            width: 100%;
+        }
+    }
+</style>

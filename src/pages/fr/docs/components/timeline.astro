@@ -1,0 +1,377 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import TimelineComponent from "@components/ui/Timeline.astro";
+import AlertComponent from "@components/ui/Alert.astro";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+
+const timelineEvents = [
+  {
+    year: "2020",
+    title: "Company Founded",
+    description: "Started our journey with a vision to change the world.",
+    icon: "🚀"
+  },
+  {
+    year: "2021",
+    title: "First Product Launch",
+    description: "Released our flagship product to the market with great success.",
+    icon: "🎯"
+  },
+  {
+    year: "2022",
+    title: "International Expansion",
+    description: "Opened offices in 5 new countries across Europe and Asia.",
+    icon: "🌍"
+  },
+  {
+    year: "2023",
+    title: "Major Milestone",
+    description: "Reached 1 million users and secured Series B funding.",
+    icon: "💎"
+  },
+  {
+    year: "2024",
+    title: "Innovation Award",
+    description: "Received industry recognition for our cutting-edge technology.",
+    icon: "🏆"
+  },
+];
+
+const shortEvents = timelineEvents.slice(0, 3);
+---
+
+<DocLayout 
+  title="Timeline Component" 
+  description="Composant timeline avec 3 orientations et 4 variants CSS pur (ZERO JavaScript)" 
+  variant="initial"
+>
+  <h1 id="timeline-component">Timeline Component</h1>
+
+  <p>
+    Le composant <code class="inline-code">Timeline</code> propose 3 orientations : 
+    <strong>Vertical</strong>, <strong>Horizontal</strong>, et <strong>Alternate</strong> (zigzag).
+  </p>
+
+  <TableOfContents
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "Orientation Vertical", href: "#vertical" },
+      { label: "Orientation Horizontal", href: "#horizontal" },
+      { label: "Orientation Alternate", href: "#alternate" },
+      { label: "Formes d'icônes", href: "#shapes" },
+      { label: "Variants", href: "#variants" },
+      { label: "API Reference", href: "#api" },
+    ]}
+    title="Table des matières"
+  />
+
+  <h2 id="installation">Installation</h2>
+
+  <Code
+    lang="astro"
+    code={`import Timeline from '@components/ui/Timeline.astro';`}
+  />
+
+  <h2 id="vertical">Orientation Vertical</h2>
+  <p>Timeline verticale classique avec ligne à gauche.</p>
+
+  <div class="demo-section">
+    <TimelineComponent 
+      events={timelineEvents}
+      orientation="vertical"
+      iconShape="circle"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<TimelineComponent 
+  events={timelineEvents}
+  orientation="vertical"
+  iconShape="circle"
+/>`}
+  />
+
+  <h2 id="horizontal">Orientation Horizontal</h2>
+  <p>Timeline horizontale avec scroll (parfait pour mobile).</p>
+
+  <div class="demo-section">
+    <TimelineComponent 
+      events={timelineEvents}
+      orientation="horizontal"
+      iconShape="circle"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<TimelineComponent 
+  events={timelineEvents}
+  orientation="horizontal"
+  iconShape="circle"
+/>`}
+  />
+
+  <h2 id="alternate">Orientation Alternate (Zigzag)</h2>
+  <p>Timeline en zigzag avec éléments alternés gauche/droite.</p>
+
+  <div class="demo-section">
+    <TimelineComponent 
+      events={timelineEvents}
+      orientation="alternate"
+      iconShape="circle"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<TimelineComponent 
+  events={timelineEvents}
+  orientation="alternate"
+  iconShape="circle"
+/>`}
+  />
+
+  <h2 id="shapes">Formes d'icônes</h2>
+
+  <h3>Circle (Défaut)</h3>
+  <div class="demo-section">
+    <TimelineComponent 
+      events={shortEvents}
+      orientation="vertical"
+      iconShape="circle"
+    />
+  </div>
+
+  <h3>Square</h3>
+  <div class="demo-section">
+    <TimelineComponent 
+      events={shortEvents}
+      orientation="vertical"
+      iconShape="square"
+    />
+  </div>
+
+  <h3>Diamond</h3>
+  <div class="demo-section">
+    <TimelineComponent 
+      events={shortEvents}
+      orientation="vertical"
+      iconShape="diamond"
+    />
+  </div>
+
+  <h3>Hexagon</h3>
+  <div class="demo-section">
+    <TimelineComponent 
+      events={shortEvents}
+      orientation="vertical"
+      iconShape="hexagon"
+    />
+  </div>
+
+  <h2 id="variants">Variants</h2>
+
+  <h3>Variant Retro</h3>
+  <div class="demo-section">
+    <TimelineComponent 
+      events={shortEvents}
+      variant="retro"
+      orientation="vertical"
+      iconShape="square"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<TimelineComponent 
+  events={shortEvents}
+  variant="retro"
+  orientation="vertical"
+  iconShape="square"
+/>`}
+  />
+
+  <h3>Variant Modern</h3>
+  <div class="demo-section">
+    <TimelineComponent 
+      events={shortEvents}
+      variant="modern"
+      orientation="vertical"
+      iconShape="circle"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<TimelineComponent 
+  events={shortEvents}
+  variant="modern"
+  orientation="vertical"
+  iconShape="circle"
+/>`}
+  />
+
+  <h3>Variant Futuristic</h3>
+  <div class="demo-section">
+    <TimelineComponent 
+      events={shortEvents}
+      variant="futuristic"
+      orientation="vertical"
+      iconShape="hexagon"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<TimelineComponent 
+  events={shortEvents}
+  variant="futuristic"
+  orientation="vertical"
+  iconShape="hexagon"
+/>`}
+  />
+
+  <h3>Alternate avec Variants</h3>
+  
+  <h4>Retro Alternate</h4>
+  <div class="demo-section">
+    <TimelineComponent 
+      events={shortEvents}
+      variant="retro"
+      orientation="alternate"
+      iconShape="square"
+    />
+  </div>
+
+  <h4>Modern Alternate</h4>
+  <div class="demo-section">
+    <TimelineComponent 
+      events={shortEvents}
+      variant="modern"
+      orientation="alternate"
+      iconShape="circle"
+    />
+  </div>
+
+  <h4>Futuristic Alternate</h4>
+  <div class="demo-section">
+    <TimelineComponent 
+      events={shortEvents}
+      variant="futuristic"
+      orientation="alternate"
+      iconShape="diamond"
+    />
+  </div>
+
+  <h2 id="api">API Reference</h2>
+
+  <h3>Props</h3>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Défaut</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">events</code></TableCell>
+          <TableCell>TimelineEvent[]</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Tableau d'événements à afficher</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">variant</code></TableCell>
+          <TableCell>"initial" | "retro" | "modern" | "futuristic"</TableCell>
+          <TableCell>"initial"</TableCell>
+          <TableCell>Style visuel de la timeline</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">orientation</code></TableCell>
+          <TableCell>"vertical" | "horizontal" | "alternate"</TableCell>
+          <TableCell>"vertical"</TableCell>
+          <TableCell>Orientation de la timeline</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">iconShape</code></TableCell>
+          <TableCell>"circle" | "square" | "diamond" | "hexagon"</TableCell>
+          <TableCell>"circle"</TableCell>
+          <TableCell>Forme des icônes</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">class</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Classes CSS supplémentaires</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3>TimelineEvent Interface</h3>
+
+  <Code
+    lang="typescript"
+    code={`interface TimelineEvent {
+  year?: string;        // Année ou date courte
+  date?: string;        // Date alternative
+  title: string;        // Titre de l'événement
+  description: string;  // Description détaillée
+  icon?: string;        // Emoji ou texte icône
+}`}
+  />
+
+  <h2>Responsive</h2>
+
+  <p>
+    La timeline s'adapte automatiquement sur mobile :
+  </p>
+
+  <ul>
+    <li><strong>Vertical</strong> : Reste vertical, padding réduit</li>
+    <li><strong>Horizontal</strong> : Défilement horizontal avec scroll-snap</li>
+    <li><strong>Alternate</strong> : Devient vertical sur mobile (ligne à gauche)</li>
+  </ul>
+
+  <AlertComponent status="info">
+    <strong>Note :</strong> ZERO JavaScript ! Toutes les animations utilisent uniquement CSS avec transitions et keyframes.
+  </AlertComponent>
+
+  <h2>Exemples de données</h2>
+
+  <Code
+    lang="typescript"
+    code={`const timelineEvents = [
+  {
+    year: "2020",
+    title: "Company Founded",
+    description: "Started our journey with a vision.",
+    icon: "🚀"
+  },
+  {
+    year: "2021",
+    title: "First Product Launch",
+    description: "Released our flagship product.",
+    icon: "🎯"
+  },
+  {
+    year: "2022",
+    title: "International Expansion",
+    description: "Opened offices in 5 countries.",
+    icon: "🌍"
+  }
+];`}
+  />
+</DocLayout>

@@ -1,0 +1,26 @@
+---
+/**
+ * TableRow - Ligne de tableau
+ * 
+ * Wraps <tr> pour chaque ligne.
+ * 
+ * @param {string} className - Classes CSS additionnelles
+ */
+
+interface Props {
+  className?: string;
+}
+
+const {
+  className = '',
+} = Astro.props;
+
+const classes = [
+  'table-row',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<tr class={classes}>
+  <slot />
+</tr>

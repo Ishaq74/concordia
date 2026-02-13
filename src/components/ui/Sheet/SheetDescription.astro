@@ -1,0 +1,41 @@
+---
+/**
+ * SheetDescription - Description du sheet
+ * 
+ * @param {string} className - Classes CSS supplémentaires
+ */
+
+interface Props {
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+const classes = [
+  'sheet-description',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<p class={classes} {...htmlAttributes}>
+  <slot />
+</p>
+
+<style>
+  .sheet-description {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .sheet-description {
+      font-size: var(--font-size-xs);
+    }
+  }
+</style>

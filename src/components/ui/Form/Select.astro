@@ -1,0 +1,51 @@
+---
+interface Props {
+  id: string;
+  name?: string;
+  value?: string;
+  required?: boolean;
+  disabled?: boolean;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  error?: string;
+  className?: string;
+}
+
+const {
+  id,
+  name,
+  required = false,
+  disabled = false,
+  variant = "initial",
+  error,
+  className = "",
+} = Astro.props;
+
+const variantClass = variant !== 'initial' ? variant : '';
+const selectClasses = [
+  error && "input-error",
+  variantClass,
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<div class="input-wrapper">
+  <select
+    id={id}
+    name={name || id}
+    required={required}
+    disabled={disabled}
+    aria-invalid={error ? "true" : undefined}
+    aria-describedby={error ? `${id}-error` : undefined}
+    class={selectClasses}
+  >
+    <slot />
+  </select>
+  
+  {error && (
+    <span class="input-error-message" id={`${id}-error`} role="alert">
+      {error}
+    </span>
+  )}
+</div>

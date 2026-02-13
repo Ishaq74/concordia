@@ -1,0 +1,48 @@
+---
+/**
+ * Kbd - Composant pour afficher des touches de clavier
+ * 
+ * Affiche une représentation visuelle d'une touche de clavier ou d'un raccourci.
+ * Supporte les 4 variants du design system et les couleurs.
+ * 
+ * @param {string} variant - Style variant (initial|retro|modern|futuristic)
+ * @param {string} color - Couleur (default|primary|secondary|accent)
+ * @param {string} size - Taille (sm|md|lg)
+ * @param {string} className - Classes CSS additionnelles
+ * 
+ * @example
+ * <Kbd>Ctrl</Kbd>
+ * <Kbd color="primary">⌘ K</Kbd>
+ * <Kbd variant="modern" size="lg">Enter</Kbd>
+ */
+
+interface Props {
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  color?: 'default' | 'primary' | 'secondary' | 'accent';
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+const {
+  variant = 'initial',
+  color = 'default',
+  size = 'md',
+  className = '',
+} = Astro.props;
+
+const variantClass = variant !== 'initial' ? `kbd-${variant}` : '';
+const colorClass = color !== 'default' ? color : '';
+const sizeClass = size !== 'md' ? `kbd-${size}` : '';
+
+const classes = [
+  'kbd',
+  variantClass,
+  colorClass,
+  sizeClass,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<kbd class={classes}>
+  <slot />
+</kbd>

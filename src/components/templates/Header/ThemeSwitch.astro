@@ -1,0 +1,63 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  class?: string;
+}
+
+const {
+  variant = 'initial',
+  class: className = '',
+} = Astro.props;
+
+const buttonClass = [
+  'theme-switch',
+  variant !== 'initial' && variant,
+  className
+].filter(Boolean).join(' ');
+---
+
+<button 
+  class={buttonClass}
+  id="theme-switch"
+  aria-label="Changer le thème"
+  type="button"
+>
+  <Icon name="mdi:white-balance-sunny" class="icon-light" />
+  <Icon name="mdi:moon-waning-crescent" class="icon-dark" />
+</button>
+
+<script>
+  function initTheme() {
+    const html = document.documentElement;
+    const button = document.getElementById('theme-switch');
+    
+    const getTheme = () => {
+      return localStorage.getItem('theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    };
+    
+    const setTheme = (theme: string) => {
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      button?.setAttribute('data-theme', theme);
+    };
+    
+    const toggleTheme = () => {
+      const current = html.getAttribute('data-theme') || 'light';
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    };
+    
+    setTheme(getTheme());
+    button?.addEventListener('click', toggleTheme);
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTheme);
+  } else {
+    initTheme();
+  }
+  
+  document.addEventListener('astro:after-swap', initTheme);
+</script>

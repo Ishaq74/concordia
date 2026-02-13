@@ -1,0 +1,161 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import ForgotPasswordForm from "@components/templates/auth/ForgotPasswordForm.astro";
+import translations from "@i18n/fr.json";
+import { getAuth } from "@lib/auth/auth";
+
+const user = Astro.locals.user;
+const redirectPath = "/fr/profil";
+const pageTitle =
+    translations.auth.forgotPassword ??
+    translations.auth.resetTitle ??
+    "Mot de passe oublié ?";
+
+if (user) {
+    return Astro.redirect(redirectPath);
+}
+
+const request = Astro.request;
+const resolveRoute = (value: unknown, fallback: string) =>
+    typeof value === "string" && value.startsWith("/") ? value : fallback;
+const resetCallbackUrl = resolveRoute(
+    translations.auth.resetPasswordUrl,
+    "/fr/reinitialiser-mot-de-passe",
+);
+let status: { type: "success" | "error"; message: string } | null = null;
+let lastEmail = "";
+const missingEmailMessage =
+    translations.auth.emailMissing ?? "Adresse email requise.";
+
+const normalizeErrorKey = (value: unknown) => {
+    if (!value || typeof value !== "string") return "";
+    return value
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_");
+};
+
+const errorMessages: Record<string, string> = {};
+const registerErrorMessage = (key: string, message: string) => {
+    const normalized = normalizeErrorKey(key);
+    if (!normalized || !message) return;
+    errorMessages[normalized] = message;
+};
+
+const emailNotFoundMessage =
+    translations.auth.emailNotFound ?? "Aucun compte trouvé avec cet email.";
+registerErrorMessage("email_not_found", emailNotFoundMessage);
+registerErrorMessage("user_not_found", emailNotFoundMessage);
+
+const emailSendFailedMessage =
+    translations.auth.emailSendFailed ?? "Erreur lors de l’envoi de l’email.";
+registerErrorMessage("email_send_failed", emailSendFailedMessage);
+
+const tooManyAttemptsMessage =
+    translations.auth.tooManyAttempts ??
+    "Trop de tentatives. Réessayez plus tard.";
+registerErrorMessage("too_many_attempts", tooManyAttemptsMessage);
+registerErrorMessage("rate_limited", tooManyAttemptsMessage);
+
+const resolveErrorMessage = (primary?: unknown, fallback?: unknown) => {
+    const primaryKey = normalizeErrorKey(primary);
+    if (primaryKey && errorMessages[primaryKey]) {
+        return errorMessages[primaryKey];
+    }
+    if (typeof fallback === "string" && fallback.trim().length > 0) {
+        const fallbackKey = normalizeErrorKey(fallback);
+        if (fallbackKey && errorMessages[fallbackKey]) {
+            return errorMessages[fallbackKey];
+        }
+        return fallback;
+    }
+    return (
+        translations.auth.serverError ?? "Erreur serveur ou réponse inattendue."
+    );
+};
+
+const codeFromUnknownError = (error: unknown) => {
+    if (error && typeof error === "object") {
+        const body = (error as { body?: Record<string, unknown> }).body;
+        if (body && typeof body === "object") {
+            const code = (body as { error?: unknown }).error;
+            if (typeof code === "string" && code.length > 0) {
+                return code;
+            }
+        }
+        const message = (error as { message?: unknown }).message;
+        if (typeof message === "string" && message.length > 0) {
+            return message;
+        }
+    }
+    return "email_not_found";
+};
+
+if (request.method === "POST") {
+    const formData = await request.formData();
+    const email = (formData.get("email") ?? "").toString().trim();
+    lastEmail = email;
+
+    if (!email) {
+        status = {
+            type: "error",
+            message: missingEmailMessage,
+        };
+    } else {
+        try {
+            const auth = await getAuth();
+            const response = await auth.api.requestPasswordReset({
+                body: {
+                    email,
+                    redirectTo: resetCallbackUrl,
+                },
+                headers: request.headers,
+                asResponse: true,
+            });
+
+            if (!response.ok) {
+                const payload = await response.json().catch(() => ({}));
+                const code =
+                    payload?.error ?? payload?.code ?? "email_not_found";
+                status = {
+                    type: "error",
+                    message: resolveErrorMessage(code, payload?.message),
+                };
+            } else {
+                const payload = await response.json().catch(() => ({}));
+                status = {
+                    type: "success",
+                    message:
+                        translations.auth.forgotSuccess ??
+                        payload?.message ??
+                        "Email envoyé.",
+                };
+            }
+        } catch (error) {
+            const code = codeFromUnknownError(error);
+            const fallbackMessage =
+                translations.auth.serverError ??
+                "Erreur serveur ou réponse inattendue.";
+            status = {
+                type: "error",
+                message: resolveErrorMessage(code, fallbackMessage),
+            };
+        }
+    }
+}
+---
+
+<BaseLayout lang="fr" title={pageTitle}>
+    <section
+        class="mx-auto flex min-h-[60vh] w-full max-w-5xl items-center justify-center px-4 py-16"
+    >
+        <ForgotPasswordForm
+            translations={translations}
+            status={status}
+            lastEmail={lastEmail}
+            title={pageTitle}
+        />
+    </section>
+</BaseLayout>

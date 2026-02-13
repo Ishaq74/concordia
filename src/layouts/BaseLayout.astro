@@ -1,0 +1,197 @@
+---
+import "@styles/global.css";
+import { AstroFont } from "astro-font";
+import Header from "@components/templates/Header/Header.astro";
+import Footer from "@components/templates/Footer/Footer.astro";
+import verifyClientScript from "@components/templates/auth/verify-email.client.ts?url";
+import forgotClientScript from "@components/templates/auth/forgot-password.client.ts?url";
+
+interface Props {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  author?: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+  prefetchUrls?: string[];
+  cssFiles?: string[];
+  jsFiles?: (string | null)[];
+  lang?: string;
+  robots?: string;
+  favicon?: string;
+  manifest?: string;
+  appleTouchIcon?: string;
+  favicon32x32?: string;
+  favicon16x16?: string;
+  dir?: string;
+}
+
+const props = Astro.props as Props;
+
+const {
+  title: rawTitle,
+  description,
+  keywords,
+  author,
+  ogImage,
+  canonicalUrl,
+  prefetchUrls = [],
+  cssFiles = [],
+  jsFiles = [],
+  lang,
+  robots,
+  favicon,
+  manifest,
+  appleTouchIcon,
+  favicon32x32,
+  favicon16x16,
+  dir,
+} = props;
+
+// Titre: NomDuSite > NomDeLaPage
+const siteTitle = "Default Title";
+const pageTitle = rawTitle ? `${siteTitle} > ${rawTitle}` : siteTitle;
+
+// Get current locale from Astro
+const currentLocale = Astro.currentLocale || "fr";
+
+// Safe fallbacks from site identity
+const htmlLang = lang ?? currentLocale;
+const htmlDir = dir ?? (currentLocale === "ar" ? "rtl" : "ltr");
+const faviconName = favicon ?? "../../favicon.svg";
+---
+
+<!doctype html>
+<html lang={htmlLang} dir={htmlDir}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Script de thème AVANT tout le reste pour éviter le flash -->
+    <script is:inline>
+      (function () {
+        const theme =
+          localStorage.getItem("theme") ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+
+    <AstroFont
+      config={[
+        {
+          name: "Bowlby One SC",
+          src: [
+            {
+              weight: "normal",
+              style: "normal",
+              path: "./public/fonts/Bowlby_One_SC/BowlbyOneSC-Regular.ttf",
+            },
+          ],
+          preload: true,
+          display: "swap",
+          selector: "h1,h2,h3,h4,h5,h6,button,.btn, .heading",
+          fallback: "sans-serif",
+        },
+        {
+          name: "Palanquin Dark",
+          src: [
+            {
+              weight: "bold",
+              style: "normal",
+              path: "../fonts/Palanquin_Dark/PalanquinDark-Bold.ttf",
+            },
+            {
+              weight: "500",
+              style: "normal",
+              path: "../fonts/Palanquin_Dark/PalanquinDark-Medium.ttf",
+            },
+            {
+              weight: "normal",
+              style: "normal",
+              path: "../fonts/Palanquin_Dark/PalanquinDark-Regular.ttf",
+            },
+            {
+              weight: "600",
+              style: "normal",
+              path: "../fonts/Palanquin_Dark/PalanquinDark-SemiBold.ttf",
+            },
+          ],
+          preload: true,
+          display: "swap",
+          selector: "body",
+          fallback: "sans-serif",
+        },
+      ]}
+    />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="author" content={author} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Prefetch URLs -->
+    {prefetchUrls.map((url) => <link rel="prefetch" href={url} />)}
+
+    <!-- Styles -->
+    {cssFiles.map((file) => <link rel="stylesheet" href={file} />)}
+
+    <!-- Scripts -->
+    {
+      jsFiles.map((file) =>
+        file ? <script is:inline async src={file} /> : null,
+      )
+    }
+
+    <!-- Favicons -->
+    <link rel="icon" href={`images/${faviconName}`} type="image/x-icon" />
+    <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon} />
+    <link rel="icon" type="image/png" sizes="32x32" href={favicon32x32} />
+    <link rel="icon" type="image/png" sizes="16x16" href={favicon16x16} />
+    <link rel="manifest" href={manifest} />
+
+    <meta name="robots" content={robots} />
+    <meta name="theme-color" content="#ffffff" />
+  </head>
+
+  <body>
+    <Header lang={htmlLang} />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+    <script type="module" src={verifyClientScript}></script>
+    <script type="module" src={forgotClientScript}></script>
+  </body>
+</html>
+
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  main {
+    flex: 1;
+  }
+</style>

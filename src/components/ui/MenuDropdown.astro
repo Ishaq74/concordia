@@ -1,0 +1,530 @@
+---
+// MenuDropdown.astro – ZERO JS dropdown (V8 - STABLE & COMPATIBLE)
+// Supports Hover (CSS) + Click (Radio Hack) + Mutual Exclusion + Mobile Accordion
+interface MenuDropdownItem {
+  label: string;
+  value?: string;
+  icon?: string;
+  href?: string;
+  disabled?: boolean;
+  children?: MenuDropdownItem[];
+}
+interface Props {
+  items: MenuDropdownItem[];
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  position?: "bottom-left" | "bottom-right" | "top-left" | "top-right";
+  triggerLabel?: string;
+  triggerIcon?: string;
+  openOnHover?: boolean;
+  isMenuMobile?: boolean;
+  class?: string;
+  groupName?: string;
+}
+const {
+  items,
+  variant = "initial",
+  position = "bottom-left",
+  triggerLabel = "Menu",
+  triggerIcon,
+  openOnHover = false,
+  isMenuMobile = false,
+  ismenumobile = false, // Support lowercase variant
+  isMobileNav = false,
+  class: className,
+  groupName = "global-dropdown-group",
+} = Astro.props as any;
+
+const isMobileStyle = isMenuMobile || ismenumobile || isMobileNav;
+const dropdownId = `md-${Math.random().toString(36).substring(2, 6)}`;
+const closeId = `${dropdownId}-close`;
+
+const containerClass = [
+  "menudropdown",
+  "dropdown", // Add 'dropdown' for Header.astro compatibility
+  openOnHover ? "hover-mode" : "click-mode",
+  isMobileStyle && "is-menu-mobile",
+  variant !== "initial" && `variant-${variant}`,
+  `pos-${position}`,
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<div class={containerClass}>
+  {/* The Radio Hack State */}
+  <input
+    type="radio"
+    name={groupName}
+    id={dropdownId}
+    class="dropdown-state-toggle"
+  />
+
+  {
+    /* The unique Close radio for this instance (unchecks the main radio because same name) */
+  }
+  <input
+    type="radio"
+    name={groupName}
+    id={closeId}
+    class="dropdown-close-toggle"
+  />
+
+  {/* The Global Backdrop - only visible when this menu is open */}
+  <label for={closeId} class="dropdown-backdrop-overlay"></label>
+
+  <div class="menu-root-container">
+    <div class="trigger-group">
+      <label for={dropdownId} class="menu-trigger dropdown-trigger">
+        <slot name="trigger">
+          {triggerIcon && <span class="trigger-icon" set:html={triggerIcon} />}
+          <span class="trigger-label">{triggerLabel}</span>
+          <span class="trigger-arrow">▼</span>
+        </slot>
+      </label>
+
+      {
+        /* 
+        This is the "Close me" overlay on the trigger itself.
+        When open, clicking the trigger area hits this label which selects the Close ID.
+      */
+      }
+      <label for={closeId} class="reclick-close-label"></label>
+    </div>
+
+    <div class="menu-panel dropdown-menu">
+      <div class="menu-panel-inner">
+        {
+          items.map((item: MenuDropdownItem, idx: number) => {
+            const hasChildren = item.children && item.children.length > 0;
+            const subId = `${dropdownId}-s-${idx}`;
+
+            return (
+              <div
+                class={`menu-item-wrapper ${hasChildren ? "has-children" : ""}`}
+              >
+                {hasChildren ? (
+                  <>
+                    <input
+                      type="checkbox"
+                      id={subId}
+                      class="sub-state-toggle"
+                    />
+                    <label
+                      for={subId}
+                      class="item-trigger dropdown-item has-submenu"
+                    >
+                      {item.icon && (
+                        <span class="item-icon" set:html={item.icon} />
+                      )}
+                      <span class="item-label">{item.label}</span>
+                      <span class="item-arrow">▶</span>
+                    </label>
+                    <div class="submenu submenu-content">
+                      <div class="submenu-inner">
+                        {item.children!.map(
+                          (child: MenuDropdownItem, cIdx: number) => {
+                            const hasGrand =
+                              child.children && child.children.length > 0;
+                            const grandId = `${subId}-g-${cIdx}`;
+
+                            return (
+                              <div
+                                class={`menu-item-wrapper ${hasGrand ? "has-children" : ""}`}
+                              >
+                                {hasGrand ? (
+                                  <>
+                                    <input
+                                      type="checkbox"
+                                      id={grandId}
+                                      class="sub-state-toggle"
+                                    />
+                                    <label
+                                      for={grandId}
+                                      class="item-trigger dropdown-item has-submenu"
+                                    >
+                                      {child.icon && (
+                                        <span
+                                          class="item-icon"
+                                          set:html={child.icon}
+                                        />
+                                      )}
+                                      <span class="item-label">
+                                        {child.label}
+                                      </span>
+                                      <span class="item-arrow">▶</span>
+                                    </label>
+                                    <div class="submenu submenu-content">
+                                      <div class="submenu-inner">
+                                        {child.children!.map(
+                                          (grand: MenuDropdownItem) =>
+                                            grand.href ? (
+                                              <a
+                                                href={grand.href}
+                                                class="menu-item link dropdown-item"
+                                                data-value={grand.value}
+                                              >
+                                                {grand.icon && (
+                                                  <span
+                                                    class="item-icon"
+                                                    set:html={grand.icon}
+                                                  />
+                                                )}
+                                                <span class="item-label">
+                                                  {grand.label}
+                                                </span>
+                                              </a>
+                                            ) : (
+                                              <div
+                                                class="menu-item dropdown-item"
+                                                data-value={grand.value}
+                                              >
+                                                {grand.icon && (
+                                                  <span
+                                                    class="item-icon"
+                                                    set:html={grand.icon}
+                                                  />
+                                                )}
+                                                <span class="item-label">
+                                                  {grand.label}
+                                                </span>
+                                              </div>
+                                            ),
+                                        )}
+                                      </div>
+                                    </div>
+                                  </>
+                                ) : child.href ? (
+                                  <a
+                                    href={child.href}
+                                    class="menu-item link dropdown-item"
+                                    data-value={child.value}
+                                  >
+                                    {child.icon && (
+                                      <span
+                                        class="item-icon"
+                                        set:html={child.icon}
+                                      />
+                                    )}
+                                    <span class="item-label">
+                                      {child.label}
+                                    </span>
+                                  </a>
+                                ) : (
+                                  <div
+                                    class="menu-item dropdown-item"
+                                    data-value={child.value}
+                                  >
+                                    {child.icon && (
+                                      <span
+                                        class="item-icon"
+                                        set:html={child.icon}
+                                      />
+                                    )}
+                                    <span class="item-label">
+                                      {child.label}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          },
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : item.href ? (
+                  <a
+                    href={item.href}
+                    class="menu-item link dropdown-item"
+                    data-value={item.value}
+                  >
+                    {item.icon && (
+                      <span class="item-icon" set:html={item.icon} />
+                    )}
+                    <span class="item-label">{item.label}</span>
+                  </a>
+                ) : (
+                  <div class="menu-item dropdown-item" data-value={item.value}>
+                    {item.icon && (
+                      <span class="item-icon" set:html={item.icon} />
+                    )}
+                    <span class="item-label">{item.label}</span>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* === MENUDROPDOWN V8 - THE ULTIMATE STABLE EDITION === */
+
+  .menudropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  /* Hidden State Toggles */
+  .dropdown-state-toggle,
+  .dropdown-close-toggle,
+  .sub-state-toggle {
+    display: none !important;
+    visibility: hidden !important;
+    position: absolute;
+  }
+
+  /* Backdrop: Global closure */
+  .dropdown-backdrop-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+    display: none;
+    background: transparent;
+  }
+
+  .dropdown-state-toggle:checked ~ .dropdown-backdrop-overlay {
+    display: block;
+  }
+
+  /* Trigger Group */
+  .trigger-group {
+    position: relative;
+    display: inline-flex;
+    width: 100%;
+  }
+
+  .menu-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-md, 0.4rem);
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e2e8f0);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    width: 100%;
+  }
+
+  .reclick-close-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    display: none;
+    cursor: pointer;
+  }
+
+  .dropdown-state-toggle:checked + .menu-root-container .reclick-close-label {
+    display: block;
+  }
+
+  /* Main Panel */
+  .menu-panel {
+    position: absolute;
+    top: calc(100% + 5px);
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: var(--radius-md, 0.4rem);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+    padding: 0.5rem;
+    min-width: 220px;
+    z-index: 1010;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.98);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .dropdown-state-toggle:checked ~ .menu-root-container .menu-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(0, 0) scale(1);
+    pointer-events: auto;
+  }
+
+  /* Submenus (Desktop) */
+  .submenu {
+    position: absolute;
+    top: -0.5rem;
+    left: calc(100% + 5px);
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: var(--radius-md, 0.4rem);
+    box-shadow: 0 5px 20px -5px rgba(0, 0, 0, 0.1);
+    min-width: 210px;
+    opacity: 0;
+    visibility: hidden;
+    padding: 0.5rem;
+    transform: translateX(10px);
+    transition: all 0.2s;
+    pointer-events: none;
+  }
+
+  .sub-state-toggle:checked ~ .submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(0, 0);
+    pointer-events: auto;
+  }
+
+  /* --- MOBILE INTEGRATION --- */
+  .is-menu-mobile .menu-trigger {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid var(--color-border, rgba(0, 0, 0, 0.08)) !important;
+    border-radius: 0 !important;
+    padding: 0.8rem 0 !important;
+    color: var(--color-foreground, inherit) !important;
+  }
+
+  .is-menu-mobile .item-trigger {
+    background: transparent !important;
+    border: none !important;
+    padding: 0.7rem 0 !important;
+    color: var(--color-foreground, inherit) !important;
+    opacity: 0.9;
+  }
+
+  .is-menu-mobile .item-trigger:hover,
+  .is-menu-mobile .menu-trigger:hover {
+    color: var(--color-primary, #3b82f6) !important;
+  }
+
+  .is-menu-mobile .menu-panel,
+  .is-menu-mobile .submenu {
+    position: static !important;
+    display: none;
+    width: 100% !important;
+    min-width: 0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    pointer-events: auto !important;
+  }
+
+  .is-menu-mobile
+    .dropdown-state-toggle:checked
+    ~ .menu-root-container
+    .menu-panel,
+  .is-menu-mobile .sub-state-toggle:checked ~ .submenu {
+    display: block !important;
+  }
+
+  .is-menu-mobile .menu-panel-inner,
+  .is-menu-mobile .submenu-inner {
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--color-border, rgba(0, 0, 0, 0.06));
+    margin: 0.25rem 0 0.5rem 0.25rem;
+  }
+
+  /* Dark theme adjustment for guides */
+  :global([data-theme="dark"]) .is-menu-mobile .menu-panel-inner,
+  :global([data-theme="dark"]) .is-menu-mobile .submenu-inner {
+    border-left-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* --- ARROW REFINEMENT --- */
+  .trigger-arrow,
+  .item-arrow {
+    font-size: 0.75rem;
+    transition: transform 0.3s;
+    opacity: 0.5;
+  }
+  .dropdown-state-toggle:checked + .menu-root-container .trigger-arrow {
+    transform: rotate(180deg);
+  }
+  .sub-state-toggle:checked + .item-trigger .item-arrow {
+    transform: rotate(90deg);
+  }
+
+  /* --- ITEM STYLES --- */
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: var(--color-foreground, #333);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .menu-item.link:hover {
+    background: var(--color-surface-hover, #f1f5f9);
+    color: var(--color-primary, #3b82f6);
+  }
+
+  .is-menu-mobile .menu-item {
+    padding: 0.6rem 0;
+    border-radius: 0;
+  }
+  .is-menu-mobile .menu-item.link:hover {
+    background: transparent;
+  }
+
+  /* Positioning */
+  .pos-bottom-right .menu-panel {
+    right: 0;
+    left: auto;
+  }
+  .pos-top-left .menu-panel {
+    bottom: calc(100% + 5px);
+    top: auto;
+  }
+  .pos-top-right .menu-panel {
+    bottom: calc(100% + 5px);
+    top: auto;
+    right: 0;
+    left: auto;
+  }
+
+  /* Hover (Desktop) */
+  @media (hover: hover) {
+    .hover-mode:not(.is-menu-mobile) .menu-root-container:hover > .menu-panel,
+    .hover-mode:not(.is-menu-mobile) .has-children:hover > .submenu {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(0, 0) scale(1);
+      pointer-events: auto;
+    }
+  }
+
+  /* Dark Theme */
+  :global([data-theme="dark"]) .menu-panel,
+  :global([data-theme="dark"]) .submenu {
+    background: #111827;
+    border-color: #374151;
+  }
+  :global([data-theme="dark"]) .menu-trigger {
+    background: #1f2937;
+    color: #f3f4f6;
+    border-color: #374151;
+  }
+  :global([data-theme="dark"]) .menu-item {
+    color: #d1d5db;
+  }
+  :global([data-theme="dark"]) .is-menu-mobile .menu-panel-inner {
+    border-left-color: #374151;
+  }
+</style>

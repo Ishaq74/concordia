@@ -1,0 +1,64 @@
+---
+/**
+ * Checkbox - Composant checkbox avec support des variants
+ * 
+ * @param {string} id - ID pour lier le label
+ * @param {string} name - Nom du champ
+ * @param {string} value - Valeur du checkbox
+ * @param {boolean} checked - État coché par défaut
+ * @param {boolean} required - Champ requis
+ * @param {boolean} disabled - Champ désactivé
+ * @param {string} variant - Style variant (initial|retro|modern|futuristic)
+ * @param {string} error - Message d'erreur
+ */
+
+interface Props {
+  id: string;
+  name: string;
+  value?: string;
+  checked?: boolean;
+  required?: boolean;
+  disabled?: boolean;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  error?: string;
+}
+
+const {
+  id,
+  name,
+  value,
+  checked = false,
+  required = false,
+  disabled = false,
+  variant = 'initial',
+  error,
+  ...rest
+} = Astro.props;
+
+const variantClass = variant !== 'initial' ? variant : '';
+const hasError = !!error;
+---
+
+<div class="checkbox-wrapper">
+  <input
+    type="checkbox"
+    id={id}
+    name={name}
+    value={value}
+    checked={checked}
+    required={required}
+    disabled={disabled}
+    class={variantClass}
+    aria-invalid={hasError}
+    aria-describedby={hasError ? `${id}-error` : undefined}
+    {...rest}
+  />
+  <label for={id}>
+    <slot />
+  </label>
+</div>
+{hasError && (
+  <span class="input-error-message" id={`${id}-error`} role="alert">
+    {error}
+  </span>
+)}

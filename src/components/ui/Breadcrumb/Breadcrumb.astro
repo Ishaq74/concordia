@@ -1,0 +1,37 @@
+---
+/**
+ * Breadcrumb - Composant racine de navigation
+ */
+
+interface Props {
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  color?: 'default' | 'primary' | 'secondary' | 'accent';
+  className?: string;
+}
+
+const {
+  variant = 'initial',
+  color = 'default',
+  className = '',
+} = Astro.props;
+
+const variantClass = variant !== 'initial' ? variant : '';
+const colorClass = color !== 'default' ? color : '';
+
+const classes = [
+  'breadcrumb',
+  variantClass,
+  colorClass,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<nav aria-label="Breadcrumb" class={classes}>
+  <slot />
+</nav>
+
+<style>
+  .breadcrumb {
+    display: block;
+  }
+</style>

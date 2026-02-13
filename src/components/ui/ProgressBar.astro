@@ -1,0 +1,70 @@
+---
+interface Props {
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  color?: "default" | "primary" | "secondary" | "accent";
+  value: number;
+  max?: number;
+  size?: "sm" | "md" | "lg";
+  showLabel?: boolean;
+  label?: string;
+  striped?: boolean;
+  animated?: boolean;
+  className?: string;
+  ariaLabel?: string;
+}
+
+const {
+  variant = "initial",
+  color = "default",
+  value,
+  max = 100,
+  size = "md",
+  showLabel = false,
+  label,
+  striped = false,
+  animated = false,
+  className = "",
+  ariaLabel,
+} = Astro.props;
+
+const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
+
+const classes = [
+  "progress-bar",
+  variant !== "initial" && variant,
+  color !== "default" && color,
+  size !== "md" && `size-${size}`,
+  striped && "striped",
+  animated && "animated",
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<div 
+  class={classes} 
+  role="progressbar" 
+  aria-valuenow={value}
+  aria-valuemin="0"
+  aria-valuemax={max}
+  aria-label={ariaLabel || label || `Progression: ${percentage.toFixed(0)}%`}
+>
+  {(showLabel || label) && (
+    <span class="progress-label">
+      {label || `${percentage.toFixed(0)}%`}
+    </span>
+  )}
+  <div class="progress-track">
+    <div 
+      class="progress-fill" 
+      style={`width: ${percentage}%`}
+    >
+      {showLabel && !label && (
+        <span class="progress-label-inner">
+          {percentage.toFixed(0)}%
+        </span>
+      )}
+    </div>
+  </div>
+</div>

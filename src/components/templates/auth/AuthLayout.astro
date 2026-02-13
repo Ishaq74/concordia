@@ -1,0 +1,10 @@
+---
+interface Props {
+    translations?: Record<string, any>;
+}
+// Simple wrapper for now, can be extended with shared auth headers/footers
+---
+
+<div class="auth-layout w-full max-w-md mx-auto">
+    <slot />
+</div>

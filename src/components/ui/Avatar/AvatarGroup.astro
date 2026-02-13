@@ -1,0 +1,25 @@
+---
+interface Props {
+  max?: number;
+  className?: string;
+}
+
+const {
+  max,
+  className = "",
+} = Astro.props;
+
+const classes = [
+  "avatar-group",
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<div class={classes}>
+  <slot />
+  {max && (
+    <slot name="overflow" />
+  )}
+</div>

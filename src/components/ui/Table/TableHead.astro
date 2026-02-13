@@ -1,0 +1,29 @@
+---
+/**
+ * TableHead - Cellule d'en-tête de colonne
+ * 
+ * Wraps <th> pour les en-têtes de colonnes.
+ * 
+ * @param {string} scope - Scope de l'en-tête (col|row)
+ * @param {string} className - Classes CSS additionnelles
+ */
+
+interface Props {
+  scope?: 'col' | 'row';
+  className?: string;
+}
+
+const {
+  scope = 'col',
+  className = '',
+} = Astro.props;
+
+const classes = [
+  'table-head',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<th class={classes} scope={scope}>
+  <slot />
+</th>

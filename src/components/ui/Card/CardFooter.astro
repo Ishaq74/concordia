@@ -1,0 +1,20 @@
+---
+interface Props {
+  align?: 'left' | 'center' | 'right' | 'between';
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  align = 'between',
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+const alignClass = align !== 'left' ? `align-${align}` : '';
+const classes = ['card-footer', alignClass, className].filter(Boolean).join(' ');
+---
+
+<footer class={classes} {...htmlAttributes}>
+  <slot />
+</footer>

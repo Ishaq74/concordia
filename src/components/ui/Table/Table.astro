@@ -1,0 +1,38 @@
+---
+/**
+ * Table - Composant conteneur pour tableaux
+ * 
+ * Container scrollable pour tableaux avec support des variants.
+ * 
+ * @param {string} variant - Style variant (initial|retro|modern|futuristic)
+ * @param {boolean} striped - Activer les lignes alternées (zebra)
+ * @param {string} className - Classes CSS additionnelles
+ */
+
+interface Props {
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  striped?: boolean;
+  className?: string;
+}
+
+const {
+  variant = 'initial',
+  striped = false,
+  className = '',
+} = Astro.props;
+
+const variantClass = variant !== 'initial' ? variant : '';
+
+const classes = [
+  'table-container',
+  variantClass,
+  striped ? 'striped' : '',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<div class={classes}>
+  <table class="table">
+    <slot />
+  </table>
+</div>

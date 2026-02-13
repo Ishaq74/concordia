@@ -1,0 +1,264 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import SignUpCard from "@components/templates/auth/SignUpCard.astro";
+import translationsRaw from "@i18n/fr.json";
+const translations = translationsRaw as any;
+import { getAuth } from "@lib/auth/auth";
+
+const user = Astro.locals.user;
+const redirectPath = "/fr/profil";
+
+if (user) {
+  return Astro.redirect(redirectPath);
+}
+
+const verifyEmailPage =
+  typeof translations.verifyEmailPageUrl === "string" &&
+  translations.verifyEmailPageUrl.startsWith("/")
+    ? translations.verifyEmailPageUrl
+    : undefined;
+const pendingVerificationCookie = "pending_verification_email";
+const request = Astro.request;
+let status: { type: "success" | "error"; message: string } | null = null;
+let lastEmail = "";
+let lastName = "";
+
+const safeRedirect = (url?: string | null) => {
+  if (!url || typeof url !== "string") return redirectPath;
+  if (!url.startsWith("/")) return redirectPath;
+  return url;
+};
+
+const rememberPendingEmail = (email: string) => {
+  if (!email) return;
+  const isSecure = (() => {
+    try {
+      return new URL(request.url).protocol === "https:";
+    } catch {
+      return false;
+    }
+  })();
+  Astro.cookies.set(pendingVerificationCookie, email, {
+    path: "/",
+    httpOnly: true,
+    sameSite: "strict",
+    secure: isSecure,
+    maxAge: 60 * 30,
+  });
+};
+
+const normalizeErrorKey = (value: unknown) => {
+  if (!value || typeof value !== "string") return "";
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_");
+};
+
+const errorMessages: Record<string, string> = {};
+const registerErrorMessage = (key: string, message: string) => {
+  const normalized = normalizeErrorKey(key);
+  if (!normalized || !message) return;
+  errorMessages[normalized] = message;
+};
+
+const emailAlreadyExistsMessage =
+  translations.auth.emailAlreadyExists ?? "Cet email est déjà utilisé.";
+registerErrorMessage("email_already_exists", emailAlreadyExistsMessage);
+registerErrorMessage("user_already_exists", emailAlreadyExistsMessage);
+registerErrorMessage(
+  "User already exists. Use another email.",
+  emailAlreadyExistsMessage,
+);
+
+const emailSendFailedMessage =
+  translations.auth.emailSendFailed ?? "Erreur lors de l’envoi de l’email.";
+registerErrorMessage("email_send_failed", emailSendFailedMessage);
+
+const passwordsDontMatchMessage =
+  translations.auth.passwordsDontMatch ??
+  "Les mots de passe ne correspondent pas.";
+registerErrorMessage("passwords_dont_match", passwordsDontMatchMessage);
+
+const passwordTooShortMessage =
+  translations.auth.passwordTooShort ??
+  "Le mot de passe doit contenir au moins 8 caractères.";
+registerErrorMessage("password_too_short", passwordTooShortMessage);
+registerErrorMessage("weak_password", passwordTooShortMessage);
+
+const passwordCompromisedMessage =
+  translations.auth.passwordCompromised ??
+  "Ce mot de passe est compromis. Choisissez-en un autre.";
+registerErrorMessage("password_compromised", passwordCompromisedMessage);
+registerErrorMessage("password_breached", passwordCompromisedMessage);
+registerErrorMessage("password_pwned", passwordCompromisedMessage);
+registerErrorMessage("pwned_password", passwordCompromisedMessage);
+registerErrorMessage("password_leaked", passwordCompromisedMessage);
+registerErrorMessage("haveibeenpwned_password", passwordCompromisedMessage);
+registerErrorMessage("have_i_been_pwned_password", passwordCompromisedMessage);
+registerErrorMessage(
+  "the password you entered has been compromised. please choose a different password.",
+  passwordCompromisedMessage,
+);
+
+const invalidCredentialsMessage =
+  translations.auth.invalidCredentials ?? "Email ou mot de passe incorrect.";
+registerErrorMessage("invalid_credentials", invalidCredentialsMessage);
+
+const emailNotFoundMessage =
+  translations.auth.emailNotFound ?? "Aucun compte trouvé avec cet email.";
+registerErrorMessage("email_not_found", emailNotFoundMessage);
+
+const resolveErrorMessage = (primary?: unknown, fallback?: unknown) => {
+  const primaryKey = normalizeErrorKey(primary);
+  if (primaryKey && errorMessages[primaryKey]) {
+    return errorMessages[primaryKey];
+  }
+  if (typeof fallback === "string" && fallback.trim().length > 0) {
+    const fallbackKey = normalizeErrorKey(fallback);
+    if (fallbackKey && errorMessages[fallbackKey]) {
+      return errorMessages[fallbackKey];
+    }
+    return fallback;
+  }
+  return (
+    translations.auth.serverError ?? "Erreur serveur ou réponse inattendue."
+  );
+};
+
+const codeFromUnknownError = (error: unknown) => {
+  if (error && typeof error === "object") {
+    const body = (error as { body?: Record<string, unknown> }).body;
+    if (body && typeof body === "object") {
+      const code = (body as { error?: unknown }).error;
+      if (typeof code === "string" && code.length > 0) {
+        return code;
+      }
+    }
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string" && message.length > 0) {
+      return message;
+    }
+  }
+  return "invalid_credentials";
+};
+
+if (request.method === "POST") {
+  const formData = await request.formData();
+  const name = (formData.get("name") ?? "").toString().trim();
+  const email = (formData.get("email") ?? "").toString().trim();
+  const password = (formData.get("password") ?? "").toString();
+  const confirmPassword = (formData.get("confirmPassword") ?? "").toString();
+  lastName = name;
+  lastEmail = email;
+
+  if (!name || !email || !password || !confirmPassword) {
+    status = {
+      type: "error",
+      message:
+        translations.auth.invalidCredentials ??
+        "Champs manquants ou invalides.",
+    };
+  } else if (password !== confirmPassword) {
+    status = {
+      type: "error",
+      message:
+        translations.auth.passwordsDontMatch ??
+        "Les mots de passe ne correspondent pas.",
+    };
+  } else if (password.length < 8) {
+    status = {
+      type: "error",
+      message:
+        translations.auth.passwordTooShort ??
+        "Le mot de passe doit contenir au moins 8 caractères.",
+    };
+  } else {
+    try {
+      const auth = await getAuth();
+      if (!auth || typeof (auth as any).api?.signUpEmail !== "function") {
+        throw new Error("Auth API not initialized");
+      }
+      // derive a safe username to satisfy DB NOT NULL constraints
+      const makeUsername = (str: string) => {
+        if (!str || typeof str !== "string") return "";
+        const raw = str.trim().toLowerCase();
+        const slug = raw.replace(/[^a-z0-9]+/g, "").slice(0, 30);
+        if (slug.length > 0) return slug;
+        const local =
+          email && typeof email === "string"
+            ? email
+                .split("@")[0]
+                .replace(/[^a-z0-9]+/g, "")
+                .slice(0, 30)
+            : `user${Math.random().toString(36).slice(2, 8)}`;
+        return local;
+      };
+      const username = makeUsername(name || email || "user");
+      const displayUsername = name || username;
+      const response = await (auth as any).api.signUpEmail({
+        body: {
+          name,
+          username,
+          displayUsername,
+          email,
+          password,
+          confirmPassword,
+          rememberMe: true,
+          callbackURL: redirectPath,
+        },
+        headers: request.headers,
+        asResponse: true,
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        const code = payload?.error ?? payload?.code ?? "invalid_credentials";
+        status = {
+          type: "error",
+          message: resolveErrorMessage(code, payload?.message),
+        };
+      } else {
+        for (const [key, value] of response.headers.entries()) {
+          if (key.toLowerCase() === "set-cookie") {
+            Astro.response.headers.append("set-cookie", value);
+          }
+        }
+
+        rememberPendingEmail(email);
+
+        const payload = await response.json().catch(() => ({}));
+        const preferredRedirect = verifyEmailPage ?? payload?.redirect;
+        return Astro.redirect(safeRedirect(preferredRedirect ?? redirectPath));
+      }
+    } catch (error) {
+      const code = codeFromUnknownError(error);
+      status = {
+        type: "error",
+        message: resolveErrorMessage(
+          code,
+          (error as { message?: string })?.message,
+        ),
+      };
+    }
+  }
+}
+
+const pageTitle = translations.auth.registerTitle ?? "Inscription";
+---
+
+<BaseLayout lang="fr" title={pageTitle}>
+  <section
+    class="mx-auto flex min-h-[60vh] w-full max-w-5xl items-center justify-center px-4 py-16"
+  >
+    <SignUpCard
+      translations={translations.auth}
+      title={pageTitle}
+      status={status}
+      lastEmail={lastEmail}
+      lastName={lastName}
+    />
+  </section>
+</BaseLayout>

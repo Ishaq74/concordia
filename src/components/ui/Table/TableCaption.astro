@@ -1,0 +1,26 @@
+---
+/**
+ * TableCaption - Légende du tableau
+ * 
+ * Wraps <caption> pour les légendes de tableau.
+ * 
+ * @param {string} className - Classes CSS additionnelles
+ */
+
+interface Props {
+  className?: string;
+}
+
+const {
+  className = '',
+} = Astro.props;
+
+const classes = [
+  'table-caption',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<caption class={classes}>
+  <slot />
+</caption>

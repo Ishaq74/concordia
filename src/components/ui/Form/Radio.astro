@@ -1,0 +1,64 @@
+---
+/**
+ * Radio - Composant radio button avec support des variants
+ * 
+ * @param {string} id - ID pour lier le label
+ * @param {string} name - Nom du groupe radio
+ * @param {string} value - Valeur du radio
+ * @param {boolean} checked - État sélectionné par défaut
+ * @param {boolean} required - Champ requis
+ * @param {boolean} disabled - Champ désactivé
+ * @param {string} variant - Style variant (initial|retro|modern|futuristic)
+ * @param {string} error - Message d'erreur
+ */
+
+interface Props {
+  id: string;
+  name: string;
+  value: string;
+  checked?: boolean;
+  required?: boolean;
+  disabled?: boolean;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  error?: string;
+}
+
+const {
+  id,
+  name,
+  value,
+  checked = false,
+  required = false,
+  disabled = false,
+  variant = 'initial',
+  error,
+  ...rest
+} = Astro.props;
+
+const variantClass = variant !== 'initial' ? variant : '';
+const hasError = !!error;
+---
+
+<div class="radio-wrapper">
+  <input
+    type="radio"
+    id={id}
+    name={name}
+    value={value}
+    checked={checked}
+    required={required}
+    disabled={disabled}
+    class={variantClass}
+    aria-invalid={hasError}
+    aria-describedby={hasError ? `${name}-error` : undefined}
+    {...rest}
+  />
+  <label for={id}>
+    <slot />
+  </label>
+</div>
+{hasError && (
+  <span class="input-error-message" id={`${name}-error`} role="alert">
+    {error}
+  </span>
+)}

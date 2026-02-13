@@ -1,0 +1,217 @@
+---
+import Brand from "./Brand.astro";
+import Navigation from "./Navigation.astro";
+import ThemeSwitch from "./ThemeSwitch.astro";
+import LangChooser from "./LangChooser.astro";
+import User from "./User.astro";
+import Sheet from "@components/ui/Sheet.astro";
+
+interface Props {
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  fixed?: boolean;
+  class?: string;
+  lang?: string;
+}
+
+const {
+  variant = "initial",
+  fixed = false,
+  class: className = "",
+  lang,
+} = Astro.props;
+
+const headerClass = [
+  "header",
+  variant !== "initial" && variant,
+  fixed && "header-fixed",
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<header class={headerClass}>
+  <div class="header-container">
+    <Brand variant={variant} />
+
+    <!-- Desktop Navigation (hidden on mobile) -->
+    <div class="header-nav-desktop">
+      <Navigation variant={variant} />
+    </div>
+
+    <!-- Desktop Actions (hidden on mobile) -->
+    <div class="header-actions-desktop">
+      <User variant={variant} lang={lang} />
+      <LangChooser variant={variant} lang={lang} />
+      <ThemeSwitch variant={variant} />
+    </div>
+
+    <!-- Mobile: Only Theme + Hamburger -->
+    <div class="header-actions-mobile">
+      <ThemeSwitch variant={variant} />
+
+      <Sheet id="mobile-menu" side="right" class="mobile-menu-sheet">
+        <span slot="trigger" class="mobile-menu-trigger">
+          <span class="hamburger-icon">☰</span>
+        </span>
+
+        <div slot="header">
+          <h2 class="mobile-menu-title">Menu</h2>
+        </div>
+
+        <!-- Mobile Navigation + Actions stacked -->
+        <div class="mobile-menu-content">
+          <Navigation variant={variant} isMenu={true} />
+          <div class="mobile-menu-actions">
+            <User variant={variant} lang={lang} isMenu={true} />
+            <LangChooser variant={variant} lang={lang} isMenu={true} />
+          </div>
+        </div>
+      </Sheet>
+    </div>
+  </div>
+</header>
+
+<style>
+  .header {
+    width: 100%;
+    background: var(--bg-default);
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .header-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+  }
+
+  .header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    height: 64px;
+  }
+
+  /* Desktop Navigation */
+  .header-nav-desktop {
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .header-actions-desktop {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  /* Mobile menu - hidden by default */
+  .header-actions-mobile {
+    display: none;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .mobile-menu-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+
+  .hamburger-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .mobile-menu-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  /* Mobile Menu Content */
+  .mobile-menu-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  /* Style Navigation inside mobile menu */
+  .mobile-menu-content :global(.nav) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .mobile-menu-content :global(.nav-link) {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-default);
+    text-decoration: none;
+    font-size: 1rem;
+  }
+
+  .mobile-menu-content :global(.nav-link:hover) {
+    background-color: var(--bg-subtle);
+  }
+
+  .mobile-menu-content :global(.nav-dropdown-wrapper) {
+    width: 100%;
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .mobile-menu-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-default);
+  }
+
+  /* Responsive Breakpoints */
+
+  /* Tablet and below: Switch to mobile layout */
+  @media (max-width: 1024px) {
+    .header-nav-desktop,
+    .header-actions-desktop {
+      display: none;
+    }
+
+    .header-actions-mobile {
+      display: flex;
+    }
+  }
+
+  /* Mobile: Reduce padding */
+  @media (max-width: 768px) {
+    .header-container {
+      padding: 0 var(--space-4);
+      gap: var(--space-2);
+    }
+
+    .header-actions-mobile {
+      gap: var(--space-2);
+    }
+  }
+
+  /* Ensure no overflow */
+  @media (max-width: 480px) {
+    .header-container {
+      padding: 0 var(--space-3);
+    }
+
+    .mobile-menu-content :global(.nav-link),
+    .mobile-menu-content :global(.dropdown-trigger) {
+      padding: 0.875rem;
+      font-size: 0.9375rem;
+    }
+  }
+</style>

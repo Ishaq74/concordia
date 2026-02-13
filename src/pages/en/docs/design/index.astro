@@ -1,0 +1,116 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+---
+
+<DocLayout 
+  title="Introduction" 
+  description="Welcome to the design system - Complete guide to components, variants and best practices"
+  variant="initial"
+>
+  <h1 id="introduction">Introduction</h1>
+  
+  <p>
+    Welcome to the design system documentation. This library offers a complete collection 
+    of UI components with multiple visual variants to adapt to different styles and needs.
+  </p>
+
+  <h2 id="what-is-this-system">What is this design system?</h2>
+  
+  <p>
+    This design system is built with Astro and native CSS, offering:
+  </p>
+
+  <ul>
+    <li><strong>Reusable components</strong> - Link, Button, Input, Card, Badge, Alert, etc.</li>
+    <li><strong>Multiple visual variants</strong> - Initial, Retro, Modern, Futuristic</li>
+    <li><strong>Native CSS with variables</strong> - Easy customization via CSS custom properties</li>
+    <li><strong>Design tokens</strong> - Colors, typography, spacing and components</li>
+    <li><strong>Accessibility</strong> - Built with accessibility best practices</li>
+    <li><strong>Optimal performance</strong> - Progressive loading and minimal CSS</li>
+  </ul>
+
+  <h2 id="project-structure">Project Structure</h2>
+  
+  <p>The project is organized logically to facilitate navigation and maintenance:</p>
+
+  <Code
+    lang="plaintext"
+    code={`src/
+├── components/
+│   ├── ui/           # Reusable UI components
+│   └── templates/    # Page templates and structures
+├── layouts/          # Base layouts
+├── pages/            # Site pages
+│   └── docs/         # Documentation
+│       └── design/   # Design system documentation
+├── styles/
+│   ├── base.css      # Base styles
+│   ├── global.css    # Global styles
+│   ├── tokens/       # Design tokens
+│   │   ├── colors.css
+│   │   ├── typography.css
+│   │   ├── spacing.css
+│   │   └── components.css
+│   └── components/   # Variant styles
+│       ├── initial.css
+│       ├── retro.css
+│       ├── modern.css
+│       └── futuristic.css
+└── fonts/            # Custom fonts`}
+  />
+
+  <h2 id="variants">Variants</h2>
+  
+  <p>
+    Each component can be displayed in different visual styles called <strong>variants</strong>. 
+    The four available variants are:
+  </p>
+
+  <div class="variants-grid">
+    <div class="variant-card">
+      <h3>Initial</h3>
+      <p>Clean and modern design with sharp lines and subtle colors.</p>
+    </div>
+    
+    <div class="variant-card">
+      <h3>Retro</h3>
+      <p>Vintage inspiration with character fonts and nostalgic colors.</p>
+    </div>
+    
+    <div class="variant-card">
+      <h3>Modern</h3>
+      <p>Contemporary style with gradients and elegant visual effects.</p>
+    </div>
+    
+    <div class="variant-card">
+      <h3>Futuristic</h3>
+      <p>Avant-garde design with neon, glassmorphism and cyberpunk effects.</p>
+    </div>
+  </div>
+
+  <h2 id="getting-started">Getting Started</h2>
+  
+  <p>To start using the components:</p>
+
+  <ol>
+    <li>Explore the <strong>Design System</strong> components in the left navigation</li>
+    <li>Check the code examples for each component</li>
+    <li>Test different variants to see which one fits best</li>
+    <li>Copy and adapt the code to your needs</li>
+  </ol>
+
+  <h2 id="design-tokens">Design Tokens</h2>
+  
+  <p>
+    The system uses design tokens (CSS variables) to maintain consistency across all components:
+  </p>
+
+  <ul>
+    <li><strong>Colors</strong> - Color palette with light/dark variants</li>
+    <li><strong>Typography</strong> - Size scale, font families and line heights</li>
+    <li><strong>Spacing</strong> - Consistent spacing system (4px, 8px, 16px, etc.)</li>
+    <li><strong>Components</strong> - Component-specific variables (borders, shadows, etc.)</li>
+  </ul>
+
+</DocLayout>

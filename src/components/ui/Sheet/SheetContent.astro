@@ -1,0 +1,44 @@
+---
+/**
+ * SheetContent - Contenu du panneau coulissant (Pure CSS)
+ * 
+ * @param {string} sheetId - ID du checkbox pour le label overlay
+ * @param {string} side - Côté d'ouverture (top|right|bottom|left)
+ * @param {string} className - Classes CSS supplémentaires
+ */
+
+interface Props {
+  sheetId: string;
+  side?: 'top' | 'right' | 'bottom' | 'left';
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  sheetId,
+  side = 'right',
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+const classes = [
+  'sheet-content',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<div
+  class={classes}
+  data-side={side}
+  role="dialog"
+  aria-modal="true"
+  {...htmlAttributes}
+>
+  <slot />
+</div>
+<label class="sheet-overlay" for={sheetId}></label>
+
+<style>
+  /* Styles déjà définis dans Sheet.astro */
+</style>
+

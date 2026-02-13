@@ -1,0 +1,42 @@
+---
+/**
+ * SheetHeader - En-tête du sheet
+ * 
+ * @param {string} className - Classes CSS supplémentaires
+ */
+
+interface Props {
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+const classes = [
+  'sheet-header',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<div class={classes} {...htmlAttributes}>
+  <slot />
+</div>
+
+<style>
+  .sheet-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-6) var(--space-6);
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  @media (max-width: 640px) {
+    .sheet-header {
+      padding: var(--space-4) var(--space-4);
+    }
+  }
+</style>

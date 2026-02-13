@@ -1,0 +1,458 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import DialogComponent from "@/components/ui/Dialog/Dialog.astro";
+import DialogTrigger from "@/components/ui/Dialog/DialogTrigger.astro";
+import DialogContent from "@/components/ui/Dialog/DialogContent.astro";
+import DialogHeader from "@/components/ui/Dialog/DialogHeader.astro";
+import DialogFooter from "@/components/ui/Dialog/DialogFooter.astro";
+import DialogTitle from "@/components/ui/Dialog/DialogTitle.astro";
+import DialogDescription from "@/components/ui/Dialog/DialogDescription.astro";
+import DialogClose from "@/components/ui/Dialog/DialogClose.astro";
+import Button from "@components/ui/Button.astro";
+---
+
+<DocLayout 
+  title="Dialog Component" 
+  description="Boîte de dialogue modale composable avec l'élément HTML natif <dialog>" 
+  variant="initial"
+>
+  <h1 id="dialog-component">Dialog Component</h1>
+
+  <p>
+    Le composant <code class="inline-code">Dialog</code> utilise l'élément HTML natif 
+    <code class="inline-code">&lt;dialog&gt;</code> pour créer des fenêtres modales accessibles et performantes.
+    Architecture composable avec des sous-composants pour une flexibilité maximale.
+  </p>
+
+  <TableOfContents
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "Utilisation basique", href: "#basic" },
+      { label: "Variants", href: "#variants" },
+      { label: "Tailles", href: "#sizes" },
+      { label: "Avec formulaire", href: "#with-form" },
+      { label: "Trigger externe", href: "#external-trigger" },
+      { label: "API Reference", href: "#api" },
+    ]}
+    title="Table des matières"
+  />
+
+  <h2 id="installation">Installation</h2>
+
+  <Code
+    lang="astro"
+    code={`import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from '@components/ui/Dialog';`}
+  />
+
+  <h2 id="basic">Utilisation basique</h2>
+
+  <div class="demo-section">
+    <DialogComponent id="dialog-basic">
+      <DialogTrigger for="dialog-basic">
+        <Button>Ouvrir Dialog</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogClose for="dialog-basic">×</DialogClose>
+        <DialogHeader>
+          <DialogTitle>Dialog Basique</DialogTitle>
+          <DialogDescription>
+            Ceci est un dialog avec checkbox hack CSS pur (zero JavaScript).
+          </DialogDescription>
+        </DialogHeader>
+        <div style="padding: 1rem 0;">
+          <p>Le contenu de votre dialog va ici.</p>
+        </div>
+        <DialogFooter>
+          <DialogClose for="dialog-basic">
+            <Button>Fermer</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </DialogComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<DialogComponent id="mon-dialog">
+  <DialogTrigger for="mon-dialog">
+    <Button>Ouvrir Dialog</Button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogClose for="mon-dialog">×</DialogClose>
+    <DialogHeader>
+      <DialogTitle>Dialog Basique</DialogTitle>
+      <DialogDescription>
+        Description du dialog.
+      </DialogDescription>
+    </DialogHeader>
+    <div>Contenu du dialog</div>
+    <DialogFooter>
+      <DialogClose for="mon-dialog">
+        <Button>Fermer</Button>
+      </DialogClose>
+    </DialogFooter>
+  </DialogContent>
+</DialogComponent>`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <h3>Initial</h3>
+  <div class="demo-section">
+    <DialogComponent variant="initial" id="dialog-initial">
+      <DialogTrigger for="dialog-initial">
+        <Button>Initial</Button>
+      </DialogTrigger>
+      <DialogContent variant="initial">
+        <DialogHeader>
+          <DialogTitle>Dialog Initial</DialogTitle>
+          <DialogDescription>
+            Style simple et épuré.
+          </DialogDescription>
+        </DialogHeader>
+        <div style="padding: 1rem 0;">
+          <p>Contenu du dialog avec le variant initial.</p>
+        </div>
+        <DialogFooter>
+          <DialogClose for="dialog-initial">
+            <Button>Fermer</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </DialogComponent>
+  </div>
+
+  <h3>Retro</h3>
+  <div class="demo-section">
+    <DialogComponent variant="retro" id="dialog-retro">
+      <DialogTrigger for="dialog-retro">
+        <Button variant="retro">Retro</Button>
+      </DialogTrigger>
+      <DialogContent variant="retro">
+        <DialogHeader>
+          <DialogTitle>DIALOG RETRO</DialogTitle>
+          <DialogDescription>
+            Style rétro avec bordures carrées.
+          </DialogDescription>
+        </DialogHeader>
+        <div style="padding: 1rem 0;">
+          <p>Contenu du dialog avec le variant retro.</p>
+        </div>
+        <DialogFooter>
+          <DialogClose for="dialog-retro">
+            <Button variant="retro">FERMER</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </DialogComponent>
+  </div>
+
+  <h3>Modern</h3>
+  <div class="demo-section">
+    <DialogComponent variant="modern" id="dialog-modern">
+      <DialogTrigger for="dialog-modern">
+        <Button variant="modern">Modern</Button>
+      </DialogTrigger>
+      <DialogContent variant="modern">
+        <DialogHeader>
+          <DialogTitle>Dialog Modern</DialogTitle>
+          <DialogDescription>
+            Style moderne avec glassmorphism.
+          </DialogDescription>
+        </DialogHeader>
+        <div style="padding: 1rem 0;">
+          <p>Contenu du dialog avec le variant modern.</p>
+        </div>
+        <DialogFooter>
+          <DialogClose for="dialog-modern">
+            <Button variant="modern">Fermer</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </DialogComponent>
+  </div>
+
+  <h3>Futuristic</h3>
+  <div class="demo-section">
+    <DialogComponent variant="futuristic" id="dialog-futuristic">
+      <DialogTrigger for="dialog-futuristic">
+        <Button variant="futuristic">Futuristic</Button>
+      </DialogTrigger>
+      <DialogContent variant="futuristic">
+        <DialogHeader>
+          <DialogTitle>DIALOG FUTURISTIC</DialogTitle>
+          <DialogDescription>
+            Style futuriste avec effets néon.
+          </DialogDescription>
+        </DialogHeader>
+        <div style="padding: 1rem 0;">
+          <p>Contenu du dialog avec le variant futuristic.</p>
+        </div>
+        <DialogFooter>
+          <DialogClose for="dialog-futuristic">
+            <Button variant="futuristic">FERMER</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </DialogComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<DialogComponent variant="retro">
+  <DialogTrigger asChild>
+    <Button variant="retro">Retro</Button>
+  </DialogTrigger>
+  <DialogContent variant="retro">
+    <!-- Contenu -->
+  </DialogContent>
+</DialogComponent>`}
+  />
+
+  <h2 id="sizes">Tailles</h2>
+
+  <div class="demo-section">
+    <DialogComponent id="dialog-small">
+      <DialogTrigger for="dialog-small">
+        <Button>Small</Button>
+      </DialogTrigger>
+      <DialogContent size="sm">
+        <DialogClose for="dialog-small">×</DialogClose>
+        <DialogHeader>
+          <DialogTitle>Small Dialog</DialogTitle>
+        </DialogHeader>
+        <div style="padding: 1rem 0;">
+          <p>Dialog de petite taille.</p>
+        </div>
+        <DialogFooter>
+          <DialogClose for="dialog-small">
+            <Button>Fermer</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </DialogComponent>
+
+    <DialogComponent id="dialog-large">
+      <DialogTrigger for="dialog-large">
+        <Button>Large</Button>
+      </DialogTrigger>
+      <DialogContent size="lg">
+        <DialogClose for="dialog-large">×</DialogClose>
+        <DialogHeader>
+          <DialogTitle>Large Dialog</DialogTitle>
+        </DialogHeader>
+        <div style="padding: 1rem 0;">
+          <p>Dialog de grande taille.</p>
+        </div>
+        <DialogFooter>
+          <DialogClose for="dialog-large">
+            <Button>Fermer</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </DialogComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<DialogContent size="sm">...</DialogContent>
+<DialogContent size="md">...</DialogContent>
+<DialogContent size="lg">...</DialogContent>
+<DialogContent size="xl">...</DialogContent>
+<DialogContent size="full">...</DialogContent>`}
+  />
+
+  <h2 id="with-form">Avec formulaire</h2>
+
+  <div class="demo-section">
+    <DialogComponent id="dialog-form">
+      <DialogTrigger for="dialog-form">
+        <Button>Éditer Profil</Button>
+      </DialogTrigger>
+      <DialogContent size="sm" animationDuration={250}>
+        <DialogClose for="dialog-form">×</DialogClose>
+        <form method="dialog" style="display: flex; flex-direction: column; gap: 1rem;">
+          <DialogHeader>
+            <DialogTitle>Éditer le profil</DialogTitle>
+            <DialogDescription>
+              Faites vos modifications et cliquez sur Enregistrer.
+            </DialogDescription>
+          </DialogHeader>
+          <div style="display: grid; gap: 1rem; padding: 1rem 0;">
+            <div>
+              <label for="name" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Nom</label>
+              <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                placeholder="Jean Dupont"
+                style="width: 100%; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm);"
+              />
+            </div>
+            <div>
+              <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email</label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                placeholder="jean@example.com"
+                style="width: 100%; padding: 0.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm);"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose for="dialog-form">
+              <Button>Annuler</Button>
+            </DialogClose>
+            <Button type="submit">Enregistrer</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </DialogComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<DialogComponent>
+  <DialogTrigger asChild>
+    <Button>Éditer Profil</Button>
+  </DialogTrigger>
+  <DialogContent>
+    <form method="dialog">
+      <DialogHeader>
+        <DialogTitle>Éditer le profil</DialogTitle>
+        <DialogDescription>
+          Faites vos modifications.
+        </DialogDescription>
+      </DialogHeader>
+      <!-- Champs du formulaire -->
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button>Annuler</Button>
+        </DialogClose>
+        <Button type="submit">Enregistrer</Button>
+      </DialogFooter>
+    </form>
+  </DialogContent>
+</DialogComponent>`}
+  />
+
+  <h2 id="external-trigger">Trigger externe</h2>
+
+  <p>
+    Vous pouvez utiliser plusieurs triggers pour le même dialog en utilisant la prop <code class="inline-code">id</code> 
+    sur Dialog et <code class="inline-code">for</code> sur les triggers externes.
+  </p>
+
+  <div class="demo-section">
+    <DialogComponent id="external-dialog">
+      <DialogTrigger for="external-dialog">
+        <Button>Trigger Interne</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogClose for="external-dialog">×</DialogClose>
+        <DialogHeader>
+          <DialogTitle>Dialog avec triggers multiples</DialogTitle>
+          <DialogDescription>
+            Ce dialog peut être ouvert par plusieurs boutons.
+          </DialogDescription>
+        </DialogHeader>
+        <div style="padding: 1rem 0;">
+          <p>Vous avez ouvert ce dialog avec un des deux triggers.</p>
+        </div>
+        <DialogFooter>
+          <DialogClose for="external-dialog">
+            <Button>Fermer</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </DialogComponent>
+
+    <DialogTrigger for="external-dialog">
+      <Button variant="modern">Trigger Externe</Button>
+    </DialogTrigger>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<DialogComponent id="my-dialog">
+  <DialogTrigger asChild>
+    <Button>Trigger Interne</Button>
+  </DialogTrigger>
+  <DialogContent>
+    <!-- Contenu -->
+  </DialogContent>
+</DialogComponent>
+
+<!-- Trigger externe -->
+<DialogTrigger for="my-dialog" asChild>
+  <Button>Trigger Externe</Button>
+</DialogTrigger>`}
+  />
+
+  <h2 id="api">API Reference</h2>
+
+  <h3>Dialog</h3>
+  <p>Composant racine qui contient tous les autres composants du dialog.</p>
+  <ul>
+    <li><code class="inline-code">variant</code>: "initial" | "retro" | "modern" | "futuristic" (défaut: "initial")</li>
+    <li><code class="inline-code">id</code>: Identifiant unique pour les triggers externes</li>
+    <li><code class="inline-code">class</code>: Classes CSS additionnelles</li>
+  </ul>
+
+  <h3>DialogTrigger</h3>
+  <p>Bouton qui ouvre le dialog.</p>
+  <ul>
+    <li><code class="inline-code">asChild</code>: Utilise l'enfant comme trigger au lieu d'un bouton</li>
+    <li><code class="inline-code">for</code>: ID du dialog à ouvrir (pour les triggers externes)</li>
+    <li><code class="inline-code">class</code>: Classes CSS additionnelles</li>
+  </ul>
+
+  <h3>DialogContent</h3>
+  <p>Container du contenu du dialog.</p>
+  <ul>
+    <li><code class="inline-code">variant</code>: Style visuel (initial, retro, modern, futuristic)</li>
+    <li><code class="inline-code">size</code>: Taille (sm, md, lg, xl, full)</li>
+    <li><code class="inline-code">animationDuration</code>: Durée d'animation en ms (défaut: 200)</li>
+    <li><code class="inline-code">class</code>: Classes CSS additionnelles</li>
+  </ul>
+
+  <h3>DialogHeader / DialogFooter</h3>
+  <p>Containers pour l'en-tête et le pied du dialog.</p>
+  <ul>
+    <li><code class="inline-code">class</code>: Classes CSS additionnelles</li>
+  </ul>
+
+  <h3>DialogTitle / DialogDescription</h3>
+  <p>Titre et description du dialog.</p>
+  <ul>
+    <li><code class="inline-code">class</code>: Classes CSS additionnelles</li>
+  </ul>
+
+  <h3>DialogClose</h3>
+  <p>Bouton qui ferme le dialog.</p>
+  <ul>
+    <li><code class="inline-code">asChild</code>: Utilise l'enfant comme bouton de fermeture</li>
+    <li><code class="inline-code">class</code>: Classes CSS additionnelles</li>
+  </ul>
+
+  <h3>Fonctionnalités natives</h3>
+  <ul>
+    <li><strong>ESC</strong> : Ferme automatiquement le dialog</li>
+    <li><strong>Backdrop</strong> : Clic sur le backdrop ferme le dialog</li>
+    <li><strong>Focus trap</strong> : Géré nativement par le navigateur</li>
+    <li><strong>Scroll lock</strong> : Le body est automatiquement bloqué</li>
+    <li><strong>@starting-style</strong> : Animations CSS natives modernes</li>
+  </ul>
+</DocLayout>

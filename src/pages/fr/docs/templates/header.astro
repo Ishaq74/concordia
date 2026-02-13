@@ -1,0 +1,163 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import Alert from "@components/ui/Alert.astro";
+import Badge from "@components/ui/Badge.astro";
+import TOC from "@components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+---
+
+<DocLayout 
+  title="Header Template" 
+  description="Template Header responsive avec navigation, theme switch et language chooser" 
+  variant="initial"
+>
+  <h1 id="header">Header Template</h1>
+
+  <p>
+    Le template <code class="inline-code">Header</code> est le composant d'en-tête principal du site. 
+    Il intègre le logo/brand, la navigation, le switch de thème et le sélecteur de langue.
+  </p>
+
+  <TOC
+    items={[
+      { label: "Composants inclus", href: "#composants" },
+      { label: "Utilisation", href: "#utilisation" },
+      { label: "Props", href: "#props" },
+      { label: "Variants", href: "#variants" },
+      { label: "Responsive", href: "#responsive" },
+    ]}
+    title="Table des matières"
+  />
+
+  <h2 id="composants">Composants inclus</h2>
+
+  <p>Le Header est composé de plusieurs sous-composants :</p>
+
+  <ul>
+    <li><strong>Brand</strong> - Logo et nom du site avec lien vers l'accueil</li>
+    <li><strong>Navigation</strong> - Menu principal avec liens actifs</li>
+    <li><strong>ThemeSwitch</strong> - Bouton pour changer entre light/dark mode</li>
+    <li><strong>LangChooser</strong> - Dropdown pour changer de langue (FR/EN/ES/AR)</li>
+  </ul>
+
+  <h2 id="utilisation">Utilisation</h2>
+
+  <Code
+    lang="astro"
+    code={`---
+import Header from '@components/templates/Header/Header.astro';
+---
+
+<Header variant="initial" fixed={false} />`}
+  />
+
+  <Alert variant="initial" status="info">
+    <strong>✅ Auto-inclus :</strong> Le Header est automatiquement inclus dans le BaseLayout. 
+    Vous n'avez pas besoin de l'importer manuellement dans vos pages.
+  </Alert>
+
+  <h2 id="props">Props</h2>
+
+  <Table variant="initial">
+    <TableHeader>
+      <TableRow>
+        <TableHead>Prop</TableHead>
+        <TableHead>Type</TableHead>
+        <TableHead>Défaut</TableHead>
+        <TableHead>Description</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow>
+        <TableCell><code>variant</code></TableCell>
+        <TableCell><code>'initial' | 'retro' | 'modern' | 'futuristic'</code></TableCell>
+        <TableCell><code>'initial'</code></TableCell>
+        <TableCell>Style visuel du header</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>fixed</code></TableCell>
+        <TableCell><code>boolean</code></TableCell>
+        <TableCell><code>false</code></TableCell>
+        <TableCell>Header fixe en haut (sticky)</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>class</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>''</code></TableCell>
+        <TableCell>Classes CSS supplémentaires</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <h2 id="variants">Variants</h2>
+
+  <p>Le Header supporte les 4 variants visuels :</p>
+
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0;">
+    <Badge>initial</Badge>
+    <Badge>retro</Badge>
+    <Badge>modern</Badge>
+    <Badge>futuristic</Badge>
+  </div>
+
+  <h3>Initial</h3>
+  <p>Design épuré avec background subtle et border légère.</p>
+
+  <h3>Retro</h3>
+  <p>Style rétro avec bordures épaisses et ombres portées.</p>
+
+  <h3>Modern</h3>
+  <p>Design moderne avec glassmorphism et backdrop blur.</p>
+
+  <h3>Futuristic</h3>
+  <p>Style futuriste avec gradients néon et effets lumineux.</p>
+
+  <h2 id="responsive">Responsive</h2>
+
+  <p>Le Header s'adapte automatiquement aux différentes tailles d'écran :</p>
+
+  <ul>
+    <li><strong>Desktop :</strong> Navigation horizontale complète</li>
+    <li><strong>Tablet :</strong> Navigation compacte avec icônes</li>
+    <li><strong>Mobile :</strong> Menu hamburger avec drawer</li>
+  </ul>
+
+  <h2>Structure</h2>
+
+  <Code
+    lang="html"
+    code={`<header class="header">
+  <div class="header-container">
+    <Brand variant={variant} />
+    <Navigation variant={variant} />
+    <div class="header-actions">
+      <LangChooser variant={variant} />
+      <ThemeSwitch variant={variant} />
+    </div>
+  </div>
+</header>`}
+  />
+
+  <h2>Fonctionnalités</h2>
+
+  <ul>
+    <li>✅ Navigation avec active state automatique</li>
+    <li>✅ Switch thème light/dark avec persistence</li>
+    <li>✅ Sélecteur de langue 4 locales (FR, EN, ES, AR)</li>
+    <li>✅ Responsive avec menu mobile</li>
+    <li>✅ Sticky header optionnel</li>
+    <li>✅ Accessibilité complète (ARIA, keyboard nav)</li>
+    <li>✅ Support 4 variants visuels</li>
+  </ul>
+
+  <Alert variant="initial" status="warning">
+    <strong>🌍 Multilingue :</strong> Le Header détecte automatiquement la locale courante 
+    et met à jour les liens de navigation en conséquence.
+  </Alert>
+</DocLayout>

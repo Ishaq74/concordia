@@ -1,0 +1,670 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import { Icon } from "astro-icon/components";
+import {
+  Breadcrumb as BreadcrumbComponent,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  BreadcrumbEllipsis,
+} from "@components/ui/Breadcrumb";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+---
+
+<DocLayout 
+  title="Breadcrumb Component" 
+  description="Documentation du composant Breadcrumb pour la navigation fil d'Ariane"
+  variant="initial"
+>
+  <h1 id="breadcrumb-component">Breadcrumb Component</h1>
+  
+  <p>
+    Le composant <code class="inline-code">Breadcrumb</code> affiche un fil d'Ariane permettant
+    aux utilisateurs de comprendre leur position dans la hiérarchie du site et de naviguer facilement.
+  </p>
+
+  <TableOfContents
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "API Reference", href: "#api" },
+      { label: "Utilisation basique", href: "#basic" },
+      { label: "Variants", href: "#variants" },
+      { label: "Couleurs", href: "#colors" },
+      { label: "Avec icons", href: "#icons" },
+      { label: "Séparateurs personnalisés", href: "#separators" },
+      { label: "Avec ellipsis", href: "#ellipsis" },
+      { label: "Accessibilité", href: "#accessibility" },
+    ]}
+    title="Table des matières"
+  />
+
+  <h2 id="installation">Installation</h2>
+
+  <Code
+    lang="astro"
+    code={`import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  BreadcrumbEllipsis,
+} from '@components/ui/Breadcrumb';`}
+  />
+
+  <h2 id="api">API Reference</h2>
+
+  <h3>Breadcrumb</h3>
+  <p>Le composant racine de navigation qui contient tous les éléments breadcrumb.</p>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Défaut</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">variant</code></TableCell>
+          <TableCell>initial | retro | modern | futuristic</TableCell>
+          <TableCell>initial</TableCell>
+          <TableCell>Style visuel du breadcrumb</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">color</code></TableCell>
+          <TableCell>default | primary | secondary | accent</TableCell>
+          <TableCell>default</TableCell>
+          <TableCell>Couleur de la page courante</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>""</TableCell>
+          <TableCell>Classes CSS additionnelles</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3>BreadcrumbList</h3>
+  <p>Un conteneur qui affiche une liste ordonnée pour les items breadcrumb.</p>
+
+  <h3>BreadcrumbItem</h3>
+  <p>Un composant représentant chaque item dans la navigation breadcrumb.</p>
+
+  <h3>BreadcrumbLink</h3>
+  <p>Un composant pour les liens cliquables qui naviguent vers les niveaux précédents.</p>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">href</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>URL de destination (requis)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>Classes CSS additionnelles</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3>BreadcrumbPage</h3>
+  <p>Représente la page courante dans le fil d'Ariane (dernier élément).</p>
+
+  <h3>BreadcrumbSeparator</h3>
+  <p>Séparateur visuel entre les items breadcrumb.</p>
+
+  <h3>BreadcrumbEllipsis</h3>
+  <p>Indique des items tronqués, utilisé quand il y a beaucoup de niveaux.</p>
+
+  <h2 id="basic">Utilisation basique</h2>
+
+  <div class="example-section">
+    <BreadcrumbComponent>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/docs">Documentation</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BreadcrumbComponent>
+  <BreadcrumbList>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/docs">Documentation</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+    </BreadcrumbItem>
+  </BreadcrumbList>
+</BreadcrumbComponent>`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <h3>Initial (défaut)</h3>
+  <div class="example-section">
+    <BreadcrumbComponent variant="initial">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/products">Produits</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Détails</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <h3>Retro</h3>
+  <div class="example-section">
+    <BreadcrumbComponent variant="retro">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/products">Produits</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Détails</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <h3>Modern</h3>
+  <div class="example-section">
+    <BreadcrumbComponent variant="modern">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/products">Produits</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Détails</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <h3>Futuristic</h3>
+  <div class="example-section">
+    <BreadcrumbComponent variant="futuristic">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/products">Produits</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Détails</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BreadcrumbComponent variant="initial">...</BreadcrumbComponent>
+<BreadcrumbComponent variant="retro">...</BreadcrumbComponent>
+<BreadcrumbComponent variant="modern">...</BreadcrumbComponent>
+<BreadcrumbComponent variant="futuristic">...</BreadcrumbComponent>`}
+  />
+
+  <h2 id="colors">Couleurs</h2>
+
+  <p>Les couleurs s'appliquent à la page courante :</p>
+
+  <div class="example-section">
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600;">Default</p>
+        <BreadcrumbComponent color="default">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Page courante</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </BreadcrumbComponent>
+      </div>
+
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600;">Primary</p>
+        <BreadcrumbComponent color="primary">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Page courante</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </BreadcrumbComponent>
+      </div>
+
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600;">Secondary</p>
+        <BreadcrumbComponent color="secondary">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Page courante</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </BreadcrumbComponent>
+      </div>
+
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600;">Accent</p>
+        <BreadcrumbComponent color="accent">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Page courante</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </BreadcrumbComponent>
+      </div>
+    </div>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BreadcrumbComponent color="default">...</BreadcrumbComponent>
+<BreadcrumbComponent color="primary">...</BreadcrumbComponent>
+<BreadcrumbComponent color="secondary">...</BreadcrumbComponent>
+<BreadcrumbComponent color="accent">...</BreadcrumbComponent>`}
+  />
+
+  <h2 id="icons">Avec icons</h2>
+
+  <div class="example-section">
+    <BreadcrumbComponent variant="modern" color="primary">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">
+            <Icon name="mdi:home" class="size-4" />
+            <span>Accueil</span>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <Icon name="mdi:chevron-right" class="size-4" />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/docs">
+            <Icon name="mdi:book-open" class="size-4" />
+            <span>Documentation</span>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <Icon name="mdi:chevron-right" class="size-4" />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbPage>
+            <Icon name="openmoji:croissant" class="size-4" />
+            <span>Breadcrumb</span>
+          </BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BreadcrumbComponent variant="modern" color="primary">
+  <BreadcrumbList>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/">
+        <Icon name="mdi:home" class="size-4" />
+        <span>Accueil</span>
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator>
+      <Icon name="mdi:chevron-right" class="size-4" />
+    </BreadcrumbSeparator>
+    <BreadcrumbItem>
+      <BreadcrumbPage>
+        <Icon name="mdi:breadcrumb" class="size-4" />
+        <span>Breadcrumb</span>
+      </BreadcrumbPage>
+    </BreadcrumbItem>
+  </BreadcrumbList>
+</BreadcrumbComponent>`}
+  />
+
+  <h2 id="separators">Séparateurs personnalisés</h2>
+
+  <p>Le composant <code class="inline-code">BreadcrumbSeparator</code> peut contenir n'importe quel contenu :</p>
+
+  <h3>Séparateur par défaut (/)</h3>
+  <div class="example-section">
+    <BreadcrumbComponent>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Page</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <h3>Avec chevron</h3>
+  <div class="example-section">
+    <BreadcrumbComponent variant="modern">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <span>›</span>
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbPage>Page</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <h3>Avec icon</h3>
+  <div class="example-section">
+    <BreadcrumbComponent variant="modern" color="primary">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <Icon name="mdi:chevron-right" class="size-4" />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/docs">Documentation</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <Icon name="mdi:chevron-right" class="size-4" />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <h3>Avec flèche double</h3>
+  <div class="example-section">
+    <BreadcrumbComponent variant="retro">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <span>»</span>
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbPage>Page</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <h3>Avec point</h3>
+  <div class="example-section">
+    <BreadcrumbComponent>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <span>•</span>
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/docs">Documentation</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <span>•</span>
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<!-- Séparateur par défaut -->
+<BreadcrumbSeparator />
+
+<!-- Avec texte personnalisé -->
+<BreadcrumbSeparator>
+  <span>›</span>
+</BreadcrumbSeparator>
+
+<!-- Avec icon -->
+<BreadcrumbSeparator>
+  <Icon name="mdi:chevron-right" class="size-4" />
+</BreadcrumbSeparator>
+
+<!-- Avec double flèche -->
+<BreadcrumbSeparator>
+  <span>»</span>
+</BreadcrumbSeparator>
+
+<!-- Avec point -->
+<BreadcrumbSeparator>
+  <span>•</span>
+</BreadcrumbSeparator>`}
+  />
+
+  <h2 id="ellipsis">Avec ellipsis</h2>
+
+  <p>Utilisez <code class="inline-code">BreadcrumbEllipsis</code> pour indiquer des niveaux masqués :</p>
+
+  <div class="example-section">
+    <BreadcrumbComponent>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbEllipsis />
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/docs/components">Components</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BreadcrumbComponent>
+  <BreadcrumbList>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbEllipsis />
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/docs/components">Components</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+    </BreadcrumbItem>
+  </BreadcrumbList>
+</BreadcrumbComponent>`}
+  />
+
+  <h2 id="accessibility">Accessibilité</h2>
+
+  <ul>
+    <li><strong>Navigation sémantique :</strong> Utilise <code class="inline-code">&lt;nav aria-label="Breadcrumb"&gt;</code></li>
+    <li><strong>Liste ordonnée :</strong> <code class="inline-code">&lt;ol&gt;</code> pour la hiérarchie</li>
+    <li><strong>Page courante :</strong> <code class="inline-code">aria-current="page"</code> sur BreadcrumbPage</li>
+    <li><strong>Séparateurs :</strong> <code class="inline-code">role="presentation"</code> et <code class="inline-code">aria-hidden="true"</code></li>
+    <li><strong>Keyboard :</strong> Navigation Tab standard</li>
+  </ul>
+
+  <h2>Meilleures pratiques</h2>
+
+  <ul>
+    <li><strong>Cohérence :</strong> Utilisez le même variant que votre design system</li>
+    <li><strong>Hiérarchie claire :</strong> Montrez uniquement les niveaux pertinents</li>
+    <li><strong>Tronquer intelligemment :</strong> Utilisez BreadcrumbEllipsis pour les chemins longs</li>
+    <li><strong>Mobile :</strong> Le breadcrumb s'adapte automatiquement avec flex-wrap</li>
+    <li><strong>Performance :</strong> Les composants sont statiques (pas de JavaScript)</li>
+  </ul>
+
+  <h2>Exemple complet</h2>
+
+  <div class="example-section">
+    <BreadcrumbComponent variant="futuristic" color="primary">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">
+            <Icon name="mdi:home" class="size-3" />
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <Icon name="mdi:chevron-right" class="size-3" />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/docs">Docs</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <Icon name="mdi:chevron-right" class="size-3" />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbEllipsis />
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <Icon name="mdi:chevron-right" class="size-3" />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/docs/components">Components</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <Icon name="mdi:chevron-right" class="size-3" />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </BreadcrumbComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<BreadcrumbComponent variant="futuristic" color="primary">
+  <BreadcrumbList>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/">
+        <Icon name="mdi:home" class="size-3" />
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator>
+      <Icon name="mdi:chevron-right" class="size-3" />
+    </BreadcrumbSeparator>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/docs">Docs</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator>
+      <Icon name="mdi:chevron-right" class="size-3" />
+    </BreadcrumbSeparator>
+    <BreadcrumbItem>
+      <BreadcrumbEllipsis />
+    </BreadcrumbItem>
+    <BreadcrumbSeparator>
+      <Icon name="mdi:chevron-right" class="size-3" />
+    </BreadcrumbSeparator>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/docs/components">Components</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator>
+      <Icon name="mdi:chevron-right" class="size-3" />
+    </BreadcrumbSeparator>
+    <BreadcrumbItem>
+      <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+    </BreadcrumbItem>
+  </BreadcrumbList>
+</BreadcrumbComponent>`}
+  />
+</DocLayout>

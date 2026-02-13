@@ -1,0 +1,7 @@
+{
+    "chat.useNestedAgentsMdFiles": true,
+    "chat.useAgentSkills": true,
+    "chat.tools.terminal.autoApprove": {
+        "npx astro": true
+    }
+}

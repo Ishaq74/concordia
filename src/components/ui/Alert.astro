@@ -1,0 +1,61 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  status?: "info" | "success" | "warning" | "danger" | "error";
+  title?: string;
+  message?: string;
+  icon?: string;
+  dismissible?: boolean;
+  className?: string;
+}
+
+const {
+  variant = "initial",
+  status = "info",
+  title,
+  message,
+  icon,
+  dismissible = false,
+  className = "",
+} = Astro.props;
+
+const classes = [
+  "alert",
+  variant !== "initial" && variant,
+  status,
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+
+// Icônes par défaut selon le statut
+const defaultIcons = {
+  info: "mdi:information",
+  success: "mdi:check-circle",
+  warning: "mdi:alert",
+  danger: "mdi:alert-circle",
+  error: "mdi:alert-circle",
+};
+
+const displayIcon = icon || defaultIcons[status];
+---
+
+<div class={classes} data-status={status} role="alert">
+  {displayIcon && <Icon name={displayIcon} />}
+  <div>
+    {title && <strong>{title}</strong>}
+    {message ? message : <slot />}
+  </div>
+  {dismissible && (
+    <button 
+      type="button" 
+      class="alert-close"
+      aria-label="Fermer l'alerte"
+      onclick="this.closest('.alert').remove()"
+    >
+      <Icon name="mdi:close" />
+    </button>
+  )}
+</div>

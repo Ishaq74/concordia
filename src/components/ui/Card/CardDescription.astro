@@ -1,0 +1,24 @@
+---
+interface Props {
+  text?: string;
+  truncate?: boolean;
+  lines?: number;
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  text,
+  truncate = false,
+  lines = 3,
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+const truncateClass = truncate ? `truncate-${lines}` : '';
+const classes = ['card-description', truncateClass, className].filter(Boolean).join(' ');
+---
+
+<p class={classes} {...htmlAttributes}>
+  {text ? text : <slot />}
+</p>

@@ -1,0 +1,450 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import KbdComponent from "@components/ui/Kbd.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+---
+
+<DocLayout 
+  title="Kbd Component" 
+  description="Documentation du composant Kbd pour afficher des touches de clavier et raccourcis"
+  variant="initial"
+>
+  <h1 id="kbd-component">Kbd Component</h1>
+  
+  <p>
+    Le composant <code class="inline-code">Kbd</code> permet d'afficher des touches de clavier 
+    et des raccourcis de manière élégante et cohérente dans votre interface.
+  </p>
+
+  <h2>Démo rapide</h2>
+  
+  <div class="demo-section">
+    <p>
+      Appuyez sur <KbdComponent>Ctrl</KbdComponent> + <KbdComponent>K</KbdComponent> pour ouvrir la recherche, ou <KbdComponent>Esc</KbdComponent> pour fermer.
+    </p>
+    <p>
+      Sur Mac : <KbdComponent>⌘</KbdComponent> + <KbdComponent>K</KbdComponent>
+    </p>
+    <p>
+      Touches spéciales : <KbdComponent>Enter</KbdComponent> <KbdComponent>Tab</KbdComponent> <KbdComponent>Shift</KbdComponent> <KbdComponent>Space</KbdComponent> <KbdComponent>⌫</KbdComponent> <KbdComponent>↑</KbdComponent> <KbdComponent>↓</KbdComponent> <KbdComponent>←</KbdComponent> <KbdComponent>→</KbdComponent>
+    </p>
+  </div>
+
+  <TableOfContents
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "Utilisation basique", href: "#basic-usage" },
+      { label: "Tailles", href: "#sizes" },
+      { label: "Raccourcis", href: "#shortcuts" },
+      { label: "Symboles", href: "#symbols" },
+      { label: "Variants", href: "#variants" },
+      { label: "Couleurs", href: "#colors" },
+      { label: "Props", href: "#props" },
+      { label: "Exemples d'utilisation", href: "#examples" },
+    ]}
+    title="Table des matières"
+  />
+
+  <h2 id="installation">Installation</h2>
+  
+  <p>Le composant est disponible dans <code class="inline-code">src/components/ui/Kbd.astro</code></p>
+  
+  <Code
+    lang="typescript"
+    code={`import Kbd from '@components/ui/Kbd.astro';`}
+  />
+
+  <h2 id="basic-usage">Utilisation basique</h2>
+
+  <p>Affichez simplement une touche de clavier :</p>
+
+  <div class="example-section">
+    <div style="padding: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+      <KbdComponent>A</KbdComponent>
+      <KbdComponent>Ctrl</KbdComponent>
+      <KbdComponent>Shift</KbdComponent>
+      <KbdComponent>Alt</KbdComponent>
+      <KbdComponent>Enter</KbdComponent>
+      <KbdComponent>Esc</KbdComponent>
+      <KbdComponent>Tab</KbdComponent>
+      <KbdComponent>Space</KbdComponent>
+    </div>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<KbdComponent>A</KbdComponent>
+<KbdComponent>Ctrl</KbdComponent>
+<KbdComponent>Enter</KbdComponent>`}
+  />
+
+  <h2 id="sizes">Tailles</h2>
+
+  <p>3 tailles disponibles : <code class="inline-code">sm</code>, <code class="inline-code">md</code> (défaut), <code class="inline-code">lg</code></p>
+
+  <div class="example-section">
+    <div style="padding: 2rem; display: flex; gap: 1rem; align-items: center;">
+      <KbdComponent size="sm">Ctrl</KbdComponent>
+      <KbdComponent size="md">Ctrl</KbdComponent>
+      <KbdComponent size="lg">Ctrl</KbdComponent>
+    </div>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<KbdComponent size="sm">Ctrl</KbdComponent>
+<KbdComponent size="md">Ctrl</KbdComponent> <!-- défaut -->
+<KbdComponent size="lg">Ctrl</KbdComponent>`}
+  />
+
+  <h2 id="shortcuts">Raccourcis clavier</h2>
+
+  <p>Combinez plusieurs touches pour afficher des raccourcis :</p>
+
+  <div class="example-section">
+    <Card variant="initial">
+      <CardContent>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Ouvrir la recherche</span>
+            <div>
+              <KbdComponent>Ctrl</KbdComponent> + <KbdComponent>K</KbdComponent>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Enregistrer</span>
+            <div>
+              <KbdComponent>Ctrl</KbdComponent> + <KbdComponent>S</KbdComponent>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Nouveau fichier</span>
+            <div>
+              <KbdComponent>Ctrl</KbdComponent> + <KbdComponent>N</KbdComponent>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Tout sélectionner</span>
+            <div>
+              <KbdComponent>Ctrl</KbdComponent> + <KbdComponent>A</KbdComponent>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Copier</span>
+            <div>
+              <KbdComponent>Ctrl</KbdComponent> + <KbdComponent>C</KbdComponent>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span>Coller</span>
+            <div>
+              <KbdComponent>Ctrl</KbdComponent> + <KbdComponent>V</KbdComponent>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<KbdComponent>Ctrl</KbdComponent> + <KbdComponent>K</KbdComponent>
+<KbdComponent>Ctrl</KbdComponent> + <KbdComponent>S</KbdComponent>
+<KbdComponent>⌘</KbdComponent> + <KbdComponent>K</KbdComponent> <!-- Mac -->`}
+  />
+
+  <h2 id="symbols">Symboles et touches spéciales</h2>
+
+  <p>Utilisez des symboles Unicode pour les touches spéciales :</p>
+
+  <div class="example-section">
+    <Card variant="initial">
+      <CardContent>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+          <div>
+            <strong>Mac</strong>
+            <div style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+              <div><KbdComponent>⌘</KbdComponent> Command</div>
+              <div><KbdComponent>⌥</KbdComponent> Option</div>
+              <div><KbdComponent>⌃</KbdComponent> Control</div>
+              <div><KbdComponent>⇧</KbdComponent> Shift</div>
+              <div><KbdComponent>⌫</KbdComponent> Delete</div>
+              <div><KbdComponent>⏎</KbdComponent> Return</div>
+              <div><KbdComponent>⎋</KbdComponent> Escape</div>
+              <div><KbdComponent>⇥</KbdComponent> Tab</div>
+            </div>
+          </div>
+          <div>
+            <strong>Navigation</strong>
+            <div style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+              <div><KbdComponent>↑</KbdComponent> Haut</div>
+              <div><KbdComponent>↓</KbdComponent> Bas</div>
+              <div><KbdComponent>←</KbdComponent> Gauche</div>
+              <div><KbdComponent>→</KbdComponent> Droite</div>
+              <div><KbdComponent>⇞</KbdComponent> Page Up</div>
+              <div><KbdComponent>⇟</KbdComponent> Page Down</div>
+              <div><KbdComponent>↖</KbdComponent> Home</div>
+              <div><KbdComponent>↘</KbdComponent> End</div>
+            </div>
+          </div>
+          <div>
+            <strong>Spécial</strong>
+            <div style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+              <div><KbdComponent>Space</KbdComponent> Espace</div>
+              <div><KbdComponent>Enter</KbdComponent> Entrée</div>
+              <div><KbdComponent>Backspace</KbdComponent> Retour</div>
+              <div><KbdComponent>Del</KbdComponent> Supprimer</div>
+              <div><KbdComponent>Esc</KbdComponent> Échap</div>
+              <div><KbdComponent>Tab</KbdComponent> Tabulation</div>
+              <div><KbdComponent>Caps</KbdComponent> Majuscule</div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<!-- Mac -->
+<KbdComponent>⌘</KbdComponent> <KbdComponent>⌥</KbdComponent> <KbdComponent>⌃</KbdComponent> <KbdComponent>⇧</KbdComponent>
+
+<!-- Flèches -->
+<KbdComponent>↑</KbdComponent> <KbdComponent>↓</KbdComponent> <KbdComponent>←</KbdComponent> <KbdComponent>→</KbdComponent>
+
+<!-- Texte -->
+<KbdComponent>Space</KbdComponent> <KbdComponent>Enter</KbdComponent> <KbdComponent>Tab</KbdComponent>`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <p>Le composant Kbd supporte les 4 variants du design system :</p>
+
+  <div class="example-section">
+    <div style="padding: 2rem; display: flex; flex-direction: column; gap: 2rem;">
+      <div>
+        <h4>Initial (défaut)</h4>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+          <KbdComponent variant="initial">Ctrl</KbdComponent> + <KbdComponent variant="initial">K</KbdComponent>
+        </div>
+      </div>
+
+      <div>
+        <h4>Retro</h4>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+          <KbdComponent variant="retro">Ctrl</KbdComponent> + <KbdComponent variant="retro">K</KbdComponent>
+        </div>
+      </div>
+
+      <div>
+        <h4>Modern</h4>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+          <KbdComponent variant="modern">Ctrl</KbdComponent> + <KbdComponent variant="modern">K</KbdComponent>
+        </div>
+      </div>
+
+      <div>
+        <h4>Futuristic</h4>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+          <KbdComponent variant="futuristic">Ctrl</KbdComponent> + <KbdComponent variant="futuristic">K</KbdComponent>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 id="colors">Couleurs</h2>
+
+  <p>Le composant Kbd supporte 4 couleurs : <code class="inline-code">default</code>, <code class="inline-code">primary</code>, <code class="inline-code">secondary</code>, <code class="inline-code">accent</code></p>
+
+  <div class="example-section">
+    <div style="padding: 2rem; display: flex; flex-direction: column; gap: 2rem;">
+      <div>
+        <h4>Default</h4>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; align-items: center;">
+          <KbdComponent>Ctrl</KbdComponent> + <KbdComponent>K</KbdComponent>
+        </div>
+      </div>
+
+      <div>
+        <h4>Primary</h4>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; align-items: center;">
+          <KbdComponent color="primary">⌘</KbdComponent> + <KbdComponent color="primary">K</KbdComponent>
+        </div>
+      </div>
+
+      <div>
+        <h4>Secondary</h4>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; align-items: center;">
+          <KbdComponent color="secondary">Ctrl</KbdComponent> + <KbdComponent color="secondary">S</KbdComponent>
+        </div>
+      </div>
+
+      <div>
+        <h4>Accent</h4>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; align-items: center;">
+          <KbdComponent color="accent">Alt</KbdComponent> + <KbdComponent color="accent">F4</KbdComponent>
+        </div>
+      </div>
+
+      <div>
+        <h4>Variants + Couleurs (Retro Primary)</h4>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; align-items: center;">
+          <KbdComponent variant="retro" color="primary">Ctrl</KbdComponent> + <KbdComponent variant="retro" color="primary">Z</KbdComponent>
+        </div>
+      </div>
+
+      <div>
+        <h4>Modern Secondary</h4>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; align-items: center;">
+          <KbdComponent variant="modern" color="secondary">⌘</KbdComponent> + <KbdComponent variant="modern" color="secondary">V</KbdComponent>
+        </div>
+      </div>
+
+      <div>
+        <h4>Futuristic Accent</h4>
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; align-items: center;">
+          <KbdComponent variant="futuristic" color="accent">ESC</KbdComponent>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<KbdComponent color="primary">⌘</KbdComponent>
+<KbdComponent color="secondary">Ctrl</KbdComponent>
+<KbdComponent color="accent">Alt</KbdComponent>
+<KbdComponent variant="modern" color="primary">Enter</KbdComponent>`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Défaut</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">variant</code></TableCell>
+          <TableCell>initial | retro | modern | futuristic</TableCell>
+          <TableCell>initial</TableCell>
+          <TableCell>Style visuel du composant</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">color</code></TableCell>
+          <TableCell>default | primary | secondary | accent</TableCell>
+          <TableCell>default</TableCell>
+          <TableCell>Couleur du composant</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">size</code></TableCell>
+          <TableCell>sm | md | lg</TableCell>
+          <TableCell>md</TableCell>
+          <TableCell>Taille du composant</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>""</TableCell>
+          <TableCell>Classes CSS additionnelles</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h2 id="examples">Exemples d'utilisation</h2>
+
+  <h3>Documentation de commandes</h3>
+
+  <div class="example-section">
+    <Card variant="initial">
+      <CardContent>
+        <h4>Raccourcis de l'éditeur</h4>
+        <ul style="list-style: none; padding: 0;">
+          <li style="margin-bottom: 0.75rem;">
+            <KbdComponent>Ctrl</KbdComponent> + <KbdComponent>Space</KbdComponent> — Autocomplétion
+          </li>
+          <li style="margin-bottom: 0.75rem;">
+            <KbdComponent>Ctrl</KbdComponent> + <KbdComponent>/</KbdComponent> — Commenter/Décommenter
+          </li>
+          <li style="margin-bottom: 0.75rem;">
+            <KbdComponent>Ctrl</KbdComponent> + <KbdComponent>D</KbdComponent> — Sélection multiple
+          </li>
+          <li style="margin-bottom: 0.75rem;">
+            <KbdComponent>Ctrl</KbdComponent> + <KbdComponent>Shift</KbdComponent> + <KbdComponent>P</KbdComponent> — Palette de commandes
+          </li>
+          <li style="margin-bottom: 0.75rem;">
+            <KbdComponent>Alt</KbdComponent> + <KbdComponent>↑</KbdComponent> / <KbdComponent>↓</KbdComponent> — Déplacer la ligne
+          </li>
+        </ul>
+      </CardContent>
+    </Card>
+  </div>
+
+  <h3>Instructions dans un formulaire</h3>
+
+  <div class="example-section">
+    <Card variant="initial">
+      <CardContent>
+        <p style="margin-bottom: 1rem;">
+          Appuyez sur <KbdComponent>Enter</KbdComponent> pour soumettre le formulaire, ou <KbdComponent>Esc</KbdComponent> pour annuler.
+        </p>
+        <p style="margin-bottom: 1rem;">
+          Utilisez <KbdComponent>Tab</KbdComponent> et <KbdComponent>Shift</KbdComponent> + <KbdComponent>Tab</KbdComponent> pour naviguer entre les champs.
+        </p>
+      </CardContent>
+    </Card>
+  </div>
+
+  <h3>Interface de recherche</h3>
+
+  <div class="example-section">
+    <Card variant="initial">
+      <CardContent>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0;">
+          <div>
+            <h4 style="margin: 0 0 0.5rem 0;">Recherche globale</h4>
+            <p style="margin: 0; color: var(--text-muted);">Recherchez dans tous les fichiers</p>
+          </div>
+          <div style="display: flex; gap: 0.25rem;">
+            <KbdComponent>⌘</KbdComponent><KbdComponent>K</KbdComponent>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+
+  <h2>Meilleures pratiques</h2>
+
+  <ul>
+    <li><strong>Symboles clairs :</strong> Utilisez les symboles Unicode appropriés (⌘ pour Mac, Ctrl pour Windows)</li>
+    <li><strong>Séparateur + :</strong> Utilisez le symbole + entre les touches pour les combinaisons</li>
+    <li><strong>Contexte OS :</strong> Adaptez les raccourcis selon le système d'exploitation de l'utilisateur</li>
+    <li><strong>Cohérence :</strong> Utilisez toujours la même taille de Kbd dans un même contexte</li>
+    <li><strong>Lisibilité :</strong> Évitez les combinaisons trop longues (max 3-4 touches)</li>
+  </ul>
+
+  <h2>Accessibilité</h2>
+
+  <ul>
+    <li>Utilise la balise sémantique <code class="inline-code">&lt;kbd&gt;</code> HTML5</li>
+    <li>Le contenu textuel est lisible par les lecteurs d'écran</li>
+    <li>Contraste suffisant pour une bonne lisibilité</li>
+    <li>Effet visuel au :active pour feedback tactile</li>
+  </ul>
+</DocLayout>

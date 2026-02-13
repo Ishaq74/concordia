@@ -1,0 +1,228 @@
+---
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import CardFooter from "@components/ui/Card/CardFooter.astro";
+import Button from "@components/ui/Button.astro";
+import Link from "@components/ui/Link.astro";
+
+interface Props {
+    translations?: Record<string, any>;
+    pendingEmail?: string;
+    maskedEmail?: string;
+    description?: string;
+    reminder?: string;
+    hasEmail?: boolean;
+    resendCooldownMs?: number;
+    callbackURL?: string;
+    pageTitle?: string;
+    clientStrings?: Record<string, string>;
+}
+
+const props = Astro.props;
+const t = props.translations?.auth ?? props.translations ?? {};
+const {
+    pendingEmail,
+    maskedEmail,
+    description,
+    reminder,
+    hasEmail,
+    clientStrings,
+} = props;
+---
+
+<Card className="auth-card">
+    <CardHeader>
+        <h1 class="auth-title">{props.pageTitle}</h1>
+        <p class="auth-subtitle">{description}</p>
+    </CardHeader>
+
+    <CardContent className="auth-content">
+        <div class="email-display">
+            <p class="email-text">{maskedEmail}</p>
+            {
+                hasEmail && (
+                    <p class="spam-notice">
+                        ({t.checkSpam ?? "Vérifiez vos spams"})
+                    </p>
+                )
+            }
+        </div>
+
+        {reminder && <p class="auth-reminder">{reminder}</p>}
+
+        <div class="verify-email-controls">
+            <Button id="resend-btn" variant="modern" class="auth-submit-btn">
+                {clientStrings?.cta ?? "Renvoyer l'email"}
+            </Button>
+            <p id="resend-status" class="status-message"></p>
+        </div>
+    </CardContent>
+
+    <CardFooter className="auth-footer">
+        <Link href="/fr/auth/connexion" class="back-link">
+            {t.backToLogin ?? "Retour à la connexion"}
+        </Link>
+    </CardFooter>
+</Card>
+
+<style>
+    .auth-card {
+        width: 100%;
+        max-width: 28rem; /* max-w-md */
+        margin-left: auto;
+        margin-right: auto;
+        margin-block: 1.5rem;
+    }
+
+    .auth-title {
+        font-size: 1.5rem; /* text-2xl */
+        font-weight: 600; /* font-semibold */
+        color: var(--color-slate-900, #0f172a);
+        margin: 0;
+    }
+
+    :global([data-theme="dark"]) .auth-title {
+        color: var(--color-slate-50, #f8fafc);
+    }
+
+    .auth-subtitle {
+        color: var(--color-slate-600, #475569);
+        margin-top: 0.5rem;
+    }
+
+    .auth-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem; /* space-y-6 */
+    }
+
+    .email-display {
+        border-radius: 0.5rem; /* rounded-lg */
+        background-color: var(--color-slate-50, #f8fafc);
+        padding: 1rem;
+        border: 1px solid var(--color-slate-200, #e2e8f0);
+        text-align: center;
+    }
+
+    :global([data-theme="dark"]) .email-display {
+        background-color: var(--color-slate-900, #0f172a);
+        border-color: var(--color-slate-800, #1e293b);
+    }
+
+    .email-text {
+        font-weight: 500;
+        color: var(--color-slate-900, #0f172a);
+    }
+
+    :global([data-theme="dark"]) .email-text {
+        color: var(--color-slate-50, #f8fafc);
+    }
+
+    .spam-notice {
+        font-size: 0.75rem; /* text-xs */
+        color: var(--color-slate-500, #64748b);
+        margin-top: 0.25rem;
+    }
+
+    .auth-reminder {
+        font-size: 0.875rem; /* text-sm */
+        color: var(--color-slate-500, #64748b);
+    }
+
+    .verify-email-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem; /* space-y-4 */
+    }
+
+    .auth-submit-btn {
+        width: 100%;
+    }
+
+    .status-message {
+        font-size: 0.875rem; /* text-sm */
+        text-align: center;
+        min-height: 1.5em;
+        color: var(--color-muted-foreground, #64748b);
+    }
+
+    .auth-footer {
+        justify-content: center;
+        border-top: 1px solid var(--color-slate-100, #f1f5f9);
+        padding-top: 1rem;
+    }
+
+    :global([data-theme="dark"]) .auth-footer {
+        border-color: var(--color-slate-800, #1e293b);
+    }
+
+    .back-link {
+        font-size: 0.875rem; /* text-sm */
+        color: var(--color-slate-600, #475569);
+        text-decoration: none;
+    }
+
+    .back-link:hover {
+        color: var(--color-slate-900, #0f172a);
+    }
+
+    :global([data-theme="dark"]) .back-link {
+        color: var(--color-slate-400, #94a3b8);
+    }
+
+    :global([data-theme="dark"]) .back-link:hover {
+        color: var(--color-slate-200, #e2e8f0);
+    }
+</style>
+
+<script>
+    import { authClient } from "@lib/auth/auth-client";
+
+    const btn = document.getElementById("resend-btn");
+    const status = document.getElementById("resend-status");
+
+    if (btn && status) {
+        btn.addEventListener("click", async () => {
+            btn.setAttribute("disabled", "true");
+            status.textContent = "H Envoi en cours..."; // Simple loader
+
+            const email = document.cookie
+                .split("; ")
+                .find((row) => row.startsWith("pending_verification_email="))
+                ?.split("=")[1];
+
+            if (!email) {
+                status.textContent =
+                    "Email introuvable. Veuillez vous reconnecter.";
+                status.className = "text-sm text-center text-red-600";
+                return;
+            }
+
+            try {
+                const { data, error } = await authClient.sendVerificationEmail({
+                    email: decodeURIComponent(email),
+                    callbackURL: "/fr/auth/profil",
+                });
+
+                if (error) {
+                    status.textContent =
+                        error.message || "Erreur lors de l'envoi.";
+                    status.className = "text-sm text-center text-red-600";
+                    btn.removeAttribute("disabled");
+                } else {
+                    status.textContent = "Email envoyé avec succès !";
+                    status.className = "text-sm text-center text-green-600";
+                    setTimeout(() => {
+                        btn.removeAttribute("disabled");
+                        status.textContent = "";
+                    }, 30000);
+                }
+            } catch (e) {
+                status.textContent = "Erreur inattendue.";
+                status.className = "text-sm text-center text-red-600";
+                btn.removeAttribute("disabled");
+            }
+        });
+    }
+</script>

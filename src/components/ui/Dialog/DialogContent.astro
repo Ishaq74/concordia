@@ -1,0 +1,28 @@
+---
+interface Props {
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  size?: "sm" | "md" | "lg" | "xl" | "full";
+  animationDuration?: number;
+  class?: string;
+}
+
+const {
+  variant = "initial",
+  size = "md",
+  animationDuration = 200,
+  class: className,
+} = Astro.props;
+
+const contentClass = [
+  "dialog-content",
+  variant !== "initial" && variant,
+  size !== "md" && `size-${size}`,
+  className,
+].filter(Boolean).join(" ");
+---
+
+<div class="dialog-backdrop">
+  <div class={contentClass} role="dialog" aria-modal="true" style={`--animation-duration: ${animationDuration}`}>
+    <slot />
+  </div>
+</div>

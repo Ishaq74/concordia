@@ -1,0 +1,102 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import AuthLayout from "@components/templates/auth/AuthLayout.astro";
+import VerifyEmailCard from "@components/templates/auth/VerifyEmailCard.astro";
+import translations from "@i18n/fr.json";
+
+const cookieName = "pending_verification_email";
+const request = Astro.request;
+const user = Astro.locals.user;
+const profilePath = "/fr/profil";
+const pendingEmail = Astro.cookies.get(cookieName)?.value ?? "";
+const hasEmail = pendingEmail.length > 0;
+
+if (user?.emailVerified) {
+  Astro.cookies.delete(cookieName, { path: "/" });
+  return Astro.redirect(profilePath);
+}
+
+if (!hasEmail) {
+  return Astro.redirect("/fr/inscription");
+}
+
+const pageTitle =
+  translations.auth.verifyEmailTitle ?? "Vérifiez votre boîte mail";
+const description =
+  translations.auth.verifyEmailDescription ??
+  "Nous venons d'envoyer un lien de confirmation. Cliquez dessus pour activer votre compte.";
+const reminder = translations.auth.verifyEmailReminder ?? "";
+const resendCooldownMs = 30_000;
+const callbackURL = profilePath;
+const maskedEmail = hasEmail ? maskEmail(pendingEmail) : "";
+const clientStrings = {
+  success:
+    translations.auth.verifyEmailResendSuccess ??
+    "Un nouvel email vient d'être envoyé.",
+  error:
+    translations.auth.verifyEmailResendError ??
+    "Impossible d'envoyer l'email. Réessayez dans un instant.",
+  cooldown:
+    translations.auth.verifyEmailCooldownMessage ??
+    "Vous pourrez renvoyer un email dans {seconds}s.",
+  ready:
+    translations.auth.verifyEmailReady ??
+    "Vous pouvez renvoyer l'email maintenant.",
+  sending: translations.auth.verifyEmailSending ?? "Envoi...",
+  cta:
+    translations.auth.verifyEmailResendCta ??
+    "Renvoyer l'email de vérification",
+  missingEmail:
+    translations.auth.verifyEmailMissingEmail ??
+    "Impossible de retrouver votre email. Reconnectez-vous ou recommencez l'inscription.",
+};
+
+const isSecure = (() => {
+  try {
+    return new URL(request.url).protocol === "https:";
+  } catch {
+    return false;
+  }
+})();
+Astro.cookies.set(cookieName, pendingEmail, {
+  path: "/",
+  httpOnly: true,
+  sameSite: "strict",
+  secure: isSecure,
+  maxAge: 60 * 30,
+});
+
+function maskEmail(email: string) {
+  const [localPart = "", domainPart = ""] = email.split("@");
+  if (!domainPart) return email;
+  if (localPart.length <= 2) {
+    const visible = localPart.slice(0, 1);
+    return `${visible}*@${domainPart}`;
+  }
+  const maskedLocal = `${localPart[0]}${"*".repeat(Math.max(1, localPart.length - 2))}${localPart.slice(-1)}`;
+  return `${maskedLocal}@${domainPart}`;
+}
+---
+
+<BaseLayout lang="fr" title={pageTitle}>
+  <section
+    class="mx-auto flex min-h-[60vh] w-full max-w-5xl items-center justify-center px-4 py-16"
+  >
+    <AuthLayout translations={translations}>
+      <VerifyEmailCard
+        translations={translations}
+        pendingEmail={pendingEmail}
+        maskedEmail={maskedEmail}
+        description={description}
+        reminder={reminder}
+        hasEmail={hasEmail}
+        resendCooldownMs={resendCooldownMs}
+        callbackURL={callbackURL}
+        pageTitle={pageTitle}
+        clientStrings={clientStrings}
+      />
+    </AuthLayout>
+  </section>
+</BaseLayout>

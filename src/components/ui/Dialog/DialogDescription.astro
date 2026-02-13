@@ -1,0 +1,13 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const descClass = ["dialog-description", className].filter(Boolean).join(" ");
+---
+
+<p class={descClass}>
+  <slot />
+</p>

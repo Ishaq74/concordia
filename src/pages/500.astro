@@ -1,0 +1,334 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Button from "@components/ui/Button.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import { getRelativeLocaleUrl } from "astro:i18n";
+
+const currentLocale = Astro.currentLocale || "fr";
+const translations = await import(`../i18n/${currentLocale}.json`);
+const t = translations.default.errors || {
+    serverError: {
+        title: "Erreur serveur",
+        subtitle: "Erreur 500",
+        message:
+            "Désolé, une erreur interne s'est produite. Nos équipes ont été notifiées et travaillent à résoudre le problème.",
+        whatToDo: "Que faire ?",
+        tryAgain: "Réessayer plus tard",
+        returnHome: "Retourner à l'accueil",
+        contactSupport: "Contacter le support",
+        refresh: "Actualiser la page",
+    },
+};
+
+const error = t.serverError;
+---
+
+<BaseLayout
+    title={`${error.title} - ${error.subtitle}`}
+    description={error.message}
+>
+    <div class="error-page">
+        <Card className="error-card">
+            <CardContent>
+                <div class="error-content">
+                    <!-- Error Icon/Number -->
+                    <div class="error-visual">
+                        <span class="error-code">500</span>
+                        <div class="error-icon">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="120"
+                                height="120"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path
+                                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                                ></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Error Text -->
+                    <div class="error-text">
+                        <p class="error-subtitle">{error.subtitle}</p>
+                        <h1 class="error-title">{error.title}</h1>
+                        <p class="error-message">{error.message}</p>
+                    </div>
+
+                    <!-- Suggestions -->
+                    <div class="error-suggestions">
+                        <h2 class="suggestions-title">{error.whatToDo}</h2>
+                        <ul class="suggestions-list">
+                            <li>{error.tryAgain}</li>
+                            <li>
+                                <button
+                                    onclick="window.location.reload()"
+                                    class="inline-button"
+                                    >{error.refresh}</button
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href={getRelativeLocaleUrl(
+                                        currentLocale,
+                                        "contact",
+                                    )}
+                                    class="inline-link"
+                                    >{error.contactSupport}</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="error-actions">
+                        <Button
+                            href={getRelativeLocaleUrl(currentLocale, "")}
+                            variant="modern"
+                            color="primary"
+                            size="large"
+                        >
+                            {error.returnHome}
+                        </Button>
+                        <Button
+                            href={getRelativeLocaleUrl(
+                                currentLocale,
+                                "contact",
+                            )}
+                            variant="modern"
+                            color="secondary"
+                            size="large"
+                        >
+                            {error.contactSupport}
+                        </Button>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+</BaseLayout>
+
+<style>
+    .error-page {
+        min-height: calc(100vh - 128px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-6);
+        background: linear-gradient(
+            135deg,
+            var(--bg-subtle) 0%,
+            var(--bg-default) 50%,
+            var(--bg-subtle) 100%
+        );
+    }
+
+    .error-card {
+        max-width: 48rem;
+        width: 100%;
+    }
+
+    .error-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: var(--space-8);
+        padding: var(--space-8);
+    }
+
+    .error-visual {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .error-code {
+        font-size: 10rem;
+        font-weight: 900;
+        line-height: 1;
+        background: linear-gradient(
+            135deg,
+            var(--color-danger),
+            var(--color-warning)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        opacity: 0.2;
+        position: absolute;
+        z-index: 0;
+    }
+
+    .error-icon {
+        position: relative;
+        z-index: 1;
+        color: var(--color-danger);
+        animation: shake 3s infinite;
+    }
+
+    @keyframes shake {
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+            transform: translateX(-5px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+            transform: translateX(5px);
+        }
+    }
+
+    .error-text {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .error-subtitle {
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--color-danger);
+        margin: 0;
+    }
+
+    .error-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-default);
+        margin: 0;
+    }
+
+    .error-message {
+        font-size: 1.125rem;
+        color: var(--text-muted);
+        max-width: 32rem;
+        margin: 0;
+    }
+
+    .error-suggestions {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        padding: var(--space-6);
+        background: var(--bg-subtle);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-default);
+        width: 100%;
+    }
+
+    .suggestions-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-default);
+        margin: 0;
+    }
+
+    .suggestions-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        text-align: left;
+    }
+
+    .suggestions-list li {
+        padding-left: 1.5rem;
+        position: relative;
+        color: var(--text-muted);
+    }
+
+    .suggestions-list li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: var(--color-danger);
+        font-size: 1.25rem;
+        line-height: 1.5;
+    }
+
+    .inline-link,
+    .inline-button {
+        color: var(--color-primary);
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.2s;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        font-size: inherit;
+    }
+
+    .inline-link:hover,
+    .inline-button:hover {
+        border-color: currentColor;
+    }
+
+    .error-actions {
+        display: flex;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .error-page {
+            padding: var(--space-4);
+        }
+
+        .error-content {
+            padding: var(--space-6);
+            gap: var(--space-6);
+        }
+
+        .error-code {
+            font-size: 6rem;
+        }
+
+        .error-title {
+            font-size: 2rem;
+        }
+
+        .error-message {
+            font-size: 1rem;
+        }
+
+        .error-icon svg {
+            width: 80px;
+            height: 80px;
+        }
+
+        .error-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .error-actions :global(.button) {
+            width: 100%;
+        }
+    }
+</style>

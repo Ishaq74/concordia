@@ -1,0 +1,274 @@
+---
+import Avatar from "../../ui/Avatar/Avatar.astro";
+import Dropdown from "../../ui/Dropdown.astro";
+import Link from "../../ui/Link.astro";
+
+interface Props {
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  lang?: string;
+  isMenu?: boolean;
+}
+
+const { variant = "initial", lang, isMenu = false } = Astro.props;
+
+// Détecter la langue depuis l'URL si non fournie (fallback uniquement si lang est undefined)
+const currentPath = Astro.url.pathname;
+const detectedLang =
+  lang ||
+  (currentPath.startsWith("/fr")
+    ? "fr"
+    : currentPath.startsWith("/es")
+      ? "es"
+      : currentPath.startsWith("/ar")
+        ? "ar"
+        : "en");
+
+// Routes multilingues
+// Note: Actuellement, seul le français a des pages d'auth dédiées sous /fr/auth/
+const loginRoute =
+  detectedLang === "fr" ? "/fr/auth/connexion" : "/fr/auth/connexion"; // Fallback to FR for now as requested
+const profileRoute =
+  detectedLang === "fr" ? "/fr/auth/profil" : "/fr/auth/profil";
+
+// Traductions locales avec fallback robustes
+const dictionaries: Record<string, any> = {
+  fr: {
+    login: "Se connecter",
+    profile: "Mon profil",
+    logout: "Se déconnecter",
+  },
+  en: { login: "Sign in", profile: "My profile", logout: "Sign out" },
+  es: {
+    login: "Iniciar sesión",
+    profile: "Mi perfil",
+    logout: "Cerrar sesión",
+  },
+  ar: { login: "تسجيل الدخول", profile: "ملفي الشخصي", logout: "تسجيل الخروج" },
+};
+
+let t = dictionaries[detectedLang] || dictionaries.en;
+
+// Tentative de chargement des traductions complètes du projet
+try {
+  // Charge le fichier JSON de la langue
+  // Note: En dev, Vite gère dynamiquement les imports. En prod, Astro bundle tout.
+  // Si le fichier n'existe pas, le catch prendra le relais.
+  const loaded = (await import(`../../../i18n/${detectedLang}.json`)).default;
+  if (loaded?.auth) {
+    t = {
+      login: loaded.auth.signIn || t.login,
+      profile: loaded.auth.profile || t.profile,
+      logout: loaded.auth.signOut || t.logout,
+    };
+  }
+} catch (e) {
+  // Silencieusement ignorer si le fichier de langue manque (fallback utilisé)
+}
+
+const user = Astro.locals.user;
+
+// Icons
+const icons = {
+  profile: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  logout: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>`,
+};
+---
+
+{
+  user ? (
+    <Dropdown
+      variant={variant}
+      position="bottom-right"
+      ishover={true}
+      ismenu={isMenu}
+      class="user-dropdown"
+      items={[
+        {
+          label: t.profile,
+          href: profileRoute,
+          icon: icons.profile,
+        },
+        {
+          label: t.logout,
+          value: "logout",
+          icon: icons.logout,
+        },
+      ]}
+    >
+      <div slot="trigger" class="user-trigger">
+        <div class="user-avatar-wrapper">
+          <Avatar
+            src={user.image || undefined}
+            alt={user.name || "User"}
+            fallback={(user.name || "U")[0].toUpperCase()}
+            size="sm"
+          />
+        </div>
+        <div class="user-info">
+          <span class="user-name">{user.name}</span>
+        </div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="user-chevron"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </div>
+    </Dropdown>
+  ) : (
+    <div class="user-auth-links">
+      <Link
+        href={loginRoute}
+        style="button"
+        color="primary"
+        size="sm"
+        variant={variant}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="icon-left"
+        >
+          <>
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+            <polyline points="10 17 15 12 10 7" />
+            <line x1="15" x2="3" y1="12" y2="12" />
+          </>
+        </svg>
+        {t.login}
+      </Link>
+    </div>
+  )
+}
+
+<style>
+  .user-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    padding-right: 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s;
+    max-width: 200px;
+  }
+
+  .user-trigger:hover {
+    background-color: var(--color-slate-100, #f1f5f9);
+    border-color: var(--color-slate-200, #e2e8f0);
+  }
+
+  :global([data-theme="dark"]) .user-trigger:hover {
+    background-color: var(--color-slate-800, #1e293b);
+    border-color: var(--color-slate-700, #334155);
+  }
+
+  .user-avatar-wrapper {
+    flex-shrink: 0;
+  }
+
+  .user-info {
+    display: none;
+    flex-direction: column;
+    text-align: left;
+    overflow: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .user-info {
+      display: flex;
+    }
+  }
+
+  .user-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--color-slate-700, #334155);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 0.25rem;
+  }
+
+  :global([data-theme="dark"]) .user-name {
+    color: var(--color-slate-200, #e2e8f0);
+  }
+
+  .user-chevron {
+    color: var(--color-slate-400, #94a3b8);
+    flex-shrink: 0;
+  }
+
+  .icon-left {
+    margin-right: 0.5rem;
+  }
+</style>
+
+<script is:inline>
+  function setupLogout() {
+    // Cibler les éléments de dropdown qui ont la valeur "logout"
+    // Grâce à la modification de Dropdown.astro, ils ont l'attribut data-value="logout"
+    const logoutItems = document.querySelectorAll('[data-value="logout"]');
+
+    logoutItems.forEach((item) => {
+      // Éviter les doublons de listeners
+      if (item.hasAttribute("data-logout-bound")) return;
+      item.setAttribute("data-logout-bound", "true");
+
+      item.addEventListener("click", async (e) => {
+        // Empêcher la navigation par défaut si c'est un lien
+        // (bien que Dropdown le rende comme label s'il n'a pas de href, on est prudent)
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Feedback visuel
+        const label = item.querySelector(".item-label");
+        const originalText = label ? label.textContent : "";
+        if (label) label.textContent = "...";
+
+        try {
+          const response = await fetch("/api/auth/sign-out", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({}),
+          });
+
+          if (response.ok) {
+            window.location.reload();
+          } else {
+            // Revert en cas d'erreur
+            if (label && originalText) label.textContent = originalText;
+            console.error("Logout failed");
+          }
+        } catch (error) {
+          console.error("Logout error", error);
+          if (label && originalText) label.textContent = originalText;
+        }
+      });
+    });
+  }
+
+  // Initialisation compatible avec Astro ViewTransitions et chargement standard
+  document.addEventListener("astro:page-load", setupLogout);
+  document.addEventListener("DOMContentLoaded", setupLogout);
+</script>

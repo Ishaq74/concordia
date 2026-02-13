@@ -1,0 +1,213 @@
+---
+export const prerender = false;
+
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import FormGroup from "@components/ui/Form/FormGroup.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Input from "@components/ui/Form/Input.astro";
+import PasswordInput from "@components/ui/Form/PasswordInput.astro";
+import Button from "@components/ui/Button.astro";
+import Alert from "@components/ui/Alert.astro";
+import Link from "@components/ui/Link.astro";
+
+interface Props {
+    translations?: Record<string, any>;
+    title?: string;
+    status?: { type: "success" | "error"; message: string } | null;
+    lastEmail?: string;
+    lastName?: string;
+}
+
+const props = Astro.props as Props;
+const translations = props.translations ?? {};
+const t = (translations?.auth ?? translations) as Record<string, any>;
+const title =
+    props.title ??
+    t.registerTitle ??
+    t.signUp ??
+    translations.registerTitle ??
+    "Inscription";
+const status = props.status ?? null;
+const lastEmail = props.lastEmail ?? "";
+const lastName = props.lastName ?? "";
+
+const resolveRoute = (value: unknown, fallback: string) => {
+    return typeof value === "string" && value.startsWith("/")
+        ? value
+        : fallback;
+};
+
+const loginUrl = resolveRoute(
+    t.loginPageUrl ?? t.loginUrl ?? translations.loginPageUrl,
+    "/fr/auth/connexion",
+);
+const alreadyHaveAccountPrompt =
+    t.alreadyHaveAccountPrompt ??
+    translations.alreadyHaveAccountPrompt ??
+    "Vous avez déjà un compte ?";
+const loginLinkLabel =
+    t.loginLinkLabel ??
+    t.signIn ??
+    translations.loginLinkLabel ??
+    "Connectez-vous";
+---
+
+<Card className="auth-card">
+    <div class="auth-card-top">
+        <span>{alreadyHaveAccountPrompt}</span>
+        <Link class="button ghost small" href={loginUrl}>{loginLinkLabel}</Link>
+    </div>
+
+    <CardHeader>
+        <p class="auth-subtitle">
+            {t.registerTitle ?? translations.registerTitle}
+        </p>
+        <h1 class="auth-title">{title}</h1>
+    </CardHeader>
+
+    <CardContent className="auth-content">
+        {
+            status && (
+                <Alert
+                    status={status.type === "error" ? "error" : "success"}
+                    aria-live="assertive"
+                >
+                    {status.message}
+                </Alert>
+            )
+        }
+
+        <form method="POST" class="auth-form">
+            <FormGroup>
+                <Label htmlFor="name"
+                    >{t.nameLabel ?? translations.nameLabel ?? "Nom"}</Label
+                >
+                <Input
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={lastName}
+                    required
+                    autocomplete="name"
+                />
+            </FormGroup>
+
+            <FormGroup>
+                <Label htmlFor="email"
+                    >{
+                        t.emailLabel ??
+                            translations.emailLabel ??
+                            "Adresse email"
+                    }</Label
+                >
+                <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={lastEmail}
+                    required
+                    autocomplete="email"
+                />
+            </FormGroup>
+
+            <FormGroup>
+                <Label htmlFor="password"
+                    >{
+                        t.passwordLabel ??
+                            translations.passwordLabel ??
+                            "Mot de passe"
+                    }</Label
+                >
+                <PasswordInput
+                    id="password"
+                    name="password"
+                    required
+                    autocomplete="new-password"
+                />
+            </FormGroup>
+
+            <FormGroup>
+                <Label htmlFor="confirmPassword"
+                    >{
+                        t.confirmPasswordLabel ??
+                            translations.confirmPasswordLabel ??
+                            "Confirmer le mot de passe"
+                    }</Label
+                >
+                <PasswordInput
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    required
+                    autocomplete="new-password"
+                />
+            </FormGroup>
+
+            <Button type="submit" class="auth-submit-btn"
+                >{
+                    t.registerButton ??
+                        translations.registerButton ??
+                        "Créer un compte"
+                }</Button
+            >
+        </form>
+    </CardContent>
+</Card>
+
+<style>
+    .auth-card {
+        width: 100%;
+        max-width: 28rem; /* max-w-md */
+        margin-left: auto;
+        margin-right: auto;
+        margin-block: 1.5rem;
+    }
+
+    .auth-card-top {
+        padding-left: 1.5rem; /* px-6 */
+        padding-right: 1.5rem;
+        padding-top: 1.5rem; /* pt-6 */
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem; /* gap-3 */
+        font-size: 0.875rem; /* text-sm */
+        color: var(--color-muted-foreground, #64748b);
+    }
+
+    .auth-subtitle {
+        font-size: 0.875rem; /* text-sm */
+        text-transform: uppercase;
+        letter-spacing: 0.025em; /* tracking-wide */
+        color: var(--color-slate-500, #64748b);
+    }
+
+    .auth-title {
+        font-size: 1.5rem; /* text-2xl */
+        font-weight: 600; /* font-semibold */
+        color: var(--color-slate-900, #0f172a);
+        margin: 0;
+    }
+
+    :global([data-theme="dark"]) .auth-title {
+        color: var(--color-slate-50, #f8fafc);
+    }
+
+    .auth-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem; /* space-y-5 */
+    }
+
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem; /* space-y-4 */
+    }
+
+    .auth-submit-btn {
+        width: 100%;
+    }
+</style>

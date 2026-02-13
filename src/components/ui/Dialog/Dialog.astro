@@ -1,0 +1,20 @@
+---
+interface Props {
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  id: string;
+  class?: string;
+}
+
+const { variant = "initial", id, class: className } = Astro.props;
+
+const dialogClass = [
+  "dialog-wrapper",
+  variant !== "initial" && variant,
+  className
+].filter(Boolean).join(" ");
+---
+
+<div class={dialogClass}>
+  <input type="checkbox" id={id} class="dialog-state" hidden />
+  <slot />
+</div>

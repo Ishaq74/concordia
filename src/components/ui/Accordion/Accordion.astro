@@ -1,0 +1,35 @@
+---
+/**
+ * Accordion - Conteneur pour accordéons 100% CSS (aucun script)
+ *
+ * @param {string} variant - Style visuel (initial|retro|modern|futuristic)
+ * @param {string} color - Couleur d'accent (default|primary|secondary|accent)
+ * @param {string} className - Classes CSS additionnelles
+ */
+
+interface Props {
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  color?: 'default' | 'primary' | 'secondary' | 'accent';
+  className?: string;
+}
+
+const {
+  variant = 'initial',
+  color = 'default',
+  className = '',
+} = Astro.props as Props;
+
+const variantClass = variant !== 'initial' ? variant : '';
+const colorClass = color !== 'default' ? color : '';
+
+const classes = [
+  'accordion',
+  variantClass,
+  colorClass,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<div class={classes}>
+  <slot />
+</div>

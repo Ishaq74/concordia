@@ -1,0 +1,365 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import SwitchComponent from "@components/ui/Form/Switch.astro";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+---
+
+<DocLayout 
+  title="Switch Component" 
+  description="Bouton toggle interactif avec variants et états" 
+  variant="initial"
+>
+  <h1 id="switch-component">Switch Component</h1>
+
+  <p>
+    Le composant <code class="inline-code">Switch</code> est un bouton toggle interactif
+    qui permet d'activer ou désactiver une option. Il utilise le rôle ARIA <code class="inline-code">switch</code>
+    pour une accessibilité optimale.
+  </p>
+
+  <TableOfContents
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "Props", href: "#props" },
+      { label: "Utilisation basique", href: "#basic" },
+      { label: "Variants", href: "#variants" },
+      { label: "États", href: "#states" },
+      { label: "Avec labels", href: "#labels" },
+      { label: "État désactivé", href: "#disabled" },
+      { label: "Gestion d'erreurs", href: "#error" },
+      { label: "Accessibilité", href: "#accessibility" },
+    ]}
+    title="Table des matières"
+  />
+
+  <h2 id="installation">Installation</h2>
+
+  <Code
+    lang="astro"
+    code={`import Switch from '@components/ui/Form/Switch.astro';`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <Table variant="initial">
+    <TableHeader>
+      <TableRow>
+        <TableHead>Prop</TableHead>
+        <TableHead>Type</TableHead>
+        <TableHead>Default</TableHead>
+        <TableHead>Description</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow>
+        <TableCell><code class="inline-code">id</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><em>Requis</em></TableCell>
+        <TableCell>Identifiant unique pour lier le label</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">name</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><em>Requis</em></TableCell>
+        <TableCell>Nom du champ pour la soumission du formulaire</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">variant</code></TableCell>
+        <TableCell><code class="inline-code">"initial" | "retro" | "modern" | "futuristic"</code></TableCell>
+        <TableCell><code class="inline-code">"initial"</code></TableCell>
+        <TableCell>Le style visuel du switch</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">checked</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">false</code></TableCell>
+        <TableCell>État activé par défaut</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">disabled</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">false</code></TableCell>
+        <TableCell>Désactive le switch</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">required</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">false</code></TableCell>
+        <TableCell>Champ requis</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">error</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><code class="inline-code">undefined</code></TableCell>
+        <TableCell>Message d'erreur à afficher</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <h2 id="basic">Utilisation basique</h2>
+
+  <div class="demo-section">
+    <SwitchComponent id="basic-switch" name="basic">
+      Activer les notifications
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="basic-switch" name="basic">
+  Activer les notifications
+</SwitchComponent>`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <h3>Initial</h3>
+  <div class="demo-section">
+    <SwitchComponent id="initial-off" name="initial1" variant="initial">
+      Mode Initial (Off)
+    </SwitchComponent>
+    <SwitchComponent id="initial-on" name="initial2" variant="initial" checked>
+      Mode Initial (On)
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="initial-off" name="initial1" variant="initial">
+  Mode Initial (Off)
+</SwitchComponent>
+<SwitchComponent id="initial-on" name="initial2" variant="initial" checked>
+  Mode Initial (On)
+</SwitchComponent>`}
+  />
+
+  <h3>Retro</h3>
+  <div class="demo-section">
+    <SwitchComponent id="retro-off" name="retro1" variant="retro">
+      Mode Retro (Off)
+    </SwitchComponent>
+    <SwitchComponent id="retro-on" name="retro2" variant="retro" checked>
+      Mode Retro (On)
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="retro-off" name="retro1" variant="retro">
+  Mode Retro (Off)
+</SwitchComponent>
+<SwitchComponent id="retro-on" name="retro2" variant="retro" checked>
+  Mode Retro (On)
+</SwitchComponent>`}
+  />
+
+  <h3>Modern</h3>
+  <div class="demo-section">
+    <SwitchComponent id="modern-off" name="modern1" variant="modern">
+      Mode Modern (Off)
+    </SwitchComponent>
+    <SwitchComponent id="modern-on" name="modern2" variant="modern" checked>
+      Mode Modern (On)
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="modern-off" name="modern1" variant="modern">
+  Mode Modern (Off)
+</SwitchComponent>
+<SwitchComponent id="modern-on" name="modern2" variant="modern" checked>
+  Mode Modern (On)
+</SwitchComponent>`}
+  />
+
+  <h3>Futuristic</h3>
+  <div class="demo-section">
+    <SwitchComponent id="futuristic-off" name="futuristic1" variant="futuristic">
+      Mode Futuristic (Off)
+    </SwitchComponent>
+    <SwitchComponent id="futuristic-on" name="futuristic2" variant="futuristic" checked>
+      Mode Futuristic (On)
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="futuristic-off" name="futuristic1" variant="futuristic">
+  Mode Futuristic (Off)
+</SwitchComponent>
+<SwitchComponent id="futuristic-on" name="futuristic2" variant="futuristic" checked>
+  Mode Futuristic (On)
+</SwitchComponent>`}
+  />
+
+  <h2 id="states">États</h2>
+
+  <div class="demo-section">
+    <SwitchComponent id="state-off" name="state1">
+      État désactivé
+    </SwitchComponent>
+    <SwitchComponent id="state-on" name="state2" checked>
+      État activé
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="state-off" name="state1">
+  État désactivé
+</SwitchComponent>
+<SwitchComponent id="state-on" name="state2" checked>
+  État activé
+</SwitchComponent>`}
+  />
+
+  <h2 id="labels">Avec labels</h2>
+
+  <div class="demo-section">
+    <SwitchComponent id="notifications" name="notifications">
+      Recevoir les notifications par email
+    </SwitchComponent>
+    <SwitchComponent id="marketing" name="marketing" checked>
+      Accepter les communications marketing
+    </SwitchComponent>
+    <SwitchComponent id="analytics" name="analytics">
+      Activer les statistiques anonymes
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="notifications" name="notifications">
+  Recevoir les notifications par email
+</SwitchComponent>
+<SwitchComponent id="marketing" name="marketing" checked>
+  Accepter les communications marketing
+</SwitchComponent>
+<SwitchComponent id="analytics" name="analytics">
+  Activer les statistiques anonymes
+</SwitchComponent>`}
+  />
+
+  <h2 id="disabled">État désactivé</h2>
+
+  <div class="demo-section">
+    <SwitchComponent id="disabled-off" name="disabled1" disabled>
+      Switch désactivé (Off)
+    </SwitchComponent>
+    <SwitchComponent id="disabled-on" name="disabled2" disabled checked>
+      Switch désactivé (On)
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="disabled-off" name="disabled1" disabled>
+  Switch désactivé (Off)
+</SwitchComponent>
+<SwitchComponent id="disabled-on" name="disabled2" disabled checked>
+  Switch désactivé (On)
+</SwitchComponent>`}
+  />
+
+  <h2 id="error">Gestion d'erreurs</h2>
+
+  <div class="demo-section">
+    <SwitchComponent 
+      id="terms" 
+      name="terms" 
+      required 
+      error="Vous devez accepter les conditions d'utilisation"
+    >
+      J'accepte les conditions d'utilisation
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent 
+  id="terms" 
+  name="terms" 
+  required 
+  error="Vous devez accepter les conditions d'utilisation"
+>
+  J'accepte les conditions d'utilisation
+</SwitchComponent>`}
+  />
+
+  <h2 id="accessibility">Accessibilité</h2>
+
+  <p>
+    Le composant <code class="inline-code">Switch</code> respecte les meilleures pratiques d'accessibilité :
+  </p>
+
+  <ul>
+    <li>
+      <code class="inline-code">role="switch"</code> : Indique qu'il s'agit d'un bouton toggle
+    </li>
+    <li>
+      <code class="inline-code">aria-checked</code> : Communique l'état activé/désactivé
+    </li>
+    <li>
+      <code class="inline-code">aria-invalid</code> : Indique si le champ contient une erreur
+    </li>
+    <li>
+      <code class="inline-code">aria-describedby</code> : Lie le message d'erreur au switch
+    </li>
+    <li>
+      Le label est correctement lié via l'attribut <code class="inline-code">for</code>
+    </li>
+    <li>
+      Navigation au clavier : <kbd>Space</kbd> ou <kbd>Enter</kbd> pour toggle
+    </li>
+    <li>
+      Focus visible pour la navigation au clavier
+    </li>
+  </ul>
+
+  <h3>Exemple avec formulaire accessible</h3>
+
+  <div class="demo-section">
+    <form style="display: flex; flex-direction: column; gap: 1rem;">
+      <fieldset style="border: 1px solid var(--color-border); padding: 1rem; border-radius: var(--radius-md);">
+        <legend style="font-weight: 600; padding: 0 0.5rem;">Préférences de notification</legend>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <SwitchComponent id="email-notifs" name="emailNotifs" checked>
+            Notifications par email
+          </SwitchComponent>
+          <SwitchComponent id="push-notifs" name="pushNotifs">
+            Notifications push
+          </SwitchComponent>
+          <SwitchComponent id="sms-notifs" name="smsNotifs">
+            Notifications SMS
+          </SwitchComponent>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<form>
+  <fieldset>
+    <legend>Préférences de notification</legend>
+    <SwitchComponent id="email-notifs" name="emailNotifs" checked>
+      Notifications par email
+    </SwitchComponent>
+    <SwitchComponent id="push-notifs" name="pushNotifs">
+      Notifications push
+    </SwitchComponent>
+    <SwitchComponent id="sms-notifs" name="smsNotifs">
+      Notifications SMS
+    </SwitchComponent>
+  </fieldset>
+</form>`}
+  />
+</DocLayout>

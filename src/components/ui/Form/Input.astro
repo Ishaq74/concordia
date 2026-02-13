@@ -1,0 +1,91 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  type?: "text" | "email" | "password" | "number" | "tel" | "url" | "search" | "date" | "time";
+  id: string;
+  name?: string;
+  value?: string;
+  placeholder?: string;
+  required?: boolean;
+  disabled?: boolean;
+  readonly?: boolean;
+  autocomplete?: string;
+  icon?: string;
+  iconPosition?: "left" | "right";
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  error?: string;
+  className?: string;
+}
+
+const {
+  type = "text",
+  id,
+  name,
+  value,
+  placeholder,
+  required = false,
+  disabled = false,
+  readonly = false,
+  autocomplete,
+  icon,
+  iconPosition = "left",
+  variant = "initial",
+  error,
+  className = "",
+} = Astro.props;
+
+const hasIcon = !!icon;
+const variantClass = variant !== 'initial' ? variant : '';
+const inputClasses = [
+  hasIcon && iconPosition === "left" && "input-with-icon-left",
+  hasIcon && iconPosition === "right" && "input-with-icon-right",
+  error && "input-error",
+  variantClass,
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+
+const wrapperClasses = [
+  "input-wrapper",
+  hasIcon && "has-icon",
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<div class={wrapperClasses}>
+  {hasIcon && iconPosition === "left" && (
+    <span class="input-icon input-icon-left">
+      <Icon name={icon} />
+    </span>
+  )}
+  
+  <input
+    type={type}
+    id={id}
+    name={name || id}
+    value={value}
+    placeholder={placeholder}
+    required={required}
+    disabled={disabled}
+    readonly={readonly}
+    autocomplete={autocomplete}
+    aria-invalid={error ? "true" : undefined}
+    aria-describedby={error ? `${id}-error` : undefined}
+    class={inputClasses}
+  />
+  
+  {hasIcon && iconPosition === "right" && (
+    <span class="input-icon input-icon-right">
+      <Icon name={icon} />
+    </span>
+  )}
+  
+  {error && (
+    <span class="input-error-message" id={`${id}-error`} role="alert">
+      {error}
+    </span>
+  )}
+</div>

@@ -1,0 +1,528 @@
+---
+interface MenuItem {
+  label: string;
+  value?: string;
+  icon?: string;
+  disabled?: boolean;
+  href?: string;
+  children?: MenuItem[];
+}
+
+interface Props {
+  items: MenuItem[];
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  position?: "bottom-left" | "bottom-right" | "top-left" | "top-right";
+  triggerLabel?: string;
+  triggerIcon?: string;
+  openOnHover?: boolean;
+  ishover?: boolean; // Alias for openOnHover
+  isMenu?: boolean; // Professional mobile navigation mode
+  ismenu?: boolean; // Alias for isMenu
+  class?: string;
+}
+
+const {
+  items,
+  variant = "initial",
+  position = "bottom-left",
+  triggerLabel = "Menu",
+  triggerIcon,
+  openOnHover = false,
+  ishover = false,
+  isMenu = false,
+  ismenu = false,
+  class: className,
+} = Astro.props;
+
+const shouldHover = openOnHover || ishover;
+const isMenuPro = isMenu || ismenu;
+
+const dropdownId = `dropdown-${Math.random().toString(36).substring(2, 11)}`;
+const dropdownClass = [
+  "dropdown",
+  shouldHover && "dropdown-hover",
+  isMenuPro && "is-menu-pro",
+  variant !== "initial" && variant,
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+
+// Name pour les radio buttons de chaque niveau
+const level1RadioName = `${dropdownId}-level1`;
+const getLevel2RadioName = (parentId: string) =>
+  `${dropdownId}-level2-${parentId}`;
+---
+
+<div class={dropdownClass}>
+  <input type="checkbox" id={dropdownId} class="dropdown-state" />
+
+  <label for={dropdownId} class="dropdown-trigger">
+    <slot name="trigger">
+      {triggerIcon && <span class="trigger-icon">{triggerIcon}</span>}
+      <span class="trigger-label">{triggerLabel}</span>
+      <span class="trigger-arrow">▼</span>
+    </slot>
+  </label>
+
+  <label for={dropdownId} class="dropdown-backdrop"></label>
+
+  <div class={`dropdown-menu position-${position}`}>
+    <div class="dropdown-content">
+      {
+        items.map((item) => {
+          const itemId = `${dropdownId}-${item.value || (item.label ? item.label.replace(/\s+/g, "-").toLowerCase() : "item")}`;
+          const hasChildren = item.children && item.children.length > 0;
+
+          if (hasChildren) {
+            return (
+              <div class="dropdown-submenu">
+                <input
+                  type="radio"
+                  name={level1RadioName}
+                  id={itemId}
+                  class="submenu-state"
+                />
+                {item.href ? (
+                  <a
+                    href={item.href}
+                    class={
+                      item.disabled
+                        ? "dropdown-item has-submenu has-link disabled"
+                        : "dropdown-item has-submenu has-link"
+                    }
+                    data-value={item.value}
+                  >
+                    {item.icon && (
+                      <span class="item-icon" set:html={item.icon} />
+                    )}
+                    <span class="item-label">{item.label}</span>
+                    <label for={itemId} class="submenu-arrow-trigger">
+                      <span class="submenu-arrow">▶</span>
+                    </label>
+                  </a>
+                ) : (
+                  <label
+                    for={itemId}
+                    class={
+                      item.disabled
+                        ? "dropdown-item has-submenu disabled"
+                        : "dropdown-item has-submenu"
+                    }
+                    data-value={item.value}
+                  >
+                    {item.icon && (
+                      <span class="item-icon" set:html={item.icon} />
+                    )}
+                    <span class="item-label">{item.label}</span>
+                    <span class="submenu-arrow">▶</span>
+                  </label>
+                )}
+                <div class="submenu-content">
+                  <div class="dropdown-content">
+                    {item.children!.map((child) => {
+                      const childId = `${itemId}-${child.value || (child.label ? child.label.replace(/\s+/g, "-").toLowerCase() : "child")}`;
+                      const hasGrandChildren =
+                        child.children && child.children.length > 0;
+
+                      if (hasGrandChildren) {
+                        return (
+                          <div class="dropdown-submenu">
+                            <input
+                              type="radio"
+                              name={getLevel2RadioName(itemId)}
+                              id={childId}
+                              class="submenu-state"
+                            />
+                            {child.href ? (
+                              <a
+                                href={child.href}
+                                class={
+                                  child.disabled
+                                    ? "dropdown-item has-submenu has-link disabled"
+                                    : "dropdown-item has-submenu has-link"
+                                }
+                                data-value={child.value}
+                              >
+                                {child.icon && (
+                                  <span
+                                    class="item-icon"
+                                    set:html={child.icon}
+                                  />
+                                )}
+                                <span class="item-label">{child.label}</span>
+                                <label
+                                  for={childId}
+                                  class="submenu-arrow-trigger"
+                                >
+                                  <span class="submenu-arrow">▶</span>
+                                </label>
+                              </a>
+                            ) : (
+                              <label
+                                for={childId}
+                                class={
+                                  child.disabled
+                                    ? "dropdown-item has-submenu disabled"
+                                    : "dropdown-item has-submenu"
+                                }
+                                data-value={child.value}
+                              >
+                                {child.icon && (
+                                  <span
+                                    class="item-icon"
+                                    set:html={child.icon}
+                                  />
+                                )}
+                                <span class="item-label">{child.label}</span>
+                                <span class="submenu-arrow">▶</span>
+                              </label>
+                            )}
+                            <div class="submenu-content">
+                              <div class="dropdown-content">
+                                {child.children!.map((grandChild) => {
+                                  if (grandChild.href) {
+                                    return (
+                                      <a
+                                        href={grandChild.href}
+                                        class={
+                                          grandChild.disabled
+                                            ? "dropdown-item disabled"
+                                            : "dropdown-item"
+                                        }
+                                        data-value={grandChild.value}
+                                      >
+                                        {grandChild.icon && (
+                                          <span
+                                            class="item-icon"
+                                            set:html={grandChild.icon}
+                                          />
+                                        )}
+                                        <span class="item-label">
+                                          {grandChild.label}
+                                        </span>
+                                      </a>
+                                    );
+                                  }
+                                  return (
+                                    <label
+                                      for={dropdownId}
+                                      class={
+                                        grandChild.disabled
+                                          ? "dropdown-item disabled"
+                                          : "dropdown-item"
+                                      }
+                                      data-value={grandChild.value}
+                                    >
+                                      {grandChild.icon && (
+                                        <span
+                                          class="item-icon"
+                                          set:html={grandChild.icon}
+                                        />
+                                      )}
+                                      <span class="item-label">
+                                        {grandChild.label}
+                                      </span>
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (child.href) {
+                        return (
+                          <a
+                            href={child.href}
+                            class={
+                              child.disabled
+                                ? "dropdown-item disabled"
+                                : "dropdown-item"
+                            }
+                            data-value={child.value}
+                          >
+                            {child.icon && (
+                              <span class="item-icon" set:html={child.icon} />
+                            )}
+                            <span class="item-label">{child.label}</span>
+                          </a>
+                        );
+                      }
+
+                      return (
+                        <label
+                          for={dropdownId}
+                          class={
+                            child.disabled
+                              ? "dropdown-item disabled"
+                              : "dropdown-item"
+                          }
+                          data-value={child.value}
+                        >
+                          {child.icon && (
+                            <span class="item-icon" set:html={child.icon} />
+                          )}
+                          <span class="item-label">{child.label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          if (item.href) {
+            return (
+              <a
+                href={item.href}
+                class={
+                  item.disabled ? "dropdown-item disabled" : "dropdown-item"
+                }
+                data-value={item.value}
+              >
+                {item.icon && <span class="item-icon" set:html={item.icon} />}
+                <span class="item-label">{item.label}</span>
+              </a>
+            );
+          }
+
+          return (
+            <label
+              for={dropdownId}
+              class={item.disabled ? "dropdown-item disabled" : "dropdown-item"}
+              data-value={item.value}
+            >
+              {item.icon && <span class="item-icon" set:html={item.icon} />}
+              <span class="item-label">{item.label}</span>
+            </label>
+          );
+        })
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  /* --- RADICAL PROFESSIONAL MENU MODE (ISMENU) --- */
+  /* This mode strips ALL "dropdown" visual cues on mobile for a seamless accordion */
+  @media (max-width: 1024px) {
+    /* Radical reset of all possible containers */
+    .is-menu-pro,
+    .is-menu-pro .dropdown-menu,
+    .is-menu-pro .dropdown-content,
+    .is-menu-pro .dropdown-submenu,
+    .is-menu-pro .submenu-content,
+    .is-menu-pro .dropdown-item,
+    .is-menu-pro .dropdown-trigger {
+      background: transparent !important;
+      background-color: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+      backdrop-filter: none !important;
+    }
+
+    /* Total reset of the trigger - keep only a subtle separator if desired, 
+       but user said "no cadres", so we remove everything */
+    .is-menu-pro .dropdown-trigger {
+      width: 100% !important;
+      padding: 0.85rem 0 !important;
+      margin: 0 !important;
+      border-bottom: 1px solid var(--border-default, rgba(255, 255, 255, 0.06)) !important;
+      border-radius: 0 !important;
+      color: var(--text-default, inherit) !important;
+      font-size: 1.05rem !important;
+      font-weight: 500 !important;
+      justify-content: space-between !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    /* Indentation - Flat and clean with only a tiny vertical guide */
+    .is-menu-pro .dropdown-content {
+      padding: 0 0 0 1.15rem !important;
+      border-left: 1px solid var(--border-default, rgba(255, 255, 255, 0.08)) !important;
+      margin: 0.25rem 0 0.25rem 0.25rem !important;
+      display: block !important; /* Reset for any variants */
+    }
+
+    .is-menu-pro .dropdown-item {
+      padding: 0.7rem 0 !important;
+      color: var(--text-muted, rgba(255, 255, 255, 0.6)) !important;
+      font-size: 0.95rem !important;
+      width: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    /* State management */
+    .is-menu-pro .dropdown-menu,
+    .is-menu-pro .submenu-content {
+      display: none !important;
+      position: static !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
+    }
+
+    .is-menu-pro .dropdown-state:checked ~ .dropdown-menu,
+    .is-menu-pro .submenu-state:checked ~ .submenu-content {
+      display: block !important;
+    }
+
+    /* Arrows - subtle */
+    .is-menu-pro .trigger-arrow,
+    .is-menu-pro .submenu-arrow {
+      font-size: 0.75rem !important;
+      opacity: 0.35;
+      margin-left: auto;
+      transition: transform 0.2s ease;
+    }
+
+    .is-menu-pro .dropdown-state:checked ~ .dropdown-trigger .trigger-arrow {
+      transform: rotate(180deg);
+      opacity: 0.7;
+    }
+    .is-menu-pro .submenu-state:checked ~ .dropdown-item .submenu-arrow {
+      transform: rotate(90deg);
+      opacity: 0.7;
+    }
+
+    .is-menu-pro .dropdown-backdrop {
+      display: none !important;
+    }
+  }
+
+  /* Dark Theme refinements */
+  :global([data-theme="dark"]) .is-menu-pro .dropdown-trigger {
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+    color: #eee !important;
+  }
+  :global([data-theme="dark"]) .is-menu-pro .dropdown-content {
+    border-left-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  :global([data-theme="dark"]) .is-menu-pro .dropdown-item {
+    color: #aaa !important;
+  }
+
+  /* Specific fix for LangChooser flag alignment in menu mode */
+  .is-menu-pro.nav-dropdown .trigger-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+</style>
+
+<script is:inline type="module" define:vars={{ dropdownId, openOnHover }}>
+  // dropdownId is provided by Astro via `define:vars` — silence TS/IDE parsing
+  // @ts-ignore
+  const dropdown = document
+    .querySelector(`#${dropdownId}`)
+    ?.closest(".dropdown");
+  if (!dropdown) return;
+
+  const menu = dropdown.querySelector(".dropdown-menu");
+  const submenus = dropdown.querySelectorAll(".submenu-content");
+
+  function checkCollision(element) {
+    if (!element) return;
+
+    const rect = element.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    // Check si le submenu sort à droite
+    if (rect.right > viewportWidth - 20) {
+      element.style.left = "auto";
+      element.style.right = "100%";
+      element.style.marginLeft = "0";
+      element.style.marginRight = "0.25rem";
+    }
+
+    // Check si le submenu sort en bas
+    if (rect.bottom > viewportHeight - 20) {
+      element.style.top = "auto";
+      element.style.bottom = "0";
+    }
+  }
+
+  // Observer pour détecter quand les menus s'ouvrent
+  const observer = new MutationObserver(() => {
+    if (
+      (menu && menu.style.visibility === "visible") ||
+      getComputedStyle(menu).visibility === "visible"
+    ) {
+      checkCollision(menu);
+
+      // Check tous les submenus visibles
+      submenus.forEach((submenu) => {
+        if (
+          submenu.style.visibility === "visible" ||
+          getComputedStyle(submenu).visibility === "visible"
+        ) {
+          checkCollision(submenu);
+        }
+      });
+    }
+  });
+
+  observer.observe(dropdown, {
+    attributes: true,
+    subtree: true,
+    attributeFilter: ["style", "class"],
+  });
+
+  // Check initial au hover pour les dropdowns hover
+  if (openOnHover) {
+    dropdown.addEventListener("mouseenter", () => {
+      setTimeout(() => {
+        checkCollision(menu);
+        submenus.forEach((submenu) => {
+          if (getComputedStyle(submenu).visibility === "visible") {
+            checkCollision(submenu);
+          }
+        });
+      }, 50);
+    });
+
+    // Re-check sur submenu hover
+    const submenuTriggers = dropdown.querySelectorAll(".dropdown-submenu");
+    submenuTriggers.forEach((trigger) => {
+      trigger.addEventListener("mouseenter", () => {
+        setTimeout(() => {
+          const submenu = trigger.querySelector(".submenu-content");
+          checkCollision(submenu);
+        }, 50);
+      });
+    });
+  } else {
+    // Pour le mode click, check après l'ouverture
+    const checkbox = dropdown.querySelector(".dropdown-state");
+    if (checkbox) {
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          setTimeout(() => {
+            checkCollision(menu);
+          }, 50);
+        }
+      });
+    }
+
+    // Check sur radio change pour submenus
+    const radioButtons = dropdown.querySelectorAll(".submenu-state");
+    radioButtons.forEach((radio) => {
+      radio.addEventListener("change", () => {
+        if (radio.checked) {
+          setTimeout(() => {
+            const parent = radio.closest(".dropdown-submenu");
+            const submenu = parent?.querySelector(".submenu-content");
+            checkCollision(submenu);
+          }, 50);
+        }
+      });
+    });
+  }
+</script>

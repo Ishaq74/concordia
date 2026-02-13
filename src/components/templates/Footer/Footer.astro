@@ -1,0 +1,152 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  config?: {
+    showSocial?: boolean;
+    showNavPrimary?: boolean;
+    showContactInfo?: boolean;
+    showLegalInfo?: boolean;
+    showAddress?: boolean;
+    showCopyright?: boolean;
+  };
+  class?: string;
+}
+
+const {
+  variant = 'initial',
+  config = {
+    showSocial: true,
+    showNavPrimary: true,
+    showContactInfo: true,
+    showLegalInfo: true,
+    showAddress: true,
+    showCopyright: true,
+  },
+  class: className = '',
+} = Astro.props;
+
+const currentLocale = Astro.currentLocale || 'fr';
+
+// Import translations
+const translations = await import(`../../../i18n/${currentLocale}.json`);
+const t = translations.default;
+
+const footerClass = [
+  'footer',
+  variant !== 'initial' && variant,
+  className
+].filter(Boolean).join(' ');
+
+const currentYear = new Date().getFullYear();
+
+// Social links
+const socialLinks = [
+  { name: 'GitHub', icon: 'mdi:github', href: 'https://github.com' },
+  { name: 'Twitter', icon: 'mdi:twitter', href: 'https://twitter.com' },
+  { name: 'LinkedIn', icon: 'mdi:linkedin', href: 'https://linkedin.com' },
+];
+---
+
+<footer class={footerClass}>
+  <div class="footer-container">
+    
+    <div class="footer-grid">
+      
+      <!-- Company Info -->
+      <div class="footer-section">
+        <h3 class="footer-title">{t.footer.company}</h3>
+        <p class="footer-text">{t.footer.description}</p>
+        <p class="footer-text footer-siret">{t.footer.siret}</p>
+      </div>
+      
+      <!-- Navigation Links -->
+      {config.showNavPrimary && (
+        <div class="footer-section">
+          <h3 class="footer-title">{t.nav.home}</h3>
+          <ul class="footer-list">
+            <li><a href={getRelativeLocaleUrl(currentLocale, '')} class="footer-link">{t.nav.home}</a></li>
+            <li><a href={getRelativeLocaleUrl(currentLocale, 'about')} class="footer-link">{t.nav.about}</a></li>
+            <li><a href={getRelativeLocaleUrl(currentLocale, 'services')} class="footer-link">{t.nav.services}</a></li>
+            <li><a href={getRelativeLocaleUrl(currentLocale, 'blog')} class="footer-link">{t.nav.blog}</a></li>
+            <li><a href={getRelativeLocaleUrl(currentLocale, 'contact')} class="footer-link">{t.nav.contact}</a></li>
+            <li><a href={getRelativeLocaleUrl(currentLocale, 'docs')} class="footer-link">{t.nav.docs}</a></li>
+          </ul>
+        </div>
+      )}
+      
+      <!-- Contact Info -->
+      {config.showContactInfo && (
+        <div class="footer-section">
+          <h3 class="footer-title">{t.footer.contact}</h3>
+          <ul class="footer-list">
+            <li>
+              <a href={`mailto:${t.footer.email}`} class="footer-link">
+                <Icon name="mdi:email" class="footer-icon" />
+                {t.footer.email}
+              </a>
+            </li>
+            <li>
+              <a href={`tel:${t.footer.phone.replace(/\s/g, '')}`} class="footer-link">
+                <Icon name="mdi:phone" class="footer-icon" />
+                {t.footer.phone}
+              </a>
+            </li>
+          </ul>
+        </div>
+      )}
+      
+      <!-- Address -->
+      {config.showAddress && (
+        <div class="footer-section">
+          <h3 class="footer-title">{t.footer.address}</h3>
+          <address class="footer-address">
+            <p class="footer-text">{t.footer.street}</p>
+            <p class="footer-text">{t.footer.city}</p>
+          </address>
+        </div>
+      )}
+      
+      <!-- Social Links -->
+      {config.showSocial && (
+        <div class="footer-section">
+          <h3 class="footer-title">{t.footer.followUs}</h3>
+          <div class="footer-social">
+            {socialLinks.map((social) => (
+              <a href={social.href} class="footer-social-link" aria-label={social.name} target="_blank" rel="noopener noreferrer">
+                <Icon name={social.icon} />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+      
+    </div>
+    
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+      
+      <!-- Legal Links -->
+      {config.showLegalInfo && (
+        <div class="footer-legal">
+          <a href={getRelativeLocaleUrl(currentLocale, 'legal')} class="footer-link">{t.footer.legal}</a>
+          <span class="footer-separator">•</span>
+          <a href={getRelativeLocaleUrl(currentLocale, 'privacy')} class="footer-link">{t.footer.privacy}</a>
+          <span class="footer-separator">•</span>
+          <a href={getRelativeLocaleUrl(currentLocale, 'terms')} class="footer-link">{t.footer.terms}</a>
+        </div>
+      )}
+      
+      <!-- Copyright -->
+      {config.showCopyright && (
+        <div class="footer-copyright">
+          <p class="footer-text">© {currentYear} {t.footer.company}. {t.footer.copyright}</p>
+        </div>
+      )}
+      
+    </div>
+    
+  </div>
+</footer>

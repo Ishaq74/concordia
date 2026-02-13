@@ -1,0 +1,74 @@
+/* Base - Styles de base minimum */
+
+/* Imports des tokens */
+@import './tokens/colors.css';
+@import './tokens/typography.css';
+@import './tokens/spacing.css';
+@import './tokens/components.css';
+
+/* Import du variant initial (styles par défaut) */
+@import './components/initial.css';
+
+/* Reset et transitions globales */
+*, *::before, *::after {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, box-shadow, transform, opacity, filter, backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+  box-sizing: border-box;
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track-bg); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb-bg); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover-bg); }
+
+/* Corps de page */
+body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  background-color: var(--bg-default);
+  color: var(--text-default);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+}
+
+/* Titres */
+h1, h2, h3, h4, h5, h6 { 
+  font-family: var(--font-family-display);
+  margin: var(--space-6) 0 var(--space-3); 
+  color: var(--heading-color); 
+  font-weight: 700;
+}
+h1 { font-size: var(--h1-font-size); }
+h2 { font-size: var(--h2-font-size); }
+h3 { font-size: var(--h3-font-size); }
+
+/* Paragraphes */
+p { margin-bottom: var(--space-4); }
+
+/* Liens de base */
+a { 
+  color: var(--link-color); 
+  font-size: var(--link-font-size);
+  font-weight: var(--link-font-weight);
+  text-decoration: var(--link-text-decoration); 
+  text-decoration-thickness: var(--link-text-decoration-thickness);
+  text-decoration-style: var(--link-text-decoration-style);
+  text-decoration-color: var(--link-text-decoration-color); 
+  text-underline-offset: var(--link-text-underline-offset);
+  transition: var(--link-transition); 
+}
+a:hover { color: var(--link-hover-color); text-decoration-color: currentColor; }
+a:active { color: var(--link-color-active); }
+a:visited { color: var(--link-color-visited); }
+
+img { max-width: 100%; }
+
+pre {
+    padding: 1.5rem;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+}

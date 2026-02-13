@@ -1,0 +1,46 @@
+/* Tokens - Typographie */
+:root {
+  /* Familles de polices */
+  --font-family-sans: "Plus Jakarta Sans", "Inter", sans-serif;
+  --font-family-display: "Space Grotesk", sans-serif;
+  --font-family-mono: "Space Mono", monospace;
+
+  /* Tailles de base */
+  --font-size-base: 1rem;
+  --line-height-base: 1.5;
+
+  /* Tailles des titres */
+  --h1-font-size: 2.5rem;
+  --h2-font-size: 2rem;
+  --h3-font-size: 1.5rem;
+
+  /* Tailles des composants */
+  --button-font-size: 0.875rem;
+  --input-font-size: 0.875rem;
+  --badge-font-size: 0.75rem;
+  --tab-font-size: 0.875rem;
+  --tooltip-font-size: 0.875rem;
+
+  /* Tailles des liens */
+  --link-font-size: 1rem;
+  --link-font-weight: 400;
+  --link-button-font-size: 0.875rem;
+
+  /* Styles de décoration des liens */
+  --link-text-decoration: underline;
+  --link-text-decoration-thickness: 1px;
+  --link-text-decoration-style: solid;
+  --link-text-underline-offset: 2px;
+  --link-transition: text-decoration-color 0.2s;
+
+  /* Variants retro */
+  --retro-link-font-weight: 600;
+  --retro-link-transition: all 0.1s;
+
+  /* Variants modern */
+  --modern-link-transition: 0.3s;
+
+  /* Variants futuristic */
+  --futuristic-link-letter-spacing: 0.05em;
+  --futuristic-link-font-size: 0.9em;
+}

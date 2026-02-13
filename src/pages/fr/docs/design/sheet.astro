@@ -1,0 +1,526 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import SheetComponent from "@components/ui/Sheet/Sheet.astro";
+import SheetTrigger from "@components/ui/Sheet/SheetTrigger.astro";
+import SheetContent from "@components/ui/Sheet/SheetContent.astro";
+import SheetHeader from "@components/ui/Sheet/SheetHeader.astro";
+import SheetTitle from "@components/ui/Sheet/SheetTitle.astro";
+import SheetDescription from "@components/ui/Sheet/SheetDescription.astro";
+import SheetFooter from "@components/ui/Sheet/SheetFooter.astro";
+import SheetClose from "@components/ui/Sheet/SheetClose.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import Alert from "@components/ui/Alert.astro";
+---
+
+<DocLayout 
+  title="Sheet Panel Component" 
+  description="Panneau coulissant accessible en pur CSS sans JavaScript"
+  variant="initial"
+>
+  <h1 id="sheet-component">Sheet Panel Component</h1>
+
+  <p>
+    Le composant <code class="inline-code">Sheet</code> crée un panneau coulissant accessible 
+    en <strong>pur CSS</strong>, sans JavaScript. Il utilise un checkbox caché et la pseudo-classe 
+    <code class="inline-code">:has()</code> pour gérer l'état ouvert/fermé.
+  </p>
+
+  <Alert status="success">
+    🎉 <strong>Zero JavaScript !</strong> Tout fonctionne avec CSS moderne uniquement. 
+    Compatible avec tous les navigateurs modernes supportant <code class="inline-code">:has()</code>.
+  </Alert>
+
+  <TableOfContents
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "Utilisation basique", href: "#basic" },
+      { label: "Variants", href: "#variants" },
+      { label: "Couleurs", href: "#colors" },
+      { label: "Côtés d'ouverture", href: "#sides" },
+      { label: "API Reference", href: "#api" },
+      { label: "Accessibilité", href: "#accessibility" },
+    ]}
+    title="Table des matières"
+  />
+
+  <h2 id="installation">Installation</h2>
+
+  <Code
+    lang="astro"
+    code={`import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+  SheetClose,
+} from '@components/ui/Sheet';`}
+  />
+
+  <h2 id="basic">Utilisation basique</h2>
+
+  <div class="demo-section">
+    <SheetComponent id="sheet-demo-basic">
+      <SheetTrigger htmlFor="sheet-demo-basic" color="primary">
+        Ouvrir le Sheet
+      </SheetTrigger>
+      <SheetContent side="right" sheetId="sheet-demo-basic">
+        <SheetHeader>
+          <SheetTitle>Titre du Sheet</SheetTitle>
+          <SheetDescription>
+            Ceci est une description du contenu du panneau sheet.
+          </SheetDescription>
+        </SheetHeader>
+        <div style="padding: var(--space-4);">
+          <p>Votre contenu va ici...</p>
+        </div>
+        <SheetFooter>
+          <SheetClose htmlFor="sheet-demo-basic" color="primary">
+            Fermer
+          </SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </SheetComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SheetComponent id="my-sheet">
+  <SheetTrigger htmlFor="my-sheet" color="primary">
+    Ouvrir le Sheet
+  </SheetTrigger>
+  <SheetContent side="right" sheetId="my-sheet">
+    <SheetHeader>
+      <SheetTitle>Titre du Sheet</SheetTitle>
+      <SheetDescription>
+        Description du contenu.
+      </SheetDescription>
+    </SheetHeader>
+    <div style="padding: var(--space-4);">
+      <p>Votre contenu va ici...</p>
+    </div>
+    <SheetFooter>
+      <SheetClose htmlFor="my-sheet">Fermer</SheetClose>
+    </SheetFooter>
+  </SheetContent>
+</SheetComponent>`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <h3>Initial (Défaut)</h3>
+  <div class="demo-section">
+    <SheetComponent id="sheet-initial" variant="initial">
+      <SheetTrigger htmlFor="sheet-initial" variant="initial" color="primary">
+        Style Initial
+      </SheetTrigger>
+      <SheetContent side="right" sheetId="sheet-initial">
+        <SheetHeader>
+          <SheetTitle>Sheet Initial</SheetTitle>
+          <SheetDescription>Style par défaut, sobre et élégant</SheetDescription>
+        </SheetHeader>
+        <div style="padding: var(--space-4);">
+          <p>Contenu avec le style initial...</p>
+        </div>
+        <SheetFooter>
+          <SheetClose htmlFor="sheet-initial">Fermer</SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </SheetComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SheetComponent id="sheet-initial" variant="initial">
+  <SheetTrigger htmlFor="sheet-initial">Style Initial</SheetTrigger>
+  <SheetContent side="right" sheetId="sheet-initial">
+    <!-- Contenu -->
+  </SheetContent>
+</SheetComponent>`}
+  />
+
+  <h3>Retro</h3>
+  <div class="demo-section">
+    <SheetComponent id="sheet-retro" variant="retro">
+      <SheetTrigger htmlFor="sheet-retro" variant="retro" color="primary">
+        Style Retro
+      </SheetTrigger>
+      <SheetContent side="right" sheetId="sheet-retro">
+        <SheetHeader>
+          <SheetTitle>Sheet Retro</SheetTitle>
+          <SheetDescription>Style vintage avec bordures marquées et ombres pixelisées</SheetDescription>
+        </SheetHeader>
+        <div style="padding: var(--space-4);">
+          <p>Contenu avec le style retro...</p>
+        </div>
+        <SheetFooter>
+          <SheetClose htmlFor="sheet-retro" variant="retro" color="accent">Fermer</SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </SheetComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SheetComponent id="sheet-retro" variant="retro">
+  <SheetTrigger htmlFor="sheet-retro" variant="retro">Style Retro</SheetTrigger>
+  <SheetContent side="right" sheetId="sheet-retro">
+    <!-- Contenu -->
+  </SheetContent>
+</SheetComponent>`}
+  />
+
+  <h3>Modern</h3>
+  <div class="demo-section">
+    <SheetComponent id="sheet-modern" variant="modern">
+      <SheetTrigger htmlFor="sheet-modern" variant="modern" color="secondary">
+        Style Modern
+      </SheetTrigger>
+      <SheetContent side="right" sheetId="sheet-modern">
+        <SheetHeader>
+          <SheetTitle>Sheet Modern</SheetTitle>
+          <SheetDescription>Style moderne avec bordures arrondies et ombres douces</SheetDescription>
+        </SheetHeader>
+        <div style="padding: var(--space-4);">
+          <p>Contenu avec le style modern...</p>
+        </div>
+        <SheetFooter>
+          <SheetClose htmlFor="sheet-modern" variant="modern" color="primary">Fermer</SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </SheetComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SheetComponent id="sheet-modern" variant="modern">
+  <SheetTrigger htmlFor="sheet-modern" variant="modern">Style Modern</SheetTrigger>
+  <SheetContent side="right" sheetId="sheet-modern">
+    <!-- Contenu -->
+  </SheetContent>
+</SheetComponent>`}
+  />
+
+  <h3>Futuristic</h3>
+  <div class="demo-section">
+    <SheetComponent id="sheet-futuristic" variant="futuristic">
+      <SheetTrigger htmlFor="sheet-futuristic" variant="futuristic" color="accent">
+        Style Futuristic
+      </SheetTrigger>
+      <SheetContent side="right" sheetId="sheet-futuristic">
+        <SheetHeader>
+          <SheetTitle>Sheet Futuristic</SheetTitle>
+          <SheetDescription>Style futuriste avec effets de lumière et dégradés néon</SheetDescription>
+        </SheetHeader>
+        <div style="padding: var(--space-4);">
+          <p>Contenu avec le style futuristic...</p>
+        </div>
+        <SheetFooter>
+          <SheetClose htmlFor="sheet-futuristic" variant="futuristic" color="primary">Fermer</SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </SheetComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SheetComponent id="sheet-futuristic" variant="futuristic">
+  <SheetTrigger htmlFor="sheet-futuristic" variant="futuristic">Style Futuristic</SheetTrigger>
+  <SheetContent side="right" sheetId="sheet-futuristic">
+    <!-- Contenu -->
+  </SheetContent>
+</SheetComponent>`}
+  />
+
+  <h2 id="colors">Couleurs des boutons</h2>
+
+  <div class="demo-section">
+    <div class="button-group">
+      <SheetComponent id="sheet-color-default">
+        <SheetTrigger htmlFor="sheet-color-default" color="default">Default</SheetTrigger>
+        <SheetContent side="right" sheetId="sheet-color-default">
+          <SheetHeader>
+            <SheetTitle>Bouton Default</SheetTitle>
+            <SheetDescription>Couleur par défaut</SheetDescription>
+          </SheetHeader>
+          <div style="padding: var(--space-4);"><p>Contenu...</p></div>
+          <SheetFooter>
+            <SheetClose htmlFor="sheet-color-default">Fermer</SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </SheetComponent>
+
+      <SheetComponent id="sheet-color-primary">
+        <SheetTrigger htmlFor="sheet-color-primary" color="primary">Primary</SheetTrigger>
+        <SheetContent side="right" sheetId="sheet-color-primary">
+          <SheetHeader>
+            <SheetTitle>Bouton Primary</SheetTitle>
+            <SheetDescription>Couleur primaire</SheetDescription>
+          </SheetHeader>
+          <div style="padding: var(--space-4);"><p>Contenu...</p></div>
+          <SheetFooter>
+            <SheetClose htmlFor="sheet-color-primary" color="primary">Fermer</SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </SheetComponent>
+
+      <SheetComponent id="sheet-color-secondary">
+        <SheetTrigger htmlFor="sheet-color-secondary" color="secondary">Secondary</SheetTrigger>
+        <SheetContent side="right" sheetId="sheet-color-secondary">
+          <SheetHeader>
+            <SheetTitle>Bouton Secondary</SheetTitle>
+            <SheetDescription>Couleur secondaire</SheetDescription>
+          </SheetHeader>
+          <div style="padding: var(--space-4);"><p>Contenu...</p></div>
+          <SheetFooter>
+            <SheetClose htmlFor="sheet-color-secondary" color="secondary">Fermer</SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </SheetComponent>
+
+      <SheetComponent id="sheet-color-accent">
+        <SheetTrigger htmlFor="sheet-color-accent" color="accent">Accent</SheetTrigger>
+        <SheetContent side="right" sheetId="sheet-color-accent">
+          <SheetHeader>
+            <SheetTitle>Bouton Accent</SheetTitle>
+            <SheetDescription>Couleur d'accent</SheetDescription>
+          </SheetHeader>
+          <div style="padding: var(--space-4);"><p>Contenu...</p></div>
+          <SheetFooter>
+            <SheetClose htmlFor="sheet-color-accent" color="accent">Fermer</SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </SheetComponent>
+    </div>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SheetTrigger htmlFor="my-sheet" color="default">Default</SheetTrigger>
+<SheetTrigger htmlFor="my-sheet" color="primary">Primary</SheetTrigger>
+<SheetTrigger htmlFor="my-sheet" color="secondary">Secondary</SheetTrigger>
+<SheetTrigger htmlFor="my-sheet" color="accent">Accent</SheetTrigger>`}
+  />
+
+  <h2 id="sides">Côtés d'ouverture</h2>
+
+  <h3>Droit (par défaut)</h3>
+  <div class="demo-section">
+    <SheetComponent id="sheet-right">
+      <SheetTrigger htmlFor="sheet-right" color="primary">Ouvrir depuis la droite</SheetTrigger>
+      <SheetContent side="right" sheetId="sheet-right">
+        <SheetHeader>
+          <SheetTitle>Sheet droit</SheetTitle>
+          <SheetDescription>S'ouvre depuis la droite</SheetDescription>
+        </SheetHeader>
+        <div style="padding: var(--space-4);"><p>Contenu depuis la droite...</p></div>
+        <SheetFooter>
+          <SheetClose htmlFor="sheet-right">Fermer</SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </SheetComponent>
+  </div>
+
+  <h3>Gauche</h3>
+  <div class="demo-section">
+    <SheetComponent id="sheet-left" variant="retro">
+      <SheetTrigger htmlFor="sheet-left" variant="retro" color="secondary">Ouvrir depuis la gauche</SheetTrigger>
+      <SheetContent side="left" sheetId="sheet-left">
+        <SheetHeader>
+          <SheetTitle>Sheet gauche</SheetTitle>
+          <SheetDescription>S'ouvre depuis la gauche</SheetDescription>
+        </SheetHeader>
+        <div style="padding: var(--space-4);"><p>Contenu depuis la gauche...</p></div>
+        <SheetFooter>
+          <SheetClose htmlFor="sheet-left" variant="retro">Fermer</SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </SheetComponent>
+  </div>
+
+  <h3>Haut</h3>
+  <div class="demo-section">
+    <SheetComponent id="sheet-top" variant="futuristic">
+      <SheetTrigger htmlFor="sheet-top" variant="futuristic" color="accent">Ouvrir depuis le haut</SheetTrigger>
+      <SheetContent side="top" sheetId="sheet-top">
+        <SheetHeader>
+          <SheetTitle>Sheet du haut</SheetTitle>
+          <SheetDescription>S'ouvre depuis le haut</SheetDescription>
+        </SheetHeader>
+        <div style="padding: var(--space-4);"><p>Contenu depuis le haut...</p></div>
+        <SheetFooter>
+          <SheetClose htmlFor="sheet-top" variant="futuristic">Fermer</SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </SheetComponent>
+  </div>
+
+  <h3>Bas</h3>
+  <div class="demo-section">
+    <SheetComponent id="sheet-bottom" variant="modern">
+      <SheetTrigger htmlFor="sheet-bottom" variant="modern">Ouvrir depuis le bas</SheetTrigger>
+      <SheetContent side="bottom" sheetId="sheet-bottom">
+        <SheetHeader>
+          <SheetTitle>Sheet du bas</SheetTitle>
+          <SheetDescription>S'ouvre depuis le bas</SheetDescription>
+        </SheetHeader>
+        <div style="padding: var(--space-4);"><p>Contenu depuis le bas...</p></div>
+        <SheetFooter>
+          <SheetClose htmlFor="sheet-bottom" variant="modern">Fermer</SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </SheetComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SheetContent side="right" sheetId="my-sheet">...</SheetContent>
+<SheetContent side="left" sheetId="my-sheet">...</SheetContent>
+<SheetContent side="top" sheetId="my-sheet">...</SheetContent>
+<SheetContent side="bottom" sheetId="my-sheet">...</SheetContent>`}
+  />
+
+  <h2 id="api">API Reference</h2>
+
+  <h3>Sheet</h3>
+  <Table striped>
+    <TableHeader>
+      <TableRow>
+        <TableHead>Prop</TableHead>
+        <TableHead>Type</TableHead>
+        <TableHead>Défaut</TableHead>
+        <TableHead>Description</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow>
+        <TableCell><code class="inline-code">id</code></TableCell>
+        <TableCell>string</TableCell>
+        <TableCell>required</TableCell>
+        <TableCell>ID unique pour le checkbox caché</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">variant</code></TableCell>
+        <TableCell>initial | retro | modern | futuristic</TableCell>
+        <TableCell>initial</TableCell>
+        <TableCell>Variante de style visuel</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">className</code></TableCell>
+        <TableCell>string</TableCell>
+        <TableCell>-</TableCell>
+        <TableCell>Classes CSS supplémentaires</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <h3>SheetTrigger & SheetClose</h3>
+  <Table striped>
+    <TableHeader>
+      <TableRow>
+        <TableHead>Prop</TableHead>
+        <TableHead>Type</TableHead>
+        <TableHead>Défaut</TableHead>
+        <TableHead>Description</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow>
+        <TableCell><code class="inline-code">htmlFor</code></TableCell>
+        <TableCell>string</TableCell>
+        <TableCell>required</TableCell>
+        <TableCell>ID du checkbox (doit correspondre à Sheet.id)</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">variant</code></TableCell>
+        <TableCell>initial | retro | modern | futuristic</TableCell>
+        <TableCell>initial</TableCell>
+        <TableCell>Variante de style visuel</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">color</code></TableCell>
+        <TableCell>default | primary | secondary | accent</TableCell>
+        <TableCell>default</TableCell>
+        <TableCell>Couleur du bouton</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">className</code></TableCell>
+        <TableCell>string</TableCell>
+        <TableCell>-</TableCell>
+        <TableCell>Classes CSS supplémentaires</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <h3>SheetContent</h3>
+  <Table striped>
+    <TableHeader>
+      <TableRow>
+        <TableHead>Prop</TableHead>
+        <TableHead>Type</TableHead>
+        <TableHead>Défaut</TableHead>
+        <TableHead>Description</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow>
+        <TableCell><code class="inline-code">sheetId</code></TableCell>
+        <TableCell>string</TableCell>
+        <TableCell>required</TableCell>
+        <TableCell>ID du checkbox (doit correspondre à Sheet.id)</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">side</code></TableCell>
+        <TableCell>top | right | bottom | left</TableCell>
+        <TableCell>right</TableCell>
+        <TableCell>Côté depuis lequel le sheet glisse</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">className</code></TableCell>
+        <TableCell>string</TableCell>
+        <TableCell>-</TableCell>
+        <TableCell>Classes CSS supplémentaires</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <h2 id="accessibility">Accessibilité</h2>
+
+  <Alert status="info">
+    Le Sheet Panel respecte les recommandations WCAG et fonctionne avec les technologies d'assistance.
+  </Alert>
+
+  <ul>
+    <li><strong>Pure CSS :</strong> Aucun JavaScript requis, fonctionne même si JS est désactivé</li>
+    <li><strong>Checkbox pattern :</strong> Utilise un input checkbox caché + label pour l'état</li>
+    <li><strong>Pseudo-classe :has() :</strong> CSS moderne pour détecter l'état checked</li>
+    <li><strong>Attributs ARIA :</strong> role="dialog", aria-modal="true"</li>
+    <li><strong>Fermeture par overlay :</strong> Cliquer sur l'overlay ferme automatiquement le sheet</li>
+    <li><strong>Support des lecteurs d'écran :</strong> Étiquetage approprié avec SheetTitle et SheetDescription</li>
+    <li><strong>Navigation au clavier :</strong> Tab et Shift+Tab pour naviguer, Space/Enter pour activer</li>
+  </ul>
+
+  <h3>Comment ça marche ?</h3>
+  <p>Le Sheet Panel utilise une technique CSS pure ingénieuse :</p>
+  <ol>
+    <li>Un <code class="inline-code">checkbox</code> caché (display: none) stocke l'état ouvert/fermé</li>
+    <li>Le <code class="inline-code">SheetTrigger</code> est un <code class="inline-code">&lt;label&gt;</code> qui coche le checkbox</li>
+    <li>La pseudo-classe <code class="inline-code">:has(.sheet-toggle:checked)</code> détecte l'état</li>
+    <li>Le CSS applique les transformations (translateX/Y) selon l'état</li>
+    <li>Le <code class="inline-code">SheetClose</code> et l'overlay sont des labels qui décochent le checkbox</li>
+  </ol>
+
+  <Alert status="success">
+    <strong>Avantages :</strong> Zéro JavaScript, performances optimales, fonctionne même avec JS désactivé !
+  </Alert>
+
+</DocLayout>

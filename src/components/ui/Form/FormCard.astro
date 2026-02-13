@@ -1,0 +1,39 @@
+---
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import CardFooter from "@components/ui/Card/CardFooter.astro";
+
+interface Props {
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  title?: string;
+  description?: string;
+  className?: string;
+}
+
+const {
+  variant = "initial",
+  title,
+  description,
+  className = "",
+} = Astro.props;
+---
+
+<Card variant={variant} className={className}>
+  {(title || description) && (
+    <CardHeader>
+      {title && <h2 style="margin: 0; font-size: 1.5rem;">{title}</h2>}
+      {description && <p style="margin: 0.5rem 0 0 0; opacity: 0.7;">{description}</p>}
+    </CardHeader>
+  )}
+  
+  <CardContent>
+    <slot />
+  </CardContent>
+  
+  <slot name="footer">
+    <CardFooter>
+      <slot name="actions" />
+    </CardFooter>
+  </slot>
+</Card>

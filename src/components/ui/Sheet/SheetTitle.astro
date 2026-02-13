@@ -1,0 +1,42 @@
+---
+/**
+ * SheetTitle - Titre du sheet
+ * 
+ * @param {string} className - Classes CSS supplémentaires
+ */
+
+interface Props {
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+const classes = [
+  'sheet-title',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<h2 class={classes} {...htmlAttributes}>
+  <slot />
+</h2>
+
+<style>
+  .sheet-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .sheet-title {
+      font-size: var(--font-size-lg);
+    }
+  }
+</style>

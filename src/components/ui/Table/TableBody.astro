@@ -1,0 +1,26 @@
+---
+/**
+ * TableBody - Corps du tableau
+ * 
+ * Wraps <tbody> pour les lignes de données.
+ * 
+ * @param {string} className - Classes CSS additionnelles
+ */
+
+interface Props {
+  className?: string;
+}
+
+const {
+  className = '',
+} = Astro.props;
+
+const classes = [
+  'table-body',
+  className,
+].filter(Boolean).join(' ');
+---
+
+<tbody class={classes}>
+  <slot />
+</tbody>

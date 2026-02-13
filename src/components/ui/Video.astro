@@ -1,0 +1,63 @@
+---
+interface Props {
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  src: string;
+  poster?: string;
+  width?: string;
+  height?: string;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  controls?: boolean;
+  preload?: "none" | "metadata" | "auto";
+  className?: string;
+  ariaLabel?: string;
+}
+
+const {
+  variant = "initial",
+  src,
+  poster,
+  width = "100%",
+  height = "auto",
+  autoplay = false,
+  loop = false,
+  muted = false,
+  controls = true,
+  preload = "metadata",
+  className = "",
+  ariaLabel,
+} = Astro.props;
+
+const classes = [
+  "video-player",
+  variant !== "initial" && variant,
+  className,
+]
+  .filter(Boolean)
+  .join(" ");
+
+const style = [
+  width && `width: ${width}`,
+  height && height !== "auto" && `height: ${height}`,
+]
+  .filter(Boolean)
+  .join("; ");
+---
+
+<div class={classes} style={style}>
+  <video
+    src={src}
+    poster={poster}
+    autoplay={autoplay}
+    loop={loop}
+    muted={muted}
+    controls={controls}
+    preload={preload}
+    aria-label={ariaLabel}
+  >
+    <slot name="source" />
+    <slot name="track" />
+    Votre navigateur ne supporte pas la balise vidéo.
+  </video>
+</div>

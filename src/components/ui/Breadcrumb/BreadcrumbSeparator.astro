@@ -1,0 +1,27 @@
+---
+/**
+ * BreadcrumbSeparator - Séparateur visuel entre les items
+ */
+
+interface Props {
+  className?: string;
+}
+
+const { className = '' } = Astro.props;
+---
+
+<li class={`breadcrumb-separator ${className}`} role="presentation" aria-hidden="true">
+  <slot>
+    <span>/</span>
+  </slot>
+</li>
+
+<style>
+  .breadcrumb-separator {
+    color: var(--breadcrumb-separator-color, var(--text-subtle));
+    font-size: var(--breadcrumb-font-size, 0.875rem);
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+  }
+</style>

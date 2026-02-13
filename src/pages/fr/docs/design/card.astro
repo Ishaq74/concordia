@@ -1,0 +1,663 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import CardComponent from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardImage from "@components/ui/Card/CardImage.astro";
+import CardMeta from "@components/ui/Card/CardMeta.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import CardDescription from "@components/ui/Card/CardDescription.astro";
+import CardFooter from "@components/ui/Card/CardFooter.astro";
+import LinkComponent from "@components/ui/Link.astro";
+import { Code } from "astro:components";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+---
+
+<DocLayout 
+  title="Card Component" 
+  description="Documentation complète du composant Card avec tous ses sous-composants et variants"
+  variant="initial"
+>
+  <h1 id="card-component">Card Component</h1>
+  
+  <p>
+    Le composant <code>Card</code> est un conteneur flexible et modulaire qui supporte plusieurs 
+    sous-composants (Header, Image, Meta, Content, Description, Footer) et variants visuels.
+  </p>
+
+  <h2 id="installation">Installation</h2>
+  
+  <p>Les composants sont disponibles dans <code class="inline-code">src/components/ui/Card/</code></p>
+  
+  <Code
+    lang="typescript"
+    code={`import Card from '@components/ui/Card/Card.astro';
+import CardHeader from '@components/ui/Card/CardHeader.astro';
+import CardImage from '@components/ui/Card/CardImage.astro';
+import CardMeta from '@components/ui/Card/CardMeta.astro';
+import CardContent from '@components/ui/Card/CardContent.astro';
+import CardDescription from '@components/ui/Card/CardDescription.astro';
+import CardFooter from '@components/ui/Card/CardFooter.astro';`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <h3 id="card-props">Card</h3>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Défaut</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code>variant</code></TableCell>
+          <TableCell>initial | retro | modern | futuristic</TableCell>
+          <TableCell>initial</TableCell>
+          <TableCell>Style visuel de la carte</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>elevation</code></TableCell>
+          <TableCell>none | sm | md | lg | xl</TableCell>
+          <TableCell>md</TableCell>
+          <TableCell>Niveau d'ombre portée</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>interactive</code></TableCell>
+          <TableCell>boolean</TableCell>
+          <TableCell>false</TableCell>
+          <TableCell>Active les effets hover/focus</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Classes CSS personnalisées</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3 id="cardimage-props">CardImage</h3>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Défaut</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code>src</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>URL de l'image (requis)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>alt</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Texte alternatif (requis)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>aspectRatio</code></TableCell>
+          <TableCell>16/9 | 4/3 | 1/1 | auto</TableCell>
+          <TableCell>16/9</TableCell>
+          <TableCell>Ratio de l'image</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>objectFit</code></TableCell>
+          <TableCell>cover | contain | fill | none</TableCell>
+          <TableCell>cover</TableCell>
+          <TableCell>Mode d'ajustement de l'image</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Classes CSS personnalisées</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3 id="cardmeta-props">CardMeta</h3>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Défaut</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code>items</code></TableCell>
+          <TableCell>Array&lt;{`{icon?, text, label?}`}&gt;</TableCell>
+          <TableCell>[]</TableCell>
+          <TableCell>Liste des métadonnées</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Classes CSS personnalisées</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3 id="carddescription-props">CardDescription</h3>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Défaut</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code>text</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Texte de la description</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>truncate</code></TableCell>
+          <TableCell>boolean</TableCell>
+          <TableCell>false</TableCell>
+          <TableCell>Tronquer le texte</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>lines</code></TableCell>
+          <TableCell>number</TableCell>
+          <TableCell>3</TableCell>
+          <TableCell>Nombre de lignes maximum</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Classes CSS personnalisées</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3 id="cardfooter-props">CardFooter</h3>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Défaut</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code>align</code></TableCell>
+          <TableCell>left | center | right | between</TableCell>
+          <TableCell>between</TableCell>
+          <TableCell>Alignement du contenu</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Classes CSS personnalisées</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h2 id="exemples-basiques">Exemples basiques</h2>
+
+  <h3 id="carte-simple">Carte simple</h3>
+
+  <div class="example">
+    <CardComponent>
+      <CardContent>
+        <h3>Titre de la carte</h3>
+        <CardDescription>
+          Une description simple pour présenter le contenu de cette carte.
+        </CardDescription>
+      </CardContent>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Card>
+  <CardContent>
+    <h3>Titre de la carte</h3>
+    <CardDescription>
+      Une description simple pour présenter le contenu de cette carte.
+    </CardDescription>
+  </CardContent>
+</Card>`}
+  />
+
+  <h3 id="carte-avec-image">Carte avec image</h3>
+
+  <div class="example">
+    <CardComponent elevation="lg">
+      <CardImage 
+        src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=450&fit=crop"
+        alt="Developer workspace"
+      />
+      <CardContent>
+        <h3>Workspace moderne</h3>
+        <CardDescription>
+          Un espace de travail élégant pour développeurs créatifs.
+        </CardDescription>
+      </CardContent>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Card elevation="lg">
+  <CardImage 
+    src="https://images.unsplash.com/photo-1498050108023-c5249f4df085"
+    alt="Developer workspace"
+  />
+  <CardContent>
+    <h3>Workspace moderne</h3>
+    <CardDescription>
+      Un espace de travail élégant pour développeurs créatifs.
+    </CardDescription>
+  </CardContent>
+</Card>`}
+  />
+
+  <h3 id="carte-complete">Carte complète</h3>
+
+  <div class="example">
+    <CardComponent variant="initial" elevation="md" interactive>
+      <CardImage 
+        src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop"
+        alt="Business analytics"
+        aspectRatio="16/9"
+      />
+      <CardContent>
+        <CardHeader>
+          <h3>Analytics Dashboard</h3>
+        </CardHeader>
+        <CardMeta 
+          items={[
+            { icon: 'mdi:calendar', text: '15 Jan 2026' },
+            { icon: 'mdi:account', text: 'John Doe' },
+            { icon: 'mdi:tag', text: 'Analytics' }
+          ]}
+        />
+        <CardDescription truncate lines={2}>
+          Découvrez les insights de vos données avec notre dashboard analytics complet. 
+          Visualisations en temps réel, rapports personnalisés et bien plus encore.
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <LinkComponent text="En savoir plus" style="link" color="primary" />
+        <LinkComponent text="Démarrer" style="button" color="primary" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Card variant="initial" elevation="md" interactive>
+  <CardImage 
+    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f"
+    alt="Business analytics"
+    aspectRatio="16/9"
+  />
+  <CardContent>
+    <CardHeader>
+      <h3>Analytics Dashboard</h3>
+    </CardHeader>
+    <CardMeta 
+      items={[
+        { icon: 'mdi:calendar', text: '15 Jan 2026' },
+        { icon: 'mdi:account', text: 'John Doe' },
+        { icon: 'mdi:tag', text: 'Analytics' }
+      ]}
+    />
+    <CardDescription truncate lines={2}>
+      Découvrez les insights de vos données avec notre dashboard analytics complet.
+    </CardDescription>
+  </CardContent>
+  <CardFooter>
+    <Link text="En savoir plus" style="link" color="primary" />
+    <Link text="Démarrer" style="button" color="primary" />
+  </CardFooter>
+</Card>`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <p>Le composant Card supporte 4 variants visuels différents.</p>
+
+  <h3 id="variant-initial">Initial (Default)</h3>
+
+  <div class="example">
+    <CardComponent variant="initial" elevation="md">
+      <CardContent>
+        <h3>Variant Initial</h3>
+        <CardDescription>
+          Design épuré et moderne avec des lignes nettes.
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <LinkComponent text="Action" style="button" variant="initial" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <h3 id="variant-retro">Retro</h3>
+
+  <div class="example">
+    <CardComponent variant="retro" elevation="md">
+      <CardContent>
+        <h3>Variant Retro</h3>
+        <CardDescription>
+          Inspiration vintage avec des couleurs nostalgiques.
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <LinkComponent text="Action" style="button" variant="retro" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <h3 id="variant-modern">Modern</h3>
+
+  <div class="example">
+    <CardComponent variant="modern" elevation="md">
+      <CardContent>
+        <h3>Variant Modern</h3>
+        <CardDescription>
+          Design contemporain avec des dégradés élégants.
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <LinkComponent text="Action" style="button" variant="modern" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <h3 id="variant-futuristic">Futuristic</h3>
+
+  <div class="example">
+    <CardComponent variant="futuristic" elevation="md">
+      <CardContent>
+        <h3>Variant Futuristic</h3>
+        <CardDescription>
+          Style futuriste avec des néons et effets cyber.
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <LinkComponent text="Action" style="button" variant="futuristic" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <h2 id="elevations">Elevations</h2>
+
+  <p>Contrôlez la profondeur visuelle avec différents niveaux d'élévation.</p>
+
+  <div class="example-grid">
+    <CardComponent elevation="none">
+      <CardContent>
+        <h4>None</h4>
+        <p>Pas d'ombre</p>
+      </CardContent>
+    </Card>
+    <CardComponent elevation="sm">
+      <CardContent>
+        <h4>Small</h4>
+        <p>Ombre légère</p>
+      </CardContent>
+    </Card>
+    <CardComponent elevation="md">
+      <CardContent>
+        <h4>Medium</h4>
+        <p>Ombre moyenne</p>
+      </CardContent>
+    </Card>
+    <CardComponent elevation="lg">
+      <CardContent>
+        <h4>Large</h4>
+        <p>Ombre forte</p>
+      </CardContent>
+    </Card>
+    <CardComponent elevation="xl">
+      <CardContent>
+        <h4>Extra Large</h4>
+        <p>Ombre très forte</p>
+      </CardContent>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Card elevation="none">...</Card>
+<Card elevation="sm">...</Card>
+<Card elevation="md">...</Card>
+<Card elevation="lg">...</Card>
+<Card elevation="xl">...</Card>`}
+  />
+
+  <h2 id="carte-interactive">Carte interactive</h2>
+
+  <p>Activez le mode interactif pour des effets hover/focus.</p>
+
+  <div class="example">
+    <CardComponent interactive elevation="md">
+      <CardImage 
+        src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=450&fit=crop"
+        alt="Code editor"
+      />
+      <CardContent>
+        <h3>Carte interactive</h3>
+        <CardDescription>
+          Survolez cette carte pour voir l'effet interactif.
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <LinkComponent text="Découvrir" style="button" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Card interactive elevation="md">
+  <CardImage src="..." alt="..." />
+  <CardContent>
+    <h3>Carte interactive</h3>
+    <CardDescription>
+      Survolez cette carte pour voir l'effet interactif.
+    </CardDescription>
+  </CardContent>
+  <CardFooter>
+    <Link text="Découvrir" style="button" />
+  </CardFooter>
+</Card>`}
+  />
+
+  <h2 id="aspect-ratios">Aspect Ratios</h2>
+
+  <p>Différents ratios d'image pour s'adapter à vos besoins.</p>
+
+  <div class="example-grid">
+    <CardComponent>
+      <CardImage 
+        src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=225&fit=crop"
+        alt="16:9 ratio"
+        aspectRatio="16/9"
+      />
+      <CardContent>
+        <h4>16:9</h4>
+        <CardDescription>Format panoramique</CardDescription>
+      </CardContent>
+    </Card>
+    <CardComponent>
+      <CardImage 
+        src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=300&fit=crop"
+        alt="4:3 ratio"
+        aspectRatio="4/3"
+      />
+      <CardContent>
+        <h4>4:3</h4>
+        <CardDescription>Format standard</CardDescription>
+      </CardContent>
+    </Card>
+    <CardComponent>
+      <CardImage 
+        src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=400&fit=crop"
+        alt="1:1 ratio"
+        aspectRatio="1/1"
+      />
+      <CardContent>
+        <h4>1:1</h4>
+        <CardDescription>Format carré</CardDescription>
+      </CardContent>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<CardImage aspectRatio="16/9" src="..." alt="..." />
+<CardImage aspectRatio="4/3" src="..." alt="..." />
+<CardImage aspectRatio="1/1" src="..." alt="..." />`}
+  />
+
+  <h2 id="meta-personnalisees">Meta personnalisées</h2>
+
+  <p>Utilisez le slot pour des métadonnées personnalisées.</p>
+
+  <div class="example">
+    <CardComponent>
+      <CardContent>
+        <h3>Article de blog</h3>
+        <CardMeta>
+          <span>⏰ 5 min de lecture</span>
+          <span>👤 Jane Smith</span>
+          <span>💬 12 commentaires</span>
+        </CardMeta>
+        <CardDescription>
+          Découvrez les dernières tendances en développement web.
+        </CardDescription>
+      </CardContent>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Card>
+  <CardContent>
+    <h3>Article de blog</h3>
+    <CardMeta>
+      <span>⏰ 5 min de lecture</span>
+      <span>👤 Jane Smith</span>
+      <span>💬 12 commentaires</span>
+    </CardMeta>
+    <CardDescription>
+      Découvrez les dernières tendances en développement web.
+    </CardDescription>
+  </CardContent>
+</Card>`}
+  />
+
+  <h2 id="alignement-footer">Alignement du Footer</h2>
+
+  <p>Contrôlez l'alignement du contenu du footer.</p>
+
+  <div class="example-grid">
+    <CardComponent>
+      <CardContent>
+        <h4>Left</h4>
+      </CardContent>
+      <CardFooter align="left">
+        <LinkComponent text="Action" style="button" />
+      </CardFooter>
+    </Card>
+    <CardComponent>
+      <CardContent>
+        <h4>Center</h4>
+      </CardContent>
+      <CardFooter align="center">
+        <LinkComponent text="Action" style="button" />
+      </CardFooter>
+    </Card>
+    <CardComponent>
+      <CardContent>
+        <h4>Right</h4>
+      </CardContent>
+      <CardFooter align="right">
+        <LinkComponent text="Action" style="button" />
+      </CardFooter>
+    </Card>
+    <CardComponent>
+      <CardContent>
+        <h4>Between</h4>
+      </CardContent>
+      <CardFooter align="between">
+        <LinkComponent text="Annuler" style="link" />
+        <LinkComponent text="Confirmer" style="button" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<CardFooter align="left">...</CardFooter>
+<CardFooter align="center">...</CardFooter>
+<CardFooter align="right">...</CardFooter>
+<CardFooter align="between">...</CardFooter>`}
+  />
+
+  <h2 id="bonnes-pratiques">Bonnes pratiques</h2>
+
+  <ul>
+    <li>Utilisez <code>CardImage</code> avec un <code>alt</code> descriptif pour l'accessibilité</li>
+    <li>Limitez le contenu de <code>CardDescription</code> avec <code>truncate</code> pour garder un design cohérent</li>
+    <li>Utilisez <code>elevation</code> pour créer une hiérarchie visuelle entre les cartes</li>
+    <li>Activez <code>interactive</code> uniquement pour les cartes cliquables</li>
+    <li>Groupez les métadonnées avec <code>CardMeta</code> pour une meilleure lisibilité</li>
+    <li>Utilisez <code>CardFooter</code> pour les actions principales liées à la carte</li>
+  </ul>
+
+  <h2 id="accessibilite">Accessibilité</h2>
+
+  <ul>
+    <li>Le composant utilise la balise sémantique <code>&lt;article&gt;</code></li>
+    <li>Les images requièrent un attribut <code>alt</code></li>
+    <li>Les en-têtes utilisent <code>&lt;header&gt;</code> et pieds de page <code>&lt;footer&gt;</code></li>
+    <li>Le mode interactif ajoute des états focus visibles</li>
+    <li>Les métadonnées sont structurées dans une liste <code>&lt;ul&gt;</code></li>
+  </ul>
+
+</DocLayout>

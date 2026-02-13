@@ -1,0 +1,62 @@
+---
+import { Icon } from 'astro-icon/components';
+
+/**
+ * Button - Composant bouton avec support des variants et icônes
+ * 
+ * @param {string} type - Type du bouton (button|submit|reset)
+ * @param {string} variant - Style variant (initial|retro|modern|futuristic)
+ * @param {string} color - Couleur (default|primary|secondary|accent)
+ * @param {boolean} disabled - Bouton désactivé
+ * @param {string} ariaLabel - Label ARIA pour accessibilité
+ * @param {object} icon - Configuration de l'icône {name, side}
+ * @param {string} className - Classes CSS supplémentaires
+ */
+
+interface Props {
+  type?: 'button' | 'submit' | 'reset';
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  color?: 'default' | 'primary' | 'secondary' | 'accent' | 'error';
+  disabled?: boolean;
+  ariaLabel?: string;
+  icon?: {
+    name: string;
+    side?: 'left' | 'right';
+  };
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  type = 'button',
+  variant = 'initial',
+  color = 'default',
+  disabled = false,
+  ariaLabel,
+  icon,
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+// Classes CSS basées sur le variant et la couleur
+const variantClass = variant !== 'initial' ? variant : '';
+const colorClass = color !== 'default' ? color : '';
+
+const classes = [
+  variantClass,
+  colorClass,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<button
+  type={type}
+  class={classes}
+  disabled={disabled}
+  aria-label={ariaLabel}
+  {...htmlAttributes}
+>
+  {icon?.side === 'left' && <Icon name={icon.name} />}
+  <slot />
+  {icon?.side === 'right' && <Icon name={icon.name} />}
+</button>

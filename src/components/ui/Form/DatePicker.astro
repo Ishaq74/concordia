@@ -1,0 +1,74 @@
+---
+/**
+ * DatePicker - Composant date picker avec support des variants
+ * Utilise l'input type="date" natif HTML5
+ * 
+ * @param {string} id - ID pour lier le label
+ * @param {string} name - Nom du champ
+ * @param {string} value - Valeur par défaut (format: YYYY-MM-DD)
+ * @param {string} min - Date minimum
+ * @param {string} max - Date maximum
+ * @param {boolean} required - Champ requis
+ * @param {boolean} disabled - Champ désactivé
+ * @param {boolean} readonly - Champ lecture seule
+ * @param {string} variant - Style variant (initial|retro|modern|futuristic)
+ * @param {string} placeholder - Texte placeholder
+ * @param {string} error - Message d'erreur
+ */
+
+interface Props {
+  id: string;
+  name: string;
+  value?: string;
+  min?: string;
+  max?: string;
+  required?: boolean;
+  disabled?: boolean;
+  readonly?: boolean;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  placeholder?: string;
+  error?: string;
+}
+
+const {
+  id,
+  name,
+  value,
+  min,
+  max,
+  required = false,
+  disabled = false,
+  readonly = false,
+  variant = 'initial',
+  placeholder,
+  error,
+  ...rest
+} = Astro.props;
+
+const variantClass = variant !== 'initial' ? variant : '';
+const hasError = !!error;
+---
+
+<div class="datepicker-wrapper">
+  <input
+    type="date"
+    id={id}
+    name={name}
+    value={value}
+    min={min}
+    max={max}
+    required={required}
+    disabled={disabled}
+    readonly={readonly}
+    class={variantClass}
+    placeholder={placeholder}
+    aria-invalid={hasError}
+    aria-describedby={hasError ? `${id}-error` : undefined}
+    {...rest}
+  />
+</div>
+{hasError && (
+  <span class="input-error-message" id={`${id}-error`} role="alert">
+    {error}
+  </span>
+)}

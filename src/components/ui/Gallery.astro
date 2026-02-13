@@ -1,0 +1,129 @@
+---
+interface GalleryImage {
+  src: string;
+  alt?: string;
+  caption?: string;
+  thumb?: string;
+}
+
+interface Props {
+  images: GalleryImage[];
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  mode?: "grid" | "masonry" | "product" | "enhanced";
+  columns?: 2 | 3 | 4 | 5 | 6;
+  gap?: string;
+  aspectRatio?: string;
+  showCaptions?: boolean;
+  class?: string;
+}
+
+const {
+  images = [],
+  variant = "initial",
+  mode = "grid",
+  columns = 3,
+  gap = "1rem",
+  aspectRatio = "1/1",
+  showCaptions = true,
+  class: className,
+} = Astro.props;
+
+const galleryId = `gallery-${Math.random().toString(36).substring(2, 11)}`;
+
+const galleryClass = [
+  "gallery",
+  `gallery-${mode}`,
+  variant !== "initial" && variant,
+  className,
+].filter(Boolean).join(" ");
+---
+
+<div
+  class={galleryClass}
+  data-gallery-id={galleryId}
+  style={`--gallery-columns: ${columns}; --gallery-gap: ${gap}; --gallery-aspect-ratio: ${aspectRatio};`}
+>
+  {mode === "grid" && (
+    <div class="gallery-grid">
+      {images.map((image, index) => (
+        <figure class="gallery-item" data-index={index}>
+          <img src={image.src} alt={image.alt || `Image ${index + 1}`} loading="lazy" />
+          {showCaptions && image.caption && (
+            <figcaption class="gallery-caption">{image.caption}</figcaption>
+          )}
+        </figure>
+      ))}
+    </div>
+  )}
+
+  {mode === "masonry" && (
+    <div class="gallery-masonry">
+      {images.map((image, index) => (
+        <figure class="gallery-item" data-index={index}>
+          <img src={image.src} alt={image.alt || `Image ${index + 1}`} loading="lazy" />
+          {showCaptions && image.caption && (
+            <figcaption class="gallery-caption">{image.caption}</figcaption>
+          )}
+        </figure>
+      ))}
+    </div>
+  )}
+
+  {mode === "product" && (
+    <div class="gallery-product">
+      {images.map((_, index) => (
+        <input
+          type="radio"
+          name={`gallery-${galleryId}`}
+          id={`${galleryId}-${index}`}
+          checked={index === 0}
+          class="gallery-radio"
+        />
+      ))}
+
+      <div class="main-image">
+        {images.map((image, index) => (
+          <img
+            src={image.src}
+            alt={image.alt || `Image ${index + 1}`}
+            class={`main-img main-img-${index}`}
+            loading={index === 0 ? "eager" : "lazy"}
+          />
+        ))}
+      </div>
+
+      <div class="thumbnails">
+        {images.map((image, index) => (
+          <label for={`${galleryId}-${index}`} class="thumb-label">
+            <img
+              src={image.thumb || image.src}
+              alt={`Thumbnail ${index + 1}`}
+              loading="lazy"
+            />
+          </label>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {mode === "enhanced" && (
+    <div class="gallery-grid">
+      {images.map((image, index) => (
+        <figure class="gallery-item gallery-item-enhanced" data-index={index}>
+          <div class="image-container">
+            <img src={image.src} alt={image.alt || `Image ${index + 1}`} loading="lazy" />
+            <div class="image-overlay">
+              <div class="overlay-content">
+                <span class="zoom-icon">🔍</span>
+                {image.caption && <p class="overlay-caption">{image.caption}</p>}
+              </div>
+            </div>
+          </div>
+          {showCaptions && image.caption && (
+            <figcaption class="gallery-caption">{image.caption}</figcaption>
+          )}
+        </figure>
+      ))}
+    </div>
+  )}
+</div>

@@ -1,0 +1,339 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import Alert from "@components/ui/Alert.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import TOC from "@components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+---
+
+<DocLayout 
+  title="BaseLayout" 
+  description="Layout de base pour toutes les pages du site avec Header, Footer et gestion du thème" 
+  variant="initial"
+>
+  <h1 id="baselayout">BaseLayout</h1>
+
+  <p>
+    Le <code class="inline-code">BaseLayout</code> est le layout principal de l'application. 
+    Il fournit la structure HTML de base, la gestion du thème, les métadonnées SEO, et inclut le Header et Footer.
+  </p>
+
+  <TOC
+    items={[
+      { label: "Utilisation", href: "#utilisation" },
+      { label: "Props", href: "#props" },
+      { label: "Fonctionnalités", href: "#fonctionnalites" },
+      { label: "Exemple", href: "#exemple" },
+      { label: "SEO et Métadonnées", href: "#seo" },
+      { label: "Gestion du thème", href: "#theme" },
+    ]}
+    title="Table des matières"
+  />
+
+  <h2 id="utilisation">Utilisation</h2>
+
+  <Code
+    lang="astro"
+    code={`---
+import BaseLayout from '@layouts/BaseLayout.astro';
+---
+
+<BaseLayout 
+  title="Ma Page"
+  description="Description de ma page"
+  lang="fr"
+>
+  <h1>Contenu de la page</h1>
+  <p>Votre contenu ici...</p>
+</BaseLayout>`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <Table variant="initial">
+    <TableHeader>
+      <TableRow>
+        <TableHead>Prop</TableHead>
+        <TableHead>Type</TableHead>
+        <TableHead>Défaut</TableHead>
+        <TableHead>Description</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow>
+        <TableCell><code>title</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>undefined</code></TableCell>
+        <TableCell>Titre de la page (format: SiteTitle > PageTitle)</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>description</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>undefined</code></TableCell>
+        <TableCell>Description meta pour SEO</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>keywords</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>undefined</code></TableCell>
+        <TableCell>Mots-clés meta pour SEO</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>author</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>undefined</code></TableCell>
+        <TableCell>Auteur de la page</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>ogImage</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>undefined</code></TableCell>
+        <TableCell>Image Open Graph pour réseaux sociaux</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>canonicalUrl</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>undefined</code></TableCell>
+        <TableCell>URL canonique de la page</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>lang</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>currentLocale</code></TableCell>
+        <TableCell>Langue de la page (fr, en, es, ar)</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>dir</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>'ltr' | 'rtl'</code></TableCell>
+        <TableCell>Direction du texte (automatique selon locale)</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>robots</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>undefined</code></TableCell>
+        <TableCell>Directives pour robots d'indexation</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>prefetchUrls</code></TableCell>
+        <TableCell><code>string[]</code></TableCell>
+        <TableCell><code>[]</code></TableCell>
+        <TableCell>URLs à précharger</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>cssFiles</code></TableCell>
+        <TableCell><code>string[]</code></TableCell>
+        <TableCell><code>[]</code></TableCell>
+        <TableCell>Fichiers CSS additionnels</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>jsFiles</code></TableCell>
+        <TableCell><code>string[]</code></TableCell>
+        <TableCell><code>[]</code></TableCell>
+        <TableCell>Fichiers JavaScript additionnels</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>favicon</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>'favicon.svg'</code></TableCell>
+        <TableCell>Nom du fichier favicon</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>manifest</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>undefined</code></TableCell>
+        <TableCell>Chemin vers le manifest PWA</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>appleTouchIcon</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>undefined</code></TableCell>
+        <TableCell>Icône Apple Touch</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <h2 id="fonctionnalites">Fonctionnalités</h2>
+
+  <div class="feature-grid">
+    <Card>
+      <CardHeader>
+        <h3 style="margin: 0;">🎨 Gestion du thème</h3>
+      </CardHeader>
+      <CardContent>
+        <p>Switch automatique light/dark avec persistence localStorage et détection des préférences système.</p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <h3 style="margin: 0;">🌍 Multilingue</h3>
+      </CardHeader>
+      <CardContent>
+        <p>Support natif de 4 langues (FR, EN, ES, AR) avec direction RTL automatique pour l'arabe.</p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <h3 style="margin: 0;">🔍 SEO Optimisé</h3>
+      </CardHeader>
+      <CardContent>
+        <p>Métadonnées complètes, Open Graph, Twitter Cards, canonical URLs et structured data.</p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <h3 style="margin: 0;">⚡ Performance</h3>
+      </CardHeader>
+      <CardContent>
+        <p>Préchargement DNS, prefetch de ressources, fonts optimisées avec AstroFont.</p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <h3 style="margin: 0;">♿ Accessibilité</h3>
+      </CardHeader>
+      <CardContent>
+        <p>HTML sémantique, attributs ARIA, skip links, et navigation au clavier.</p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <h3 style="margin: 0;">📱 Responsive</h3>
+      </CardHeader>
+      <CardContent>
+        <p>Design entièrement responsive avec viewport optimisé et touch-friendly.</p>
+      </CardContent>
+    </Card>
+  </div>
+
+  <h2 id="exemple">Exemple complet</h2>
+
+  <Code
+    lang="astro"
+    code={`---
+import BaseLayout from '@layouts/BaseLayout.astro';
+---
+
+<BaseLayout 
+  title="Mon Article"
+  description="Un article incroyable sur le design system"
+  keywords="design, ui, composants, astro"
+  author="John Doe"
+  ogImage="/images/article-og.jpg"
+  canonicalUrl="https://example.com/fr/blog/mon-article"
+  lang="fr"
+  robots="index, follow"
+  prefetchUrls={['/fr/blog', '/fr/about']}
+>
+  <main>
+    <article>
+      <h1>Mon Article</h1>
+      <p>Contenu de l'article...</p>
+    </article>
+  </main>
+</BaseLayout>`}
+  />
+
+  <h2 id="seo">SEO et Métadonnées</h2>
+
+  <p>Le BaseLayout génère automatiquement :</p>
+
+  <ul>
+    <li>✅ Balises meta essentielles (charset, viewport, description, keywords)</li>
+    <li>✅ Open Graph pour Facebook et LinkedIn</li>
+    <li>✅ Twitter Cards</li>
+    <li>✅ Canonical URL</li>
+    <li>✅ Directives robots</li>
+    <li>✅ Langue et direction du texte</li>
+    <li>✅ Favicons multiples (ico, png 16x16, 32x32)</li>
+    <li>✅ Apple Touch Icon</li>
+    <li>✅ Manifest PWA</li>
+  </ul>
+
+  <Alert variant="initial" status="info">
+    <strong>💡 Astuce SEO :</strong> Toujours définir un title et une description uniques pour chaque page. 
+    Le title est formaté automatiquement en "NomDuSite > TitreDeLaPage".
+  </Alert>
+
+  <h2 id="theme">Gestion du thème</h2>
+
+  <p>Le thème est géré via un script inline exécuté immédiatement pour éviter le flash :</p>
+
+  <Code
+    lang="javascript"
+    code={`// Script exécuté AVANT le rendu pour éviter le flash
+const theme = localStorage.getItem('theme') || 
+  (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+document.documentElement.setAttribute('data-theme', theme);`}
+  />
+
+  <p>L'attribut <code class="inline-code">data-theme</code> sur <code class="inline-code">&lt;html&gt;</code> permet de cibler les styles :</p>
+
+  <Code
+    lang="css"
+    code={`:root {
+  --bg-default: #ffffff;
+  --text-default: #0f172a;
+}
+
+[data-theme="dark"] {
+  --bg-default: #0f172a;
+  --text-default: #f8fafc;
+}`}
+  />
+
+  <h2>Structure HTML</h2>
+
+  <p>Le BaseLayout génère la structure suivante :</p>
+
+  <Code
+    lang="html"
+    code={`<!doctype html>
+<html lang="fr" dir="ltr">
+  <head>
+    <!-- Script thème inline -->
+    <!-- Fonts AstroFont -->
+    <!-- Métadonnées SEO -->
+    <!-- Préchargement ressources -->
+    <!-- CSS global -->
+  </head>
+  <body>
+    <Header />
+    <slot /> <!-- Votre contenu ici -->
+    <Footer />
+  </body>
+</html>`}
+  />
+
+  <Alert variant="initial" status="warning">
+    <strong>📦 Composants inclus :</strong> Le BaseLayout inclut automatiquement le Header et Footer. 
+    Vous n'avez pas besoin de les importer séparément dans vos pages.
+  </Alert>
+
+  <h2>Polices</h2>
+
+  <p>Le layout charge automatiquement 2 familles de polices via AstroFont :</p>
+
+  <ul>
+    <li><strong>Bowlby One SC</strong> - Pour les titres (font-display: swap)</li>
+    <li><strong>Palanquin Dark</strong> - Pour le corps de texte (weights: 400, 500, 600, 700)</li>
+  </ul>
+
+  <Alert variant="initial" status="info">
+    <strong>⚡ Performance :</strong> Les polices sont préchargées avec font-display: swap pour éviter 
+    le blocage du rendu et améliorer les Core Web Vitals.
+  </Alert>
+</DocLayout>

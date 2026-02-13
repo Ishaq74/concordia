@@ -1,0 +1,232 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import translations from "@i18n/fr.json";
+import { getAuth } from "@lib/auth/auth";
+
+type Status = { type: "success" | "error"; message: string };
+
+type InvitationRecord = {
+    id: string;
+    email: string;
+    role?: string | null;
+    status?: string | null;
+    expiresAt?: string | null;
+    organization?: { name?: string | null; slug?: string | null } | null;
+    inviter?: {
+        user?: { name?: string | null; email?: string | null } | null;
+    } | null;
+};
+
+const user = Astro.locals.user;
+const request = Astro.request;
+const url = new URL(request.url);
+const callback = url.pathname + url.search;
+const auth = (await getAuth()) as any;
+
+if (!user) {
+    return Astro.redirect(
+        `/fr/connexion?callbackURL=${encodeURIComponent(callback)}`,
+    );
+}
+
+const pageTitle = translations.auth.invitationsTitle ?? "Invitations";
+
+const resolveErrorMessage = (error: unknown) => {
+    if (typeof error === "string" && error.trim().length > 0) return error;
+    if (error && typeof error === "object") {
+        const body = (error as { body?: { error?: string; message?: string } })
+            .body;
+        const code = body?.error ?? (error as { message?: string }).message;
+        if (typeof code === "string" && code.trim().length > 0) return code;
+        if (body?.message) return body.message;
+    }
+    return translations.auth.serverError ?? "Erreur inattendue.";
+};
+
+let status: Status | null = null;
+const flash = url.searchParams.get("status");
+if (flash === "accepted")
+    status = { type: "success", message: "Invitation acceptée." };
+if (flash === "rejected")
+    status = { type: "success", message: "Invitation refusée." };
+if (flash === "error")
+    status = {
+        type: "error",
+        message: translations.auth.serverError ?? "Action impossible.",
+    };
+
+if (request.method === "POST") {
+    const formData = await request.formData();
+    const intent = formData.get("intent")?.toString();
+    const invitationId = formData.get("invitationId")?.toString();
+
+    try {
+        if (!intent || !invitationId) throw new Error("ACTION_INCOMPLETE");
+
+        if (intent === "accept") {
+            // const auth = await getAuth();
+            await auth.api.acceptInvitation({
+                headers: request.headers,
+                body: { invitationId },
+            });
+            status = { type: "success", message: "Invitation acceptée." };
+        } else if (intent === "reject") {
+            // const auth = await getAuth();
+            await auth.api.rejectInvitation({
+                headers: request.headers,
+                body: { invitationId },
+            });
+            status = { type: "success", message: "Invitation refusée." };
+        } else {
+            throw new Error("UNKNOWN_ACTION");
+        }
+    } catch (error) {
+        status = { type: "error", message: resolveErrorMessage(error) };
+    }
+}
+
+let invitations: InvitationRecord[] = [];
+try {
+    const result = await auth.api.listUserInvitations({
+        headers: request.headers,
+    });
+    const source = Array.isArray(result)
+        ? result
+        : Array.isArray(
+                (result as { invitations?: InvitationRecord[] })?.invitations,
+            )
+          ? (result as { invitations: InvitationRecord[] }).invitations
+          : [];
+    invitations = source as InvitationRecord[];
+} catch {
+    invitations = [];
+}
+
+const formatDate = (value?: string | null) => {
+    if (!value) return "—";
+    try {
+        return new Date(value).toLocaleString("fr-FR", {
+            dateStyle: "medium",
+            timeStyle: "short",
+        });
+    } catch {
+        return value;
+    }
+};
+---
+
+<BaseLayout lang="fr" title={pageTitle}>
+    <section class="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 py-12">
+        <a
+            href="/fr/profil"
+            class="text-sm font-medium text-slate-500 hover:text-slate-800"
+            >&larr; Retour au profil</a
+        >
+
+        <header class="space-y-2">
+            <p class="text-sm uppercase tracking-wide text-slate-500">
+                {translations.auth.profile ?? "Mon profil"}
+            </p>
+            <h1 class="text-3xl font-bold text-slate-900">{pageTitle}</h1>
+            <p class="text-slate-600">
+                Consultez et répondez à vos invitations d'organisation.
+            </p>
+        </header>
+
+        {
+            status && (
+                <div
+                    class:list={{
+                        "rounded-xl border px-4 py-3 text-sm": true,
+                        "border-emerald-200 bg-emerald-50 text-emerald-900":
+                            status.type === "success",
+                        "border-rose-200 bg-rose-50 text-rose-900":
+                            status.type === "error",
+                    }}
+                    role="status"
+                    aria-live="assertive"
+                >
+                    {status.message}
+                </div>
+            )
+        }
+
+        <section
+            class="rounded-2xl border border-slate-200 bg-white/90 p-6 shadow-sm"
+        >
+            {
+                invitations.length === 0 ? (
+                    <p class="text-sm text-slate-600">
+                        Aucune invitation en attente.
+                    </p>
+                ) : (
+                    <ul class="space-y-3">
+                        {invitations.map((inv) => (
+                            <li class="rounded-xl border border-slate-200 bg-white p-4">
+                                <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                                    <div>
+                                        <p class="font-semibold text-slate-900">
+                                            {inv.organization?.name ??
+                                                inv.organization?.slug ??
+                                                "Organisation"}
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            Rôle: {inv.role ?? "member"} ·
+                                            Expire: {formatDate(inv.expiresAt)}
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            Invité par:{" "}
+                                            {inv.inviter?.user?.email ??
+                                                inv.inviter?.user?.name ??
+                                                "—"}
+                                        </p>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <form method="POST">
+                                            <input
+                                                type="hidden"
+                                                name="intent"
+                                                value="accept"
+                                            />
+                                            <input
+                                                type="hidden"
+                                                name="invitationId"
+                                                value={inv.id}
+                                            />
+                                            <button
+                                                type="submit"
+                                                class="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800"
+                                            >
+                                                Accepter
+                                            </button>
+                                        </form>
+                                        <form method="POST">
+                                            <input
+                                                type="hidden"
+                                                name="intent"
+                                                value="reject"
+                                            />
+                                            <input
+                                                type="hidden"
+                                                name="invitationId"
+                                                value={inv.id}
+                                            />
+                                            <button
+                                                type="submit"
+                                                class="rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-sm font-medium text-rose-800 hover:bg-rose-100"
+                                            >
+                                                Refuser
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                )
+            }
+        </section>
+    </section>
+</BaseLayout>

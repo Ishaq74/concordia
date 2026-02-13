@@ -1,0 +1,409 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import AccordionComponent from "@components/ui/Accordion/Accordion.astro";
+import AccordionItem from "@components/ui/Accordion/AccordionItem.astro";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+---
+
+<DocLayout 
+  title="Accordion Component" 
+  description="Accordéon 100% CSS avec variants et couleurs" 
+  variant="initial"
+>
+  <h1 id="accordion-component">Accordion Component</h1>
+
+  <p>
+    Le composant <code class="inline-code">Accordion</code> est construit uniquement en HTML/CSS
+    (aucun script) et s'appuie sur l'élément natif <code class="inline-code">&lt;details&gt;</code>.
+    Il expose des variants cohérents avec le design system et gère les couleurs d'accent.
+  </p>
+
+  <TableOfContents
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "Props", href: "#props" },
+      { label: "Utilisation basique", href: "#basic" },
+      { label: "Variants", href: "#variants" },
+      { label: "Couleurs", href: "#colors" },
+      { label: "Mode single (un seul ouvert)", href: "#single" },
+      { label: "État désactivé", href: "#disabled" },
+      { label: "Accessibilité", href: "#accessibility" },
+    ]}
+    title="Table des matières"
+  />
+
+  <h2 id="installation">Installation</h2>
+
+  <Code
+    lang="astro"
+    code={`import { Accordion, AccordionItem } from '@components/ui/Accordion';`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <h3>Accordion</h3>
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Défaut</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">variant</code></TableCell>
+          <TableCell>initial | retro | modern | futuristic</TableCell>
+          <TableCell>initial</TableCell>
+          <TableCell>Style visuel</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">color</code></TableCell>
+          <TableCell>default | primary | secondary | accent</TableCell>
+          <TableCell>default</TableCell>
+          <TableCell>Couleur d'accent (bordure + icône)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>""</TableCell>
+          <TableCell>Classes CSS additionnelles</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3>AccordionItem</h3>
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Défaut</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">title</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Titre affiché (ou slot <code class="inline-code">title</code>)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">open</code></TableCell>
+          <TableCell>boolean</TableCell>
+          <TableCell>false</TableCell>
+          <TableCell>Ouvre l'item par défaut</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">disabled</code></TableCell>
+          <TableCell>boolean</TableCell>
+          <TableCell>false</TableCell>
+          <TableCell>Désactive l'interaction</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">type</code></TableCell>
+          <TableCell>multiple | single</TableCell>
+          <TableCell>multiple</TableCell>
+          <TableCell>Mode d'ouverture ("single" avec <code class="inline-code">groupName</code>)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">groupName</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Nom de groupe pour mutualiser le mode "single"</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>""</TableCell>
+          <TableCell>Classes sur l'élément <code class="inline-code">&lt;details&gt;</code></TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">triggerClass</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>""</TableCell>
+          <TableCell>Classes sur le <code class="inline-code">summary</code></TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">contentClass</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>""</TableCell>
+          <TableCell>Classes sur le wrapper de contenu</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h2 id="basic">Utilisation basique</h2>
+
+  <div class="example-section">
+    <AccordionComponent>
+      <AccordionItem title="Qu'est-ce que l'UI kit ?" open>
+        <p>Une collection de composants Astro cohérents, stylés via des variants CSS.</p>
+      </AccordionItem>
+      <AccordionItem title="Le composant est-il 100% CSS ?">
+        <p>Oui, aucune dépendance JS. L'ouverture repose sur l'élément natif <code class="inline-code">details</code>.</p>
+      </AccordionItem>
+      <AccordionItem title="Puis-je personnaliser les couleurs ?">
+        <p>Utilisez la prop <strong>color</strong> sur le container : <code class="inline-code">primary</code>, <code class="inline-code">secondary</code>, ou <code class="inline-code">accent</code>.</p>
+      </AccordionItem>
+    </AccordionComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<AccordionComponent>
+  <AccordionItem title="Question" open>
+    <p>Réponse...</p>
+  </AccordionItem>
+  <AccordionItem title="Une autre question">
+    <p>Autre réponse...</p>
+  </AccordionItem>
+</AccordionComponent>`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <h3>Initial (défaut)</h3>
+  <div class="example-section">
+    <AccordionComponent variant="initial" color="primary">
+      <AccordionItem title="Style par défaut" open>
+        <p>Angles arrondis, bord doux. Le fond devient légèrement bleu quand ouvert.</p>
+      </AccordionItem>
+      <AccordionItem title="Transitions soft">
+        <p>Animation via grid-template-rows.</p>
+      </AccordionItem>
+      <AccordionItem title="Troisième item">
+        <p>Ouvrez-moi pour voir la couleur primaire s'appliquer.</p>
+      </AccordionItem>
+    </AccordionComponent>
+  </div>
+
+  <h3>Retro</h3>
+  <div class="example-section">
+    <AccordionComponent variant="retro" color="secondary">
+      <AccordionItem title="LOOK PIXÉLISÉ" open>
+        <p>Bord carré + ombre en escalier. Le fond et le titre deviennent violets quand ouvert.</p>
+      </AccordionItem>
+      <AccordionItem title="ACCENTS FORTS">
+        <p>Utilise l'accent défini sur le container.</p>
+      </AccordionItem>
+      <AccordionItem title="STYLE 8-BIT">
+        <p>Ouvrez-moi pour voir l'effet violet rétro.</p>
+      </AccordionItem>
+    </AccordionComponent>
+  </div>
+
+  <h3>Modern</h3>
+  <div class="example-section">
+    <AccordionComponent variant="modern" color="accent">
+      <AccordionItem title="Arrondis élégants" open>
+        <p>Fond subtil avec gradient rose, ombre légère colorée.</p>
+      </AccordionItem>
+      <AccordionItem title="Séparateurs fins">
+        <p>Border top affiné avec la couleur d'accent.</p>
+      </AccordionItem>
+      <AccordionItem title="Design épuré">
+        <p>Ouvrez-moi pour voir le gradient rose moderne.</p>
+      </AccordionItem>
+    </AccordionComponent>
+  </div>
+
+  <h3>Futuristic</h3>
+  <div class="example-section">
+    <AccordionComponent variant="futuristic" color="primary">
+      <AccordionItem title="CLIP-PATH SCI-FI" open>
+        <p>Angles coupés avec glow jaune, gradient diagonal et text-shadow.</p>
+      </AccordionItem>
+      <AccordionItem title="UPPERCASE NÉON">
+        <p>Typo resserrée avec effet néon.</p>
+      </AccordionItem>
+      <AccordionItem title="CYBER DESIGN">
+        <p>Ouvrez-moi pour voir le glow externe et le gradient.</p>
+      </AccordionItem>
+    </AccordionComponent>
+  </div>
+
+  <h2 id="colors">Couleurs</h2>
+
+  <p>Les couleurs s'appliquent aux <strong>items ouverts</strong> : bordures, fonds, textes et icônes prennent la couleur choisie.</p>
+
+  <h3>Avec variant Initial</h3>
+  <div class="example-section">
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600; color: var(--color-primary);">● Primary (Jaune)</p>
+        <AccordionComponent color="primary">
+          <AccordionItem title="Accent primaire" open>
+            <p>Le fond devient jaune pâle, la bordure jaune, le titre jaune et l'icône jaune.</p>
+          </AccordionItem>
+          <AccordionItem title="Item fermé">
+            <p>Ouvrez-moi pour voir le style jaune.</p>
+          </AccordionItem>
+        </AccordionComponent>
+      </div>
+      
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600; color: var(--color-secondary);">● Secondary (Violet)</p>
+        <AccordionComponent color="secondary">
+          <AccordionItem title="Accent secondaire" open>
+            <p>Le fond devient violet pâle, la bordure violette, le titre violet et l'icône violette.</p>
+          </AccordionItem>
+          <AccordionItem title="Item fermé">
+            <p>Ouvrez-moi pour voir le style violet.</p>
+          </AccordionItem>
+        </AccordionComponent>
+      </div>
+      
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600; color: var(--color-accent);">● Accent (Rose)</p>
+        <AccordionComponent color="accent">
+          <AccordionItem title="Accent custom" open>
+            <p>Le fond devient rose pâle, la bordure rose, le titre rose et l'icône rose.</p>
+          </AccordionItem>
+          <AccordionItem title="Item fermé">
+            <p>Ouvrez-moi pour voir le style rose.</p>
+          </AccordionItem>
+        </AccordionComponent>
+      </div>
+    </div>
+  </div>
+
+  <h3>Avec variant Retro</h3>
+  <div class="example-section">
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600;">Primary Retro</p>
+        <AccordionComponent variant="retro" color="primary">
+          <AccordionItem title="STYLE 8-BIT JAUNE" open>
+            <p>Fond jaune pixelisé avec bordure jaune épaisse et ombre en escalier.</p>
+          </AccordionItem>
+        </AccordionComponent>
+      </div>
+      
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600;">Secondary Retro</p>
+        <AccordionComponent variant="retro" color="secondary">
+          <AccordionItem title="STYLE 8-BIT VIOLET" open>
+            <p>Fond violet pixelisé avec bordure violette épaisse.</p>
+          </AccordionItem>
+        </AccordionComponent>
+      </div>
+    </div>
+  </div>
+
+  <h3>Avec variant Modern</h3>
+  <div class="example-section">
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600;">Primary Modern</p>
+        <AccordionComponent variant="modern" color="primary">
+          <AccordionItem title="Gradient jaune élégant" open>
+            <p>Gradient jaune du haut vers le bas + ombre jaune douce.</p>
+          </AccordionItem>
+        </AccordionComponent>
+      </div>
+      
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600;">Accent Modern</p>
+        <AccordionComponent variant="modern" color="accent">
+          <AccordionItem title="Gradient rose élégant" open>
+            <p>Gradient rose du haut vers le bas + ombre rose douce.</p>
+          </AccordionItem>
+        </AccordionComponent>
+      </div>
+    </div>
+  </div>
+
+  <h3>Avec variant Futuristic</h3>
+  <div class="example-section">
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600;">Primary Futuristic</p>
+        <AccordionComponent variant="futuristic" color="primary">
+          <AccordionItem title="GLOW JAUNE CYBER" open>
+            <p>Gradient diagonal jaune + glow externe jaune + text-shadow jaune.</p>
+          </AccordionItem>
+        </AccordionComponent>
+      </div>
+      
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600;">Secondary Futuristic</p>
+        <AccordionComponent variant="futuristic" color="secondary">
+          <AccordionItem title="GLOW VIOLET CYBER" open>
+            <p>Gradient diagonal violet + glow externe violet + text-shadow violet.</p>
+          </AccordionItem>
+        </AccordionComponent>
+      </div>
+    </div>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<!-- Couleurs s'appliquent aux items ouverts -->
+<AccordionComponent color="primary">...</AccordionComponent>
+<AccordionComponent color="secondary">...</AccordionComponent>
+<AccordionComponent color="accent">...</AccordionComponent>
+
+<!-- Combinaison variant + couleur -->
+<AccordionComponent variant="retro" color="primary">...</AccordionComponent>
+<AccordionComponent variant="modern" color="accent">...</AccordionComponent>
+<AccordionComponent variant="futuristic" color="secondary">...</AccordionComponent>`}
+  />
+
+  <h2 id="single">Mode single (un seul ouvert)</h2>
+  <p>
+    Utilisez <code class="inline-code">type="single"</code> et partagez le même <code class="inline-code">groupName</code>
+    pour rendre l'ouverture mutuellement exclusive (support natif via l'attribut <code class="inline-code">name</code> sur
+    <code class="inline-code">details</code>). Les navigateurs non compatibles retomberont en mode multiple.
+  </p>
+
+  <div class="example-section">
+    <AccordionComponent>
+      <AccordionItem title="Étape 1" type="single" groupName="wizard" open>
+        <p>Cette étape est ouverte au chargement.</p>
+      </AccordionItem>
+      <AccordionItem title="Étape 2" type="single" groupName="wizard">
+        <p>Se ferme dès qu'une autre étape s'ouvre.</p>
+      </AccordionItem>
+      <AccordionItem title="Étape 3" type="single" groupName="wizard">
+        <p>Pure CSS, sans script.</p>
+      </AccordionItem>
+    </AccordionComponent>
+  </div>
+
+  <h2 id="disabled">État désactivé</h2>
+
+  <div class="example-section">
+    <AccordionComponent>
+      <AccordionItem title="Actif" open>
+        <p>Cet item est interactif.</p>
+      </AccordionItem>
+      <AccordionItem title="Désactivé" disabled>
+        <p>Le curseur change et les clics sont ignorés.</p>
+      </AccordionItem>
+    </AccordionComponent>
+  </div>
+
+  <h2 id="accessibility">Accessibilité</h2>
+
+  <ul>
+    <li>Structure native <code class="inline-code">details/summary</code> compréhensible par les lecteurs d'écran.</li>
+    <li>Focus visible sur le header avec <code class="inline-code">outline</code> d'accent.</li>
+    <li>Pas de JavaScript : l'état ouvert est géré par le navigateur.</li>
+    <li><code class="inline-code">groupName</code> facultatif pour mutualiser le mode "single" (si supporté).</li>
+    <li>Attribut <code class="inline-code">aria-disabled</code> appliqué sur le trigger quand <strong>disabled</strong>.</li>
+  </ul>
+</DocLayout>

@@ -1,0 +1,503 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import Alert from "@components/ui/Alert.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import DropdownComponent from "@components/ui/Dropdown.astro";
+
+const menuItems = [
+  { label: "Profile", value: "profile", icon: "👤" },
+  { label: "Settings", value: "settings", icon: "⚙️" },
+  { label: "Messages", value: "messages", icon: "💬" },
+  { label: "Notifications", value: "notifications", icon: "🔔" },
+  { label: "Help", value: "help", icon: "❓" },
+  { label: "Logout", value: "logout", icon: "🚪" },
+];
+
+const shortMenu = menuItems.slice(0, 3);
+
+const longMenu = [
+  ...menuItems,
+  { label: "Dashboard", value: "dashboard", icon: "📊" },
+  { label: "Analytics", value: "analytics", icon: "📈" },
+  { label: "Reports", value: "reports", icon: "📄" },
+  { label: "Team", value: "team", icon: "👥" },
+  { label: "Projects", value: "projects", icon: "📁" },
+  { label: "Calendar", value: "calendar", icon: "📅" },
+  { label: "Tasks", value: "tasks", icon: "✓" },
+  { label: "Files", value: "files", icon: "📂" },
+];
+
+const menuWithLinks = [
+  { label: "Home", href: "#home", icon: "🏠" },
+  { label: "About", href: "#about", icon: "ℹ️" },
+  { label: "Contact", href: "#contact", icon: "📧" },
+  { label: "Blog", href: "#blog", icon: "📝" },
+];
+
+const menuWithDisabled = [
+  { label: "Edit", value: "edit", icon: "✏️" },
+  { label: "Delete", value: "delete", icon: "🗑️", disabled: true },
+  { label: "Share", value: "share", icon: "🔗" },
+];
+
+const recursiveMenu = [
+  { label: "Dashboard", value: "dashboard", icon: "📊" },
+  { 
+    label: "Products", 
+    value: "products", 
+    icon: "📦",
+    children: [
+      { label: "All Products", value: "products-all", icon: "🗂️" },
+      { label: "Categories", value: "categories", icon: "📂",
+        children: [
+          { label: "Electronics", value: "cat-electronics", icon: "⚡" },
+          { label: "Clothing", value: "cat-clothing", icon: "👕" },
+          { label: "Books", value: "cat-books", icon: "📚" },
+        ]
+      },
+      { label: "Add Product", value: "product-add", icon: "➕" },
+    ]
+  },
+  {
+    label: "Settings",
+    value: "settings",
+    icon: "⚙️",
+    children: [
+      { label: "Profile", value: "settings-profile", icon: "👤" },
+      { label: "Security", value: "settings-security", icon: "🔒",
+        children: [
+          { label: "Password", value: "change-password", icon: "🔑" },
+          { label: "2FA", value: "2fa", icon: "🛡️" },
+        ]
+      },
+      { label: "Notifications", value: "settings-notif", icon: "🔔" },
+    ]
+  },
+  { label: "Logout", value: "logout", icon: "🚪" },
+];
+---
+
+<DocLayout 
+  title="Dropdown Component" 
+  description="Dropdown menu with smart positioning and responsive handling (ZERO JavaScript)" 
+  variant="initial"
+>
+
+  <h1 id="dropdown-component">Dropdown Component</h1>
+
+  <p>
+    The <code class="inline-code">Dropdown</code> component uses the CSS checkbox hack to create dropdown menus without JavaScript. Smart positioning and responsive handling.
+  </p>
+
+  <TableOfContents
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "Basic Usage", href: "#basic" },
+      { label: "Recursive Menus", href: "#recursive" },
+      { label: "Positions", href: "#positions" },
+      { label: "Variants", href: "#variants" },
+      { label: "Features", href: "#features" },
+      { label: "API Reference", href: "#api" },
+    ]}
+    title="Table of Contents"
+  />
+
+  <h2 id="installation">Installation</h2>
+
+  <Code
+    lang="astro"
+    code={`import Dropdown from '@components/ui/Dropdown.astro';`}
+  />
+
+  <h2 id="basic">Basic Usage</h2>
+
+  <div class="demo-section">
+    <DropdownComponent 
+      items={menuItems}
+      triggerLabel="Menu"
+      triggerIcon="☰"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<DropdownComponent 
+  items={menuItems}
+  triggerLabel="Menu"
+  triggerIcon="☰"
+/>`}
+  />
+
+  <h2 id="recursive">Recursive Menus (multi-level)</h2>
+  <p>
+    Dropdowns support nested submenus at multiple levels without JavaScript. Each submenu has its own checkbox for open/close state.
+  </p>
+
+  <div class="demo-section">
+    <DropdownComponent 
+      items={recursiveMenu}
+      triggerLabel="Menu Multi-niveaux"
+      triggerIcon="📁"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`const recursiveMenu = [
+  { label: "Dashboard", value: "dashboard", icon: "📊" },
+  { 
+    label: "Products", 
+    icon: "📦",
+    children: [
+      { label: "All Products", value: "products-all", icon: "🗂️" },
+      { 
+        label: "Categories", 
+        icon: "📂",
+        children: [
+          { label: "Electronics", value: "cat-electronics", icon: "⚡" },
+          { label: "Clothing", value: "cat-clothing", icon: "👕" },
+          { label: "Books", value: "cat-books", icon: "📚" },
+        ]
+      },
+      { label: "Add Product", value: "product-add", icon: "➕" },
+    ]
+  },
+  {
+    label: "Settings",
+    icon: "⚙️",
+    children: [
+      { label: "Profile", value: "settings-profile", icon: "👤" },
+      { 
+        label: "Security", 
+        icon: "🔒",
+        children: [
+          { label: "Password", value: "change-password", icon: "🔑" },
+          { label: "2FA", value: "2fa", icon: "🛡️" },
+        ]
+      },
+      { label: "Notifications", value: "settings-notif", icon: "🔔" },
+    ]
+  },
+  { label: "Logout", value: "logout", icon: "🚪" },
+];
+
+  <DropdownComponent items={recursiveMenu} triggerLabel="Multi-level Menu" />`}
+  />
+
+  <Alert variant="initial" status="info">
+    <strong>ZERO JavaScript:</strong> Each submenu uses a hidden checkbox + label to manage its state.
+    Submenus open to the right (desktop) or stack (mobile). Unlimited nesting levels supported!
+  </Alert>
+
+  <h2 id="positions">Positions</h2>
+  <p>The dropdown can be positioned in 4 different ways relative to the trigger.</p>
+
+  <div class="demo-section" style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: space-between;">
+    <div>
+      <h4>Bottom Left (default)</h4>
+      <DropdownComponent 
+        items={shortMenu}
+        triggerLabel="Bottom Left"
+        position="bottom-left"
+      />
+    </div>
+
+    <div>
+      <h4>Bottom Right</h4>
+      <DropdownComponent 
+        items={shortMenu}
+        triggerLabel="Bottom Right"
+        position="bottom-right"
+      />
+    </div>
+
+    <div>
+      <h4>Top Left</h4>
+      <DropdownComponent 
+        items={shortMenu}
+        triggerLabel="Top Left"
+        position="top-left"
+      />
+    </div>
+
+    <div>
+      <h4>Top Right</h4>
+      <DropdownComponent 
+        items={shortMenu}
+        triggerLabel="Top Right"
+        position="top-right"
+      />
+    </div>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<DropdownComponent items={items} position="bottom-left" />
+<DropdownComponent items={items} position="bottom-right" />
+<DropdownComponent items={items} position="top-left" />
+<DropdownComponent items={items} position="top-right" />`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <h3>Retro Variant</h3>
+  <div class="demo-section">
+    <DropdownComponent 
+      items={menuItems}
+      variant="retro"
+      triggerLabel="RETRO MENU"
+      triggerIcon="▣"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<DropdownComponent 
+  items={menuItems}
+  variant="retro"
+  triggerLabel="RETRO MENU"
+/>`}
+  />
+
+  <h3>Modern Variant</h3>
+  <div class="demo-section">
+    <DropdownComponent 
+      items={menuItems}
+      variant="modern"
+      triggerLabel="Modern Menu"
+      triggerIcon="✨"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<DropdownComponent 
+  items={menuItems}
+  variant="modern"
+  triggerLabel="Modern Menu"
+/>`}
+  />
+
+  <h3>Futuristic Variant</h3>
+  <div class="demo-section">
+    <DropdownComponent 
+      items={menuItems}
+      variant="futuristic"
+      triggerLabel="FUTURISTIC"
+      triggerIcon="◈"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<DropdownComponent 
+  items={menuItems}
+  variant="futuristic"
+  triggerLabel="FUTURISTIC"
+/>`}
+  />
+
+  <h2 id="features">Features</h2>
+
+  <h3>Menu with links</h3>
+  <p>Items can have <code class="inline-code">href</code> attributes to create links.</p>
+
+  <div class="demo-section">
+    <DropdownComponent 
+      items={menuWithLinks}
+      triggerLabel="Navigation"
+      triggerIcon="🔗"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`const menuWithLinks = [
+  { label: "Home", href: "#home", icon: "🏠" },
+  { label: "About", href: "#about", icon: "ℹ️" },
+  { label: "Contact", href: "#contact", icon: "📧" },
+];
+
+<DropdownComponent items={menuWithLinks} triggerLabel="Navigation" />`}
+  />
+
+  <h3>Disabled items</h3>
+
+  <div class="demo-section">
+    <DropdownComponent 
+      items={menuWithDisabled}
+      triggerLabel="Actions"
+      triggerIcon="⚡"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`const menuWithDisabled = [
+  { label: "Edit", value: "edit", icon: "✏️" },
+  { label: "Delete", value: "delete", icon: "🗑️", disabled: true },
+  { label: "Share", value: "share", icon: "🔗" },
+];`}
+  />
+
+  <h3>Long menu with scroll</h3>
+  <p>Long menus have automatic scrolling with a max height of 400px.</p>
+
+  <div class="demo-section">
+    <DropdownComponent 
+      items={longMenu}
+      triggerLabel="Long Menu"
+      triggerIcon="📋"
+    />
+  </div>
+
+  <h2 id="api">API Reference</h2>
+
+  <h3>Props</h3>
+
+  <div class="props-table">
+    <Table variant="initial">
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Default</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code>items</code></TableCell>
+          <TableCell><code>MenuItem[]</code></TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Menu items array</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>variant</code></TableCell>
+          <TableCell><code>"initial" | "retro" | "modern" | "futuristic"</code></TableCell>
+          <TableCell><code>"initial"</code></TableCell>
+          <TableCell>Visual style of the dropdown</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>position</code></TableCell>
+          <TableCell><code>"bottom-left" | "bottom-right" | "top-left" | "top-right"</code></TableCell>
+          <TableCell><code>"bottom-left"</code></TableCell>
+          <TableCell>Menu position relative to the trigger</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>triggerLabel</code></TableCell>
+          <TableCell><code>string</code></TableCell>
+          <TableCell><code>"Menu"</code></TableCell>
+          <TableCell>Button text</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>triggerIcon</code></TableCell>
+          <TableCell><code>string</code></TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Button icon</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>class</code></TableCell>
+          <TableCell><code>string</code></TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Additional CSS classes</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3>MenuItem Interface</h3>
+
+  <Code
+    lang="typescript"
+    code={`interface MenuItem {
+  label: string;         // Displayed text
+  value?: string;        // Item value
+  icon?: string;         // Emoji or icon
+  disabled?: boolean;    // Disabled item
+  href?: string;         // Link (becomes an <a>)
+  children?: MenuItem[]; // Recursive submenu (multi-level)
+}`}
+  />
+
+  <h2>Responsive & Smart Positioning</h2>
+  <p>The dropdown automatically handles:</p>
+  <ul>
+    <li><strong>Screen overflow</strong>: On mobile, automatic centered position</li>
+    <li><strong>Max height</strong>: 400px desktop, 300px mobile with scroll</li>
+    <li><strong>Adaptive width</strong>: max-width on mobile to avoid overflow</li>
+    <li><strong>Backdrop</strong>: Click outside closes the menu</li>
+    <li><strong>Custom scrollbar</strong>: Minimal style on webkit browsers</li>
+  </ul>
+  <Alert variant="initial" status="info">
+    <strong>Note:</strong> ZERO JavaScript! Everything works with a hidden checkbox and the <code>:checked</code> selector.
+    The backdrop uses an invisible <code>&lt;label&gt;</code> to close on click.
+  </Alert>
+  <h2>Pure CSS Architecture</h2>
+  <p>Clear and logical HTML structure for a dropdown menu with submenus:</p>
+  <Code
+    lang="html"
+    code={`<!-- Main menu -->
+<div class="dropdown">
+  <input type="checkbox" id="menu" class="dropdown-state" />
+  <label for="menu" class="dropdown-trigger">Menu</label>
+  <label for="menu" class="dropdown-backdrop"></label>
+  
+  <div class="dropdown-menu position-bottom-left">
+    <div class="dropdown-content">
+      <!-- Simple item -->
+      <label for="menu" class="dropdown-item">Dashboard</label>
+      
+      <!-- Item with submenu -->
+      <div class="dropdown-submenu">
+        <input type="checkbox" id="products" class="submenu-state" />
+        <label for="products" class="dropdown-item has-submenu">
+          Products ▶
+        </label>
+        <div class="submenu-content">
+          <div class="dropdown-content">
+            <label for="menu" class="dropdown-item">All Products</label>
+            <!-- Can nest up to 3 levels -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>`}
+  />
+  <Code
+    lang="css"
+    code={`/* Hidden checkbox for main menu state */
+.dropdown-state {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Open menu when checkbox is checked */
+.dropdown-state:checked ~ .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Transparent backdrop to close on outside click */
+.dropdown-state:checked ~ .dropdown-backdrop {
+  display: block;
+}
+
+/* Submenus with their own checkbox */
+.submenu-state:checked ~ .submenu-content {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}`} 
+  />
+</DocLayout>

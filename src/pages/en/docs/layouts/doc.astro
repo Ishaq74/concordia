@@ -1,0 +1,286 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import Alert from "@components/ui/Alert.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import TOC from "@components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import Badge from "@components/ui/Badge.astro";
+---
+
+<DocLayout 
+  title="DocLayout" 
+  description="Specialized layout for documentation pages with sidebar, TOC and navigation" 
+  variant="initial"
+>
+  <h1 id="doclayout">DocLayout</h1>
+
+  <p>
+    The <code class="inline-code">DocLayout</code> is a specialized layout for documentation pages. 
+    It extends BaseLayout and adds a navigation sidebar, a dynamic table of contents and an optimized style for reading.
+  </p>
+
+  <TOC
+    items={[
+      { label: "Usage", href: "#usage" },
+      { label: "Props", href: "#props" },
+      { label: "Features", href: "#features" },
+      { label: "Full example", href: "#example" },
+      { label: "Navigation sidebar", href: "#sidebar" },
+      { label: "Automatic table of contents", href: "#toc" },
+    ]}
+    title="Table of Contents"
+  />
+
+  <h2 id="usage">Usage</h2>
+
+  <Code
+    lang="astro"
+    code={`---
+import DocLayout from '@layouts/DocLayout.astro';
+---
+
+<DocLayout 
+  title="My Component"
+  description="Component documentation"
+  variant="initial"
+>
+  <h1 id="title">My Component</h1>
+  <h2 id="section1">Section 1</h2>
+  <p>Content...</p>
+  <h2 id="section2">Section 2</h2>
+  <p>More content...</p>
+</DocLayout>`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <Table variant="initial">
+    <TableHeader>
+      <TableRow>
+        <TableHead>Prop</TableHead>
+        <TableHead>Type</TableHead>
+        <TableHead>Default</TableHead>
+        <TableHead>Description</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow>
+        <TableCell><code>title</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>required</code></TableCell>
+        <TableCell>Documentation page title</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>description</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>undefined</code></TableCell>
+        <TableCell>Page meta description</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>variant</code></TableCell>
+        <TableCell><code>'initial' | 'retro' | 'modern' | 'futuristic'</code></TableCell>
+        <TableCell><code>'initial'</code></TableCell>
+        <TableCell>Visual style of the documentation</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <Alert variant="initial" status="info">
+    <strong>📝 Note:</strong> The DocLayout inherits all props from BaseLayout (SEO, metadata, etc.).
+  </Alert>
+
+  <h2 id="features">Features</h2>
+
+  <div class="feature-grid">
+    <Card>
+      <CardHeader>
+        <h3 style="margin: 0;">📚 Sidebar Navigation</h3>
+      </CardHeader>
+      <CardContent>
+        <p>Contextual navigation with page hierarchy, active state and search.</p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <h3 style="margin: 0;">📖 Table of Contents</h3>
+      </CardHeader>
+      <CardContent>
+        <p>TOC generated automatically from the page's H2 and H3 headings.</p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <h3 style="margin: 0;">🎨 4 Variants</h3>
+      </CardHeader>
+      <CardContent>
+        <p>Full support for the 4 visual variants (initial, retro, modern, futuristic).</p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <h3 style="margin: 0;">📱 Responsive</h3>
+      </CardHeader>
+      <CardContent>
+        <p>Collapsible sidebar on mobile with hamburger menu.</p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <h3 style="margin: 0;">🔍 Optimized for reading</h3>
+      </CardHeader>
+      <CardContent>
+        <p>Optimal content width (max-width), line-height and readable typography.</p>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <h3 style="margin: 0;">🎯 Active state</h3>
+      </CardHeader>
+      <CardContent>
+        <p>Automatic highlight of the active page and scroll spy for the TOC.</p>
+      </CardContent>
+    </Card>
+  </div>
+
+  <h2 id="example">Full example</h2>
+
+  <Code
+    lang="astro"
+    code={`---
+import DocLayout from '@layouts/DocLayout.astro';
+import { Code } from 'astro:components';
+import Alert from '@components/ui/Alert.astro';
+---
+
+<DocLayout 
+  title="Button Component"
+  description="Complete documentation of the Button component"
+  variant="modern"
+>
+  <h1 id="button-component">Button Component</h1>
+  
+  <p>
+    The Button component is a reusable interactive element.
+  </p>
+
+  <h2 id="installation">Installation</h2>
+  <Code lang="bash" code="npm install" />
+
+  <h2 id="usage">Usage</h2>
+  <p>Usage example...</p>
+
+  <h2 id="props">Props</h2>
+  <p>List of available properties...</p>
+
+  <Alert>
+    <strong>Note:</strong> The component is accessible.
+  </Alert>
+</DocLayout>`}
+  />
+
+  <h2 id="sidebar">Navigation sidebar</h2>
+
+  <p>The sidebar is generated automatically from the configuration file:</p>
+
+
+  <Code
+    lang="ts"
+    code={`// src/components/templates/docs/navigation.ts\nexport const getDocNavConfig = (locale: string, t: any) => [\n  {\n    title: t.docsSidebar.gettingStarted,\n    items: [\n      { label: t.docsSidebar.introduction, href: '/'+locale+'/docs/design' },\n    ]\n  },\n  {\n    title: t.docsSidebar.uiAtoms,\n    items: [\n      { label: t.docsSidebar.button, href: '/'+locale+'/docs/design/button' },\n      { label: t.docsSidebar.input, href: '/'+locale+'/docs/design/input' },\n    ]\n  }\n];`}
+  />
+
+  <Alert variant="initial" status="info">
+    <strong>🌍 Multilingual:</strong> The sidebar uses translations from the i18n system and adapts automatically to the current locale.
+  </Alert>
+
+  <h2 id="toc">Automatic table of contents</h2>
+
+  <p>The DocLayout automatically generates a table of contents from the headings:</p>
+
+  <ul>
+    <li>✅ Automatically detects H2 and H3 with IDs</li>
+    <li>✅ Generates anchor links</li>
+    <li>✅ Visual indentation for hierarchy</li>
+    <li>✅ Scroll spy for highlighting the active section</li>
+    <li>✅ Smooth scroll on click</li>
+  </ul>
+
+  <Code
+    lang="astro"
+    code={`<!-- IDs required for the TOC -->
+<h2 id="installation">Installation</h2>
+<h3 id="npm">Via npm</h3>
+<h3 id="yarn">Via yarn</h3>
+<h2 id="usage">Usage</h2>`}
+  />
+
+  <Alert variant="initial" status="warning">
+    <strong>💡 Tip:</strong> Always use IDs on your H2 and H3 headings to enable the automatic TOC. IDs should be in kebab-case for better URLs.
+  </Alert>
+
+  <h2>Layout structure</h2>
+
+  <Code
+    lang="html"
+    code={`<BaseLayout>
+  <div class="doc-layout">
+    <!-- Left sidebar -->
+    <Sidebar currentPath={Astro.url.pathname} />
+    
+    <!-- Main content -->
+    <MainDoc>
+      <slot /> <!-- Your content here -->
+    </MainDoc>
+    
+    <!-- Right TOC -->
+    <aside class="doc-toc">
+      <!-- Automatically generated TOC -->
+    </aside>
+  </div>
+</BaseLayout>`}
+  />
+
+  <h2>Responsive grid layout</h2>
+
+  <p>The DocLayout uses CSS Grid for a flexible layout:</p>
+
+  <ul>
+    <li><strong>Desktop (> 1200px):</strong> Sidebar (250px) | Content (1fr) | TOC (250px)</li>
+    <li><strong>Tablet (768-1200px):</strong> Sidebar (200px) | Content (1fr)</li>
+    <li><strong>Mobile (&lt; 768px):</strong> Full-width content + hamburger menu</li>
+  </ul>
+
+  <h2>Variants</h2>
+
+  <p>The DocLayout supports the 4 variants:</p>
+
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0;">
+    <Badge>initial</Badge>
+    <Badge>retro</Badge>
+    <Badge>modern</Badge>
+    <Badge>futuristic</Badge>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<DocLayout variant="retro">
+  <!-- Retro style -->
+</DocLayout>
+
+<DocLayout variant="futuristic">
+  <!-- Futuristic style -->
+</DocLayout>`}
+  />
+</DocLayout>

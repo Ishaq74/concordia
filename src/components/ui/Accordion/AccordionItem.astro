@@ -1,0 +1,84 @@
+---
+/**
+ * AccordionItem - Élément d'accordéon 100% CSS basé sur <details>
+ *
+ * @param {string} title - Titre affiché (ou slot "title")
+ * @param {boolean} open - Ouvrir l'item par défaut
+ * @param {boolean} disabled - Désactiver l'interaction
+ * @param {string} type - Mode d'ouverture (multiple|single)
+ * @param {string} groupName - Nom de groupe pour le mode "single" (utilise l'attribut name des <details>)
+ * @param {string} className - Classes supplémentaires sur <details>
+ * @param {string} triggerClass - Classes supplémentaires sur le summary
+ * @param {string} contentClass - Classes supplémentaires sur le contenu
+ */
+
+interface Props {
+  title?: string;
+  open?: boolean;
+  disabled?: boolean;
+  type?: 'multiple' | 'single';
+  groupName?: string;
+  className?: string;
+  triggerClass?: string;
+  contentClass?: string;
+}
+
+const {
+  title,
+  open = false,
+  disabled = false,
+  type = 'multiple',
+  groupName,
+  className = '',
+  triggerClass = '',
+  contentClass = '',
+} = Astro.props as Props;
+
+const baseId = (globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2, 10));
+const summaryId = `accordion-trigger-${baseId}`;
+const contentId = `accordion-content-${baseId}`;
+
+const detailsClasses = [
+  'accordion-item',
+  className,
+].filter(Boolean).join(' ');
+
+const triggerClasses = [
+  'accordion-trigger',
+  triggerClass,
+].filter(Boolean).join(' ');
+
+const contentClasses = [
+  'accordion-content',
+  contentClass,
+].filter(Boolean).join(' ');
+
+const isSingle = type === 'single';
+const nameAttr = isSingle && groupName ? groupName : undefined;
+---
+
+<details
+  class={detailsClasses}
+  open={open && !disabled ? true : undefined}
+  data-disabled={disabled ? 'true' : undefined}
+  data-type={type}
+  name={nameAttr}
+>
+  <summary
+    class={triggerClasses}
+    id={summaryId}
+    aria-disabled={disabled ? 'true' : undefined}
+    tabindex={disabled ? -1 : undefined}
+  >
+    <div class="accordion-title">
+      <slot name="title">{title}</slot>
+    </div>
+    <span class="accordion-indicator" aria-hidden="true"></span>
+  </summary>
+
+  <div class={contentClasses} id={contentId} role="region" aria-labelledby={summaryId}>
+    <div class="accordion-content-inner">
+      <slot />
+    </div>
+  </div>
+</details>

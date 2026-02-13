@@ -1,0 +1,18 @@
+---
+interface Props {
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+}
+
+const { variant = 'initial' } = Astro.props;
+---
+
+<article class={`doc-main variant-${variant}`}>
+  <slot />
+</article>
+
+<style>
+  .doc-main {
+    min-width: 0;
+    max-width: 800px;
+  }
+</style>

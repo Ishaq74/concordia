@@ -1,0 +1,33 @@
+---
+interface Props {
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  elevation?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  interactive?: boolean;
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  variant = 'initial',
+  elevation = 'md',
+  interactive = false,
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+const variantClass = variant !== 'initial' ? `card-${variant}` : '';
+const elevationClass = elevation !== 'none' ? `elevation-${elevation}` : '';
+const interactiveClass = interactive ? 'interactive' : '';
+
+const classes = [
+  'card',
+  variantClass,
+  elevationClass,
+  interactiveClass,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<article class={classes} {...htmlAttributes}>
+  <slot />
+</article>

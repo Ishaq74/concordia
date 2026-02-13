@@ -1,0 +1,79 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import ResetPasswordForm from "@components/templates/auth/ResetPasswordForm.astro";
+import translations from "@i18n/fr.json";
+import { getAuth } from "@lib/auth/auth";
+
+const redirectPath = "/fr/connexion";
+const pageTitle =
+  translations.auth.resetPassword ?? "Réinitialiser le mot de passe";
+
+const request = Astro.request;
+const token = new URL(request.url).searchParams.get("token") ?? ""; // Better Auth often expects 'token' query param
+
+if (!token && request.method === "GET") {
+  // Assuming token is required to view this page, or we show an error.
+  // But user might arrive here without token if they messed up.
+}
+
+let status: { type: "success" | "error"; message: string } | null = null;
+
+if (request.method === "POST") {
+  const formData = await request.formData();
+  const password = (formData.get("password") ?? "").toString();
+  const confirmPassword = (formData.get("confirmPassword") ?? "").toString();
+  const tokenInput = (formData.get("token") ?? "").toString();
+
+  if (password !== confirmPassword) {
+    status = {
+      type: "error",
+      message:
+        translations.auth.passwordsDontMatch ??
+        "Les mots de passe ne correspondent pas.",
+    };
+  } else if (password.length < 8) {
+    status = {
+      type: "error",
+      message:
+        translations.auth.passwordTooShort ?? "Le mot de passe trop court.",
+    };
+  } else {
+    try {
+      const auth = await getAuth();
+      const response = await auth.api.resetPassword({
+        body: {
+          newPassword: password,
+          token: tokenInput || token,
+        },
+        asResponse: true,
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        status = {
+          type: "error",
+          message: payload.message || "Erreur lors de la réinitialisation.",
+        };
+      } else {
+        return Astro.redirect(redirectPath + "?status=password_reset");
+      }
+    } catch (e) {
+      status = { type: "error", message: "Erreur serveur." };
+    }
+  }
+}
+---
+
+<BaseLayout lang="fr" title={pageTitle}>
+  <section
+    class="mx-auto flex min-h-[60vh] w-full max-w-5xl items-center justify-center px-4 py-16"
+  >
+    <ResetPasswordForm
+      translations={translations}
+      status={status}
+      token={token}
+    />
+  </section>
+</BaseLayout>

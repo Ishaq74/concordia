@@ -1,0 +1,304 @@
+---
+export interface Props {
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  items: { label: string; href: string }[];
+  title?: string;
+  className?: string;
+}
+
+const { 
+  variant = 'initial', 
+  items = [],
+  title = 'Table of Contents',
+  className = ''
+} = Astro.props;
+---
+
+<nav 
+  class={`table-of-contents variant-${variant} ${className}`}
+  aria-label={title}
+>
+  <div class="toc-header">
+    <span class="toc-icon">📖</span>
+    <h2 class="toc-title">{title}</h2>
+  </div>
+  
+  <ul class="toc-list">
+    {items.map((item) => (
+      <li class="toc-item">
+        <a href={item.href} class="toc-link">
+          {item.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .table-of-contents {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg, 0.75rem);
+    padding: 1.5rem;
+    margin: 2rem 0;
+    transition: all 0.3s ease;
+  }
+
+  .toc-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .toc-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .toc-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-default);
+  }
+
+  .toc-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .toc-item {
+    margin: 0;
+    padding: 0;
+  }
+
+  .toc-link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    border-radius: var(--radius-sm, 0.25rem);
+    transition: all 0.2s ease;
+    font-size: 0.9375rem;
+  }
+
+  .toc-link:hover {
+    background: var(--bg-inset);
+    color: var(--color-primary-hover, var(--color-primary));
+    transform: translateX(0.25rem);
+  }
+
+  .toc-link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Variant: Initial */
+  .variant-initial {
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.1));
+  }
+
+  .variant-initial .toc-link:hover {
+    background: var(--bg-inset);
+  }
+
+  /* Variant: Retro */
+  .variant-retro {
+    border: 3px solid var(--border-default);
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .variant-retro .toc-header {
+    border-bottom: 2px solid var(--border-default);
+  }
+
+  .variant-retro .toc-title {
+    font-family: var(--font-retro, monospace);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .variant-retro .toc-link {
+    font-family: var(--font-retro, monospace);
+  }
+
+  .variant-retro .toc-link:hover {
+    background: var(--color-primary);
+    color: var(--text-inverse, white);
+    transform: translateX(0.5rem);
+  }
+
+  /* Variant: Modern */
+  .variant-modern {
+    background: linear-gradient(
+      135deg,
+      var(--bg-subtle) 0%,
+      var(--bg-default) 100%
+    );
+    border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
+    box-shadow: var(--shadow-lg, 0 10px 30px rgba(0, 0, 0, 0.15));
+    backdrop-filter: blur(10px);
+  }
+
+  .variant-modern .toc-header {
+    background: linear-gradient(
+      90deg,
+      var(--color-primary) 0%,
+      var(--color-secondary, var(--color-primary)) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
+  }
+
+  .variant-modern .toc-link {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .variant-modern .toc-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: linear-gradient(
+      180deg,
+      var(--color-primary) 0%,
+      var(--color-secondary, var(--color-primary)) 100%
+    );
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.3s ease;
+  }
+
+  .variant-modern .toc-link:hover::before {
+    transform: scaleY(1);
+  }
+
+  .variant-modern .toc-link:hover {
+    background: var(--bg-inset, rgba(255, 255, 255, 0.05));
+    padding-left: 1.25rem;
+  }
+
+  /* Variant: Futuristic */
+  .variant-futuristic {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-primary) 10%, transparent) 0%,
+      color-mix(in srgb, var(--color-secondary, var(--color-primary)) 10%, transparent) 100%
+    );
+    border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+    box-shadow: 
+      0 0 20px color-mix(in srgb, var(--color-primary) 20%, transparent),
+      inset 0 0 20px color-mix(in srgb, var(--color-primary) 5%, transparent);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .variant-futuristic::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--color-primary) 10%, transparent),
+      transparent
+    );
+    animation: scan 3s linear infinite;
+  }
+
+  @keyframes scan {
+    to {
+      left: 100%;
+    }
+  }
+
+  .variant-futuristic .toc-header {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+
+  .variant-futuristic .toc-title {
+    color: var(--color-primary);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--color-primary) 50%, transparent);
+    font-family: var(--font-futuristic, 'Orbitron', sans-serif);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .variant-futuristic .toc-icon {
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-primary) 60%, transparent));
+  }
+
+  .variant-futuristic .toc-link {
+    color: var(--color-primary);
+    font-family: var(--font-futuristic, 'Orbitron', sans-serif);
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    position: relative;
+  }
+
+  .variant-futuristic .toc-link::after {
+    content: '→';
+    position: absolute;
+    right: 0.5rem;
+    opacity: 0;
+    transform: translateX(-0.5rem);
+    transition: all 0.3s ease;
+  }
+
+  .variant-futuristic .toc-link:hover {
+    background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+    color: var(--color-primary-hover, var(--color-primary));
+    text-shadow: 0 0 8px color-mix(in srgb, var(--color-primary) 80%, transparent);
+    border-left: 2px solid var(--color-primary);
+    padding-left: 1rem;
+  }
+
+  .variant-futuristic .toc-link:hover::after {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Dark mode adjustments */
+  @media (prefers-color-scheme: dark) {
+    .variant-initial {
+      box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.3));
+    }
+
+    .variant-retro {
+      box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .variant-modern {
+      box-shadow: var(--shadow-lg, 0 10px 30px rgba(0, 0, 0, 0.3));
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .table-of-contents {
+      padding: 1.25rem;
+    }
+
+    .toc-title {
+      font-size: 1.125rem;
+    }
+
+    .toc-link {
+      font-size: 0.875rem;
+      padding: 0.375rem 0.5rem;
+    }
+  }
+</style>

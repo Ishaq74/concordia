@@ -1,0 +1,169 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import SignInCard from "@components/templates/auth/SignInCard.astro";
+import translations from "@i18n/fr.json";
+import { getAuth } from "@lib/auth/auth";
+
+const user = Astro.locals.user;
+const redirectPath = "/fr/profil";
+
+if (user) {
+  return Astro.redirect(redirectPath);
+}
+
+const pageTitle = translations.auth.loginTitle ?? "Connexion";
+const request = Astro.request;
+let status: { type: "success" | "error"; message: string } | null = null;
+let lastEmail = "";
+
+const safeRedirect = (url?: string | null) => {
+  if (!url || typeof url !== "string") return redirectPath;
+  if (!url.startsWith("/")) return redirectPath;
+  return url;
+};
+
+const normalizeErrorKey = (value: unknown) => {
+  if (!value || typeof value !== "string") return "";
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_");
+};
+
+const errorMessages: Record<string, string> = {};
+const registerErrorMessage = (key: string, message: string) => {
+  const normalized = normalizeErrorKey(key);
+  if (!normalized || !message) return;
+  errorMessages[normalized] = message;
+};
+
+const invalidCredentialsMessage = translations.auth.invalidCredentials ?? "Email ou mot de passe incorrect.";
+registerErrorMessage("invalid_credentials", invalidCredentialsMessage);
+registerErrorMessage("credentials_invalid", invalidCredentialsMessage);
+registerErrorMessage("wrong_password", invalidCredentialsMessage);
+registerErrorMessage("invalid_email_or_password", invalidCredentialsMessage);
+registerErrorMessage("invalid email or password", invalidCredentialsMessage);
+
+const emailNotFoundMessage = translations.auth.emailNotFound ?? "Aucun compte trouvé avec cet email.";
+registerErrorMessage("email_not_found", emailNotFoundMessage);
+registerErrorMessage("user_not_found", emailNotFoundMessage);
+
+const emailSendFailedMessage = translations.auth.emailSendFailed ?? "Erreur lors de l’envoi de l’email.";
+registerErrorMessage("email_send_failed", emailSendFailedMessage);
+
+const emailNotVerifiedMessage = translations.auth.emailNotVerified ??
+  "Votre email n'est pas encore vérifié. Consultez votre boîte de réception.";
+registerErrorMessage("email_not_verified", emailNotVerifiedMessage);
+registerErrorMessage("user_not_verified", emailNotVerifiedMessage);
+
+const tooManyAttemptsMessage = translations.auth.tooManyAttempts ??
+  "Trop de tentatives. Réessayez dans quelques minutes.";
+registerErrorMessage("too_many_attempts", tooManyAttemptsMessage);
+registerErrorMessage("rate_limited", tooManyAttemptsMessage);
+
+const resolveErrorMessage = (primary?: unknown, fallback?: unknown) => {
+  const primaryKey = normalizeErrorKey(primary);
+  if (primaryKey && errorMessages[primaryKey]) {
+    return errorMessages[primaryKey];
+  }
+  if (typeof fallback === "string" && fallback.trim().length > 0) {
+    const fallbackKey = normalizeErrorKey(fallback);
+    if (fallbackKey && errorMessages[fallbackKey]) {
+      return errorMessages[fallbackKey];
+    }
+    return fallback;
+  }
+  return translations.auth.serverError ?? "Erreur serveur ou réponse inattendue.";
+};
+
+const codeFromUnknownError = (error: unknown) => {
+  if (error && typeof error === "object") {
+    const body = (error as { body?: Record<string, unknown> }).body;
+    if (body && typeof body === "object") {
+      const code = (body as { error?: unknown }).error;
+      if (typeof code === "string" && code.length > 0) {
+        return code;
+      }
+    }
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string" && message.length > 0) {
+      return message;
+    }
+  }
+  return "invalid_credentials";
+};
+
+const forwardSetCookies = (source: Response, target: Response) => {
+  const headerProxy = source.headers as unknown as { getSetCookie?: () => string[] };
+  const cookies = headerProxy.getSetCookie?.();
+  if (Array.isArray(cookies)) {
+    cookies.forEach((cookie) => target.headers.append("set-cookie", cookie));
+    return;
+  }
+  for (const [key, value] of source.headers.entries()) {
+    if (key.toLowerCase() === "set-cookie") {
+      target.headers.append("set-cookie", value);
+    }
+  }
+};
+
+if (request.method === "POST") {
+  const formData = await request.formData();
+  const email = (formData.get("email") ?? "").toString().trim();
+  const password = (formData.get("password") ?? "").toString();
+  lastEmail = email;
+
+  if (!email || !password) {
+    status = {
+      type: "error",
+      message: translations.auth.invalidCredentials ?? "Email ou mot de passe incorrect.",
+    };
+  } else {
+    try {
+      const auth = await getAuth();
+      const response = await auth.api.signInEmail({
+        body: {
+          email,
+          password,
+          rememberMe: true,
+          callbackURL: redirectPath,
+        },
+        headers: request.headers,
+        asResponse: true,
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        const code = payload?.error ?? payload?.code ?? "invalid_credentials";
+        status = {
+          type: "error",
+          message: resolveErrorMessage(code, payload?.message),
+        };
+      } else {
+        const payload = await response.json().catch(() => ({}));
+        const redirectTarget = safeRedirect(payload?.redirect ?? redirectPath);
+        const redirectResponse = Astro.redirect(redirectTarget);
+        forwardSetCookies(response, redirectResponse);
+        return redirectResponse;
+      }
+    } catch (error) {
+      const code = codeFromUnknownError(error);
+      const fallbackMessage = error instanceof Error ? error.message : undefined;
+      status = {
+        type: "error",
+        message: resolveErrorMessage(code, fallbackMessage),
+      };
+    }
+  }
+}
+---
+
+<BaseLayout lang="fr" title={pageTitle}>
+  <section class="mx-auto flex min-h-[60vh] w-full max-w-5xl items-center justify-center px-4 py-16">
+    <SignInCard
+      translations={translations.auth}
+      title={pageTitle}
+      status={status}
+      lastEmail={lastEmail}
+    />
+  </section>
+</BaseLayout>

@@ -1,0 +1,34 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  aspectRatio?: '16/9' | '4/3' | '1/1' | 'auto';
+  objectFit?: 'cover' | 'contain' | 'fill' | 'none';
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  src,
+  alt,
+  aspectRatio = '16/9',
+  objectFit = 'cover',
+  className = '',
+  ...htmlAttributes
+} = Astro.props as Props;
+
+const aspectClass = aspectRatio !== 'auto' ? `aspect-${aspectRatio.replace('/', '-')}` : '';
+const fitClass = `object-${objectFit}`;
+
+const wrapperClasses = ['card-image-wrapper', aspectClass].filter(Boolean).join(' ');
+const imageClasses = ['card-image', fitClass, className].filter(Boolean).join(' ');
+---
+
+<div class={wrapperClasses}>
+  <img 
+    src={src} 
+    alt={alt} 
+    class={imageClasses}
+    {...htmlAttributes}
+  />
+</div>

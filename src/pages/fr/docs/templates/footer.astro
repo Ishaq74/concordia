@@ -1,0 +1,85 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import Alert from "@components/ui/Alert.astro";
+---
+
+<DocLayout 
+  title="Footer Template" 
+  description="Template Footer avec informations légales, liens et réseaux sociaux" 
+  variant="initial"
+>
+  <h1 id="footer">Footer Template</h1>
+
+  <p>
+    Le template <code class="inline-code">Footer</code> est le pied de page du site. 
+    Il contient les informations de l'entreprise, les liens utiles, les mentions légales et les réseaux sociaux.
+  </p>
+
+  <h2>Utilisation</h2>
+
+  <Code
+    lang="astro"
+    code={`---
+import Footer from '@components/templates/Footer/Footer.astro';
+---
+
+<Footer />`}
+  />
+
+  <Alert variant="initial" status="info">
+    <strong>✅ Auto-inclus :</strong> Le Footer est automatiquement inclus dans le BaseLayout.
+  </Alert>
+
+  <h2>Contenu</h2>
+
+  <ul>
+    <li>✅ Informations entreprise (nom, description, SIRET)</li>
+    <li>✅ Coordonnées de contact (email, téléphone, adresse)</li>
+    <li>✅ Liens légaux (mentions légales, politique de confidentialité, CGU)</li>
+    <li>✅ Liens réseaux sociaux</li>
+    <li>✅ Copyright automatique avec année</li>
+    <li>✅ Multilingue avec traductions i18n</li>
+  </ul>
+
+  <h2>Structure</h2>
+
+  <Code
+    lang="html"
+    code={`<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-section">
+      <!-- Entreprise -->
+    </div>
+    <div class="footer-section">
+      <!-- Contact -->
+    </div>
+    <div class="footer-section">
+      <!-- Légal -->
+    </div>
+    <div class="footer-section">
+      <!-- Réseaux sociaux -->
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© {currentYear} - Copyright</p>
+  </div>
+</footer>`}
+  />
+
+  <h2>Personnalisation</h2>
+
+  <p>Pour personnaliser le footer, modifiez les traductions dans les fichiers i18n :</p>
+
+  <Code
+    lang="json"
+    code={`{
+  "footer": {
+    "company": "Nom de l'entreprise",
+    "description": "Description",
+    "email": "contact@example.com",
+    "phone": "+33 1 23 45 67 89"
+  }
+}`}
+  />
+</DocLayout>

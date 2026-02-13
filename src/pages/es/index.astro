@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import translations from '../../i18n/es.json';
+
+const { welcome } = translations;
+---
+
+<BaseLayout title={welcome}>
+  <main>
+    <h1>{welcome}</h1>
+  </main>
+</BaseLayout>

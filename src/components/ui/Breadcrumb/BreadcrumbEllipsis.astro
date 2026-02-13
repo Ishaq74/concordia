@@ -1,0 +1,28 @@
+---
+/**
+ * BreadcrumbEllipsis - Indique des items tronqués
+ */
+
+interface Props {
+  className?: string;
+}
+
+const { className = '' } = Astro.props;
+---
+
+<span class={`breadcrumb-ellipsis ${className}`} role="presentation" aria-hidden="true">
+  <slot>
+    <span>...</span>
+  </slot>
+</span>
+
+<style>
+  .breadcrumb-ellipsis {
+    color: var(--breadcrumb-separator-color, var(--text-subtle));
+    font-size: var(--breadcrumb-font-size, 0.875rem);
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+</style>

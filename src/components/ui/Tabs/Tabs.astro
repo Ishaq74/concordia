@@ -1,0 +1,32 @@
+---
+/**
+ * Tabs - Composant conteneur pour système de tabs CSS-only (ZERO SCRIPT)
+ * 
+ * Utilise :nth-of-type() pour matcher radios et panels par position
+ * AUCUN ID en dur dans le CSS - design system réutilisable
+ * 
+ * @param {string} variant - Style variant (initial|retro|modern|futuristic)
+ * @param {string} className - Classes CSS additionnelles
+ */
+
+interface Props {
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  className?: string;
+}
+
+const {
+  variant = 'initial',
+  className = '',
+} = Astro.props;
+
+const variantClass = variant !== 'initial' ? variant : '';
+const containerClasses = [
+  'tabs-container',
+  variantClass,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<div class={containerClasses}>
+  <slot />
+</div>
