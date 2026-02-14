@@ -179,8 +179,8 @@ const faviconName = favicon ?? "../../favicon.svg";
       <slot />
     </main>
     <Footer />
-    <script type="module" src={verifyClientScript}></script>
-    <script type="module" src={forgotClientScript}></script>
+    <script is:inline type="module" src={verifyClientScript}></script>
+    <script is:inline type="module" src={forgotClientScript}></script>
   </body>
 </html>
 

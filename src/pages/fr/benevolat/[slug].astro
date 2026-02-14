@@ -1,0 +1,229 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getDrizzle } from "@database/drizzle";
+import { volunteerProject, volunteerTask, volunteerParticipation } from "@database/schemas";
+import { eq, and, asc } from "drizzle-orm";
+import translations from "@i18n/fr.json";
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+
+const t = translations;
+const locale = "fr";
+const db = await getDrizzle();
+const { slug } = Astro.params;
+
+if (!slug) return Astro.redirect(getRelativeLocaleUrl(locale, "/benevolat"));
+
+const projectRows = await db
+  .select()
+  .from(volunteerProject)
+  .where(eq(volunteerProject.slug, slug))
+  .limit(1);
+
+if (projectRows.length === 0) return Astro.redirect(getRelativeLocaleUrl(locale, "/benevolat"));
+
+const project = projectRows[0];
+
+const tasks = await db
+  .select({
+    id: volunteerTask.id,
+    title: volunteerTask.title,
+    description: volunteerTask.description,
+    requiredSkills: volunteerTask.requiredSkills,
+    maxVolunteers: volunteerTask.maxVolunteers,
+    currentVolunteers: volunteerTask.currentVolunteers,
+    scheduledDate: volunteerTask.scheduledDate,
+    estimatedHours: volunteerTask.estimatedHours,
+    status: volunteerTask.status,
+  })
+  .from(volunteerTask)
+  .where(eq(volunteerTask.projectId, project.id))
+  .orderBy(asc(volunteerTask.scheduledDate));
+
+const user = Astro.locals.user;
+let userParticipations: Set<string> = new Set();
+if (user) {
+  const participations = await db
+    .select({ taskId: volunteerParticipation.taskId })
+    .from(volunteerParticipation)
+    .where(and(eq(volunteerParticipation.userId, user.id)));
+  participations.forEach((p) => userParticipations.add(p.taskId));
+}
+
+const volunteerPercent = project.volunteerGoal ? Math.min(100, Math.round((project.volunteerCount / project.volunteerGoal) * 100)) : 0;
+const fundingPercent = project.fundingGoal ? Math.min(100, Math.round((Number(project.fundingRaised) / Number(project.fundingGoal)) * 100)) : 0;
+
+const statusLabels: Record<string, string> = {
+  recruiting: "En recrutement",
+  in_progress: "En cours",
+  completed: "Terminé",
+  draft: "Brouillon",
+  cancelled: "Annulé",
+};
+
+const taskStatusLabels: Record<string, string> = {
+  open: "Ouvert",
+  filled: "Complet",
+  in_progress: "En cours",
+  completed: "Terminé",
+  cancelled: "Annulé",
+};
+---
+
+<BaseLayout title={project.title} description={project.description ?? ""}>
+  <main class="project-detail">
+    <a href={getRelativeLocaleUrl(locale, "/benevolat")} class="back-link">← {t.common.back}</a>
+
+    <header class="project-header">
+      <div class="project-meta-top">
+        <span class:list={["status-badge", project.status]}>{statusLabels[project.status] ?? project.status}</span>
+        {project.location && <span class="location">📍 {project.location}</span>}
+      </div>
+      <h1>{project.title}</h1>
+      {project.description && <p class="project-description">{project.description}</p>}
+
+      <div class="project-progress">
+        <div class="progress-section">
+          <span class="progress-label">{t.volunteerPage.volunteers}: {project.volunteerCount} / {project.volunteerGoal ?? "∞"}</span>
+          {project.volunteerGoal && (
+            <div class="progress-bar">
+              <div class="progress-fill volunteer-fill" style={`width: ${volunteerPercent}%`}></div>
+            </div>
+          )}
+        </div>
+        {project.fundingGoal && (
+          <div class="progress-section">
+            <span class="progress-label">{t.volunteerPage.funding}: {Number(project.fundingRaised).toFixed(0)} € / {Number(project.fundingGoal).toFixed(0)} €</span>
+            <div class="progress-bar">
+              <div class="progress-fill funding-fill" style={`width: ${fundingPercent}%`}></div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {project.startDate && (
+        <div class="project-dates">
+          <span>Du {new Date(project.startDate).toLocaleDateString("fr-FR")}</span>
+          {project.endDate && <span>au {new Date(project.endDate).toLocaleDateString("fr-FR")}</span>}
+        </div>
+      )}
+
+      {project.impactSummary && (
+        <div class="impact-summary">
+          <h3>Impact</h3>
+          <p>{project.impactSummary}</p>
+        </div>
+      )}
+    </header>
+
+    <section class="tasks-section" aria-label={t.volunteerPage.tasks}>
+      <h2>{t.volunteerPage.tasks} ({tasks.length})</h2>
+      {tasks.length === 0 ? (
+        <p>Aucune tâche pour le moment.</p>
+      ) : (
+        <ul class="task-list" role="list">
+          {tasks.map((task) => (
+            <li class="task-card">
+              <div class="task-header">
+                <h3 class="task-title">{task.title}</h3>
+                <span class:list={["task-status", task.status]}>
+                  {taskStatusLabels[task.status] ?? task.status}
+                </span>
+              </div>
+              {task.description && <p class="task-description">{task.description}</p>}
+              <div class="task-meta">
+                {task.scheduledDate && (
+                  <span>{new Date(task.scheduledDate).toLocaleDateString("fr-FR")}</span>
+                )}
+                {task.estimatedHours && <span>{task.estimatedHours}h</span>}
+                <span>{task.currentVolunteers}/{task.maxVolunteers} bénévoles</span>
+              </div>
+              {task.requiredSkills && task.requiredSkills.length > 0 && (
+                <div class="task-skills">
+                  <span class="skills-label">{t.volunteerPage.skills}:</span>
+                  {task.requiredSkills.map((skill: string) => (
+                    <span class="skill-tag">{skill}</span>
+                  ))}
+                </div>
+              )}
+              {user && task.status === "open" && (
+                <div class="task-actions">
+                  {userParticipations.has(task.id) ? (
+                    <span class="joined-badge">{t.volunteerPage.joined}</span>
+                  ) : (
+                    <a
+                      href={`/api/volunteer/tasks/${task.id}?action=join`}
+                      class="join-button"
+                    >
+                      {t.volunteerPage.join}
+                    </a>
+                  )}
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+
+    {!user && project.status === "recruiting" && (
+      <section class="cta-section">
+        <a href={getRelativeLocaleUrl(locale, "/auth/connexion")} class="join-button">
+          {t.auth.signIn} — {t.volunteerPage.join}
+        </a>
+      </section>
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .project-detail { max-width: 800px; margin: 0 auto; padding: var(--space-6, 1.5rem) var(--space-4, 1rem); }
+  .back-link { color: var(--color-primary, #3b82f6); text-decoration: none; font-size: var(--text-sm, 0.875rem); font-weight: 500; display: inline-block; margin-bottom: var(--space-4, 1rem); }
+
+  .project-header { margin-bottom: var(--space-6, 1.5rem); }
+  .project-meta-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2, 0.5rem); }
+  .status-badge { font-size: var(--text-xs, 0.75rem); padding: 2px var(--space-2, 0.5rem); border-radius: var(--radius-sm, 0.25rem); font-weight: 600; }
+  .status-badge.recruiting { background: #dcfce7; color: #166534; }
+  .status-badge.in_progress { background: #dbeafe; color: #1e40af; }
+  .status-badge.completed { background: #e2e8f0; color: #475569; }
+  .location { font-size: var(--text-sm, 0.875rem); color: var(--text-muted, #94a3b8); }
+
+  .project-header h1 { font-size: var(--text-3xl, 1.875rem); font-weight: 800; margin: 0 0 var(--space-2, 0.5rem); }
+  .project-description { font-size: var(--text-lg, 1.125rem); color: var(--text-secondary, #64748b); line-height: 1.6; margin: 0 0 var(--space-4, 1rem); }
+
+  .project-progress { display: flex; flex-direction: column; gap: var(--space-3, 0.75rem); margin-bottom: var(--space-4, 1rem); }
+  .progress-section { display: flex; flex-direction: column; gap: 4px; }
+  .progress-label { font-size: var(--text-sm, 0.875rem); font-weight: 500; }
+  .progress-bar { height: 8px; background: var(--border-color, #e2e8f0); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; }
+  .volunteer-fill { background: var(--color-primary, #3b82f6); }
+  .funding-fill { background: var(--color-accent, #10b981); }
+
+  .project-dates { font-size: var(--text-sm, 0.875rem); color: var(--text-muted, #94a3b8); display: flex; gap: var(--space-1, 0.25rem); margin-bottom: var(--space-4, 1rem); }
+
+  .impact-summary { background: var(--bg-secondary, #f8f9fa); border-radius: var(--radius-md, 0.375rem); padding: var(--space-3, 0.75rem); }
+  .impact-summary h3 { font-size: var(--text-sm, 0.875rem); font-weight: 700; margin: 0 0 var(--space-1, 0.25rem); }
+  .impact-summary p { font-size: var(--text-sm, 0.875rem); margin: 0; color: var(--text-secondary, #64748b); }
+
+  .tasks-section h2 { font-size: var(--text-xl, 1.25rem); font-weight: 700; margin: 0 0 var(--space-4, 1rem); }
+  .task-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-3, 0.75rem); }
+  .task-card { border: 1px solid var(--border-color, #e2e8f0); border-radius: var(--radius-md, 0.375rem); padding: var(--space-3, 0.75rem); }
+  .task-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-2, 0.5rem); margin-bottom: var(--space-2, 0.5rem); }
+  .task-title { font-size: var(--text-base, 1rem); font-weight: 600; margin: 0; }
+  .task-status { font-size: var(--text-xs, 0.75rem); padding: 1px var(--space-1, 0.25rem); border-radius: 2px; white-space: nowrap; }
+  .task-status.open { background: #dcfce7; color: #166534; }
+  .task-status.filled { background: #fef9c3; color: #854d0e; }
+  .task-status.in_progress { background: #dbeafe; color: #1e40af; }
+  .task-status.completed { background: #e2e8f0; color: #475569; }
+  .task-description { font-size: var(--text-sm, 0.875rem); color: var(--text-secondary, #64748b); margin: 0 0 var(--space-2, 0.5rem); }
+  .task-meta { display: flex; gap: var(--space-3, 0.75rem); font-size: var(--text-xs, 0.75rem); color: var(--text-muted, #94a3b8); margin-bottom: var(--space-2, 0.5rem); }
+  .task-skills { display: flex; flex-wrap: wrap; gap: var(--space-1, 0.25rem); align-items: center; margin-bottom: var(--space-2, 0.5rem); }
+  .skills-label { font-size: var(--text-xs, 0.75rem); font-weight: 600; }
+  .skill-tag { font-size: var(--text-xs, 0.75rem); background: var(--bg-secondary, #f1f5f9); padding: 1px var(--space-2, 0.5rem); border-radius: var(--radius-sm, 0.25rem); }
+  .task-actions { margin-top: var(--space-2, 0.5rem); }
+  .join-button { display: inline-block; padding: var(--space-2, 0.5rem) var(--space-4, 1rem); background: var(--color-primary, #3b82f6); color: #fff; border-radius: var(--radius-md, 0.375rem); text-decoration: none; font-weight: 600; font-size: var(--text-sm, 0.875rem); }
+  .joined-badge { display: inline-block; padding: var(--space-2, 0.5rem) var(--space-4, 1rem); background: var(--color-accent, #10b981); color: #fff; border-radius: var(--radius-md, 0.375rem); font-weight: 600; font-size: var(--text-sm, 0.875rem); }
+
+  .cta-section { margin-top: var(--space-6, 1.5rem); text-align: center; padding-top: var(--space-4, 1rem); border-top: 1px solid var(--border-color, #e2e8f0); }
+</style>

@@ -22,7 +22,7 @@ interface Props {
 const props = Astro.props;
 const t = props.translations?.auth ?? props.translations ?? {};
 const {
-    pendingEmail,
+    pendingEmail: _pendingEmail,
     maskedEmail,
     description,
     reminder,
@@ -200,7 +200,7 @@ const {
             }
 
             try {
-                const { data, error } = await authClient.sendVerificationEmail({
+                const { data: _data, error } = await authClient.sendVerificationEmail({
                     email: decodeURIComponent(email),
                     callbackURL: "/fr/auth/profil",
                 });

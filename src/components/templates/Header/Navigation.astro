@@ -1,10 +1,10 @@
 ---
 import Dropdown from "@components/ui/Dropdown.astro";
-import { getRelativeLocaleUrl } from "astro:i18n";
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
 
 interface Props {
   variant?: "initial" | "retro" | "modern" | "futuristic";
-  isMenu?: boolean; // Mobile-optimized mode
+  isMenu?: boolean;
   class?: string;
 }
 
@@ -17,7 +17,6 @@ const {
 const currentLocale = Astro.currentLocale || "fr";
 const currentPath = Astro.url.pathname;
 
-// Import translations
 const translations = await import(`../../../i18n/${currentLocale}.json`);
 const t = translations.default;
 
@@ -25,87 +24,66 @@ const navClass = ["nav", variant !== "initial" && variant, className]
   .filter(Boolean)
   .join(" ");
 
-// Menu items pour les dropdowns
-const servicesItems = [
+// Locale-aware slug mapping
+const isFr = currentLocale === "fr";
+
+// Découvrir: Places, Sentiers, Magazine, Événements
+const discoverItems = [
   {
-    label: t.services.consulting,
-    href: getRelativeLocaleUrl(currentLocale, "services/consulting"),
+    label: t.nav.places,
+    href: getRelativeLocaleUrl(currentLocale, isFr ? "places" : "places"),
   },
   {
-    label: t.services.development,
-    href: getRelativeLocaleUrl(currentLocale, "services/development"),
+    label: t.nav.trails,
+    href: getRelativeLocaleUrl(currentLocale, isFr ? "sentiers" : "trails"),
   },
   {
-    label: t.services.design,
-    href: getRelativeLocaleUrl(currentLocale, "services/design"),
+    label: t.nav.magazine,
+    href: getRelativeLocaleUrl(currentLocale, isFr ? "articles" : "articles"),
+  },
+  {
+    label: t.nav.events,
+    href: getRelativeLocaleUrl(currentLocale, isFr ? "evenements" : "events"),
   },
 ];
 
-const blogItems = [
+// Communauté: Forum, Groupes, Annonces, Services
+const communityItems = [
   {
-    label: t.blog.news,
-    href: getRelativeLocaleUrl(currentLocale, "blog/news"),
+    label: t.nav.forum,
+    href: getRelativeLocaleUrl(currentLocale, "forum"),
   },
   {
-    label: t.blog.tutorials,
-    href: getRelativeLocaleUrl(currentLocale, "blog/tutorials"),
+    label: t.nav.groups,
+    href: getRelativeLocaleUrl(currentLocale, isFr ? "groupes" : "groups"),
   },
   {
-    label: t.blog.releases,
-    href: getRelativeLocaleUrl(currentLocale, "blog/releases"),
+    label: t.nav.classifieds,
+    href: getRelativeLocaleUrl(currentLocale, isFr ? "annonces" : "classifieds"),
+  },
+  {
+    label: t.nav.services,
+    href: getRelativeLocaleUrl(currentLocale, "services"),
   },
 ];
 
-const docsItems = [
+// S'engager: Bénévolat, Éducation, Financement, Transparence
+const engageItems = [
   {
-    label: t.docs.ui,
-    href: getRelativeLocaleUrl(currentLocale, "docs/ui"),
-    children: [
-      {
-        label: t.docs.design,
-        href: getRelativeLocaleUrl(currentLocale, "docs/design"),
-        children: [
-          {
-            label: t.docs.colors,
-            href: getRelativeLocaleUrl(currentLocale, "docs/design/colors"),
-          },
-          {
-            label: t.docs.typography,
-            href: getRelativeLocaleUrl(currentLocale, "docs/design/typography"),
-          },
-          {
-            label: t.docs.spacing,
-            href: getRelativeLocaleUrl(currentLocale, "docs/design/spacing"),
-          },
-          {
-            label: t.docs.shadows,
-            href: getRelativeLocaleUrl(currentLocale, "docs/design/shadows"),
-          },
-          {
-            label: t.docs.borders,
-            href: getRelativeLocaleUrl(currentLocale, "docs/design/borders"),
-          },
-        ],
-      },
-    ],
+    label: t.nav.volunteer,
+    href: getRelativeLocaleUrl(currentLocale, isFr ? "benevolat" : "volunteer"),
   },
   {
-    label: t.docs.components,
-    href: getRelativeLocaleUrl(currentLocale, "docs/components"),
+    label: t.nav.education,
+    href: getRelativeLocaleUrl(currentLocale, "education"),
   },
   {
-    label: t.docs.data,
-    href: getRelativeLocaleUrl(currentLocale, "docs/data"),
-    children: [
-      {
-        label: t.docs.layouts,
-        href: getRelativeLocaleUrl(currentLocale, "docs/data/layouts"),
-      },
-      {
-        label: t.docs.entities,
-        href: getRelativeLocaleUrl(currentLocale, "docs/data/entities"),
-      },
-    ],
+    label: t.nav.funding,
+    href: getRelativeLocaleUrl(currentLocale, isFr ? "financement" : "funding"),
+  },
+  {
+    label: t.nav.transparency,
+    href: getRelativeLocaleUrl(currentLocale, isFr ? "transparence" : "transparency"),
   },
 ];
 ---
@@ -113,75 +91,51 @@ const docsItems = [
 <nav class={navClass}>
   <a
     href={getRelativeLocaleUrl(currentLocale, "")}
-    class={[
-      "nav-link",
-      currentPath === getRelativeLocaleUrl(currentLocale, "") && "active",
-    ]
-      .filter(Boolean)
-      .join(" ")}
+    class:list={["nav-link", { active: currentPath === getRelativeLocaleUrl(currentLocale, "") }]}
   >
     {t.nav.home}
   </a>
 
+  <div class="nav-dropdown-wrapper">
+    <Dropdown
+      items={discoverItems}
+      variant={variant}
+      position="bottom-left"
+      triggerLabel={t.nav.discover}
+      ishover={true}
+      ismenu={isMenu}
+      class="nav-dropdown"
+    />
+  </div>
+
+  <div class="nav-dropdown-wrapper">
+    <Dropdown
+      items={communityItems}
+      variant={variant}
+      position="bottom-left"
+      triggerLabel={t.nav.community}
+      ishover={true}
+      ismenu={isMenu}
+      class="nav-dropdown"
+    />
+  </div>
+
+  <div class="nav-dropdown-wrapper">
+    <Dropdown
+      items={engageItems}
+      variant={variant}
+      position="bottom-left"
+      triggerLabel={t.nav.engage}
+      ishover={true}
+      ismenu={isMenu}
+      class="nav-dropdown"
+    />
+  </div>
+
   <a
-    href={getRelativeLocaleUrl(currentLocale, "about")}
-    class={[
-      "nav-link",
-      currentPath.startsWith(getRelativeLocaleUrl(currentLocale, "about")) &&
-        "active",
-    ]
-      .filter(Boolean)
-      .join(" ")}
+    href={getRelativeLocaleUrl(currentLocale, "docs")}
+    class:list={["nav-link", { active: currentPath.startsWith(getRelativeLocaleUrl(currentLocale, "docs")) }]}
   >
-    {t.nav.about}
+    {t.nav.docs}
   </a>
-
-  <div class="nav-dropdown-wrapper">
-    <Dropdown
-      items={servicesItems}
-      variant={variant}
-      position="bottom-left"
-      triggerLabel={t.nav.services}
-      ishover={true}
-      ismenu={isMenu}
-      class="nav-dropdown"
-    />
-  </div>
-
-  <div class="nav-dropdown-wrapper">
-    <Dropdown
-      items={blogItems}
-      variant={variant}
-      position="bottom-left"
-      triggerLabel={t.nav.blog}
-      ishover={true}
-      ismenu={isMenu}
-      class="nav-dropdown"
-    />
-  </div>
-
-  <a
-    href={getRelativeLocaleUrl(currentLocale, "contact")}
-    class={[
-      "nav-link",
-      currentPath.startsWith(getRelativeLocaleUrl(currentLocale, "contact")) &&
-        "active",
-    ]
-      .filter(Boolean)
-      .join(" ")}
-  >
-    {t.nav.contact}
-  </a>
-
-  <div class="nav-dropdown-wrapper">
-    <Dropdown
-      items={docsItems}
-      variant={variant}
-      position="bottom-left"
-      triggerLabel={t.nav.docs}
-      ishover={true}
-      ismenu={isMenu}
-      class="nav-dropdown"
-    />
-  </div>
 </nav>

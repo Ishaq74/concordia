@@ -1,0 +1,164 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getDrizzle } from "@database/drizzle";
+import { forumThread, forumPost } from "@database/schemas";
+import { eq, and, asc } from "drizzle-orm";
+import translations from "@i18n/fr.json";
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+
+const t = translations;
+const locale = "fr";
+const db = await getDrizzle();
+const { slug } = Astro.params;
+
+if (!slug) return Astro.redirect(getRelativeLocaleUrl(locale, "/forum"));
+
+const threadRows = await db
+  .select()
+  .from(forumThread)
+  .where(and(eq(forumThread.slug, slug), eq(forumThread.status, "published")))
+  .limit(1);
+
+if (threadRows.length === 0) return Astro.redirect(getRelativeLocaleUrl(locale, "/forum"));
+
+const thread = threadRows[0];
+
+const posts = await db
+  .select()
+  .from(forumPost)
+  .where(and(eq(forumPost.threadId, thread.id), eq(forumPost.status, "published")))
+  .orderBy(asc(forumPost.createdAt))
+  .limit(50);
+
+const user = Astro.locals.user;
+---
+
+<BaseLayout title={thread.title} description={`${t.forumPage.title} — ${thread.title}`}>
+  <main class="thread-detail">
+    <header class="thread-header">
+      <a href={getRelativeLocaleUrl(locale, "/forum")} class="back-link">← {t.common.back}</a>
+      <div class="thread-badges">
+        {thread.isPinned && <span class="badge">📌 {t.forumPage.pinned}</span>}
+        {thread.isLocked && <span class="badge badge-locked">🔒 {t.forumPage.locked}</span>}
+      </div>
+      <h1>{thread.title}</h1>
+      <div class="thread-meta">
+        <time datetime={thread.createdAt.toISOString()}>
+          {thread.createdAt.toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })}
+        </time>
+        <span>{thread.postCount} {t.forumPage.replies}</span>
+      </div>
+    </header>
+
+    <section class="posts-section" aria-label={t.forumPage.posts}>
+      {posts.length === 0 ? (
+        <p class="no-posts">Aucun message dans ce sujet.</p>
+      ) : (
+        <ol class="post-list" role="list">
+          {posts.map((post, index) => (
+            <li class="post-item" id={`post-${post.id}`}>
+              <div class="post-header">
+                <span class="post-number">#{index + 1}</span>
+                <time datetime={post.createdAt.toISOString()}>
+                  {post.createdAt.toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                </time>
+              </div>
+              <div class="post-content">
+                <p>{post.content}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+
+    {thread.isLocked ? (
+      <div class="thread-locked-notice">
+        <p>🔒 {t.forumPage.threadLocked}</p>
+      </div>
+    ) : user ? (
+      <section class="reply-section" aria-label={t.forumPage.reply}>
+        <h2>{t.forumPage.reply}</h2>
+        <form method="post" action={`/api/forum/threads/${slug}`} class="reply-form">
+          <textarea
+            name="content"
+            required
+            rows="4"
+            placeholder="Votre message..."
+            aria-label="Votre message"
+            class="reply-textarea"
+          ></textarea>
+          <button type="submit" class="reply-button">{t.forumPage.reply}</button>
+        </form>
+      </section>
+    ) : (
+      <div class="login-prompt">
+        <a href={getRelativeLocaleUrl(locale, "/auth/connexion")}>
+          {t.auth.signIn} pour répondre
+        </a>
+      </div>
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .thread-detail { max-width: 900px; margin: 0 auto; padding: var(--space-6, 1.5rem) var(--space-4, 1rem); }
+  .back-link { color: var(--color-primary, #3b82f6); text-decoration: none; font-size: var(--text-sm, 0.875rem); font-weight: 500; display: inline-block; margin-bottom: var(--space-4, 1rem); }
+
+  .thread-badges { display: flex; gap: var(--space-2, 0.5rem); margin-bottom: var(--space-2, 0.5rem); }
+  .badge { font-size: var(--text-xs, 0.75rem); background: var(--bg-secondary, #f1f5f9); padding: var(--space-1, 0.25rem) var(--space-2, 0.5rem); border-radius: var(--radius-sm, 0.25rem); }
+  .badge-locked { background: var(--color-error, #ef4444); color: #fff; }
+
+  .thread-header h1 { font-size: var(--text-2xl, 1.5rem); font-weight: 800; margin: 0 0 var(--space-2, 0.5rem); }
+  .thread-meta { display: flex; gap: var(--space-3, 0.75rem); font-size: var(--text-sm, 0.875rem); color: var(--text-muted, #94a3b8); margin-bottom: var(--space-6, 1.5rem); }
+
+  .post-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-4, 1rem); }
+
+  .post-item {
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: var(--radius-md, 0.375rem);
+    overflow: hidden;
+  }
+
+  .post-header {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    background: var(--bg-secondary, #f8f9fa);
+    font-size: var(--text-xs, 0.75rem);
+    color: var(--text-muted, #94a3b8);
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+  }
+
+  .post-number { font-weight: 700; }
+
+  .post-content {
+    padding: var(--space-3, 0.75rem);
+    line-height: 1.7;
+  }
+
+  .post-content p { margin: 0; white-space: pre-line; }
+  .no-posts { color: var(--text-secondary, #64748b); font-style: italic; }
+
+  .thread-locked-notice {
+    margin-top: var(--space-6, 1.5rem);
+    padding: var(--space-3, 0.75rem);
+    background: var(--bg-secondary, #f8f9fa);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: var(--radius-md, 0.375rem);
+    text-align: center;
+    color: var(--text-secondary, #64748b);
+  }
+
+  .reply-section { margin-top: var(--space-6, 1.5rem); border-top: 1px solid var(--border-color, #e2e8f0); padding-top: var(--space-4, 1rem); }
+  .reply-section h2 { font-size: var(--text-lg, 1.125rem); font-weight: 700; margin: 0 0 var(--space-3, 0.75rem); }
+
+  .reply-form { display: flex; flex-direction: column; gap: var(--space-3, 0.75rem); }
+  .reply-textarea { width: 100%; padding: var(--space-3, 0.75rem); border: 1px solid var(--border-color, #e2e8f0); border-radius: var(--radius-md, 0.375rem); font-size: var(--text-sm, 0.875rem); font-family: inherit; resize: vertical; }
+  .reply-button { align-self: flex-end; padding: var(--space-2, 0.5rem) var(--space-4, 1rem); background: var(--color-primary, #3b82f6); color: #fff; border: none; border-radius: var(--radius-md, 0.375rem); cursor: pointer; font-weight: 600; }
+
+  .login-prompt { margin-top: var(--space-6, 1.5rem); text-align: center; }
+  .login-prompt a { color: var(--color-primary, #3b82f6); font-weight: 600; }
+</style>

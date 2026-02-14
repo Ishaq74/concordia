@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { getAuth } from './auth';
 
 // Define RBAC/ABAC enums and helpers for test matrix

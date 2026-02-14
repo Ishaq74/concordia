@@ -3,7 +3,6 @@ import { Client } from 'pg';
 
 config();
 
-const USE_PROD_DB = process.env.USE_PROD_DB === 'true';
 const urlLocal = process.env.DATABASE_URL_LOCAL;
 const urlProd = process.env.DATABASE_URL_PROD;
 

@@ -1,5 +1,5 @@
 ---
-import { getRelativeLocaleUrl } from 'astro:i18n';
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
 import { Icon } from 'astro-icon/components';
 
 interface Props {
@@ -42,11 +42,35 @@ const footerClass = [
 
 const currentYear = new Date().getFullYear();
 
+const isFr = currentLocale === 'fr';
+
 // Social links
 const socialLinks = [
-  { name: 'GitHub', icon: 'mdi:github', href: 'https://github.com' },
-  { name: 'Twitter', icon: 'mdi:twitter', href: 'https://twitter.com' },
-  { name: 'LinkedIn', icon: 'mdi:linkedin', href: 'https://linkedin.com' },
+  { name: 'Facebook', icon: 'mdi:facebook', href: 'https://facebook.com/concordia-annecy' },
+  { name: 'Instagram', icon: 'mdi:instagram', href: 'https://instagram.com/concordia_annecy' },
+  { name: 'Twitter', icon: 'mdi:twitter', href: 'https://twitter.com/concordia_ancy' },
+];
+
+// Footer nav columns
+const discoverLinks = [
+  { label: t.nav.places, href: getRelativeLocaleUrl(currentLocale, 'places') },
+  { label: t.nav.events, href: getRelativeLocaleUrl(currentLocale, isFr ? 'evenements' : 'events') },
+  { label: t.nav.trails, href: getRelativeLocaleUrl(currentLocale, isFr ? 'sentiers' : 'trails') },
+  { label: t.nav.magazine, href: getRelativeLocaleUrl(currentLocale, isFr ? 'articles' : 'articles') },
+];
+
+const communityLinks = [
+  { label: t.nav.forum, href: getRelativeLocaleUrl(currentLocale, 'forum') },
+  { label: t.nav.groups, href: getRelativeLocaleUrl(currentLocale, isFr ? 'groupes' : 'groups') },
+  { label: t.nav.classifieds, href: getRelativeLocaleUrl(currentLocale, isFr ? 'annonces' : 'classifieds') },
+  { label: t.nav.services, href: getRelativeLocaleUrl(currentLocale, 'services') },
+];
+
+const engageLinks = [
+  { label: t.nav.volunteer, href: getRelativeLocaleUrl(currentLocale, isFr ? 'benevolat' : 'volunteer') },
+  { label: t.nav.education, href: getRelativeLocaleUrl(currentLocale, 'education') },
+  { label: t.nav.funding, href: getRelativeLocaleUrl(currentLocale, isFr ? 'financement' : 'funding') },
+  { label: t.nav.transparency, href: getRelativeLocaleUrl(currentLocale, isFr ? 'transparence' : 'transparency') },
 ];
 ---
 
@@ -56,23 +80,44 @@ const socialLinks = [
     <div class="footer-grid">
       
       <!-- Company Info -->
-      <div class="footer-section">
+      <div class="footer-section footer-brand">
         <h3 class="footer-title">{t.footer.company}</h3>
         <p class="footer-text">{t.footer.description}</p>
         <p class="footer-text footer-siret">{t.footer.siret}</p>
       </div>
       
-      <!-- Navigation Links -->
+      <!-- Découvrir -->
       {config.showNavPrimary && (
         <div class="footer-section">
-          <h3 class="footer-title">{t.nav.home}</h3>
+          <h3 class="footer-title">{t.footer.navDiscover}</h3>
           <ul class="footer-list">
-            <li><a href={getRelativeLocaleUrl(currentLocale, '')} class="footer-link">{t.nav.home}</a></li>
-            <li><a href={getRelativeLocaleUrl(currentLocale, 'about')} class="footer-link">{t.nav.about}</a></li>
-            <li><a href={getRelativeLocaleUrl(currentLocale, 'services')} class="footer-link">{t.nav.services}</a></li>
-            <li><a href={getRelativeLocaleUrl(currentLocale, 'blog')} class="footer-link">{t.nav.blog}</a></li>
-            <li><a href={getRelativeLocaleUrl(currentLocale, 'contact')} class="footer-link">{t.nav.contact}</a></li>
-            <li><a href={getRelativeLocaleUrl(currentLocale, 'docs')} class="footer-link">{t.nav.docs}</a></li>
+            {discoverLinks.map((link) => (
+              <li><a href={link.href} class="footer-link">{link.label}</a></li>
+            ))}
+          </ul>
+        </div>
+      )}
+      
+      <!-- Communauté -->
+      {config.showNavPrimary && (
+        <div class="footer-section">
+          <h3 class="footer-title">{t.footer.navCommunity}</h3>
+          <ul class="footer-list">
+            {communityLinks.map((link) => (
+              <li><a href={link.href} class="footer-link">{link.label}</a></li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <!-- S'engager -->
+      {config.showNavPrimary && (
+        <div class="footer-section">
+          <h3 class="footer-title">{t.footer.navEngage}</h3>
+          <ul class="footer-list">
+            {engageLinks.map((link) => (
+              <li><a href={link.href} class="footer-link">{link.label}</a></li>
+            ))}
           </ul>
         </div>
       )}
@@ -95,17 +140,12 @@ const socialLinks = [
               </a>
             </li>
           </ul>
-        </div>
-      )}
-      
-      <!-- Address -->
-      {config.showAddress && (
-        <div class="footer-section">
-          <h3 class="footer-title">{t.footer.address}</h3>
-          <address class="footer-address">
-            <p class="footer-text">{t.footer.street}</p>
-            <p class="footer-text">{t.footer.city}</p>
-          </address>
+          {config.showAddress && (
+            <address class="footer-address">
+              <p class="footer-text">{t.footer.street}</p>
+              <p class="footer-text">{t.footer.city}</p>
+            </address>
+          )}
         </div>
       )}
       

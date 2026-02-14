@@ -1,0 +1,148 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getDrizzle } from "@database/drizzle";
+import { fundingCampaign, donation } from "@database/schemas";
+import { eq, desc } from "drizzle-orm";
+import translations from "@i18n/fr.json";
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+
+const t = translations;
+const locale = "fr";
+const db = await getDrizzle();
+const { slug } = Astro.params;
+
+if (!slug) return Astro.redirect(getRelativeLocaleUrl(locale, "/financement"));
+
+const campaignRows = await db
+  .select()
+  .from(fundingCampaign)
+  .where(eq(fundingCampaign.slug, slug))
+  .limit(1);
+
+if (campaignRows.length === 0) return Astro.redirect(getRelativeLocaleUrl(locale, "/financement"));
+
+const campaign = campaignRows[0];
+
+const recentDonations = await db
+  .select({
+    id: donation.id,
+    amount: donation.amount,
+    isAnonymous: donation.isAnonymous,
+    message: donation.message,
+    createdAt: donation.createdAt,
+  })
+  .from(donation)
+  .where(eq(donation.campaignId, campaign.id))
+  .orderBy(desc(donation.createdAt))
+  .limit(10);
+
+const percent = campaign.goalAmount ? Math.min(100, Math.round((Number(campaign.raisedAmount) / Number(campaign.goalAmount)) * 100)) : 0;
+const daysLeft = campaign.deadline ? Math.max(0, Math.ceil((new Date(campaign.deadline).getTime() - Date.now()) / 86400000)) : null;
+const user = Astro.locals.user;
+---
+
+<BaseLayout title={campaign.title} description={campaign.description ?? ""}>
+  <main class="campaign-detail">
+    <a href={getRelativeLocaleUrl(locale, "/financement")} class="back-link">← {t.common.back}</a>
+
+    <header class="campaign-header">
+      <h1>{campaign.title}</h1>
+      {campaign.description && <p class="campaign-description">{campaign.description}</p>}
+    </header>
+
+    <section class="campaign-progress">
+      <div class="progress-bar">
+        <div class="progress-fill" style={`width: ${percent}%`}></div>
+      </div>
+      <div class="progress-stats">
+        <div class="stat-main">
+          <span class="amount-raised">{Number(campaign.raisedAmount).toLocaleString("fr-FR")} {campaign.currency}</span>
+          <span class="amount-goal">collectés sur {Number(campaign.goalAmount).toLocaleString("fr-FR")} {campaign.currency}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-item">{percent}% atteint</span>
+          <span class="stat-item">{campaign.donorCount} donateurs</span>
+          {daysLeft !== null && <span class="stat-item">{daysLeft} jours restants</span>}
+        </div>
+      </div>
+    </section>
+
+    <section class="campaign-actions">
+      {campaign.status === "active" ? (
+        user ? (
+          <a href={`/api/funding/campaigns/${campaign.slug}?action=donate`} class="donate-button">
+            {t.volunteerPage.donate}
+          </a>
+        ) : (
+          <a href={getRelativeLocaleUrl(locale, "/auth/connexion")} class="donate-button">
+            {t.auth.signIn} — {t.volunteerPage.donate}
+          </a>
+        )
+      ) : campaign.status === "funded" ? (
+        <span class="funded-badge">{t.volunteerPage.goalReached} ✓</span>
+      ) : (
+        <span class="expired-badge">Campagne terminée</span>
+      )}
+    </section>
+
+    {campaign.deadline && (
+      <div class="campaign-meta">
+        <span>Date limite : {new Date(campaign.deadline).toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" })}</span>
+      </div>
+    )}
+
+    {recentDonations.length > 0 && (
+      <section class="donations-section" aria-label="Dons récents">
+        <h2>Dons récents</h2>
+        <ul class="donation-list" role="list">
+          {recentDonations.map((d) => (
+            <li class="donation-item">
+              <div class="donation-header">
+                <span class="donor-name">{d.isAnonymous ? "Anonyme" : "Donateur"}</span>
+                <span class="donation-amount">{Number(d.amount).toLocaleString("fr-FR")} {campaign.currency}</span>
+              </div>
+              {d.message && <p class="donation-message">{d.message}</p>}
+              {d.createdAt && <span class="donation-date">{new Date(d.createdAt).toLocaleDateString("fr-FR")}</span>}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .campaign-detail { max-width: 800px; margin: 0 auto; padding: var(--space-6, 1.5rem) var(--space-4, 1rem); }
+  .back-link { color: var(--color-primary, #3b82f6); text-decoration: none; font-size: var(--text-sm, 0.875rem); font-weight: 500; display: inline-block; margin-bottom: var(--space-4, 1rem); }
+
+  .campaign-header h1 { font-size: var(--text-3xl, 1.875rem); font-weight: 800; margin: 0 0 var(--space-2, 0.5rem); }
+  .campaign-description { font-size: var(--text-lg, 1.125rem); color: var(--text-secondary, #64748b); line-height: 1.6; margin: 0 0 var(--space-6, 1.5rem); }
+
+  .campaign-progress { background: var(--bg-secondary, #f8f9fa); border-radius: var(--radius-lg, 0.5rem); padding: var(--space-4, 1rem); margin-bottom: var(--space-4, 1rem); }
+  .progress-bar { height: 12px; background: var(--border-color, #e2e8f0); border-radius: 6px; overflow: hidden; margin-bottom: var(--space-3, 0.75rem); }
+  .progress-fill { height: 100%; background: var(--color-accent, #10b981); border-radius: 6px; transition: width 0.3s; }
+  .progress-stats { display: flex; flex-direction: column; gap: var(--space-2, 0.5rem); }
+  .stat-main { display: flex; gap: var(--space-2, 0.5rem); align-items: baseline; }
+  .amount-raised { font-size: var(--text-2xl, 1.5rem); font-weight: 800; color: var(--color-accent, #10b981); }
+  .amount-goal { font-size: var(--text-sm, 0.875rem); color: var(--text-muted, #94a3b8); }
+  .stat-row { display: flex; gap: var(--space-3, 0.75rem); font-size: var(--text-sm, 0.875rem); color: var(--text-secondary, #64748b); }
+
+  .campaign-actions { margin-bottom: var(--space-4, 1rem); }
+  .donate-button { display: inline-block; padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem); background: var(--color-accent, #10b981); color: #fff; border-radius: var(--radius-md, 0.375rem); text-decoration: none; font-weight: 700; font-size: var(--text-lg, 1.125rem); }
+  .funded-badge { display: inline-block; padding: var(--space-2, 0.5rem) var(--space-4, 1rem); background: #dcfce7; color: #166534; border-radius: var(--radius-md, 0.375rem); font-weight: 700; }
+  .expired-badge { display: inline-block; padding: var(--space-2, 0.5rem) var(--space-4, 1rem); background: #e2e8f0; color: #475569; border-radius: var(--radius-md, 0.375rem); font-weight: 600; }
+
+  .campaign-meta { font-size: var(--text-sm, 0.875rem); color: var(--text-muted, #94a3b8); margin-bottom: var(--space-6, 1.5rem); }
+
+  .donations-section { margin-top: var(--space-6, 1.5rem); border-top: 1px solid var(--border-color, #e2e8f0); padding-top: var(--space-4, 1rem); }
+  .donations-section h2 { font-size: var(--text-xl, 1.25rem); font-weight: 700; margin: 0 0 var(--space-4, 1rem); }
+  .donation-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-3, 0.75rem); }
+  .donation-item { padding: var(--space-3, 0.75rem); border: 1px solid var(--border-color, #e2e8f0); border-radius: var(--radius-md, 0.375rem); }
+  .donation-header { display: flex; justify-content: space-between; align-items: center; }
+  .donor-name { font-weight: 600; font-size: var(--text-sm, 0.875rem); }
+  .donation-amount { font-weight: 700; color: var(--color-accent, #10b981); }
+  .donation-message { font-size: var(--text-sm, 0.875rem); color: var(--text-secondary, #64748b); margin: var(--space-1, 0.25rem) 0 0; font-style: italic; }
+  .donation-date { font-size: var(--text-xs, 0.75rem); color: var(--text-muted, #94a3b8); }
+</style>

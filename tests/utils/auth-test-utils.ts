@@ -1,12 +1,10 @@
-import { randomUUID, createHash } from 'crypto'
+import { randomUUID } from 'crypto'
 import { getAuth } from '@/lib/auth/auth'
 import { getTestDb } from '../config/test-db'
 import {
   user,
-  session,
   organization,
   member,
-  verification,
 } from '@database/schemas'
 import { eq } from 'drizzle-orm'
 
@@ -170,4 +168,12 @@ export async function createTestOrganization(ownerId: string, name?: string) {
 export async function clearTestData() {
   usedEmails.clear()
   usedUsernames.clear()
+}
+
+/** Fetch all audit log entries ordered by creation time. */
+export async function getAuditLogs() {
+  const { getDrizzle } = await import('@database/drizzle')
+  const { auditLog } = await import('@database/schemas')
+  const db = await getDrizzle()
+  return db.select().from(auditLog).orderBy(auditLog.createdAt)
 }

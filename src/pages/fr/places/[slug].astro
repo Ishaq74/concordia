@@ -1,0 +1,276 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getDrizzle } from "@database/drizzle";
+import { place, placeTranslation, review, categoryTranslation } from "@database/schemas";
+import { eq, and, desc } from "drizzle-orm";
+import translations from "@i18n/fr.json";
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+
+const t = translations;
+const locale = "fr";
+const db = await getDrizzle();
+const { slug } = Astro.params;
+
+if (!slug) return Astro.redirect(getRelativeLocaleUrl(locale, "/places"));
+
+// Fetch place with translation
+const placeRows = await db
+  .select()
+  .from(place)
+  .where(and(eq(place.slug, slug), eq(place.status, "published")))
+  .limit(1);
+
+if (placeRows.length === 0) return Astro.redirect(getRelativeLocaleUrl(locale, "/places"));
+
+const p = placeRows[0];
+
+const translationRows = await db
+  .select()
+  .from(placeTranslation)
+  .where(and(eq(placeTranslation.placeId, p.id), eq(placeTranslation.language, locale)))
+  .limit(1);
+
+// Fallback to FR
+const tr = translationRows[0] ?? (
+  await db
+    .select()
+    .from(placeTranslation)
+    .where(and(eq(placeTranslation.placeId, p.id), eq(placeTranslation.language, "fr")))
+    .limit(1)
+)[0];
+
+// Category name
+const catTranslation = await db
+  .select({ name: categoryTranslation.name })
+  .from(categoryTranslation)
+  .where(and(eq(categoryTranslation.categoryId, p.categoryId), eq(categoryTranslation.lang, locale)))
+  .limit(1);
+
+const categoryName = catTranslation[0]?.name ?? "";
+
+// Reviews
+const reviews = await db
+  .select()
+  .from(review)
+  .where(and(eq(review.placeId, p.id), eq(review.status, "published")))
+  .orderBy(desc(review.createdAt))
+  .limit(10);
+
+const user = Astro.locals.user;
+const isOwner = user?.id === p.ownerId;
+---
+
+<BaseLayout title={tr?.name ?? slug} description={tr?.description ?? ""}>
+  <main class="place-detail">
+    <header class="place-header">
+      <div class="place-meta">
+        <a href={getRelativeLocaleUrl(locale, "/places")} class="back-link">← {t.common.back}</a>
+        <span class="place-category">{categoryName}</span>
+        <span class="place-type">{p.type}</span>
+      </div>
+      <h1>{tr?.name ?? slug}</h1>
+      {tr?.description && <p class="place-description">{tr.description}</p>}
+      {p.ratingCount && p.ratingCount > 0 && (
+        <div class="place-rating" aria-label={`${t.places.rating}: ${p.ratingAvg}/5`}>
+          <span class="rating-stars">{"★".repeat(Math.round(Number(p.ratingAvg ?? 0)))}</span>
+          <span class="rating-value">{Number(p.ratingAvg ?? 0).toFixed(1)}/5</span>
+          <span class="rating-count">({p.ratingCount} {t.places.reviews.toLowerCase()})</span>
+        </div>
+      )}
+    </header>
+
+    <div class="place-content">
+      <section class="place-info">
+        {p.email && (
+          <div class="info-row">
+            <strong>{t.places.contact}:</strong>
+            <a href={`mailto:${p.email}`}>{p.email}</a>
+          </div>
+        )}
+        {p.phone && (
+          <div class="info-row">
+            <strong>Téléphone:</strong>
+            <a href={`tel:${p.phone}`}>{p.phone}</a>
+          </div>
+        )}
+        {p.website && (
+          <div class="info-row">
+            <strong>Site web:</strong>
+            <a href={p.website} target="_blank" rel="noopener noreferrer">{p.website}</a>
+          </div>
+        )}
+        {p.priceRange && (
+          <div class="info-row">
+            <strong>{t.places.priceRange}:</strong>
+            <span>{p.priceRange}</span>
+          </div>
+        )}
+      </section>
+
+      <section class="place-reviews" aria-label={t.places.reviews}>
+        <h2>{t.places.reviews} ({p.ratingCount ?? 0})</h2>
+        {reviews.length === 0 ? (
+          <p class="no-reviews">{t.places.noReviews}</p>
+        ) : (
+          <ul class="review-list" role="list">
+            {reviews.map((r) => (
+              <li class="review-item">
+                <div class="review-header">
+                  <span class="review-rating">{"★".repeat(Math.round(Number(r.rating)))}</span>
+                  <time datetime={r.createdAt.toISOString()}>
+                    {r.createdAt.toLocaleDateString(locale)}
+                  </time>
+                </div>
+                <p class="review-content">{r.content}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {user && !isOwner && (
+          <div class="write-review">
+            <a
+              href={`${getRelativeLocaleUrl(locale, `/places/${slug}`)}#review-form`}
+              class="write-review-link"
+            >
+              {t.places.writeReview}
+            </a>
+          </div>
+        )}
+      </section>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .place-detail {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--space-6, 1.5rem) var(--space-4, 1rem);
+  }
+
+  .place-header {
+    margin-bottom: var(--space-6, 1.5rem);
+  }
+
+  .place-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3, 0.75rem);
+    margin-bottom: var(--space-3, 0.75rem);
+  }
+
+  .back-link {
+    color: var(--color-primary, #3b82f6);
+    text-decoration: none;
+    font-size: var(--text-sm, 0.875rem);
+    font-weight: 500;
+  }
+
+  .place-category,
+  .place-type {
+    font-size: var(--text-xs, 0.75rem);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted, #94a3b8);
+    background: var(--bg-secondary, #f1f5f9);
+    padding: var(--space-1, 0.25rem) var(--space-2, 0.5rem);
+    border-radius: var(--radius-sm, 0.25rem);
+  }
+
+  .place-header h1 {
+    font-size: var(--text-3xl, 1.875rem);
+    font-weight: 800;
+    margin: 0 0 var(--space-2, 0.5rem);
+  }
+
+  .place-description {
+    font-size: var(--text-lg, 1.125rem);
+    color: var(--text-secondary, #64748b);
+    margin: 0 0 var(--space-3, 0.75rem);
+    line-height: 1.6;
+  }
+
+  .place-rating {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 0.5rem);
+    font-size: var(--text-base, 1rem);
+  }
+
+  .rating-stars { color: var(--color-warning, #f59e0b); font-size: var(--text-lg, 1.125rem); }
+  .rating-value { font-weight: 700; }
+  .rating-count { color: var(--text-muted, #94a3b8); }
+
+  .place-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6, 1.5rem);
+  }
+
+  .place-info {
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: var(--radius-lg, 0.5rem);
+    padding: var(--space-4, 1rem);
+  }
+
+  .info-row {
+    display: flex;
+    gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) 0;
+    border-bottom: 1px solid var(--border-color-light, #f1f5f9);
+    font-size: var(--text-sm, 0.875rem);
+  }
+
+  .info-row:last-child { border-bottom: none; }
+  .info-row a { color: var(--color-primary, #3b82f6); text-decoration: none; }
+
+  .place-reviews h2 {
+    font-size: var(--text-xl, 1.25rem);
+    font-weight: 700;
+    margin: 0 0 var(--space-4, 1rem);
+  }
+
+  .review-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4, 1rem);
+  }
+
+  .review-item {
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: var(--radius-md, 0.375rem);
+    padding: var(--space-3, 0.75rem);
+  }
+
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-2, 0.5rem);
+    font-size: var(--text-sm, 0.875rem);
+  }
+
+  .review-rating { color: var(--color-warning, #f59e0b); }
+  .review-content { margin: 0; font-size: var(--text-sm, 0.875rem); line-height: 1.5; }
+  .no-reviews { color: var(--text-secondary, #64748b); font-style: italic; }
+
+  .write-review {
+    margin-top: var(--space-4, 1rem);
+  }
+
+  .write-review-link {
+    display: inline-block;
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+    background: var(--color-primary, #3b82f6);
+    color: #fff;
+    border-radius: var(--radius-md, 0.375rem);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: var(--text-sm, 0.875rem);
+  }
+</style>

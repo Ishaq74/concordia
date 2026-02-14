@@ -1,3 +1,4 @@
+
 import { config } from 'dotenv';
 import { getPgClient } from '../../src/database/drizzle';
 import { drizzle } from 'drizzle-orm/node-postgres';
@@ -11,10 +12,31 @@ config();
 const isProd = process.env.USE_PROD_DB === 'true';
 process.env.DATABASE_URL = isProd ? process.env.DATABASE_URL_PROD : process.env.DATABASE_URL_LOCAL;
 
+
 async function seed() {
+  const args = process.argv.slice(2);
+  const doReset = args.includes('--reset');
   const client = getPgClient();
   await client.connect();
   const db = drizzle(client);
+
+  if (doReset) {
+    // Récupère la liste des tables dynamiquement
+    const { rows: tables } = await client.query(`SELECT tablename FROM pg_tables WHERE schemaname = 'public'`);
+    // Désactive les contraintes FK
+    await client.query('SET session_replication_role = replica;');
+    for (const { tablename } of tables) {
+      try {
+        await client.query(`TRUNCATE TABLE "${tablename}" RESTART IDENTITY CASCADE;`);
+        console.log(`[RESET] Table vidée: ${tablename}`);
+      } catch (err) {
+        console.error(`[ERR] Reset table ${tablename}:`, err);
+      }
+    }
+    // Réactive les contraintes FK
+    await client.query('SET session_replication_role = DEFAULT;');
+    console.log('[RESET] Toutes les tables ont été vidées.');
+  }
 
   function normalizeValue(v: any) {
     if (typeof v === 'boolean') return v ? 1 : 0;
@@ -27,8 +49,8 @@ async function seed() {
     return out;
   }
 
-  const schemaDir = path.resolve(process.cwd(), 'src/lib/database/schemas');
-  const dataDir = path.resolve(process.cwd(), 'src/lib/database/data');
+  const schemaDir = path.resolve(process.cwd(), 'src/database/schemas');
+  const dataDir = path.resolve(process.cwd(), 'src/database/data');
   const schemaFiles = fs.readdirSync(schemaDir).filter(f => f.endsWith('.ts') && !f.startsWith('index'));
   const dataFiles = fs.readdirSync(dataDir)
     .filter(f => f.endsWith('.data.ts'))
@@ -105,7 +127,11 @@ async function seed() {
       }
       console.log(`[OK] ${baseName} -> ${chosenSchemaFile} (${rows.length} lignes)`);
     } catch (err) {
-      console.error(`[ERR] ${baseName}:`, err);
+      if (err && err.message) {
+        console.error(`[ERR] ${baseName}: ${err.message}`);
+      } else {
+        console.error(`[ERR] ${baseName}:`, err);
+      }
     }
   }
 

@@ -1,0 +1,201 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getDrizzle } from "@database/drizzle";
+import { localService, serviceAvailability } from "@database/schemas";
+import { eq, and } from "drizzle-orm";
+import translations from "@i18n/fr.json";
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+
+const t = translations;
+const locale = "fr";
+const db = await getDrizzle();
+const { id } = Astro.params;
+
+if (!id) return Astro.redirect(getRelativeLocaleUrl(locale, "/services"));
+
+const serviceRows = await db
+  .select()
+  .from(localService)
+  .where(and(eq(localService.id, id), eq(localService.status, "active")))
+  .limit(1);
+
+if (serviceRows.length === 0) return Astro.redirect(getRelativeLocaleUrl(locale, "/services"));
+
+const s = serviceRows[0];
+
+const availabilities = await db
+  .select()
+  .from(serviceAvailability)
+  .where(and(eq(serviceAvailability.serviceId, s.id), eq(serviceAvailability.isAvailable, true)))
+  .orderBy(serviceAvailability.dayOfWeek);
+
+const dayNames = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+
+const user = Astro.locals.user;
+const isProvider = user?.id === s.providerId;
+---
+
+<BaseLayout title={s.title} description={s.description}>
+  <main class="service-detail">
+    <header class="service-header">
+      <a href={getRelativeLocaleUrl(locale, "/services")} class="back-link">← {t.common.back}</a>
+      <h1>{s.title}</h1>
+      <p class="service-description">{s.description}</p>
+
+      <div class="service-key-info">
+        {s.basePrice && (
+          <div class="info-item">
+            <strong>Tarif:</strong>
+            <span>{Number(s.basePrice).toFixed(2)} {s.currency}{s.priceType ? ` / ${s.priceType}` : ""}</span>
+          </div>
+        )}
+        {s.durationMinutes && (
+          <div class="info-item">
+            <strong>Durée:</strong>
+            <span>{s.durationMinutes} minutes</span>
+          </div>
+        )}
+        {s.isMobile && (
+          <div class="info-item">
+            <strong>Mobilité:</strong>
+            <span>Se déplace chez vous</span>
+          </div>
+        )}
+        {s.maxParticipants && (
+          <div class="info-item">
+            <strong>Capacité:</strong>
+            <span>{s.maxParticipants} participants max</span>
+          </div>
+        )}
+        {s.cancellationHours && (
+          <div class="info-item">
+            <strong>Annulation:</strong>
+            <span>Jusqu'à {s.cancellationHours}h avant</span>
+          </div>
+        )}
+      </div>
+    </header>
+
+    {availabilities.length > 0 && (
+      <section class="service-availability" aria-label={t.servicesPage.availability}>
+        <h2>{t.servicesPage.availability}</h2>
+        <ul class="availability-list" role="list">
+          {availabilities.map((av) => (
+            <li class="availability-item">
+              <strong>{dayNames[av.dayOfWeek]}:</strong>
+              <span>{av.startTime} — {av.endTime}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {!isProvider && user && (
+      <section class="service-actions">
+        <a href={getRelativeLocaleUrl(locale, `/reservations?service=${s.id}`)} class="book-button">
+          {t.servicesPage.book}
+        </a>
+      </section>
+    )}
+
+    {!user && (
+      <section class="service-actions">
+        <a href={getRelativeLocaleUrl(locale, "/auth/connexion")} class="book-button">
+          {t.auth.signIn} — {t.servicesPage.book}
+        </a>
+      </section>
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .service-detail {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-6, 1.5rem) var(--space-4, 1rem);
+  }
+
+  .back-link {
+    color: var(--color-primary, #3b82f6);
+    text-decoration: none;
+    font-size: var(--text-sm, 0.875rem);
+    font-weight: 500;
+    display: inline-block;
+    margin-bottom: var(--space-4, 1rem);
+  }
+
+  .service-header h1 {
+    font-size: var(--text-3xl, 1.875rem);
+    font-weight: 800;
+    margin: 0 0 var(--space-2, 0.5rem);
+  }
+
+  .service-description {
+    font-size: var(--text-lg, 1.125rem);
+    color: var(--text-secondary, #64748b);
+    line-height: 1.6;
+    margin: 0 0 var(--space-4, 1rem);
+  }
+
+  .service-key-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2, 0.5rem);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: var(--radius-lg, 0.5rem);
+    padding: var(--space-4, 1rem);
+    background: var(--bg-secondary, #f8f9fa);
+  }
+
+  .info-item {
+    display: flex;
+    gap: var(--space-2, 0.5rem);
+    font-size: var(--text-sm, 0.875rem);
+  }
+
+  .service-availability {
+    margin-top: var(--space-6, 1.5rem);
+  }
+
+  .service-availability h2 {
+    font-size: var(--text-xl, 1.25rem);
+    font-weight: 700;
+    margin: 0 0 var(--space-3, 0.75rem);
+  }
+
+  .availability-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1, 0.25rem);
+  }
+
+  .availability-item {
+    display: flex;
+    gap: var(--space-2, 0.5rem);
+    font-size: var(--text-sm, 0.875rem);
+    padding: var(--space-2, 0.5rem) 0;
+    border-bottom: 1px solid var(--border-color-light, #f1f5f9);
+  }
+
+  .service-actions {
+    margin-top: var(--space-6, 1.5rem);
+    padding-top: var(--space-4, 1rem);
+    border-top: 1px solid var(--border-color, #e2e8f0);
+  }
+
+  .book-button {
+    display: inline-block;
+    padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem);
+    background: var(--color-primary, #3b82f6);
+    color: #fff;
+    border-radius: var(--radius-md, 0.375rem);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: var(--text-base, 1rem);
+  }
+</style>

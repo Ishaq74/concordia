@@ -7,7 +7,7 @@ import { admin } from "better-auth/plugins";
 import { ac, roles, checkPermission } from "./permissions";
 import { validateUserInput } from "./validate-user";
 import { smtp } from "@lib/smtp/smtp";
-import { auditLog } from "@database/schemas";
+import { auditLog, profile, wallet, userRole } from "@database/schemas";
 import { randomUUID } from "crypto";
 
 // ==================== HELPERS ====================
@@ -184,14 +184,37 @@ export async function getAuth() {
         create: {
           after: async (user: any) => {
             try {
-              await db.insert(auditLog).values({
-                id: randomUUID(),
-                action: "signup",
-                userId: user.id,
-                data: { email: user.email, username: user.username },
-              });
+              const derivedUsername = user.username || user.email.split("@")[0].replace(/[^a-zA-Z0-9-]/g, "-").slice(0, 30);
+
+              await Promise.all([
+                db.insert(profile).values({
+                  id: randomUUID(),
+                  userId: user.id,
+                  username: derivedUsername,
+                  fullName: user.name || null,
+                  preferredLanguage: "fr",
+                }),
+                db.insert(wallet).values({
+                  id: randomUUID(),
+                  userId: user.id,
+                  balance: "0.00",
+                  currency: "EUR",
+                }),
+                db.insert(userRole).values({
+                  id: randomUUID(),
+                  userId: user.id,
+                  role: "citizen",
+                  grantedBy: null,
+                }),
+                db.insert(auditLog).values({
+                  id: randomUUID(),
+                  action: "signup",
+                  userId: user.id,
+                  data: { email: user.email, username: derivedUsername },
+                }),
+              ]);
             } catch (e) {
-              console.error("Audit: signup failed", e);
+              console.error("Post-signup hook failed", e);
             }
           },
         },
@@ -295,7 +318,7 @@ if (DATABASE_URL) {
         ipAddressHeaders: ["x-real-ip", "x-forwarded-for", "cf-connecting-ip"],
         disableIpTracking: false,
       },
-      onError: (error: any, ctx: any) => {
+      onError: (error: any, _ctx: any) => {
         console.error("Better Auth Error:", error.message);
       },
     },
@@ -304,13 +327,39 @@ if (DATABASE_URL) {
       user: {
         create: {
           after: async (user: any) => {
-            // CLI doesn't need audit logging
+            try {
+              const derivedUsername = user.username || user.email.split("@")[0].replace(/[^a-zA-Z0-9-]/g, "-").slice(0, 30);
+
+              await Promise.all([
+                db.insert(profile).values({
+                  id: randomUUID(),
+                  userId: user.id,
+                  username: derivedUsername,
+                  fullName: user.name || null,
+                  preferredLanguage: "fr",
+                }),
+                db.insert(wallet).values({
+                  id: randomUUID(),
+                  userId: user.id,
+                  balance: "0.00",
+                  currency: "EUR",
+                }),
+                db.insert(userRole).values({
+                  id: randomUUID(),
+                  userId: user.id,
+                  role: "citizen",
+                  grantedBy: null,
+                }),
+              ]);
+            } catch (e) {
+              console.error("CLI post-signup hook failed", e);
+            }
           },
         },
       },
       session: {
         create: {
-          after: async (session: any) => {
+          after: async (_session: any) => {
             // CLI doesn't need audit logging
           },
         },

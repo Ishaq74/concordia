@@ -1,0 +1,118 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getDrizzle } from "@database/drizzle";
+import { classified } from "@database/schemas";
+import { eq, and } from "drizzle-orm";
+import translations from "@i18n/fr.json";
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+
+const t = translations;
+const locale = "fr";
+const db = await getDrizzle();
+const { id } = Astro.params;
+
+if (!id) return Astro.redirect(getRelativeLocaleUrl(locale, "/annonces"));
+
+const adRows = await db
+  .select()
+  .from(classified)
+  .where(and(eq(classified.id, id), eq(classified.status, "active")))
+  .limit(1);
+
+if (adRows.length === 0) return Astro.redirect(getRelativeLocaleUrl(locale, "/annonces"));
+
+const ad = adRows[0];
+
+const conditionLabels: Record<string, string> = {
+  new: t.classifiedsPage.conditionNew,
+  used: t.classifiedsPage.conditionUsed,
+  damaged: t.classifiedsPage.conditionDamaged,
+};
+
+const user = Astro.locals.user;
+const isOwner = user?.id === ad.sellerId;
+---
+
+<BaseLayout title={ad.title} description={ad.description}>
+  <main class="ad-detail">
+    <header class="ad-header">
+      <a href={getRelativeLocaleUrl(locale, "/annonces")} class="back-link">← {t.common.back}</a>
+      <h1>{ad.title}</h1>
+
+      <div class="ad-key-info">
+        {ad.price && (
+          <div class="ad-price">{Number(ad.price).toFixed(2)} €</div>
+        )}
+        {ad.condition && (
+          <span class="ad-condition">{conditionLabels[ad.condition] ?? ad.condition}</span>
+        )}
+        {ad.location && (
+          <span class="ad-location">{ad.location}</span>
+        )}
+      </div>
+    </header>
+
+    <section class="ad-body">
+      <p>{ad.description}</p>
+    </section>
+
+    <footer class="ad-footer">
+      <time datetime={ad.createdAt.toISOString()}>
+        Publiée le {ad.createdAt.toLocaleDateString(locale)}
+      </time>
+      {ad.expiresAt && (
+        <span class="ad-expires">
+          Expire le {ad.expiresAt.toLocaleDateString(locale)}
+        </span>
+      )}
+    </footer>
+
+    {!isOwner && user && (
+      <section class="ad-actions">
+        <a href={getRelativeLocaleUrl(locale, `/messages?contact=classified&id=${ad.id}`)} class="contact-button">
+          {t.classifiedsPage.contact}
+        </a>
+      </section>
+    )}
+
+    {!user && (
+      <section class="ad-actions">
+        <a href={getRelativeLocaleUrl(locale, "/auth/connexion")} class="contact-button">
+          {t.auth.signIn} — {t.classifiedsPage.contact}
+        </a>
+      </section>
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .ad-detail { max-width: 800px; margin: 0 auto; padding: var(--space-6, 1.5rem) var(--space-4, 1rem); }
+  .back-link { color: var(--color-primary, #3b82f6); text-decoration: none; font-size: var(--text-sm, 0.875rem); font-weight: 500; display: inline-block; margin-bottom: var(--space-4, 1rem); }
+  .ad-header h1 { font-size: var(--text-3xl, 1.875rem); font-weight: 800; margin: 0 0 var(--space-4, 1rem); }
+
+  .ad-key-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3, 0.75rem);
+    flex-wrap: wrap;
+    padding: var(--space-4, 1rem);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: var(--radius-lg, 0.5rem);
+    background: var(--bg-secondary, #f8f9fa);
+  }
+
+  .ad-price { font-size: var(--text-2xl, 1.5rem); font-weight: 800; color: var(--color-primary, #3b82f6); }
+  .ad-condition { background: var(--bg-default, #fff); padding: var(--space-1, 0.25rem) var(--space-2, 0.5rem); border-radius: var(--radius-sm, 0.25rem); font-size: var(--text-sm, 0.875rem); border: 1px solid var(--border-color, #e2e8f0); }
+  .ad-location { color: var(--text-secondary, #64748b); font-size: var(--text-sm, 0.875rem); }
+
+  .ad-body { margin-top: var(--space-6, 1.5rem); line-height: 1.8; }
+  .ad-body p { margin: 0; white-space: pre-line; }
+
+  .ad-footer { margin-top: var(--space-6, 1.5rem); padding-top: var(--space-4, 1rem); border-top: 1px solid var(--border-color, #e2e8f0); font-size: var(--text-sm, 0.875rem); color: var(--text-muted, #94a3b8); display: flex; gap: var(--space-4, 1rem); }
+  .ad-expires { color: var(--color-error, #ef4444); }
+
+  .ad-actions { margin-top: var(--space-6, 1.5rem); }
+  .contact-button { display: inline-block; padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem); background: var(--color-primary, #3b82f6); color: #fff; border-radius: var(--radius-md, 0.375rem); text-decoration: none; font-weight: 700; }
+</style>

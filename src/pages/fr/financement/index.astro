@@ -1,0 +1,162 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getDrizzle } from "@database/drizzle";
+import { fundingCampaign } from "@database/schemas";
+import { eq, and, sql, desc } from "drizzle-orm";
+import translations from "@i18n/fr.json";
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+
+const t = translations;
+const locale = "fr";
+const db = await getDrizzle();
+
+const url = new URL(Astro.request.url);
+const search = url.searchParams.get("q") ?? "";
+const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1", 10));
+const limit = 12;
+const offset = (page - 1) * limit;
+
+const conditions: ReturnType<typeof eq>[] = [eq(fundingCampaign.status, "active")];
+if (search) {
+  conditions.push(
+    sql`(${fundingCampaign.title} ILIKE ${"%" + search + "%"} OR ${fundingCampaign.description} ILIKE ${"%" + search + "%"})`,
+  );
+}
+
+const where = and(...conditions);
+
+const [campaigns, countResult] = await Promise.all([
+  db
+    .select({
+      id: fundingCampaign.id,
+      slug: fundingCampaign.slug,
+      title: fundingCampaign.title,
+      description: fundingCampaign.description,
+      goalAmount: fundingCampaign.goalAmount,
+      raisedAmount: fundingCampaign.raisedAmount,
+      donorCount: fundingCampaign.donorCount,
+      currency: fundingCampaign.currency,
+      deadline: fundingCampaign.deadline,
+      status: fundingCampaign.status,
+    })
+    .from(fundingCampaign)
+    .where(where)
+    .orderBy(desc(fundingCampaign.createdAt))
+    .limit(limit)
+    .offset(offset),
+  db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(fundingCampaign)
+    .where(where),
+]);
+
+const total = countResult[0].count;
+const totalPages = Math.ceil(total / limit);
+---
+
+<BaseLayout title="Financement participatif" description="Soutenez les projets communautaires par le financement participatif.">
+  <main class="funding-page">
+    <header class="page-header">
+      <h1>Financement participatif</h1>
+      <p>Soutenez les campagnes qui font vivre notre communauté.</p>
+    </header>
+
+    <section class="filters" aria-label="Filtres">
+      <form method="get" action="" class="search-form" role="search">
+        <input
+          type="search"
+          name="q"
+          value={search}
+          placeholder="Rechercher une campagne..."
+          aria-label="Rechercher une campagne"
+          class="search-input"
+        />
+        <button type="submit" class="search-button">{t.common.search}</button>
+      </form>
+    </section>
+
+    <section class="campaigns-grid" aria-label="Campagnes">
+      {campaigns.length === 0 ? (
+        <p class="no-results">{t.common.noResults}</p>
+      ) : (
+        <ul class="campaign-list" role="list">
+          {campaigns.map((c) => {
+            const percent = c.goalAmount ? Math.min(100, Math.round((Number(c.raisedAmount) / Number(c.goalAmount)) * 100)) : 0;
+            const daysLeft = c.deadline ? Math.max(0, Math.ceil((new Date(c.deadline).getTime() - Date.now()) / 86400000)) : null;
+            return (
+              <li class="campaign-card">
+                <a href={getRelativeLocaleUrl(locale, `/financement/${c.slug}`)} class="campaign-link">
+                  <div class="campaign-body">
+                    <h2 class="campaign-title">{c.title}</h2>
+                    {c.description && <p class="campaign-description">{c.description}</p>}
+
+                    <div class="campaign-progress">
+                      <div class="progress-bar">
+                        <div class="progress-fill" style={`width: ${percent}%`}></div>
+                      </div>
+                      <div class="progress-stats">
+                        <span class="progress-amount">{Number(c.raisedAmount).toLocaleString("fr-FR")} {c.currency}</span>
+                        <span class="progress-goal">sur {Number(c.goalAmount).toLocaleString("fr-FR")} {c.currency}</span>
+                      </div>
+                      <div class="progress-meta">
+                        <span>{percent}% financé</span>
+                        <span>{c.donorCount} donateurs</span>
+                        {daysLeft !== null && <span>{daysLeft} jours restants</span>}
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+
+    {totalPages > 1 && (
+      <nav class="pagination" aria-label="Pagination">
+        {page > 1 && (
+          <a href={`?q=${search}&page=${page - 1}`} class="pagination-link" rel="prev">{t.common.previous}</a>
+        )}
+        <span class="pagination-info">Page {page} / {totalPages}</span>
+        {page < totalPages && (
+          <a href={`?q=${search}&page=${page + 1}`} class="pagination-link" rel="next">{t.common.next}</a>
+        )}
+      </nav>
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .funding-page { max-width: 1200px; margin: 0 auto; padding: var(--space-6, 1.5rem) var(--space-4, 1rem); }
+  .page-header { text-align: center; margin-bottom: var(--space-6, 1.5rem); }
+  .page-header h1 { font-size: var(--text-3xl, 1.875rem); font-weight: 800; margin: 0 0 var(--space-2, 0.5rem); }
+  .page-header p { color: var(--text-secondary, #64748b); font-size: var(--text-lg, 1.125rem); margin: 0; }
+  .filters { margin-bottom: var(--space-6, 1.5rem); }
+  .search-form { display: flex; gap: var(--space-2, 0.5rem); flex-wrap: wrap; }
+  .search-input { flex: 1; min-width: 200px; padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem); border: 1px solid var(--border-color, #e2e8f0); border-radius: var(--radius-md, 0.375rem); font-size: var(--text-sm, 0.875rem); }
+  .search-button { padding: var(--space-2, 0.5rem) var(--space-4, 1rem); background: var(--color-primary, #3b82f6); color: #fff; border: none; border-radius: var(--radius-md, 0.375rem); cursor: pointer; font-weight: 600; }
+
+  .campaign-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: var(--space-4, 1rem); list-style: none; padding: 0; margin: 0; }
+  .campaign-card { border: 1px solid var(--border-color, #e2e8f0); border-radius: var(--radius-lg, 0.5rem); overflow: hidden; transition: box-shadow 0.2s; }
+  .campaign-card:hover { box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1)); }
+  .campaign-link { text-decoration: none; color: inherit; display: block; }
+  .campaign-body { padding: var(--space-4, 1rem); }
+  .campaign-title { font-size: var(--text-lg, 1.125rem); font-weight: 700; margin: 0 0 var(--space-2, 0.5rem); }
+  .campaign-description { font-size: var(--text-sm, 0.875rem); color: var(--text-secondary, #64748b); margin: 0 0 var(--space-3, 0.75rem); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  .campaign-progress { display: flex; flex-direction: column; gap: var(--space-2, 0.5rem); }
+  .progress-bar { height: 10px; background: var(--border-color, #e2e8f0); border-radius: 5px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--color-accent, #10b981); border-radius: 5px; transition: width 0.3s; }
+  .progress-stats { display: flex; gap: var(--space-1, 0.25rem); align-items: baseline; }
+  .progress-amount { font-size: var(--text-lg, 1.125rem); font-weight: 700; color: var(--color-accent, #10b981); }
+  .progress-goal { font-size: var(--text-sm, 0.875rem); color: var(--text-muted, #94a3b8); }
+  .progress-meta { display: flex; gap: var(--space-3, 0.75rem); font-size: var(--text-xs, 0.75rem); color: var(--text-muted, #94a3b8); }
+
+  .no-results { text-align: center; color: var(--text-secondary, #64748b); padding: var(--space-8, 2rem) 0; font-size: var(--text-lg, 1.125rem); }
+  .pagination { display: flex; justify-content: center; align-items: center; gap: var(--space-4, 1rem); margin-top: var(--space-8, 2rem); }
+  .pagination-link { padding: var(--space-2, 0.5rem) var(--space-4, 1rem); border: 1px solid var(--border-color, #e2e8f0); border-radius: var(--radius-md, 0.375rem); text-decoration: none; color: var(--color-primary, #3b82f6); font-weight: 500; }
+  .pagination-info { color: var(--text-secondary, #64748b); font-size: var(--text-sm, 0.875rem); }
+</style>

@@ -1,0 +1,153 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getDrizzle } from "@database/drizzle";
+import { impactMetric, transparencyReport } from "@database/schemas";
+import { eq, desc } from "drizzle-orm";
+import translations from "@i18n/fr.json";
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+
+const t = translations;
+const locale = "fr";
+const db = await getDrizzle();
+
+const metricTypes = [
+  "projects_completed",
+  "volunteer_hours",
+  "funds_raised",
+  "mediations_resolved",
+  "lessons_completed",
+  "active_citizens",
+  "resources_shared",
+] as const;
+
+const metricLabels: Record<string, string> = {
+  projects_completed: t.transparencyPage.projectsCompleted,
+  volunteer_hours: t.transparencyPage.volunteerHours,
+  funds_raised: t.transparencyPage.fundsRaised,
+  mediations_resolved: t.transparencyPage.mediationsResolved,
+  lessons_completed: t.transparencyPage.lessonsCompleted,
+  active_citizens: t.transparencyPage.activeCitizens,
+  resources_shared: t.transparencyPage.resourcesShared,
+};
+
+const metricIcons: Record<string, string> = {
+  projects_completed: "🏗️",
+  volunteer_hours: "⏱️",
+  funds_raised: "💰",
+  mediations_resolved: "⚖️",
+  lessons_completed: "📚",
+  active_citizens: "👥",
+  resources_shared: "📦",
+};
+
+const latestMetrics = await Promise.all(
+  metricTypes.map(async (type) => {
+    const rows = await db
+      .select({
+        type: impactMetric.type,
+        value: impactMetric.value,
+        periodStart: impactMetric.periodStart,
+        periodEnd: impactMetric.periodEnd,
+        computedAt: impactMetric.computedAt,
+      })
+      .from(impactMetric)
+      .where(eq(impactMetric.type, type))
+      .orderBy(desc(impactMetric.computedAt))
+      .limit(1);
+    return rows[0] ?? null;
+  }),
+);
+
+const recentReports = await db
+  .select({
+    id: transparencyReport.id,
+    title: transparencyReport.title,
+    slug: transparencyReport.slug,
+    periodStart: transparencyReport.periodStart,
+    periodEnd: transparencyReport.periodEnd,
+    publishedAt: transparencyReport.publishedAt,
+  })
+  .from(transparencyReport)
+  .where(eq(transparencyReport.status, "published"))
+  .orderBy(desc(transparencyReport.publishedAt))
+  .limit(6);
+---
+
+<BaseLayout title={t.transparencyPage.title} description={t.transparencyPage.description}>
+  <main class="impact-page">
+    <header class="page-header">
+      <h1>{t.transparencyPage.title}</h1>
+      <p>{t.transparencyPage.description}</p>
+    </header>
+
+    <section class="metrics-section" aria-label={t.transparencyPage.metrics}>
+      <h2>{t.transparencyPage.metrics}</h2>
+      <div class="metrics-grid">
+        {latestMetrics.map((metric) => {
+          if (!metric) return null;
+          return (
+            <div class="metric-card">
+              <span class="metric-icon">{metricIcons[metric.type] ?? "📊"}</span>
+              <span class="metric-value">{Number(metric.value).toLocaleString("fr-FR")}</span>
+              <span class="metric-label">{metricLabels[metric.type] ?? metric.type}</span>
+              <span class="metric-period">
+                {new Date(metric.periodStart).toLocaleDateString("fr-FR", { month: "short", year: "numeric" })}
+                — {new Date(metric.periodEnd).toLocaleDateString("fr-FR", { month: "short", year: "numeric" })}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    {recentReports.length > 0 && (
+      <section class="reports-section" aria-label={t.transparencyPage.reports}>
+        <h2>{t.transparencyPage.reports}</h2>
+        <ul class="report-list" role="list">
+          {recentReports.map((r) => (
+            <li class="report-card">
+              <a href={getRelativeLocaleUrl(locale, `/transparence/${r.slug}`)} class="report-link">
+                <h3 class="report-title">{r.title}</h3>
+                <div class="report-meta">
+                  <span>
+                    {new Date(r.periodStart).toLocaleDateString("fr-FR")}
+                    — {new Date(r.periodEnd).toLocaleDateString("fr-FR")}
+                  </span>
+                  {r.publishedAt && (
+                    <span>Publié le {new Date(r.publishedAt).toLocaleDateString("fr-FR")}</span>
+                  )}
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .impact-page { max-width: 1200px; margin: 0 auto; padding: var(--space-6, 1.5rem) var(--space-4, 1rem); }
+  .page-header { text-align: center; margin-bottom: var(--space-8, 2rem); }
+  .page-header h1 { font-size: var(--text-3xl, 1.875rem); font-weight: 800; margin: 0 0 var(--space-2, 0.5rem); }
+  .page-header p { color: var(--text-secondary, #64748b); font-size: var(--text-lg, 1.125rem); margin: 0; }
+
+  .metrics-section { margin-bottom: var(--space-8, 2rem); }
+  .metrics-section h2 { font-size: var(--text-xl, 1.25rem); font-weight: 700; margin: 0 0 var(--space-4, 1rem); }
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-4, 1rem); }
+  .metric-card { display: flex; flex-direction: column; align-items: center; text-align: center; padding: var(--space-4, 1rem); border: 1px solid var(--border-color, #e2e8f0); border-radius: var(--radius-lg, 0.5rem); }
+  .metric-icon { font-size: 2rem; margin-bottom: var(--space-2, 0.5rem); }
+  .metric-value { font-size: var(--text-3xl, 1.875rem); font-weight: 800; color: var(--color-primary, #3b82f6); }
+  .metric-label { font-size: var(--text-sm, 0.875rem); font-weight: 600; margin-top: var(--space-1, 0.25rem); }
+  .metric-period { font-size: var(--text-xs, 0.75rem); color: var(--text-muted, #94a3b8); margin-top: var(--space-1, 0.25rem); }
+
+  .reports-section h2 { font-size: var(--text-xl, 1.25rem); font-weight: 700; margin: 0 0 var(--space-4, 1rem); }
+  .report-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--space-3, 0.75rem); }
+  .report-card { border: 1px solid var(--border-color, #e2e8f0); border-radius: var(--radius-md, 0.375rem); transition: box-shadow 0.2s; }
+  .report-card:hover { box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1)); }
+  .report-link { display: block; padding: var(--space-4, 1rem); text-decoration: none; color: inherit; }
+  .report-title { font-size: var(--text-base, 1rem); font-weight: 600; margin: 0 0 var(--space-2, 0.5rem); }
+  .report-meta { display: flex; gap: var(--space-3, 0.75rem); font-size: var(--text-xs, 0.75rem); color: var(--text-muted, #94a3b8); }
+</style>

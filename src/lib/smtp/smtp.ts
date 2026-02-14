@@ -322,7 +322,7 @@ export class SmtpService {
   }
 
   async close(): Promise<void> {
-    await this.transporter.close();
+    this.transporter.close();
   }
 }
 

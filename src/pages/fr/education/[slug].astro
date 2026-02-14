@@ -1,0 +1,176 @@
+---
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getDrizzle } from "@database/drizzle";
+import { educationModule, educationLesson, educationEnrollment } from "@database/schemas";
+import { eq, and, asc } from "drizzle-orm";
+import translations from "@i18n/fr.json";
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+
+const t = translations;
+const locale = "fr";
+const db = await getDrizzle();
+const { slug } = Astro.params;
+
+if (!slug) return Astro.redirect(getRelativeLocaleUrl(locale, "/education"));
+
+const moduleRows = await db
+  .select()
+  .from(educationModule)
+  .where(and(eq(educationModule.slug, slug), eq(educationModule.status, "published")))
+  .limit(1);
+
+if (moduleRows.length === 0) return Astro.redirect(getRelativeLocaleUrl(locale, "/education"));
+
+const m = moduleRows[0];
+
+const lessons = await db
+  .select({
+    id: educationLesson.id,
+    title: educationLesson.title,
+    slug: educationLesson.slug,
+    type: educationLesson.type,
+    sortOrder: educationLesson.sortOrder,
+    estimatedMinutes: educationLesson.estimatedMinutes,
+  })
+  .from(educationLesson)
+  .where(eq(educationLesson.moduleId, m.id))
+  .orderBy(asc(educationLesson.sortOrder));
+
+const user = Astro.locals.user;
+let enrollment: { status: string; progressPercent: string } | null = null;
+if (user) {
+  const enrollRows = await db
+    .select({ status: educationEnrollment.status, progressPercent: educationEnrollment.progressPercent })
+    .from(educationEnrollment)
+    .where(and(eq(educationEnrollment.moduleId, m.id), eq(educationEnrollment.userId, user.id)))
+    .limit(1);
+  enrollment = enrollRows[0] ?? null;
+}
+
+const difficultyLabels: Record<string, string> = {
+  beginner: t.educationPage.beginner,
+  intermediate: t.educationPage.intermediate,
+  advanced: t.educationPage.advanced,
+};
+
+const lessonTypeLabels: Record<string, string> = {
+  text: "Texte",
+  video: "Vidéo",
+  exercise: "Exercice",
+  quiz: "Quiz",
+};
+---
+
+<BaseLayout title={m.title} description={m.description ?? ""}>
+  <main class="module-detail">
+    <header class="module-header">
+      <a href={getRelativeLocaleUrl(locale, "/education")} class="back-link">← {t.common.back}</a>
+      {m.coverImageUrl && <img src={m.coverImageUrl} alt="" class="module-cover" />}
+      <div class="module-badges">
+        <span class:list={["difficulty-badge", m.difficulty]}>
+          {difficultyLabels[m.difficulty] ?? m.difficulty}
+        </span>
+        {m.isFree ? (
+          <span class="free-badge">Gratuit</span>
+        ) : m.price && (
+          <span class="price-badge">{Number(m.price).toFixed(2)} €</span>
+        )}
+      </div>
+      <h1>{m.title}</h1>
+      {m.description && <p class="module-description">{m.description}</p>}
+
+      <div class="module-stats">
+        <span>{m.lessonCount} {t.educationPage.lessons}</span>
+        {m.estimatedDurationHours && <span>{Number(m.estimatedDurationHours)}h estimées</span>}
+        <span>{m.enrollmentCount} inscrits</span>
+      </div>
+    </header>
+
+    {enrollment && (
+      <section class="enrollment-status">
+        <div class="progress-bar">
+          <div class="progress-fill" style={`width: ${Number(enrollment.progressPercent)}%`}></div>
+        </div>
+        <span class="progress-text">{t.educationPage.progress}: {Number(enrollment.progressPercent).toFixed(0)}%</span>
+      </section>
+    )}
+
+    <section class="lessons-section" aria-label={t.educationPage.lessons}>
+      <h2>{t.educationPage.lessons} ({lessons.length})</h2>
+      {lessons.length === 0 ? (
+        <p>Aucune leçon pour le moment.</p>
+      ) : (
+        <ol class="lesson-list" role="list">
+          {lessons.map((lesson, index) => (
+            <li class="lesson-item">
+              <span class="lesson-number">{index + 1}</span>
+              <div class="lesson-info">
+                <span class="lesson-title">{lesson.title}</span>
+                <div class="lesson-meta">
+                  <span class="lesson-type">{lessonTypeLabels[lesson.type] ?? lesson.type}</span>
+                  {lesson.estimatedMinutes && <span>{lesson.estimatedMinutes} min</span>}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+
+    <section class="module-actions">
+      {user ? (
+        enrollment ? (
+          <span class="enrolled-badge">{t.educationPage.enrolled}</span>
+        ) : (
+          <a href={`/api/education/modules/${m.slug}?action=enroll`} class="enroll-button">
+            {t.educationPage.enroll}
+          </a>
+        )
+      ) : (
+        <a href={getRelativeLocaleUrl(locale, "/auth/connexion")} class="enroll-button">
+          {t.auth.signIn} — {t.educationPage.enroll}
+        </a>
+      )}
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .module-detail { max-width: 800px; margin: 0 auto; padding: var(--space-6, 1.5rem) var(--space-4, 1rem); }
+  .back-link { color: var(--color-primary, #3b82f6); text-decoration: none; font-size: var(--text-sm, 0.875rem); font-weight: 500; display: inline-block; margin-bottom: var(--space-4, 1rem); }
+  .module-cover { width: 100%; max-height: 300px; object-fit: cover; border-radius: var(--radius-lg, 0.5rem); margin-bottom: var(--space-4, 1rem); }
+  .module-badges { display: flex; gap: var(--space-2, 0.5rem); margin-bottom: var(--space-2, 0.5rem); }
+  .difficulty-badge { font-size: var(--text-xs, 0.75rem); padding: 2px var(--space-2, 0.5rem); border-radius: var(--radius-sm, 0.25rem); font-weight: 600; }
+  .difficulty-badge.beginner { background: #dcfce7; color: #166534; }
+  .difficulty-badge.intermediate { background: #fef9c3; color: #854d0e; }
+  .difficulty-badge.advanced { background: #fecaca; color: #991b1b; }
+  .free-badge { font-size: var(--text-xs, 0.75rem); background: var(--color-accent, #10b981); color: #fff; padding: 2px var(--space-2, 0.5rem); border-radius: var(--radius-sm, 0.25rem); font-weight: 600; }
+  .price-badge { font-size: var(--text-xs, 0.75rem); background: var(--color-primary, #3b82f6); color: #fff; padding: 2px var(--space-2, 0.5rem); border-radius: var(--radius-sm, 0.25rem); font-weight: 600; }
+
+  .module-header h1 { font-size: var(--text-3xl, 1.875rem); font-weight: 800; margin: 0 0 var(--space-2, 0.5rem); }
+  .module-description { font-size: var(--text-lg, 1.125rem); color: var(--text-secondary, #64748b); line-height: 1.6; margin: 0 0 var(--space-4, 1rem); }
+  .module-stats { display: flex; gap: var(--space-3, 0.75rem); font-size: var(--text-sm, 0.875rem); color: var(--text-muted, #94a3b8); }
+
+  .enrollment-status { margin-top: var(--space-4, 1rem); padding: var(--space-3, 0.75rem); background: var(--bg-secondary, #f8f9fa); border-radius: var(--radius-md, 0.375rem); }
+  .progress-bar { height: 8px; background: var(--border-color, #e2e8f0); border-radius: 4px; overflow: hidden; margin-bottom: var(--space-1, 0.25rem); }
+  .progress-fill { height: 100%; background: var(--color-primary, #3b82f6); border-radius: 4px; transition: width 0.3s; }
+  .progress-text { font-size: var(--text-sm, 0.875rem); font-weight: 600; }
+
+  .lessons-section { margin-top: var(--space-6, 1.5rem); }
+  .lessons-section h2 { font-size: var(--text-xl, 1.25rem); font-weight: 700; margin: 0 0 var(--space-4, 1rem); }
+  .lesson-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0; counter-reset: lesson; }
+  .lesson-item { display: flex; align-items: center; gap: var(--space-3, 0.75rem); padding: var(--space-3, 0.75rem); border: 1px solid var(--border-color, #e2e8f0); border-bottom: none; }
+  .lesson-item:first-child { border-radius: var(--radius-md, 0.375rem) var(--radius-md, 0.375rem) 0 0; }
+  .lesson-item:last-child { border-bottom: 1px solid var(--border-color, #e2e8f0); border-radius: 0 0 var(--radius-md, 0.375rem) var(--radius-md, 0.375rem); }
+  .lesson-number { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: var(--bg-secondary, #f1f5f9); border-radius: 50%; font-size: var(--text-xs, 0.75rem); font-weight: 700; flex-shrink: 0; }
+  .lesson-info { flex: 1; }
+  .lesson-title { font-size: var(--text-sm, 0.875rem); font-weight: 600; }
+  .lesson-meta { display: flex; gap: var(--space-2, 0.5rem); font-size: var(--text-xs, 0.75rem); color: var(--text-muted, #94a3b8); margin-top: 2px; }
+  .lesson-type { background: var(--bg-secondary, #f1f5f9); padding: 0 var(--space-1, 0.25rem); border-radius: 2px; }
+
+  .module-actions { margin-top: var(--space-6, 1.5rem); padding-top: var(--space-4, 1rem); border-top: 1px solid var(--border-color, #e2e8f0); }
+  .enroll-button { display: inline-block; padding: var(--space-3, 0.75rem) var(--space-6, 1.5rem); background: var(--color-primary, #3b82f6); color: #fff; border-radius: var(--radius-md, 0.375rem); text-decoration: none; font-weight: 700; }
+  .enrolled-badge { display: inline-block; padding: var(--space-2, 0.5rem) var(--space-4, 1rem); background: var(--color-accent, #10b981); color: #fff; border-radius: var(--radius-md, 0.375rem); font-weight: 600; }
+</style>

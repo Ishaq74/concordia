@@ -33,21 +33,23 @@ Este proyecto demuestra una aplicación web full-stack usando tecnologías moder
 ## Stack tecnológico
 
 - **@astrojs/check**: `^0.9.6`
-- **@astrojs/node**: `^9.5.2`
+- **@astrojs/node**: `^9.5.3`
 - **@astrojs/vercel**: `^9.0.4`
 - **@babel/preset-typescript**: `^7.28.5`
 - **@iconify-json/circle-flags**: `^1.2.10`
 - **@iconify-json/mdi**: `^1.2.3`
 - **@iconify-json/openmoji**: `^1.2.21`
-- **astro**: `^5.16.15`
+- **astro**: `^5.17.2`
 - **astro-font**: `^1.1.0`
 - **astro-icon**: `^1.1.5`
 - **better-auth**: `^1.4.17`
 - **dotenv**: `^17.2.3`
 - **drizzle-orm**: `^0.45.1`
+- **jose**: `^6.1.3`
 - **nodemailer**: `^7.0.12`
 - **pg**: `^8.17.2`
 - **typescript**: `^5.9.3`
+- **validator**: `^13.15.26`
 
 ## Instalación
 
@@ -68,19 +70,32 @@ npm install
 - `npm run db:migrate`: tsx scripts/db/db.migrate.ts
 - `npm run db:generate`: tsx scripts/db/db.generate.ts
 - `npm run db:seed`: tsx scripts/db/db.seed.ts
-- `npm run smtp:check`: tsx src/lib/smtp/smtp.tests.ts
-- `npm run test`: vitest run
+- `npm run smtp:check`: tsx src/lib/smtp/smtp.check.ts
+- `npm run test`: vitest
+- `npm run test:watch`: vitest --watch
+- `npm run test:ui`: vitest --ui
+- `npm run test:coverage`: vitest --coverage
+- `npm run test:unit`: vitest run tests/unit
+- `npm run test:integration`: vitest run tests/integration
+- `npm run test:e2e`: vitest run tests/e2e
+- `npm run test:security`: vitest run tests/e2e/security.test.ts
+- `npm run test:api`: vitest run tests/e2e/api-auth.test.ts
+- `npm run test:all`: vitest run
+- `npm run test:debug`: vitest --inspect-brk --inspect --single-thread
+- `npm run test:ci`: vitest run --coverage
 ```
 
 ## Estructura del proyecto
 
 ```text
 - astro.config.mjs
+- concordia-specs.md
 - drizzle-dev.config.ts
 - drizzle-prod.config.ts
 - package.json
 - playwright.config.ts
 - pnpm-lock.yaml
+- pnpm-workspace.yaml
 - **public**
   - favicon.svg
   - **fonts**
@@ -117,7 +132,6 @@ npm install
     - utils.ts
   - readme-generate.ts
   - run-sonda.mjs
-- smtp-simple.js
 - **src**
   - **components**
     - **templates**
@@ -197,6 +211,7 @@ npm install
       - Gallery.astro
       - Kbd.astro
       - Link.astro
+      - Map.astro
       - MenuDropdown.astro
       - Pagination.astro
       - ProgressBar.astro
@@ -230,22 +245,129 @@ npm install
       - Timeline.astro
       - Tooltip.astro
       - Video.astro
+  - content.config.ts
   - **database**
-    - drizzle.test.ts
+    - **data**
+      - 01-user.data.ts
+      - 02-account.data.ts
+      - 03-profile.data.ts
+      - 04-userRole.data.ts
+      - 05-wallet.data.ts
+      - 06-category.data.ts
+      - 07-categoryTranslation.data.ts
+      - 08-tag.data.ts
+      - 09-tagTranslation.data.ts
+      - 10-address.data.ts
+      - 11-place.data.ts
+      - 12-placeTranslation.data.ts
+      - 13-gastronomyDetail.data.ts
+      - 14-accommodationDetail.data.ts
+      - 15-activityDetail.data.ts
+      - 16-professional.data.ts
+      - 17-trail.data.ts
+      - 18-poi.data.ts
+      - 19-article.data.ts
+      - 20-articleContent.data.ts
+      - 21-event.data.ts
+      - 22-eventRegistration.data.ts
+      - 23-review.data.ts
+      - 24-subRating.data.ts
+      - 25-comment.data.ts
+      - 26-forumThread.data.ts
+      - 27-forumPost.data.ts
+      - 28-classified.data.ts
+      - 29-product.data.ts
+      - 30-localService.data.ts
+      - 31-serviceAvailability.data.ts
+      - 32-booking.data.ts
+      - 33-conversation.data.ts
+      - 34-conversationParticipant.data.ts
+      - 35-message.data.ts
+      - 36-group.data.ts
+      - 37-groupMember.data.ts
+      - 38-mediationCase.data.ts
+      - 39-mediationSession.data.ts
+      - 40-mediationAgreement.data.ts
+      - 41-educationModule.data.ts
+      - 42-educationLesson.data.ts
+      - 43-educationEnrollment.data.ts
+      - 44-educationProgress.data.ts
+      - 45-volunteerProject.data.ts
+      - 46-volunteerTask.data.ts
+      - 47-volunteerParticipation.data.ts
+      - 48-fundingCampaign.data.ts
+      - 49-donation.data.ts
+      - 50-impactMetric.data.ts
+      - 51-transparencyReport.data.ts
+      - 52-gallery.data.ts
+      - 53-galleryItem.data.ts
+      - 54-placeTag.data.ts
+      - 55-favorite.data.ts
+      - 56-notification.data.ts
+      - 57-systemCommission.data.ts
     - drizzle.ts
     - **loaders**
+      - articles-loader.ts
+      - categories-loader.ts
+      - events-loader.ts
       - factory.ts
+      - places-loader.ts
     - **migrations**
       - 0000_loving_blue_blade.sql
       - 0001_famous_tarantula.sql
       - 0002_ambitious_lady_ursula.sql
+      - 0003_condemned_iron_lad.sql
+      - 0003_create_audit_logs.sql
+      - 0004_sloppy_arachne.sql
+      - 0005_magenta_nico_minoru.sql
+      - 0006_unique_thanos.sql
+      - 0007_slim_mentor.sql
       - **meta**
         - 0000_snapshot.json
         - 0001_snapshot.json
         - 0002_snapshot.json
+        - 0003_snapshot.json
+        - 0004_snapshot.json
+        - 0005_snapshot.json
+        - 0006_snapshot.json
+        - 0007_snapshot.json
         - _journal.json
     - **schemas**
+      - address.ts
+      - article.ts
+      - attribute.ts
+      - audit-log.ts
       - auth-schema.ts
+      - category.ts
+      - classified.ts
+      - comment.ts
+      - conversation.ts
+      - education.ts
+      - event.ts
+      - favorite.ts
+      - forum.ts
+      - funding.ts
+      - gallery.ts
+      - group.ts
+      - image.ts
+      - impact.ts
+      - local-service.ts
+      - mediation.ts
+      - notification.ts
+      - place-attribute-value.ts
+      - place-detail.ts
+      - place-tag.ts
+      - place.ts
+      - product.ts
+      - professional.ts
+      - profile.ts
+      - review.ts
+      - system-commission.ts
+      - tag.ts
+      - trail.ts
+      - user-role.ts
+      - volunteer.ts
+      - wallet.ts
     - schemas.ts
   - env.d.ts
   - **i18n**
@@ -255,6 +377,7 @@ npm install
     - fr.json
   - **layouts**
     - BaseLayout.astro
+    - DashboardLayout.astro
     - DocLayout.astro
   - **lib**
     - **auth**
@@ -263,24 +386,104 @@ npm install
       - auth.ts
       - permissions.test.ts
       - permissions.ts
+      - roles.ts
+      - validate-user.ts
+    - **i18n**
+      - locale-url.ts
+    - **notifications**
+      - notifications.ts
     - **smtp**
-      - smtp.config.ts
-      - smtp.errors.ts
-      - smtp.send.ts
-      - smtp.tests.ts
+      - smtp.check.ts
       - smtp.ts
-      - smtp.types.ts
-      - smtp.validate.ts
+    - types.ts
+    - **wallet**
+      - wallet.ts
+  - middleware.ts
   - **pages**
     - 404.astro
     - 500.astro
     - **api**
+      - **admin**
+        - moderate.ts
+        - roles.ts
+      - **articles**
+        - index.ts
+        - **[slug]**
+          - status.ts
+        - [slug].ts
       - **auth**
-        - auth.test.ts
         - [...all].ts
       - **auth-client**
         - forgot-password.ts
         - verification.ts
+      - **bookings**
+        - index.ts
+      - **categories**
+        - index.ts
+      - **classifieds**
+        - index.ts
+      - **comments**
+        - index.ts
+      - **conversations**
+        - index.ts
+        - [id].ts
+      - **education**
+        - **modules**
+          - index.ts
+          - [slug].ts
+      - **events**
+        - index.ts
+        - [slug].ts
+      - **favorites**
+        - index.ts
+      - **forum**
+        - **threads**
+          - index.ts
+          - [slug].ts
+      - **funding**
+        - **campaigns**
+          - index.ts
+          - [slug].ts
+      - **galleries**
+        - index.ts
+        - [id].ts
+      - **groups**
+        - index.ts
+        - [slug].ts
+      - **impact**
+        - index.ts
+      - **mediation**
+        - index.ts
+      - **notifications**
+        - index.ts
+      - **places**
+        - index.ts
+        - **[slug]**
+          - moderate.ts
+        - [slug].ts
+      - **products**
+        - index.ts
+        - [id].ts
+      - **profile**
+        - index.ts
+      - **reviews**
+        - index.ts
+        - [id].ts
+      - **services**
+        - index.ts
+      - **sse**
+        - notifications.ts
+      - **tags**
+        - index.ts
+      - **transparency**
+        - index.ts
+        - [slug].ts
+      - **volunteer**
+        - **projects**
+          - index.ts
+          - [slug].ts
+      - **wallet**
+        - index.ts
     - **ar**
       - index.astro
     - **en**
@@ -325,6 +528,14 @@ npm install
     - **es**
       - index.astro
     - **fr**
+      - **admin**
+        - index.astro
+      - **annonces**
+        - index.astro
+        - [id].astro
+      - **articles**
+        - index.astro
+        - [slug].astro
       - **auth**
         - connexion.astro
         - inscription.astro
@@ -334,6 +545,24 @@ npm install
         - profil.astro
         - reinitialiser-mot-de-passe.astro
         - verifier-email.astro
+      - **benevolat**
+        - index.astro
+        - [slug].astro
+      - **dashboard**
+        - **bookings**
+          - index.astro
+        - **favorites**
+          - index.astro
+        - index.astro
+        - **mediation**
+          - index.astro
+        - **messages**
+          - index.astro
+          - [id].astro
+        - **notifications**
+          - index.astro
+        - **wallet**
+          - index.astro
       - **docs**
         - **components**
           - accordion.astro
@@ -371,7 +600,33 @@ npm install
           - footer.astro
           - header.astro
           - table-of-contents.astro
+      - **education**
+        - index.astro
+        - [slug].astro
+      - **evenements**
+        - index.astro
+        - [slug].astro
+      - **financement**
+        - index.astro
+        - [slug].astro
+      - **forum**
+        - index.astro
+        - [slug].astro
+      - **groupes**
+        - index.astro
+        - [slug].astro
       - index.astro
+      - **places**
+        - index.astro
+        - [slug].astro
+      - **produits-locaux**
+        - index.astro
+      - **services**
+        - index.astro
+        - [id].astro
+      - **transparence**
+        - index.astro
+        - [slug].astro
   - **styles**
     - base.css
     - **components**
@@ -386,13 +641,23 @@ npm install
       - spacing.css
       - typography.css
 - **tests**
-  - **auth**
-    - auth.e2e.test.ts
-  - **e2e**
-    - auth.spec.ts
+  - **config**
+    - test-db.ts
+    - test-env.ts
+  - **fixtures**
+    - auth-fixtures.ts
+    - security-payloads.ts
+  - **integration**
+    - auth-emails.test.ts
+  - README.md
   - setup.ts
+  - **unit**
+    - smtp.test.ts
+    - validation.test.ts
   - **utils**
+    - api-helpers.ts
     - auth-test-utils.ts
+    - cleanup.ts
 - tsconfig.json
 - vitest.config.ts
 ```
@@ -411,6 +676,7 @@ npm install
 - `@images/*` → `public/images/*`
 - `@smtp/*` → `src/lib/smtp/*`
 - `@i18n/*` → `src/i18n/*`
+- `@tests/*` → `tests/*`
 
 ## Autenticación
 
@@ -418,6 +684,41 @@ Better Auth está configurado con plugins para OAuth, gestión de sesiones y má
 
 ## Base de datos
 
+- **address.ts**
+  - Table _address_ (const _address_)
+    - Champ : _id_ `(text)`
+    - Champ : _street_ `(text)`
+    - Champ : _city_ `(text)`
+    - Champ : _postcode_ `(text)`
+    - Champ : _region_ `(text)`
+    - Champ : _country_ `(text)`
+    - Champ : _latitude_ `(decimal)`
+- **article.ts**
+  - Table _article_ (const _article_)
+    - Champ : _id_ `(text)`
+    - Champ : _authorId_ `(text)`
+  - Table _article_content_ (const _articleContent_)
+    - Champ : _id_ `(text)`
+    - Champ : _articleId_ `(text)`
+  - Table _article_category_link_ (const _articleCategoryLink_)
+    - Champ : _articleId_ `(text)`
+  - Table _article_place_link_ (const _articlePlaceLink_)
+    - Champ : _articleId_ `(text)`
+  - Table _article_place_comparison_ (const _articlePlaceComparison_)
+    - Champ : _id_ `(text)`
+    - Champ : _articleId_ `(text)`
+- **attribute.ts**
+  - Table _attribute_definition_ (const _attributeDefinition_)
+    - Champ : _id_ `(text)`
+    - Champ : _slug_ `(text)`
+    - Champ : _valueType_ `(attributeValueTypeEnum)`
+    - Champ : _possibleValues_ `(text)`
+    - Champ : _applicableCategoryIds_ `(text)`
+    - Champ : _isActive_ `(boolean)`
+    - Champ : _createdAt_ `(timestamp)`
+  - Table _attribute_def_translation_ (const _attributeDefTranslation_)
+    - Champ : _id_ `(text)`
+    - Champ : _attributeDefinitionId_ `(text)`
 - **auth-schema.ts**
   - Table _user_ (const _user_)
     - Champ : _id_ `(text)`
@@ -429,6 +730,10 @@ Better Auth está configurado con plugins para OAuth, gestión de sesiones y má
     - Champ : _updatedAt_ `(timestamp)`
     - Champ : _username_ `(text)`
     - Champ : _displayUsername_ `(text)`
+    - Champ : _role_ `(text)`
+    - Champ : _banned_ `(boolean)`
+    - Champ : _banReason_ `(text)`
+    - Champ : _banExpires_ `(timestamp)`
   - Table _account_ (const _account_)
     - Champ : _id_ `(text)`
     - Champ : _accountId_ `(text)`
@@ -439,23 +744,240 @@ Better Auth está configurado con plugins para OAuth, gestión de sesiones y má
     - Champ : _identifier_ `(text)`
     - Champ : _value_ `(text)`
     - Champ : _expiresAt_ `(timestamp)`
+    - Champ : _usedAt_ `(timestamp)`
     - Champ : _createdAt_ `(timestamp)`
     - Champ : _updatedAt_ `(timestamp)`
+  - Table _organization_ (const _organization_)
+    - Champ : _id_ `(text)`
+    - Champ : _name_ `(text)`
+    - Champ : _slug_ `(text)`
+    - Champ : _logo_ `(text)`
+    - Champ : _createdAt_ `(timestamp)`
+    - Champ : _metadata_ `(text)`
+  - Table _member_ (const _member_)
+    - Champ : _id_ `(text)`
+    - Champ : _organizationId_ `(text)`
+  - Table _invitation_ (const _invitation_)
+    - Champ : _id_ `(text)`
+    - Champ : _organizationId_ `(text)`
+- **category.ts**
+  - Table _category_ (const _category_)
+    - Champ : _id_ `(text)`
+    - Champ : _parentId_ `(text)`
+    - Champ : _slug_ `(text)`
+    - Champ : _type_ `(categoryTypeEnum)`
+    - Champ : _icon_ `(text)`
+    - Champ : _level_ `(integer)`
+    - Champ : _sortOrder_ `(integer)`
+    - Champ : _isActive_ `(boolean)`
+    - Champ : _createdAt_ `(timestamp)`
+    - Champ : _updatedAt_ `(timestamp)`
+  - Table _category_translation_ (const _categoryTranslation_)
+    - Champ : _id_ `(text)`
+    - Champ : _categoryId_ `(text)`
+- **classified.ts**
+  - Table _classified_ (const _classified_)
+    - Champ : _id_ `(text)`
+    - Champ : _categoryId_ `(text)`
+- **comment.ts**
+  - Table _comment_ (const _comment_)
+    - Champ : _id_ `(text)`
+    - Champ : _authorId_ `(text)`
+- **conversation.ts**
+  - Table _conversation_ (const _conversation_)
+    - Champ : _id_ `(text)`
+    - Champ : _type_ `(conversationTypeEnum)`
+    - Champ : _subject_ `(text)`
+    - Champ : _createdAt_ `(timestamp)`
+    - Champ : _lastMessageAt_ `(timestamp)`
+  - Table _conversation_participant_ (const _conversationParticipant_)
+    - Champ : _id_ `(text)`
+    - Champ : _conversationId_ `(text)`
+  - Table _message_ (const _message_)
+    - Champ : _id_ `(text)`
+    - Champ : _conversationId_ `(text)`
+- **education.ts**
+  - Table _education_module_ (const _educationModule_)
+    - Champ : _id_ `(text)`
+    - Champ : _educatorId_ `(text)`
+  - Table _education_lesson_ (const _educationLesson_)
+    - Champ : _id_ `(text)`
+    - Champ : _moduleId_ `(text)`
+  - Table _education_enrollment_ (const _educationEnrollment_)
+    - Champ : _id_ `(text)`
+    - Champ : _moduleId_ `(text)`
+  - Table _education_progress_ (const _educationProgress_)
+    - Champ : _id_ `(text)`
+    - Champ : _enrollmentId_ `(text)`
+- **event.ts**
+  - Table _event_ (const _event_)
+    - Champ : _id_ `(text)`
+    - Champ : _createdBy_ `(text)`
+  - Table _event_registration_ (const _eventRegistration_)
+    - Champ : _id_ `(text)`
+    - Champ : _eventId_ `(text)`
+- **favorite.ts**
+  - Table _favorite_ (const _favorite_)
+    - Champ : _id_ `(text)`
+    - Champ : _userId_ `(text)`
+- **forum.ts**
+  - Table _forum_thread_ (const _forumThread_)
+    - Champ : _id_ `(text)`
+    - Champ : _categoryId_ `(text)`
+  - Table _forum_post_ (const _forumPost_)
+    - Champ : _id_ `(text)`
+    - Champ : _threadId_ `(text)`
+- **funding.ts**
+  - Table _funding_campaign_ (const _fundingCampaign_)
+    - Champ : _id_ `(text)`
+    - Champ : _creatorId_ `(text)`
+  - Table _donation_ (const _donation_)
+    - Champ : _id_ `(text)`
+    - Champ : _campaignId_ `(text)`
+- **gallery.ts**
+  - Table _gallery_ (const _gallery_)
+    - Champ : _id_ `(text)`
+    - Champ : _title_ `(text)`
+    - Champ : _description_ `(text)`
+    - Champ : _createdBy_ `(text)`
+  - Table _gallery_item_ (const _galleryItem_)
+    - Champ : _id_ `(text)`
+    - Champ : _galleryId_ `(text)`
+- **group.ts**
+  - Table _group_ (const _group_)
+    - Champ : _id_ `(text)`
+    - Champ : _name_ `(text)`
+    - Champ : _slug_ `(text)`
+    - Champ : _description_ `(text)`
+    - Champ : _createdBy_ `(text)`
+  - Table _group_member_ (const _groupMember_)
+    - Champ : _groupId_ `(text)`
+- **image.ts**
+  - Table _image_ (const _image_)
+    - Champ : _id_ `(text)`
+    - Champ : _uploadedBy_ `(text)`
+- **impact.ts**
+  - Table _impact_metric_ (const _impactMetric_)
+    - Champ : _id_ `(text)`
+    - Champ : _type_ `(impactMetricTypeEnum)`
+    - Champ : _value_ `(decimal)`
+  - Table _transparency_report_ (const _transparencyReport_)
+    - Champ : _id_ `(text)`
+    - Champ : _title_ `(text)`
+    - Champ : _slug_ `(text)`
+    - Champ : _contentJson_ `(jsonb)`
+    - Champ : _periodStart_ `(date)`
+    - Champ : _periodEnd_ `(date)`
+    - Champ : _metricIds_ `(text)`
+    - Champ : _publishedBy_ `(text)`
+- **local-service.ts**
+  - Table _local_service_ (const _localService_)
+    - Champ : _id_ `(text)`
+    - Champ : _categoryId_ `(text)`
+  - Table _service_availability_ (const _serviceAvailability_)
+    - Champ : _id_ `(text)`
+    - Champ : _serviceId_ `(text)`
+  - Table _booking_ (const _booking_)
+    - Champ : _id_ `(text)`
+    - Champ : _customerId_ `(text)`
+- **mediation.ts**
+  - Table _mediation_case_ (const _mediationCase_)
+    - Champ : _id_ `(text)`
+    - Champ : _reporterId_ `(text)`
+  - Table _mediation_session_ (const _mediationSession_)
+    - Champ : _id_ `(text)`
+    - Champ : _caseId_ `(text)`
+  - Table _mediation_agreement_ (const _mediationAgreement_)
+    - Champ : _id_ `(text)`
+    - Champ : _caseId_ `(text)`
+- **notification.ts**
+  - Table _notification_ (const _notification_)
+    - Champ : _id_ `(text)`
+    - Champ : _userId_ `(text)`
+- **place-attribute-value.ts**
+  - Table _place_attribute_value_ (const _placeAttributeValue_)
+    - Champ : _id_ `(text)`
+    - Champ : _placeId_ `(text)`
+- **place-detail.ts**
+  - Table _accommodation_detail_ (const _accommodationDetail_)
+    - Champ : _placeId_ `(text)`
+- **place-tag.ts**
+  - Table _place_tag_ (const _placeTag_)
+    - Champ : _placeId_ `(text)`
+- **place.ts**
+  - Table _place_ (const _place_)
+    - Champ : _id_ `(text)`
+    - Champ : _ownerId_ `(text)`
+  - Table _place_translation_ (const _placeTranslation_)
+    - Champ : _id_ `(text)`
+    - Champ : _placeId_ `(text)`
+- **profile.ts**
+  - Table _profile_ (const _profile_)
+    - Champ : _id_ `(text)`
+    - Champ : _userId_ `(text)`
+- **review.ts**
+  - Table _review_ (const _review_)
+    - Champ : _id_ `(text)`
+    - Champ : _placeId_ `(text)`
+  - Table _sub_rating_ (const _subRating_)
+    - Champ : _id_ `(text)`
+    - Champ : _reviewId_ `(text)`
+- **system-commission.ts**
+  - Table _system_commission_ (const _systemCommission_)
+    - Champ : _id_ `(text)`
+    - Champ : _name_ `(text)`
+    - Champ : _percentage_ `(decimal)`
+- **tag.ts**
+  - Table _tag_ (const _tag_)
+    - Champ : _id_ `(text)`
+    - Champ : _slug_ `(text)`
+    - Champ : _createdAt_ `(timestamp)`
+  - Table _tag_translation_ (const _tagTranslation_)
+    - Champ : _id_ `(text)`
+    - Champ : _tagId_ `(text)`
+- **trail.ts**
+  - Table _trail_ (const _trail_)
+    - Champ : _id_ `(text)`
+    - Champ : _createdBy_ `(text)`
+  - Table _poi_ (const _poi_)
+    - Champ : _id_ `(text)`
+    - Champ : _trailId_ `(text)`
+- **user-role.ts**
+  - Table _user_role_ (const _userRole_)
+    - Champ : _id_ `(text)`
+    - Champ : _userId_ `(text)`
+- **volunteer.ts**
+  - Table _volunteer_project_ (const _volunteerProject_)
+    - Champ : _id_ `(text)`
+    - Champ : _coordinatorId_ `(text)`
+  - Table _volunteer_task_ (const _volunteerTask_)
+    - Champ : _id_ `(text)`
+    - Champ : _projectId_ `(text)`
+  - Table _volunteer_participation_ (const _volunteerParticipation_)
+    - Champ : _id_ `(text)`
+    - Champ : _taskId_ `(text)`
+- **wallet.ts**
+  - Table _wallet_ (const _wallet_)
+    - Champ : _id_ `(text)`
+    - Champ : _userId_ `(text)`
+  - Table _transaction_ (const _transaction_)
+    - Champ : _id_ `(text)`
+    - Champ : _walletId_ `(text)`
 
 ## Variables de entorno
 
+- `USE_DB_TEST`
 - `USE_PROD_DB`
 - `DATABASE_URL_LOCAL`
+- `DATABASE_URL_TEST`
 - `DATABASE_URL_PROD`
 - `BETTER_AUTH_SECRET`
 - `BETTER_AUTH_URL`
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `SMTP_SECURE`
+- `SMTP_PROVIDER`
 - `SMTP_USER`
 - `SMTP_PASS`
-- `SMTP_PASSWORD`
 - `SMTP_FROM`
+- `NODE_ENV`
 - `RESEND_API_KEY`
 - `PUBLIC_API_URL`
 
@@ -534,13 +1056,23 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 
 #### Recommended test configs and files
 
-- **auth**
-  - auth.e2e.test.ts
-- **e2e**
-  - auth.spec.ts
+- **config**
+  - test-db.ts
+  - test-env.ts
+- **fixtures**
+  - auth-fixtures.ts
+  - security-payloads.ts
+- **integration**
+  - auth-emails.test.ts
+- README.md
 - setup.ts
+- **unit**
+  - smtp.test.ts
+  - validation.test.ts
 - **utils**
+  - api-helpers.ts
   - auth-test-utils.ts
+  - cleanup.ts
 - **src/lib**
 - **auth**
   - auth-client.ts
@@ -548,79 +1080,362 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - auth.ts
   - permissions.test.ts
   - permissions.ts
+  - roles.ts
+  - validate-user.ts
+- **i18n**
+  - locale-url.ts
+- **notifications**
+  - notifications.ts
 - **smtp**
-  - smtp.config.ts
-  - smtp.errors.ts
-  - smtp.send.ts
-  - smtp.tests.ts
+  - smtp.check.ts
   - smtp.ts
-  - smtp.types.ts
-  - smtp.validate.ts
+- types.ts
+- **wallet**
+  - wallet.ts
 - **src/database**
-- drizzle.test.ts
+- **data**
+  - 01-user.data.ts
+  - 02-account.data.ts
+  - 03-profile.data.ts
+  - 04-userRole.data.ts
+  - 05-wallet.data.ts
+  - 06-category.data.ts
+  - 07-categoryTranslation.data.ts
+  - 08-tag.data.ts
+  - 09-tagTranslation.data.ts
+  - 10-address.data.ts
+  - 11-place.data.ts
+  - 12-placeTranslation.data.ts
+  - 13-gastronomyDetail.data.ts
+  - 14-accommodationDetail.data.ts
+  - 15-activityDetail.data.ts
+  - 16-professional.data.ts
+  - 17-trail.data.ts
+  - 18-poi.data.ts
+  - 19-article.data.ts
+  - 20-articleContent.data.ts
+  - 21-event.data.ts
+  - 22-eventRegistration.data.ts
+  - 23-review.data.ts
+  - 24-subRating.data.ts
+  - 25-comment.data.ts
+  - 26-forumThread.data.ts
+  - 27-forumPost.data.ts
+  - 28-classified.data.ts
+  - 29-product.data.ts
+  - 30-localService.data.ts
+  - 31-serviceAvailability.data.ts
+  - 32-booking.data.ts
+  - 33-conversation.data.ts
+  - 34-conversationParticipant.data.ts
+  - 35-message.data.ts
+  - 36-group.data.ts
+  - 37-groupMember.data.ts
+  - 38-mediationCase.data.ts
+  - 39-mediationSession.data.ts
+  - 40-mediationAgreement.data.ts
+  - 41-educationModule.data.ts
+  - 42-educationLesson.data.ts
+  - 43-educationEnrollment.data.ts
+  - 44-educationProgress.data.ts
+  - 45-volunteerProject.data.ts
+  - 46-volunteerTask.data.ts
+  - 47-volunteerParticipation.data.ts
+  - 48-fundingCampaign.data.ts
+  - 49-donation.data.ts
+  - 50-impactMetric.data.ts
+  - 51-transparencyReport.data.ts
+  - 52-gallery.data.ts
+  - 53-galleryItem.data.ts
+  - 54-placeTag.data.ts
+  - 55-favorite.data.ts
+  - 56-notification.data.ts
+  - 57-systemCommission.data.ts
 - drizzle.ts
 - **loaders**
+  - articles-loader.ts
+  - categories-loader.ts
+  - events-loader.ts
   - factory.ts
+  - places-loader.ts
 - **migrations**
   - 0000_loving_blue_blade.sql
   - 0001_famous_tarantula.sql
   - 0002_ambitious_lady_ursula.sql
+  - 0003_condemned_iron_lad.sql
+  - 0003_create_audit_logs.sql
+  - 0004_sloppy_arachne.sql
+  - 0005_magenta_nico_minoru.sql
+  - 0006_unique_thanos.sql
+  - 0007_slim_mentor.sql
   - **meta**
     - 0000_snapshot.json
     - 0001_snapshot.json
     - 0002_snapshot.json
+    - 0003_snapshot.json
+    - 0004_snapshot.json
+    - 0005_snapshot.json
+    - 0006_snapshot.json
+    - 0007_snapshot.json
     - _journal.json
 - **schemas**
+  - address.ts
+  - article.ts
+  - attribute.ts
+  - audit-log.ts
   - auth-schema.ts
+  - category.ts
+  - classified.ts
+  - comment.ts
+  - conversation.ts
+  - education.ts
+  - event.ts
+  - favorite.ts
+  - forum.ts
+  - funding.ts
+  - gallery.ts
+  - group.ts
+  - image.ts
+  - impact.ts
+  - local-service.ts
+  - mediation.ts
+  - notification.ts
+  - place-attribute-value.ts
+  - place-detail.ts
+  - place-tag.ts
+  - place.ts
+  - product.ts
+  - professional.ts
+  - profile.ts
+  - review.ts
+  - system-commission.ts
+  - tag.ts
+  - trail.ts
+  - user-role.ts
+  - volunteer.ts
+  - wallet.ts
 - schemas.ts
 - **src/pages/api**
+- **admin**
+  - moderate.ts
+  - roles.ts
+- **articles**
+  - index.ts
+  - **[slug]**
+    - status.ts
+  - [slug].ts
 - **auth**
-  - auth.test.ts
   - [...all].ts
 - **auth-client**
   - forgot-password.ts
   - verification.ts
+- **bookings**
+  - index.ts
+- **categories**
+  - index.ts
+- **classifieds**
+  - index.ts
+- **comments**
+  - index.ts
+- **conversations**
+  - index.ts
+  - [id].ts
+- **education**
+  - **modules**
+    - index.ts
+    - [slug].ts
+- **events**
+  - index.ts
+  - [slug].ts
+- **favorites**
+  - index.ts
+- **forum**
+  - **threads**
+    - index.ts
+    - [slug].ts
+- **funding**
+  - **campaigns**
+    - index.ts
+    - [slug].ts
+- **galleries**
+  - index.ts
+  - [id].ts
+- **groups**
+  - index.ts
+  - [slug].ts
+- **impact**
+  - index.ts
+- **mediation**
+  - index.ts
+- **notifications**
+  - index.ts
+- **places**
+  - index.ts
+  - **[slug]**
+    - moderate.ts
+  - [slug].ts
+- **products**
+  - index.ts
+  - [id].ts
+- **profile**
+  - index.ts
+- **reviews**
+  - index.ts
+  - [id].ts
+- **services**
+  - index.ts
+- **sse**
+  - notifications.ts
+- **tags**
+  - index.ts
+- **transparency**
+  - index.ts
+  - [slug].ts
+- **volunteer**
+  - **projects**
+    - index.ts
+    - [slug].ts
+- **wallet**
+  - index.ts
 
 #### Test file summaries
 
-- `src\database\drizzle.test.ts`
-  - **Database - Drizzle ORM**
-    - devrait insérer et récupérer un utilisateur
-    - devrait respecter les contraintes uniques sur email
-
 - `src\lib\auth\auth.test.ts`
-  - **Better Auth - Authentication**
-  - **Inscription**
-    - devrait créer un utilisateur avec email et mot de passe
-    - devrait rejeter un email invalide
-    - devrait rejeter un mot de passe trop court
-    - devrait rejeter un doublon d\'email
-  - **Connexion**
-    - devrait connecter un utilisateur avec des identifiants valides
-    - devrait rejeter un mot de passe incorrect
-    - devrait rejeter un utilisateur inexistant
-  - **Session**
-    - devrait créer une session valide
+  - **Auth - Security & Functionality**
+  - **Inscription Sécurisée**
+    - crée utilisateur avec password fort
+    - rejète email homograph attack
+    - limite longueur champs
+  - **Password Security**
+    - hash password différent pour même password
+  - **Connexion Sécurisée**
+    - JWT a claims sécurisés
+    - .');
+      if (parts.length === 3) {
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
+        expect(payload.sub ?? payload.userId ?? login.user.id).toBeDefined();
+        expect(payload.iat ?? payload.issuedAt).toBeDefined();
+      } else {
+        // Session-based token (not JWT) — verify token and user exist
+        expect(login.token).toBeDefined();
+        expect(login.user.id).toBeDefined();
+      }
+    });
+
+    it('rejète timing attack (temps similaire)
+    - rate limit après 5 échecs
+    - session unique par device
+  - **Email Verification**
+    - envoie email avec token sécurisé
+    - token verification à usage unique
+  - **Password Reset**
+    - token reset expire
+    - token reset à usage unique
+    - notification email si password changé
+  - **Logout & Session**
+    - logout invalide token
+    - session expire après inactivité
+  - **Audit & Logging**
+    - log création utilisateur
+    - log échec connexion
 
 - `src\lib\auth\permissions.test.ts`
-  - **Permissions System**
-  - **checkPermission**
-    - devrait autoriser admin pour toutes les actions
-    - devrait restreindre les permissions utilisateur
-    - devrait gérer les permissions owner
+  - **RBAC/ABAC Security**
+  - **ABAC - Attribute Based**
+    - owner: ressource own vs other
+    - member: accès projet org uniquement
+    - time-based restrictions
+    - IP-based restrictions
+  - **Privilege Escalation Prevention**
+    - user ne peut pas s\'auto-promouvoir
+    - owner ne peut pas supprimer owner
+  - **Edge Cases**
+    - rôle inexistant = deny
+    - permission inexistante = deny
+    - context manquant pour ABAC = deny
 
-- `src\pages\api\auth\auth.test.ts`
-  - **API Auth Routes**
-  - **POST /api/auth/sign-up/email**
-    - devrait créer un utilisateur via l\'API
-    - devrait retourner une erreur pour un email existant
+- `tests\integration\auth-emails.test.ts`
+  - **BetterAuth Email Functions**
+  - **Email Verification**
+    - should have email verification config
+    - should call sendVerificationEmail without error
+    - should log mock SMTP when email verification is called
+  - **Password Reset**
+    - should have sendResetPassword config
+    - should call sendResetPassword without error
+    - should log mock SMTP when password reset is called
 
-- `tests\auth\auth.e2e.test.ts`
-  - **Authentication E2E**
-    - registers a new user
-    - logs in with valid credentials
-    - rejects login with invalid credentials
-    - starts password reset flow
+- `tests\unit\smtp.test.ts`
+  - **SmtpService Unit Tests**
+  - **Basic Email Sending**
+    - should send valid email
+    - should send email with HTML
+    - should send email with custom from
+    - should send email with replyTo
+  - **Email Validation**
+    - should reject invalid recipient email
+    - should reject invalid sender email
+    - should require subject
+    - should require content (text or html)
+    - should reject subject longer than 998 chars
+    - should accept valid email: user@example.com
+  - **Security - XSS Protection**
+  - **Security - SQL Injection**
+  - **Security - Null Bytes**
+    - should accept valid email without null byte: user@example.com
+  - **Batch Operations**
+    - should send batch emails
+    - should batch with custom concurrency
+    - should handle mixed valid and invalid emails in batch
+  - **Connection Management**
+    - should verify connection
+    - should close connection
+    - should return config
+  - **Error Handling**
+    - should handle timeout gracefully
+    - should classify auth errors
 
-- `tests\e2e\auth.spec.ts`
-  - **Authentication E2E**
+- `tests\unit\validation.test.ts`
+  - **Input Validation Unit Tests**
+  - **Email Validation**
+    - should accept valid email: user@example.com
+  - **Password Validation**
+  - **Username Validation**
+    - should accept valid usernames
+    - should reject invalid usernames
+  - **Subject Line Validation**
+    - should accept valid subjects
+    - should reject empty subject
+    - should reject oversized subject
+  - **Null Byte Detection**
+  - **SQL Injection Detection**
+  - **XSS Detection**
+  - **Command Injection Detection**
+  - **Path Traversal Detection**
+  - **LDAP Injection Detection**
+  - **XML Injection Detection**
+  - **Buffer Overflow Detection**
+  - **NoSQL Injection Detection**
+    - should detect NoSQL injection objects
+  - **Unicode Normalization**
+  - **Data Type Validation**
+    - should validate email is string
+    - should validate password is string
+    - should reject email as non-string
+    - should reject password as non-string
+  - **Required Fields Validation**
+    - should require email
+    - should require password
+    - should require username
+    - should accept all required fields
+  - **Whitespace Handling**
+    - should trim whitespace from username
+    - should reject username with only whitespace
+    - should preserve internal whitespace
+  - **Case Sensitivity**
+    - should handle email case insensitivity
+    - should handle password case sensitivity
+  - **Special Characters**
+    - should allow special characters in password
+    - should allow dots in email local part
+    - should reject special characters in username

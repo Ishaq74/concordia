@@ -1,0 +1,117 @@
+---
+export const prerender = false;
+
+import DashboardLayout from "@layouts/DashboardLayout.astro";
+import { getDrizzle } from "@database/drizzle";
+import { wallet, transaction } from "@database/schemas";
+import { eq, desc } from "drizzle-orm";
+import translations from "@i18n/fr.json";
+
+const t = translations;
+const db = await getDrizzle();
+const user = Astro.locals.user!;
+
+const walletRows = await db
+  .select()
+  .from(wallet)
+  .where(eq(wallet.userId, user.id))
+  .limit(1);
+
+const userWallet = walletRows[0] ?? null;
+
+let transactions: { id: string; type: string; amount: string; description: string | null; referenceType: string | null; referenceId: string | null; createdAt: Date }[] = [];
+if (userWallet) {
+  transactions = await db
+    .select({
+      id: transaction.id,
+      type: transaction.type,
+      amount: transaction.amount,
+      description: transaction.description,
+      referenceType: transaction.referenceType,
+      referenceId: transaction.referenceId,
+      createdAt: transaction.createdAt,
+    })
+    .from(transaction)
+    .where(eq(transaction.walletId, userWallet.id))
+    .orderBy(desc(transaction.createdAt))
+    .limit(50);
+}
+
+const typeLabels: Record<string, string> = {
+  credit: "Crédit",
+  debit: "Débit",
+  commission: "Commission",
+  refund: "Remboursement",
+  donation: "Don",
+  transfer: "Transfert",
+};
+
+const typeColors: Record<string, string> = {
+  credit: "positive",
+  refund: "positive",
+  debit: "negative",
+  commission: "negative",
+  donation: "neutral",
+  transfer: "neutral",
+};
+---
+
+<DashboardLayout title={t.dashboard.wallet} activeSection="wallet">
+  <h1>{t.dashboard.wallet}</h1>
+
+  {userWallet ? (
+    <>
+      <div class="balance-card">
+        <span class="balance-label">{t.dashboard.balance}</span>
+        <span class="balance-amount">{Number(userWallet.balance).toLocaleString("fr-FR", { minimumFractionDigits: 2 })} {userWallet.currency}</span>
+      </div>
+
+      <section class="transactions-section" aria-label={t.dashboard.transactions}>
+        <h2>{t.dashboard.transactions}</h2>
+        {transactions.length === 0 ? (
+          <p class="empty">Aucune transaction.</p>
+        ) : (
+          <ul class="transaction-list" role="list">
+            {transactions.map((tx) => (
+              <li class:list={["transaction-item", typeColors[tx.type] ?? "neutral"]}>
+                <div class="tx-main">
+                  <span class="tx-type">{typeLabels[tx.type] ?? tx.type}</span>
+                  <span class:list={["tx-amount", typeColors[tx.type] ?? "neutral"]}>
+                    {tx.type === "credit" || tx.type === "refund" ? "+" : tx.type === "debit" || tx.type === "commission" ? "−" : ""}
+                    {Number(tx.amount).toLocaleString("fr-FR", { minimumFractionDigits: 2 })} {userWallet.currency}
+                  </span>
+                </div>
+                {tx.description && <p class="tx-description">{tx.description}</p>}
+                <span class="tx-date">
+                  {new Date(tx.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </>
+  ) : (
+    <p class="empty">Aucun portefeuille associé à votre compte.</p>
+  )}
+</DashboardLayout>
+
+<style>
+  h1 { font-size: var(--text-2xl, 1.5rem); font-weight: 800; margin: 0 0 var(--space-4, 1rem); }
+  .balance-card { background: linear-gradient(135deg, var(--color-primary, #3b82f6), #8b5cf6); color: #fff; border-radius: var(--radius-lg, 0.5rem); padding: var(--space-6, 1.5rem); margin-bottom: var(--space-6, 1.5rem); }
+  .balance-label { display: block; font-size: var(--text-sm, 0.875rem); opacity: 0.8; margin-bottom: var(--space-1, 0.25rem); }
+  .balance-amount { font-size: var(--text-3xl, 1.875rem); font-weight: 800; }
+
+  .transactions-section h2 { font-size: var(--text-lg, 1.125rem); font-weight: 700; margin: 0 0 var(--space-3, 0.75rem); }
+  .empty { color: var(--text-secondary, #64748b); }
+  .transaction-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+  .transaction-item { padding: var(--space-3, 0.75rem); border-bottom: 1px solid var(--border-color, #e2e8f0); }
+  .tx-main { display: flex; justify-content: space-between; align-items: center; }
+  .tx-type { font-size: var(--text-sm, 0.875rem); font-weight: 600; }
+  .tx-amount { font-size: var(--text-sm, 0.875rem); font-weight: 700; }
+  .tx-amount.positive { color: #16a34a; }
+  .tx-amount.negative { color: #dc2626; }
+  .tx-amount.neutral { color: var(--text-primary, #1e293b); }
+  .tx-description { font-size: var(--text-sm, 0.875rem); color: var(--text-secondary, #64748b); margin: 2px 0 0; }
+  .tx-date { font-size: var(--text-xs, 0.75rem); color: var(--text-muted, #94a3b8); }
+</style>
