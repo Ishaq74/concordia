@@ -22,17 +22,24 @@ const { entityId, entityType } = Astro.props;
 const user = Astro.locals.user;
 const lang = Astro.locals.lang || "fr";
 
-const db = await getDrizzle();
-const allComments = await db.query.comments.findMany({
-  where: and(
-    eq(comments.entityId, entityId),
-    eq(comments.entityType, entityType),
-  ),
-  orderBy: [desc(comments.createdAt)],
-});
-
-// On identifie les racines pour lancer la récursivité
-const rootComments = allComments.filter((c) => !c.parentId);
+let allComments = [];
+let rootComments = [];
+let dbError = null;
+try {
+  const db = await getDrizzle();
+  allComments = await db.query.comments.findMany({
+    where: and(
+      eq(comments.entityId, entityId),
+      eq(comments.entityType, entityType),
+    ),
+    orderBy: [desc(comments.createdAt)],
+  });
+  rootComments = allComments.filter((c) => !c.parentId);
+} catch (err) {
+  // Défensive : ne doit jamais casser la page article
+  dbError = err?.message || String(err);
+  console.error('PostComments: DB read error', dbError);
+}
 const loginUrl = `/${lang}/connexion?callbackURL=${Astro.url.pathname}`;
 ---
 

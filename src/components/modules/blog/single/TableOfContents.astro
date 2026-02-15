@@ -3,22 +3,34 @@
 // On peut le rendre sticky via CSS.
 interface Props {
   class?: string;
+  items?: { label: string; href: string; depth?: number }[];
 }
 
-const { class: className } = Astro.props;
+const { class: className, items = undefined } = Astro.props as Props;
 ---
 
 <nav class:list={["toc-container", className]} aria-label="Table des matières">
   <h3 class="toc-title">Sommaire</h3>
-  <ul id="toc-list" class="toc-list">
-    {/* Rempli par le script client */}
-  </ul>
+  {items ? (
+    <ul class="toc-list">
+      {items.map(item => (
+        <li>
+          <a class={item.depth === 3 ? 'toc-link toc-link--child' : 'toc-link'} href={item.href}>{item.label}</a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <ul id="toc-list" class="toc-list">
+      {/* Rempli par le script client */}
+    </ul>
+  )}
 </nav>
 
 <script>
   // Script "Island" qui s'exécute côté client
   function generateTOC() {
-    const article = document.querySelector('article .content'); // Ta classe "prose" ou "content"
+    // Cherche plusieurs cibles possibles : .post-content (nouveau), .content, .prose, ou l'article lui‑même
+    const article = document.querySelector('article.post-content, article .content, article.prose, .post-content, .prose, article');
     const tocList = document.getElementById('toc-list');
 
     if (!article || !tocList) return;
@@ -26,8 +38,36 @@ const { class: className } = Astro.props;
     // 1. Trouver tous les H2 et H3
     const headers = article.querySelectorAll('h2, h3');
     
+    // Si pas de H2/H3, essayer de générer une TOC à partir de <p><strong>... (fallback)
     if (headers.length === 0) {
-      document.querySelector('.toc-container')?.remove(); // Si pas de titre, on cache la TOC
+      const strongs = article.querySelectorAll('p > strong, strong');
+      if (strongs.length > 0) {
+        strongs.forEach((s, i) => {
+          const fakeId = s.id || `section-strong-${i}`;
+          s.id = fakeId;
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `#${fakeId}`;
+          a.textContent = s.textContent || `Section ${i + 1}`;
+          a.className = 'toc-link';
+          a.addEventListener('click', (e) => { e.preventDefault(); s.scrollIntoView({ behavior: 'smooth' }); history.pushState(null, '', `#${fakeId}`); });
+          li.appendChild(a);
+          tocList.appendChild(li);
+        });
+        // continue to observe these pseudo‑headers
+        const fauxHeaders = Array.from(article.querySelectorAll('[id^="section-strong-"]'));
+        fauxHeaders.forEach(h => observer.observe(h));
+        return;
+      }
+
+      // Aucun titre détectable → afficher un petit message utile au lieu de supprimer
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = '#';
+      a.textContent = 'Aucun sommaire disponible';
+      a.className = 'toc-link disabled';
+      li.appendChild(a);
+      tocList.appendChild(li);
       return;
     }
 

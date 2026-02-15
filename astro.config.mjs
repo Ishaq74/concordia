@@ -8,6 +8,8 @@ import Sonda from 'sonda/astro';
 
 import Icon from 'astro-icon';
 
+import mdx from '@astrojs/mdx';
+
 let adapter = vercel();
 if (process.argv && process.argv.includes('--node')) {
   adapter = node({ mode: 'standalone' });
@@ -16,10 +18,7 @@ if (process.argv && process.argv.includes('--node')) {
 const siteUrl = process.env.SITE || undefined;
 
 export default defineConfig({
-  integrations: [
-    Icon(),
-    Sonda({server: true})
-  ],
+  integrations: [Icon(), Sonda({server: true}), mdx()],
   output: 'server',
   site: siteUrl,
   base: '/',
