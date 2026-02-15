@@ -276,7 +276,9 @@ input[type="range"]::-webkit-slider-thumb {
 
 /* CARD */
 .card { 
+  display: grid;
   padding: var(--card-padding); 
+  gap: 1rem;
   border-radius: var(--card-border-radius); 
   background-color: var(--card-bg); 
   color: var(--card-color);

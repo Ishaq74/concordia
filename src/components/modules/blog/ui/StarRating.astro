@@ -1,0 +1,106 @@
+---
+interface Props {
+  rating: number;
+  count?: number;
+  size?: "sm" | "md" | "lg";
+  showCount?: boolean;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  color?: 'default' | 'primary' | 'secondary' | 'accent' | 'error';
+  className?: string;
+}
+
+const {
+  rating,
+  count = 0,
+  size = "sm",
+  showCount = true,
+  variant = 'initial',
+  color = 'primary',
+  className = ''
+} = Astro.props as Props;
+
+const stars = [1, 2, 3, 4, 5];
+const roundedRating = Math.round(rating || 0);
+
+const classes = [
+  'star-rating',
+  variant !== 'initial' ? variant : '',
+  color && color !== 'default' ? `color-${color}` : '',
+  `size-${size}`,
+  className,
+].filter(Boolean).join(' ');
+---
+
+<div class={classes} role="img" aria-label={`${roundedRating}/5 (${count} avis)`} title={`${roundedRating}/5 (${count} avis)`}>
+  <div class="stars" aria-hidden="true">
+    {stars.map((star) => (
+      <svg
+        viewBox="0 0 24 24"
+        class={`star ${star <= roundedRating ? 'filled' : ''}`}
+        role="presentation"
+        focusable="false"
+        aria-hidden="true"
+      >
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
+    ))}
+  </div>
+
+  {showCount && count > 0 && (
+    <span class="count">({count})</span>
+  )}
+</div>
+
+<style>
+  /* StarRating — uses design tokens for sizes & colors */
+  .star-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: inherit;
+  }
+
+  .star-rating .stars {
+    display: inline-flex;
+    gap: var(--space-1);
+    color: var(--star-fill, var(--color-primary)); /* filled star color */
+  }
+
+  .star {
+    width: var(--star-size, var(--space-4));
+    height: var(--star-size, var(--space-4));
+    flex: 0 0 auto;
+    stroke: var(--star-unfilled, var(--text-muted));
+    fill: none;
+    transition: transform 0.12s ease, color 0.12s ease;
+  }
+
+  .star.filled {
+    fill: currentColor;
+    stroke: currentColor;
+  }
+
+  /* Sizes mapped to spacing tokens */
+  .size-sm { --star-size: var(--space-4); } /* 1rem */
+  .size-md { --star-size: var(--space-5); } /* 1.25rem */
+  .size-lg { --star-size: var(--space-6); } /* 1.5rem */
+
+  .count {
+    font-size: var(--badge-font-size);
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-left: var(--space-2);
+    display: inline-block;
+  }
+
+  /* Color tokens */
+  .color-primary { --star-fill: var(--color-primary); }
+  .color-secondary { --star-fill: var(--color-secondary); }
+  .color-accent { --star-fill: var(--color-accent); }
+  .color-error { --star-fill: var(--color-danger); }
+
+  /* Variant-specific micro-styling (keeps system consistent) */
+  .star-rating.retro .star { filter: saturate(0.95); }
+  .star-rating.modern .star { transform-origin: center; }
+  .star-rating.futuristic .star { filter: drop-shadow(0 4px 10px rgba(0,0,0,0.12)); }
+</style>

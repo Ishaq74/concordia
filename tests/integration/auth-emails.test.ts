@@ -43,9 +43,8 @@ describe('BetterAuth Email Functions', () => {
         token: 'abc123',
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[MOCK SMTP]')
-      )
+      expect(consoleSpy).toHaveBeenCalled()
+      expect(consoleSpy.mock.calls.some(args => typeof args[0] === 'string' && args[0].includes('[MOCK SMTP]'))).toBe(true)
       consoleSpy.mockRestore()
     })
   })
@@ -83,9 +82,8 @@ describe('BetterAuth Email Functions', () => {
         token: 'xyz789',
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[MOCK SMTP]')
-      )
+      expect(consoleSpy).toHaveBeenCalled()
+      expect(consoleSpy.mock.calls.some(args => typeof args[0] === 'string' && args[0].includes('[MOCK SMTP]'))).toBe(true)
       consoleSpy.mockRestore()
     })
   })

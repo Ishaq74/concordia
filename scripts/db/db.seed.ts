@@ -5,6 +5,8 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import * as fs from 'fs';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
+// Schema helper used to insert derived junction rows from blog_posts.categoryId
+import { blogPostCategories } from '../../src/database/schemas';
 
 config();
 
@@ -16,6 +18,27 @@ process.env.DATABASE_URL = isProd ? process.env.DATABASE_URL_PROD : process.env.
 async function seed() {
   const args = process.argv.slice(2);
   const doReset = args.includes('--reset');
+
+  // Safety: show target DB and require confirmation when running against production
+  if (isProd) {
+    const prodUrl = process.env.DATABASE_URL_PROD || process.env.DATABASE_URL;
+    const mask = (u?: string) => u ? u.replace(/:\/\/[^@]+@/, '://***@') : 'N/A';
+    const dbName = (() => { try { return new URL(prodUrl!).pathname.replace(/^\//, '') } catch { return (prodUrl || '').split('/').pop() || 'unknown' } })();
+    console.log(`\x1b[41m\x1b[97m PROD ATTENTION !! Vous ciblez la base de production : ${dbName} (${mask(prodUrl)}) \x1b[0m`);
+    if (process.env.CONFIRM_PROD !== 'oui') {
+      const readline = await import('node:readline/promises');
+      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      const answer = await rl.question('CONFIRM_PROD requis pour seed sur PROD. Continuer ? (oui/non): ');
+      rl.close();
+      if (answer.trim().toLowerCase() !== 'oui') {
+        console.log('Opération annulée.');
+        process.exit(0);
+      }
+    } else {
+      console.log('\x1b[33m[SECURE] CONFIRM_PROD=oui détecté — seed sur PROD autorisé.\x1b[0m');
+    }
+  }
+
   const client = getPgClient();
   await client.connect();
   const db = drizzle(client);
@@ -114,18 +137,79 @@ async function seed() {
         console.warn(`[SKIP] Dataset tableau non trouvé pour ${dataFile}`);
         continue;
       }
-      const rows = (dataset as any[]).map(transformRow);
+      let rows = (dataset as any[]).map(transformRow);
+
+      // Normalize / map known data key mismatches so schema insertions succeed
+      if (baseName === 'blog_media') {
+        rows = rows.map(r => {
+          // schema expects `alt` (jsonb); some seed data used `altText`
+          if (r.altText && !r.alt) {
+            r.alt = r.altText;
+            delete r.altText;
+          }
+          // ensure width/height are strings (schema stores text)
+          if (r.width !== undefined) r.width = String(r.width);
+          if (r.height !== undefined) r.height = String(r.height);
+          // remove uploadDate if present (not in schema)
+          if (r.uploadDate) delete r.uploadDate;
+          return r;
+        });
+      }
+
+      if (baseName === 'blog_organizations' || baseName === 'blog_organization') {
+        rows = rows.map(r => {
+          // schema has `name` (string); data provides `legalName` (localized object)
+          if (!r.name && r.legalName) {
+            r.name = r.legalName.fr || r.legalName.en || Object.values(r.legalName)[0] || r.slug || r.id;
+          }
+          // drop large/unused localized fields that schema doesn't expect
+          if (r.legalName) delete r.legalName;
+          if (r.address) delete r.address;
+          if (r.sameAs) delete r.sameAs;
+          if (r.foundingDate) delete r.foundingDate;
+          return r;
+        });
+      }
+
       if (rows.length === 0) {
         console.log(`[INFO] Dataset vide pour ${baseName}`);
         continue;
       }
+
       const inserter: any = db.insert(chosenSchemaExport as any).values(rows as any);
-      if (typeof inserter.onConflictDoNothing === 'function') {
-        await inserter.onConflictDoNothing();
-      } else {
-        await inserter;
+      try {
+        if (typeof inserter.onConflictDoNothing === 'function') {
+          await inserter.onConflictDoNothing();
+        } else {
+          await inserter;
+        }
+        console.log(`[OK] ${baseName} -> ${chosenSchemaFile} (${rows.length} lignes)`);
+      } catch (err) {
+        // Log full error for debugging (include driver details)
+        try { console.error(`[ERR-DETAILED] ${baseName}:`, JSON.stringify(err, Object.getOwnPropertyNames(err), 2)); } catch (e) { console.error('[ERR-DETAILED] could not stringify error', err); }
+        throw err;
       }
-      console.log(`[OK] ${baseName} -> ${chosenSchemaFile} (${rows.length} lignes)`);
+
+      // --- Special-case: if blog_posts rows include `categoryId`, populate
+      // the junction table `blog_post_categories` from those values so existing
+      // (misnamed) data in blog_posts is respected instead of requiring a
+      // separate blog_post_categories.data.ts file.
+      if (baseName === 'blog_posts') {
+        try {
+          const rawDataset = (dataModule && Object.values(dataModule).find((d: any[]) => Array.isArray(d))) as any[];
+          if (rawDataset && rawDataset.length) {
+            const mapping = rawDataset
+              .map(r => ({ postId: r.id, categoryId: r.categoryId }))
+              .filter(x => x.postId && x.categoryId);
+            if (mapping.length) {
+              await db.insert(blogPostCategories).values(mapping).onConflictDoNothing();
+              console.log(`[OK] blog_post_categories (derived from blog_posts.categoryId) -> ${mapping.length} lignes`);
+            }
+          }
+        } catch (err) {
+          console.warn('[WARN] Failed to derive blog_post_categories from blog_posts:', err);
+        }
+      }
     } catch (err) {
       if (err && err.message) {
         console.error(`[ERR] ${baseName}: ${err.message}`);

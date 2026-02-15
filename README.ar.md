@@ -114,6 +114,7 @@ npm install
   - sonda-report.html
 - **scripts**
   - **db**
+    - check-pseudo.ts
     - db.check.ts
     - db.compare.ts
     - db.generate.ts
@@ -162,7 +163,9 @@ npm install
       - **Accordion**
         - Accordion.astro
         - AccordionItem.astro
+      - AdCard.astro
       - Alert.astro
+      - ArticleCard.astro
       - **Avatar**
         - Avatar.astro
         - AvatarCard.astro
@@ -186,6 +189,7 @@ npm install
         - CardHeader.astro
         - CardImage.astro
         - CardMeta.astro
+      - Container.astro
       - **Dialog**
         - Dialog.astro
         - DialogClose.astro
@@ -196,6 +200,8 @@ npm install
         - DialogTitle.astro
         - DialogTrigger.astro
       - Dropdown.astro
+      - EventCard.astro
+      - Flex.astro
       - **Form**
         - Checkbox.astro
         - DatePicker.astro
@@ -208,13 +214,22 @@ npm install
         - Select.astro
         - Switch.astro
         - Textarea.astro
+      - FundingCampaignCard.astro
       - Gallery.astro
+      - Grid.astro
+      - GroupCard.astro
       - Kbd.astro
       - Link.astro
       - Map.astro
       - MenuDropdown.astro
       - Pagination.astro
+      - PlaceCard.astro
+      - ProductCard.astro
       - ProgressBar.astro
+      - QueryLoop.astro
+      - SearchBar.astro
+      - SearchFilter.astro
+      - ServiceCard.astro
       - **Sheet**
         - Sheet.astro
         - SheetClose.astro
@@ -242,9 +257,11 @@ npm install
         - Tab.astro
         - TabPanel.astro
         - Tabs.astro
+      - ThreadCard.astro
       - Timeline.astro
       - Tooltip.astro
       - Video.astro
+      - VolunteerProjectCard.astro
   - content.config.ts
   - **database**
     - **data**
@@ -322,6 +339,7 @@ npm install
       - 0005_magenta_nico_minoru.sql
       - 0006_unique_thanos.sql
       - 0007_slim_mentor.sql
+      - 0008_fix_user_pseudo_data.sql
       - **meta**
         - 0000_snapshot.json
         - 0001_snapshot.json
@@ -466,6 +484,7 @@ npm install
         - [id].ts
       - **profile**
         - index.ts
+      - query.ts
       - **reviews**
         - index.ts
         - [id].ts
@@ -1168,6 +1187,7 @@ npm install
   - 0005_magenta_nico_minoru.sql
   - 0006_unique_thanos.sql
   - 0007_slim_mentor.sql
+  - 0008_fix_user_pseudo_data.sql
   - **meta**
     - 0000_snapshot.json
     - 0001_snapshot.json
@@ -1279,6 +1299,7 @@ npm install
   - [id].ts
 - **profile**
   - index.ts
+- query.ts
 - **reviews**
   - index.ts
   - [id].ts

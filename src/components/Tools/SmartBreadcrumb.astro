@@ -1,0 +1,153 @@
+---
+// src/components/ui/SmartBreadcrumb.astro
+import {
+    Breadcrumb,
+    BreadcrumbList,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/starwind/breadcrumb";
+import { Icon } from "astro-icon/components";
+
+// Imports i18n
+import translationsFr from "@i18n/fr.json";
+import translationsEn from "@i18n/en.json";
+import translationsEs from "@i18n/es.json";
+import translationsAr from "@i18n/ar.json";
+import translationsDe from "@i18n/de.json";
+import translationsZh from "@i18n/zh.json";
+
+interface Props {
+    excludeLevels?: string[];
+    showIcons?: boolean;
+    homeIcon?: string;
+    overrides?: Record<string, string>;
+    class?: string;
+    lang?: string;
+    hideOnEntities?: boolean; // If true, hides on ALL entity pages (index, cat, detail)
+    hideOnDetails?: boolean; // If true, hides ONLY on detail pages (default true)
+    customCrumbs?: { label: string; href: string }[];
+    hide?: boolean;
+}
+
+const {
+    excludeLevels = [],
+    showIcons = true,
+    homeIcon = "mdi:home",
+    overrides = {},
+    class: className,
+    lang = "fr",
+    hideOnEntities = false,
+    hideOnDetails = false,
+    customCrumbs,
+    hide = false,
+} = Astro.props;
+
+if (hide) return null;
+
+const translationsMap: Record<string, any> = {
+    fr: translationsFr,
+    en: translationsEn,
+    es: translationsEs,
+    ar: translationsAr,
+    de: translationsDe,
+    zh: translationsZh,
+};
+
+const t = translationsMap[lang] ?? translationsFr;
+
+// Get current path
+const pathname = Astro.url.pathname;
+const segments = pathname.split("/").filter(Boolean);
+
+// Skip language segment if it's the first one
+const startIdx = segments[0] === lang ? 1 : 0;
+const breadcrumbSegments = segments.slice(startIdx);
+
+// Mapping for entity segments to i18n keys
+const entityKeys: Record<string, string> = {
+    places: "guide.places",
+    events: "guide.events",
+    hikes: "guide.hikes",
+    classifieds: "guide.classifieds",
+    blog: "blog",
+};
+
+// Helper to get label
+const getLabel = (segment: string) => {
+    if (overrides[segment]) return overrides[segment];
+
+    // Check if it's an entity
+    const entityKey = entityKeys[segment];
+    if (entityKey && t[entityKey]) return t[entityKey];
+
+    // Check common keys
+    if (t[segment]) return t[segment];
+
+    // Fallback: capitalize and replace dashes
+    return (
+        segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ")
+    );
+};
+
+// Filter out excluded levels
+const filteredSegments = breadcrumbSegments.filter(
+    (s) => !excludeLevels.includes(s),
+);
+
+// If customCrumbs are provided, use them instead of automatic generation
+const finalCrumbs =
+    customCrumbs ||
+    filteredSegments.map((segment, index) => {
+        const segmentIdxInOriginal = breadcrumbSegments.indexOf(segment);
+        return {
+            label: getLabel(segment),
+            href: `/${lang}/${breadcrumbSegments.slice(0, segmentIdxInOriginal + 1).join("/")}`,
+        };
+    });
+
+// Logic for hiding
+const entities = ["places", "events", "hikes", "classifieds", "blog"];
+const currentEntity = segments[startIdx];
+const isEntityPage = entities.includes(currentEntity);
+const isDetailPage = isEntityPage && breadcrumbSegments.length >= 3;
+
+if (hideOnEntities && isEntityPage) return null;
+if (hideOnDetails && isDetailPage) return null;
+
+// If we are on the home page (only language segment or empty), we might want to hide it too
+if (breadcrumbSegments.length === 0) return null;
+---
+
+<Breadcrumb class={className}>
+    <BreadcrumbList>
+        <BreadcrumbItem>
+            <BreadcrumbLink href={`/${lang}/`} class="flex items-center gap-1">
+                {showIcons && <Icon name={homeIcon} class="size-4" />}
+                <span>{t.home || "Home"}</span>
+            </BreadcrumbLink>
+        </BreadcrumbItem>
+
+        {
+            finalCrumbs.map((crumb, index) => {
+                const isLast = index === finalCrumbs.length - 1;
+
+                return (
+                    <>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            {isLast ? (
+                                <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                            ) : (
+                                <BreadcrumbLink href={crumb.href}>
+                                    {crumb.label}
+                                </BreadcrumbLink>
+                            )}
+                        </BreadcrumbItem>
+                    </>
+                );
+            })
+        }
+    </BreadcrumbList>
+</Breadcrumb>

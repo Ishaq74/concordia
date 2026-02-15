@@ -1,0 +1,62 @@
+---
+// src/pages/fr/blog/index.astro
+import { getCollection } from "astro:content";
+import { getDrizzle } from "@database/drizzle";
+import { comments } from "@database/schemas";
+import { sql, and, eq } from "drizzle-orm";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import PostGrid from "@components/modules/blog/lists/PostGrid.astro";
+import PostCard from "@components/modules/blog/cards/PostCard.astro";
+
+const LANG = "fr";
+const allPosts = await getCollection("blog");
+
+// On récupère les vraies stats SQL depuis la nouvelle table générique
+const db = await getDrizzle();
+const liveStats = await db
+  .select({
+    entityId: comments.entityId,
+    avgRating: sql<number>`avg(${comments.rating})`.mapWith(Number),
+    count: sql<number>`count(${comments.id})`.mapWith(Number),
+  })
+  .from(comments)
+  .where(eq(comments.entityType, "blog"))
+  .groupBy(comments.entityId);
+
+const statsMap = new Map(liveStats.map((s) => [s.entityId, s]));
+
+const posts = allPosts
+  .filter((post) => post.data.lang === LANG)
+  .sort(
+    (a, b) =>
+      new Date(b.data.publishedAt || 0).getTime() -
+      new Date(a.data.publishedAt || 0).getTime(),
+  );
+
+// DEBUG — afficher les catégories des posts pour investiguer l'absence de CategoryBadge
+console.log('[blog/index] posts count=', posts.length);
+posts.forEach(p => console.log(`[blog/index] slug=${p.data.slug} categories=`, p.data.categories ?? null));
+
+---
+
+<BaseLayout title="Blog" lang={LANG}>
+  <main class="container py-12">
+    <PostGrid>
+      {
+        posts.map((post) => {
+          const stats = statsMap.get(post.data.id);
+
+          return (
+            <PostCard
+              post={post}
+              lang={LANG}
+              rating={stats?.avgRating}
+              count={stats?.count}
+              variant="retro"
+            />
+          );
+        })
+      }
+    </PostGrid>
+  </main>
+</BaseLayout>

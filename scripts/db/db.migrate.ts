@@ -25,13 +25,87 @@ async function main() {
     console.log(`\n${cyan}${bold}═══════════════════════════════════════════════════════${reset}`);
     console.log(`${cyan}${bold}   🚀 Migration Drizzle - Connexion ${CONNECTION_LABEL} 🚀${reset}`);
     console.log(`${cyan}${bold}═══════════════════════════════════════════════════════${reset}\n`);
+
+        // Affiche la DB cible (masquée) et avertissement PROD si nécessaire
+        const targetDbUrl = USE_PROD_DB ? (process.env.DATABASE_URL_PROD || process.env.DATABASE_URL) : (process.env.DATABASE_URL_LOCAL || process.env.DATABASE_URL);
+        const maskUrl = (u?: string) => u ? u.replace(/:\/\/[^@]+@/, '://***@') : 'N/A';
+        const dbNameFromUrl = (u?: string) => {
+          try { return u ? new URL(u).pathname.replace(/^\//, '') : 'unknown'; } catch { return (u || '').split('/').pop() || 'unknown'; }
+        };
+        console.log(`${yellow}${bold}Cible DB:${reset} ${maskUrl(targetDbUrl)} (${CONNECTION_LABEL})`);
+        if (USE_PROD_DB) {
+          console.log(`\n\x1b[41m\x1b[97m PROD ATTENTION !! Vous ciblez la base de production : ${dbNameFromUrl(targetDbUrl)} \x1b[0m\n`);
+          if (process.env.CONFIRM_PROD !== 'oui') {
+            const readline = await import('node:readline/promises');
+            const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+            const answer = await rl.question('Êtes-vous sûr de vouloir exécuter les migrations sur PROD ? (oui/non): ');
+            rl.close();
+            if (answer.trim().toLowerCase() !== 'oui') {
+              console.log('Opération annulée (confirmation PROD manquante).');
+              process.exit(0);
+            }
+          } else {
+            console.log(`${yellow}[SECURE] CONFIRM_PROD=oui détecté — exécution sur PROD autorisée.${reset}`);
+          }
+        }
+
+    // Connexion au client PostgreSQL (restaurée — avait été supprimée par erreur)
+    console.log(`${cyan}Connexion au client PostgreSQL...${reset}`);
     await client.connect();
+
+    // --- Nouveau: gère le flag --reset -------------------------------------------------
+    const doReset = process.argv.includes('--reset');
+    if (doReset) {
+      console.log(`\n\x1b[41m\x1b[97m ATTENTION DESTRUCTIF: --reset demandé — toutes les tables de la base ${dbNameFromUrl(targetDbUrl)} vont être SUPPRIMÉES ! \x1b[0m\n`);
+
+      // Si on est en production on exige CONFIRM_PROD=oui ou une confirmation explicite
+      if (USE_PROD_DB && process.env.CONFIRM_PROD !== 'oui') {
+        const readline = await import('node:readline/promises');
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        const answer = await rl.question('CONFIRM_PROD requis pour --reset sur PROD. Tapez "oui" pour confirmer: ');
+        rl.close();
+        if (answer.trim().toLowerCase() !== 'oui') {
+          console.log('Opération annulée (confirmation manquante).');
+          process.exit(0);
+        }
+      } else {
+        // Non-PROD: demande une confirmation explicite (protection contre erreur humaine)
+        const readline = await import('node:readline/promises');
+        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        const answer = await rl.question('Ce flag va supprimer toutes les tables et réinitialiser l\'historique des migrations. Confirmer (oui/non) ? ');
+        rl.close();
+        if (answer.trim().toLowerCase() !== 'oui') {
+          console.log('Opération annulée (annulation par utilisateur).');
+          process.exit(0);
+        }
+      }
+
+      console.log(`${yellow}Suppression des tables en cours...${reset}`);
+      // Désactive temporairement les contraintes pour éviter les erreurs de dépendance
+      await client.query('SET session_replication_role = replica;');
+      const { rows: tables } = await client.query(`SELECT tablename FROM pg_tables WHERE schemaname = 'public'`);
+      for (const { tablename } of tables) {
+        try {
+          await client.query(`DROP TABLE IF EXISTS "${tablename}" CASCADE;`);
+          console.log(`${green}Table supprimée: ${tablename}${reset}`);
+        } catch (err: any) {
+          console.warn(`${yellow}Échec suppression table ${tablename}: ${err?.message || err}${reset}`);
+        }
+      }
+      await client.query('SET session_replication_role = DEFAULT;');
+      console.log(`${green}Toutes les tables supprimées.${reset}\n`);
+    }
+    // --- fin -- nouveau ---------------------------------------------------------------
+
     await ensureMigrationsTable(client);
 
     const applied = await loadAppliedMigrations(client);
     const pending = collectMigrations(applied);
 
     if (pending.length === 0) {
+      // Message clair et visible dans tous les cas (évite l'impression incomplète de la sortie)
+      console.log(`\n${green}${bold}✔️  Aucun changement — aucune migration en attente pour la base ${dbNameFromUrl(targetDbUrl)} (${CONNECTION_LABEL}).${reset}`);
+
       if (!existsSync(MIGRATIONS_DIR)) {
         console.log(`\n${yellow}${bold}⚠️  Dossier de migrations introuvable.${reset}`);
         console.log(`${cyan}Aucune migration à appliquer car le dossier de migrations n'existe pas.${reset}`);
@@ -49,6 +123,7 @@ async function main() {
           console.log(`${cyan}Toutes les migrations sont déjà appliquées.${reset}`);
         }
       }
+
       console.log(`\n${cyan}${bold}═══════════════════════════════════════════════════════${reset}\n`);
       return;
     }

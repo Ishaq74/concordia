@@ -1,0 +1,47 @@
+---
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import CardMeta from "@components/ui/Card/CardMeta.astro";
+import Link from "@components/ui/Link.astro";
+
+interface Props {
+  href: string;
+  title: string;
+  summary?: string;
+  coverImageUrl?: string;
+  publishedAt?: Date;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+}
+
+const {
+  href,
+  title,
+  summary,
+  coverImageUrl,
+  publishedAt,
+  variant = 'initial'
+} = Astro.props as Props;
+---
+
+<Link href={href} variant={variant}>
+  <Card variant={variant} interactive>
+    {coverImageUrl && (
+      <img src={coverImageUrl} alt="" class="article-cover" loading="lazy" />
+    )}
+    <CardHeader>
+      <h3>{title}</h3>
+    </CardHeader>
+    <CardContent>
+      {summary && <p>{summary}</p>}
+    </CardContent>
+    {publishedAt && (
+      <CardMeta
+        items={[{
+          text: publishedAt.toLocaleDateString('fr'),
+          label: "Publié le"
+        }]}
+      />
+    )}
+  </Card>
+</Link>

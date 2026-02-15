@@ -1,0 +1,70 @@
+---
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import CardMeta from "@components/ui/Card/CardMeta.astro";
+import Link from "@components/ui/Link.astro";
+import Badge from "@components/ui/Badge.astro";
+
+interface Props {
+  href: string;
+  title: string;
+  description?: string;
+  location?: string;
+  status: string;
+  volunteerCount: number;
+  volunteerGoal?: number;
+  fundingRaised?: number;
+  fundingGoal?: number;
+  startDate?: Date;
+  endDate?: Date;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+}
+
+const {
+  href,
+  title,
+  description,
+  location,
+  status,
+  volunteerCount,
+  volunteerGoal,
+  fundingRaised,
+  fundingGoal,
+  startDate,
+  endDate,
+  variant = 'initial'
+} = Astro.props as Props;
+
+const volunteerPercent = volunteerGoal ? Math.min(100, Math.round((volunteerCount / volunteerGoal) * 100)) : 0;
+const fundingPercent = fundingGoal ? Math.min(100, Math.round((Number(fundingRaised || 0) / Number(fundingGoal)) * 100)) : 0;
+---
+
+<Link href={href} variant={variant}>
+  <Card variant={variant} interactive>
+    <CardHeader>
+      <div>
+        <Badge variant={variant} color={status === 'recruiting' ? 'primary' : status === 'in_progress' ? 'accent' : 'secondary'}>
+          {status}
+        </Badge>
+        {location && <Badge variant={variant} color="secondary">📍 {location}</Badge>}
+        <h3>{title}</h3>
+      </div>
+    </CardHeader>
+    <CardContent>
+      {description && <p>{description}</p>}
+      <div>
+        <p>Volontaires: {volunteerCount}{volunteerGoal ? `/${volunteerGoal}` : ''}</p>
+        {fundingGoal && <p>Financement: {Number(fundingRaised || 0).toFixed(0)} € / {Number(fundingGoal).toFixed(0)} €</p>}
+      </div>
+    </CardContent>
+    {(startDate || endDate) && (
+      <CardMeta
+        items={[
+          startDate ? { text: `Du ${startDate.toLocaleDateString('fr')}`, label: "Dates" } : null,
+          endDate ? { text: `Au ${endDate.toLocaleDateString('fr')}`, label: "Fin" } : null
+        ].filter(Boolean)}
+      />
+    )}
+  </Card>
+</Link>

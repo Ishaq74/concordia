@@ -7,6 +7,14 @@ const securityHeaders = defineMiddleware(async (_context, next) => {
   const response = await next();
 
   // CSP — restrictif mais permet les polices auto-hébergées et les inline scripts Astro
+  // Exception in dev/localhost so VS Code Simple Browser and other dev tools can embed pages
+  const isLocalDev = (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') ||
+    _context.url.hostname === 'localhost' ||
+    _context.url.hostname === '127.0.0.1' ||
+    _context.url.hostname === '::1';
+
+  const frameAncestors = isLocalDev ? "frame-ancestors 'self'" : "frame-ancestors 'none'";
+
   response.headers.set(
     "Content-Security-Policy",
     [
@@ -16,14 +24,15 @@ const securityHeaders = defineMiddleware(async (_context, next) => {
       "img-src 'self' data: blob: https:",
       "font-src 'self'",
       "connect-src 'self'",
-      "frame-ancestors 'none'",
+      frameAncestors,
       "base-uri 'self'",
       "form-action 'self'",
       "upgrade-insecure-requests",
     ].join("; "),
   );
 
-  response.headers.set("X-Frame-Options", "DENY");
+  // Don't set X-Frame-Options to DENY for local dev to allow embedding in VS Code Simple Browser
+  if (!isLocalDev) response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("X-XSS-Protection", "0");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");

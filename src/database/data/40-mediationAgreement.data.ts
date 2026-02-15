@@ -1,4 +1,0 @@
-// Seed: mediationAgreement — accords de médiation (unique per caseId)
-export const mediationAgreementData = [
-  { id: "ma-001", caseId: "med-001", content: "Accord de médiation entre les parties :\n\n1. L'avis publié par le client reste visible sur la plateforme.\n2. Le restaurateur est autorisé à publier une réponse publique à l'avis.\n3. Les deux parties s'engagent à ne pas se diffamer mutuellement.\n4. Le restaurateur s'engage à améliorer la gestion des temps d'attente.\n5. Le client s'engage à mettre à jour son avis si une amélioration est constatée lors d'une visite future.", actions: JSON.stringify([{ type: "allow_response", target: "review", targetId: "rev-002" }, { type: "monitor", duration: "3_months" }]), signedByReporter: true, signedByReported: true, signedByMediator: true, signedAt: new Date("2024-07-20"), createdAt: new Date("2024-07-18") },
-];

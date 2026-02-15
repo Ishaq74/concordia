@@ -1,0 +1,85 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+// 1. Réutilisation des composants
+import PostGrid from "@components/modules/blog/lists/PostGrid.astro";
+import PostCard from "@components/modules/blog/cards/PostCard.astro";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const LANG = "fr";
+  const allPosts = await getCollection("blog");
+  const frPosts = allPosts.filter((p) => p.data.lang === LANG);
+
+  const categories = new Map();
+  frPosts.forEach((post) => {
+    post.data.categories.forEach((cat) => {
+      if (!categories.has(cat.slug)) {
+        categories.set(cat.slug, cat.name);
+      }
+    });
+  });
+
+  return Array.from(categories.entries()).map(([slug, name]) => ({
+    params: { category: slug },
+    props: { name },
+  }));
+}
+
+const { category } = Astro.params;
+const { name } = Astro.props;
+const LANG = "fr";
+
+const allPosts = await getCollection("blog");
+const posts = allPosts
+  .filter((p) => p.data.lang === LANG)
+  .filter((p) => p.data.categories.some((c) => c.slug === category))
+  .sort(
+    (a, b) =>
+      new Date(b.data.publishedAt || 0).getTime() -
+      new Date(a.data.publishedAt || 0).getTime(),
+  );
+---
+
+<BaseLayout
+  title={`${name} - Blog`}
+  description={`Tous les articles de la catégorie ${name}`}
+  lang={LANG}
+>
+  <main class="container mx-auto px-4 py-12" transition:name="category">
+    {/* EN-TÊTE CATÉGORIE */}
+    <div class="mb-12 space-y-4">
+      <div class="space-y-2">
+        <h1
+          class="text-4xl font-extrabold tracking-tight lg:text-5xl capitalize"
+        >
+          {name}
+        </h1>
+        <p class="text-xl text-muted-foreground">
+          Explorez nos articles sur le thème <span
+            class="font-medium text-foreground">"{name}"</span
+          >.
+        </p>
+      </div>
+    </div>
+
+    {/* GRILLE D'ARTICLES */}
+    {
+      posts.length > 0 ? (
+        <PostGrid>
+          {posts.map((post) => (
+            <PostCard post={post} lang={LANG} />
+          ))}
+        </PostGrid>
+      ) : (
+        <div class="py-12 text-center border-2 border-dashed rounded-lg">
+          <p class="text-muted-foreground">
+            Aucun article trouvé dans cette catégorie pour le moment.
+          </p>
+        </div>
+      )
+    }
+  </main>
+</BaseLayout>

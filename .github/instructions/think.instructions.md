@@ -1,6 +1,6 @@
 ---
-description: "Complete human, philosophical, epistemological, and operational profile of the project owner to ensure correct interpretation, decision-making, and execution."
-applyTo: "**"
+description: 'Complete human, philosophical, epistemological, and operational profile of the project owner to ensure correct interpretation, decision-making, and execution.'
+applyTo: '**'
 ---
 
 ## PROJECT OWNER — COMPLETE PROFILE

@@ -1,0 +1,84 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+// Import des composants
+import PostHeader from "@components/modules/blog/single/PostHeader.astro";
+import PostContent from "@components/modules/blog/single/PostContent.astro";
+import TableOfContents from "@components/modules/blog/single/TableOfContents.astro";
+import AuthorCard from "@components/modules/blog/cards/AuthorCard.astro";
+import ShareButtons from "@components/modules/blog/ui/ShareButtons.astro";
+import PostComments from "@components/modules/blog/single/PostComments.astro";
+
+// 1. On récupère les paramètres de l'URL
+const { slug } = Astro.params;
+const LANG = "fr";
+
+// 2. On va chercher l'article dans la collection "blog"
+// Ton loader génère des IDs sous la forme "slug-lang"
+const post = await getEntry("blog", `${slug}-${LANG}`);
+
+// 3. Sécurité : Si l'article n'existe pas, on renvoie vers une 404
+if (!post) {
+  return Astro.redirect("/404");
+}
+---
+
+<BaseLayout
+  title={post.data.seo?.title || post.data.title}
+  description={post.data.seo?.description || post.data.excerpt}
+  lang={LANG}
+>
+  <main class="container mx-auto px-4 py-12">
+    {/* 1. HEADER (Titre, Image, Méta) - Centré en haut */}
+    <div class="mb-16">
+      <PostHeader post={post} lang={LANG} />
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      {
+        /* 2. SIDEBAR GAUCHE (Table des matières Sticky) - Prend 3/12 colonnes */
+      }
+      <aside class="hidden lg:block lg:col-span-3">
+        <div class="sticky top-24">
+          <TableOfContents />
+        </div>
+      </aside>
+
+      {/* 3. CONTENU PRINCIPAL - Prend 8/12 colonnes (Lecture confortable) */}
+      <div class="lg:col-span-8 lg:col-start-4">
+        <PostContent>
+          <Fragment set:html={post.data.content} />
+        </PostContent>
+
+        {/* --- ZONE FOOTER DE L'ARTICLE --- */}
+        <hr class="my-12 border-muted" />
+
+        {/* Partage */}
+        <div
+          class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-12 p-6 bg-muted/20 rounded-xl"
+        >
+          <p class="font-bold text-foreground">Vous avez aimé cet article ?</p>
+          <ShareButtons title={post.data.title} />
+        </div>
+
+        {/* Auteur(s) - Affiché en grand sous l'article */}
+        <div class="space-y-6 mb-16">
+          {
+            post.data.authors.map((author: any) => (
+              <AuthorCard author={author} lang={LANG} />
+            ))
+          }
+        </div>
+
+        {/* Commentaires */}
+        <div id="comments" class="scroll-mt-20">
+          <PostComments entityId={post.data.id} entityType="blog" />
+        </div>
+      </div>
+
+      {/* Colonne vide à droite pour l'équilibre (1/12) */}
+      <div class="hidden lg:block lg:col-span-1"></div>
+    </div>
+  </main>
+</BaseLayout>

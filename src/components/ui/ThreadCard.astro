@@ -1,0 +1,56 @@
+---
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import CardMeta from "@components/ui/Card/CardMeta.astro";
+import Link from "@components/ui/Link.astro";
+import Badge from "@components/ui/Badge.astro";
+
+interface Props {
+  href: string;
+  title: string;
+  categoryName?: string;
+  isPinned?: boolean;
+  isLocked?: boolean;
+  postCount?: number;
+  lastPostAt?: Date;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+}
+
+const {
+  href,
+  title,
+  categoryName,
+  isPinned = false,
+  isLocked = false,
+  postCount = 0,
+  lastPostAt,
+  variant = 'initial'
+} = Astro.props as Props;
+---
+
+<Link href={href} variant={variant}>
+  <Card variant={variant} interactive>
+    <CardHeader>
+      <div>
+        {(isPinned || isLocked) && (
+          <div>
+            {isPinned && <Badge variant={variant} color="accent">📌 Épinglé</Badge>}
+            {isLocked && <Badge variant={variant} color="error">🔒 Verrouillé</Badge>}
+          </div>
+        )}
+        <h3>{title}</h3>
+        {categoryName && <Badge variant={variant} color="secondary">{categoryName}</Badge>}
+      </div>
+    </CardHeader>
+    <CardContent>
+      {/* Empty for now */}
+    </CardContent>
+    <CardMeta
+      items={[
+        postCount ? { text: `${postCount} réponses`, label: "Réponses" } : null,
+        lastPostAt ? { text: lastPostAt.toLocaleDateString('fr'), label: "Dernière activité" } : null
+      ].filter(Boolean)}
+    />
+  </Card>
+</Link>

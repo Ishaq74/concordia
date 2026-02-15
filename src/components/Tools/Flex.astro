@@ -1,0 +1,80 @@
+---
+// Flex component for flexbox layouts
+export interface Props {
+  direction?: 'row' | 'col' | 'row-reverse' | 'col-reverse';
+  wrap?: 'nowrap' | 'wrap' | 'wrap-reverse';
+  alignItems?: 'start' | 'center' | 'end' | 'stretch' | 'baseline';
+  justifyContent?: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly';
+  gap?: 'sm' | 'md' | 'lg' | 'xl';
+  class?: string;
+}
+
+const {
+  direction = 'row',
+  wrap = 'nowrap',
+  alignItems,
+  justifyContent,
+  gap = 'md',
+  class: className = '',
+} = Astro.props;
+
+const classes = [
+  'flex',
+  direction === 'col' && 'flex-col',
+  direction === 'row-reverse' && 'flex-row-reverse',
+  direction === 'col-reverse' && 'flex-col-reverse',
+  wrap !== 'nowrap' && `flex-${wrap}`,
+  alignItems && `items-${alignItems}`,
+  justifyContent && `justify-${justifyContent}`,
+  `gap-${gap === 'sm' ? '2' : gap === 'md' ? '4' : gap === 'lg' ? '6' : '8'}`,
+  className
+].filter(Boolean).join(' ');
+---
+
+<div class={classes}>
+  <slot />
+</div>
+
+<style>
+  .flex {
+    display: flex;
+  }
+
+  .flex-col {
+    flex-direction: column;
+  }
+
+  .flex-row-reverse {
+    flex-direction: row-reverse;
+  }
+
+  .flex-col-reverse {
+    flex-direction: column-reverse;
+  }
+
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+
+  .flex-wrap-reverse {
+    flex-wrap: wrap-reverse;
+  }
+
+  .gap-2 { gap: var(--space-2); }
+  .gap-4 { gap: var(--space-4); }
+  .gap-6 { gap: var(--space-6); }
+  .gap-8 { gap: var(--space-8); }
+
+  .items-start { align-items: flex-start; }
+  .items-center { align-items: center; }
+  .items-end { align-items: flex-end; }
+  .items-stretch { align-items: stretch; }
+  .items-baseline { align-items: baseline; }
+
+  .justify-start { justify-content: flex-start; }
+  .justify-center { justify-content: center; }
+  .justify-end { justify-content: flex-end; }
+  .justify-between { justify-content: space-between; }
+  .justify-around { justify-content: space-around; }
+  .justify-evenly { justify-content: space-evenly; }
+</style>

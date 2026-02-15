@@ -1,0 +1,17 @@
+---
+import Grid from '@components/Tools/Grid.astro';
+---
+
+<Grid
+  tag="section"
+  display="grid"
+  cols="3"
+  gap="var(--space-1)"
+  variant="retro"
+  color="secondary"
+  sameHeight
+  margin="40px"
+  ariaLabel="Liste d'articles"
+>
+  <slot />
+</Grid>
