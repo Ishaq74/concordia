@@ -44,7 +44,15 @@ describe('BetterAuth Email Functions', () => {
       })
 
       expect(consoleSpy).toHaveBeenCalled()
-      expect(consoleSpy.mock.calls.some(args => typeof args[0] === 'string' && args[0].includes('[MOCK SMTP]'))).toBe(true)
+      // Le log est: '[MOCK SMTP] Email verification', { to, url, token }
+      const found = consoleSpy.mock.calls.find(call => call[0] === '[MOCK SMTP] Email verification')
+      expect(found).toBeTruthy()
+      const obj = found ? found[1] : undefined
+      expect(obj).toMatchObject({
+        to: 'test@example.com',
+        url: expect.stringContaining('verify?code=abc123'),
+        token: 'abc123',
+      })
       consoleSpy.mockRestore()
     })
   })
@@ -83,7 +91,15 @@ describe('BetterAuth Email Functions', () => {
       })
 
       expect(consoleSpy).toHaveBeenCalled()
-      expect(consoleSpy.mock.calls.some(args => typeof args[0] === 'string' && args[0].includes('[MOCK SMTP]'))).toBe(true)
+      // Le log est: '[MOCK SMTP] Password reset', { to, url, token }
+      const found = consoleSpy.mock.calls.find(call => call[0] === '[MOCK SMTP] Password reset')
+      expect(found).toBeTruthy()
+      const obj = found ? found[1] : undefined
+      expect(obj).toMatchObject({
+        to: 'test@example.com',
+        url: expect.stringContaining('reset?token=xyz789'),
+        token: 'xyz789',
+      })
       consoleSpy.mockRestore()
     })
   })

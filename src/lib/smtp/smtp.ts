@@ -160,23 +160,14 @@ export class SmtpService {
     this.isMocked = process.env.SMTP_MOCK === '1' || process.env.NODE_ENV === 'test';
 
     if (this.isMocked) {
-      // Mock transporter for tests
-      this.transporter = {
-        sendMail: async (options: any) => {
-          console.log('[MOCK SMTP]', {
-            to: options.to,
-            subject: options.subject,
-            from: options.from
-          });
-          return { messageId: `mock-${Date.now()}-${Math.random()}` };
-        },
-        verify: async () => true,
-        close: async () => undefined,
-      } as any;
+      // Use nodemailer transport even in mock mode so test spies (vi.mock)
+      // receive the sendMail calls via the mocked transporter.
+      this.transporter = nodemailer.createTransport({ jsonTransport: true } as any) as any;
 
       if (process.env.NODE_ENV !== 'production') {
         console.log('[SMTP] Mode MOCK activé - pas de vrais emails envoyés');
       }
+
       return;
     }
 

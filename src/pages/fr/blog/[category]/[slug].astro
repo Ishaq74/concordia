@@ -1,7 +1,6 @@
 ---
 import { getEntry } from "astro:content";
-import BaseLayout from "@layouts/BaseLayout.astro";
-import Grid from "@components/Tools/Grid.astro";
+import BlogLayout from "@components/templates/blog/BlogLayout.astro";
 
 // Import des composants
 import PostHeader from "@components/modules/blog/single/PostHeader.astro";
@@ -25,10 +24,10 @@ if (!post) {
 }
 ---
 
-<BaseLayout
+<BlogLayout
   title={post.data.seo?.title || post.data.title}
   description={post.data.seo?.description || post.data.excerpt}
-  lang={LANG}
+  variant="initial"
 >
   <main class="page-container">
     {/* 1. HEADER (Titre, Image, Méta) - Centré en haut */}
@@ -36,46 +35,35 @@ if (!post) {
       <PostHeader post={post} lang={LANG} />
     </div>
 
-    <Grid display="grid" gridTemplateColumns="200px 1fr 80px" gap="3rem" className="page-grid">
-      <aside class="toc-column">
-        <div class="toc-sticky">
-          <TableOfContents />
-        </div>
-      </aside>
+    <article class="content-column">
+      <!-- inline TOC (client island) -->
+      <TableOfContents />
 
-      <article class="content-column">
-        <PostContent>
-          <Fragment set:html={post.data.content} />
-        </PostContent>
+      <PostContent>
+        <div set:html={post.data.content} />
+      </PostContent>
 
-        <div class="article-cta">
-          <p class="article-cta-title">Vous avez aimé cet article ?</p>
-          <ShareButtons title={post.data.title} />
-        </div>
+      <div class="article-cta">
+        <p class="article-cta-title">Vous avez aimé cet article ?</p>
+        <ShareButtons title={post.data.title} />
+      </div>
 
-        <div class="article-authors">
-          {post.data.authors.map((author: any) => (
-            <AuthorCard author={author} lang={LANG} />
-          ))}
-        </div>
+      <div class="article-authors">
+        {post.data.authors.map((author: any) => (
+          <AuthorCard author={author} lang={LANG} />
+        ))}
+      </div>
 
-        <section id="comments" class="article-comments">
-          <PostComments entityId={post.data.id} entityType="blog" />
-        </section>
-      </article>
-
-      <div class="spacer-column"></div>
-    </Grid>
+      <section id="comments" class="article-comments">
+        <PostComments entityId={post.data.id} entityType="blog" />
+      </section>
+    </article>
   </main>
 
   <style>
     .page-container{max-width:1200px;margin:0 auto;padding:3rem 1rem}
     .page-header{margin-bottom:2rem}
-    .page-grid{display:grid;grid-template-columns:200px 1fr 80px;gap:3rem;align-items:start}
-    .toc-column{display:none}
-    @media(min-width:1024px){.toc-column{display:block}.toc-sticky{position:sticky;top:6rem}} 
     .content-column{max-width:68ch;margin:0 auto}
-    .spacer-column{display:none}@media(min-width:1024px){.spacer-column{display:block}}
 
     .article-cta{display:flex;flex-direction:column;gap:var(--space-3);align-items:flex-start;background:var(--muted-bg);padding:var(--space-4);border-radius:var(--card-border-radius);margin:2rem 0}
     @media(min-width:640px){.article-cta{flex-direction:row;justify-content:space-between;align-items:center}}
@@ -84,4 +72,4 @@ if (!post) {
     .article-authors{margin-top:2rem;display:flex;flex-direction:column;gap:var(--space-4)}
     .article-comments{margin-top:2rem}
   </style>
-</BaseLayout>
+</BlogLayout>

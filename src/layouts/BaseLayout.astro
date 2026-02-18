@@ -58,7 +58,10 @@ const currentLocale = Astro.currentLocale || "fr";
 // Safe fallbacks from site identity
 const htmlLang = lang ?? currentLocale;
 const htmlDir = dir ?? (currentLocale === "ar" ? "rtl" : "ltr");
-const faviconName = favicon ?? "../../favicon.svg";
+
+// Resolve favicon as an absolute URL to avoid relative-path requests (e.g. `/fr/blog/favicon.svg`)
+const _faviconRaw = favicon ?? "/favicon.svg";
+const faviconHref = _faviconRaw.startsWith("/") ? _faviconRaw : `/images/${_faviconRaw.replace(/^(\.\.\/)+/, "")}`;
 ---
 
 <!doctype html>
@@ -163,11 +166,11 @@ const faviconName = favicon ?? "../../favicon.svg";
     }
 
     <!-- Favicons -->
-    <link rel="icon" href={`images/${faviconName}`} type="image/x-icon" />
-    <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon} />
-    <link rel="icon" type="image/png" sizes="32x32" href={favicon32x32} />
-    <link rel="icon" type="image/png" sizes="16x16" href={favicon16x16} />
-    <link rel="manifest" href={manifest} />
+    <link rel="icon" href={faviconHref} type="image/x-icon" />
+    {appleTouchIcon ? <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon.startsWith('/') ? appleTouchIcon : `/images/${appleTouchIcon}`} /> : null}
+    {favicon32x32 ? <link rel="icon" type="image/png" sizes="32x32" href={favicon32x32.startsWith('/') ? favicon32x32 : `/images/${favicon32x32}`} /> : null}
+    {favicon16x16 ? <link rel="icon" type="image/png" sizes="16x16" href={favicon16x16.startsWith('/') ? favicon16x16 : `/images/${favicon16x16}`} /> : null}
+    {manifest ? <link rel="manifest" href={manifest.startsWith('/') ? manifest : `/${manifest}`} /> : null}
 
     <meta name="robots" content={robots} />
     <meta name="theme-color" content="#ffffff" />

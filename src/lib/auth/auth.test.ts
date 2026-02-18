@@ -8,8 +8,11 @@ import {
   getAuditLogs,
 } from '@tests/utils/auth-test-utils';
 import { cleanupTestData } from '@tests/utils/cleanup';
-import { securityPayloads, createSmtpMock } from '@tests/setup';
+import { createSmtpMock } from '@tests/setup';
+import { securityPayloads } from '@tests/fixtures/security-payloads';
 import { getDrizzle } from '@database/drizzle';
+
+
 import { session } from '@database/schemas/auth-schema';
 import { eq } from 'drizzle-orm';
 import { getAuth } from '@/lib/auth/auth';

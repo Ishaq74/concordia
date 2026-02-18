@@ -1,0 +1,65 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Sidebar from "@components/templates/blog/Sidebar.astro";
+import MainBlog from "@components/templates/blog/MainBlog.astro";
+
+export interface Props {
+  title: string;
+  description?: string;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+}
+
+const { title, description, variant = 'initial' } = Astro.props;
+
+// Extract headings from the rendered slot for an inline TOC
+let headings: Array<{depth: number, slug: string, text: string}> = [];
+try {
+  const html = await Astro.slots.render('default');
+  const regex = /<h([2-3])[^>]*id="([^"]+)"[^>]*>([^<]+)<\/h\1>/g;
+  const matches = Array.from(html.matchAll(regex));
+  headings = matches.map(match => ({ depth: parseInt(match[1]), slug: match[2], text: match[3] }));
+} catch (e) {
+  // ignore
+}
+---
+
+<BaseLayout title={title} description={description}>
+  <div class={`blog-layout ${variant}`}>
+    <Sidebar currentPath={Astro.url.pathname} variant={variant} />
+
+    <MainBlog variant={variant}>
+      <slot />
+    </MainBlog>
+
+    {headings.length > 0 && (
+      <aside class="blog-toc">
+        <div class="blog-toc-content">
+          <h2 class="blog-toc-title">Sur cette page</h2>
+          <nav class="blog-toc-nav">
+            <ul class="blog-toc-list">
+              {headings.map(heading => (
+                <li class={`blog-toc-item depth-${heading.depth}`}>
+                  <a href={`#${heading.slug}`} class="blog-toc-link">{heading.text}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      </aside>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+.blog-layout { display: grid; grid-template-columns: 250px 1fr 260px; gap: 3rem; max-width: 1400px; margin: 0 auto; padding: 2rem 1rem; }
+@media (max-width: 1200px) { .blog-layout { grid-template-columns: 220px 1fr; } .blog-toc { display:none } }
+@media (max-width: 768px) { .blog-layout { grid-template-columns: 1fr } .blog-layout :global(.blog-sidebar) { display:none } }
+.blog-toc { position: sticky; top: 2rem; height: fit-content; max-height: calc(100vh - 4rem); overflow-y: auto }
+.blog-toc-content { border-left:1px solid var(--border-default); padding-left:1rem }
+.blog-toc-title{ font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.75rem }
+.blog-toc-list{ list-style:none; padding:0; margin:0 }
+.blog-toc-item{ margin-bottom:0.5rem }
+.blog-toc-item.depth-3{ padding-left:1rem }
+.blog-toc-link{ display:block; font-size:0.813rem; color:var(--text-muted); text-decoration:none; transition:color .2s; line-height:1.4 }
+.blog-toc-link:hover{ color:var(--color-primary) }
+</style>
