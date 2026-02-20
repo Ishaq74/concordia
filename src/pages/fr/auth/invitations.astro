@@ -22,12 +22,11 @@ type InvitationRecord = {
 const user = Astro.locals.user;
 const request = Astro.request;
 const url = new URL(request.url);
-const callback = url.pathname + url.search;
 const auth = (await getAuth()) as any;
 
 if (!user) {
     return Astro.redirect(
-        `/fr/connexion?callbackURL=${encodeURIComponent(callback)}`,
+        `/fr/connexion?callbackURL=${encodeURIComponent(url.pathname + url.search)}`,
     );
 }
 

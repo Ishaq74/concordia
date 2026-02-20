@@ -1,0 +1,49 @@
+---
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import CardMeta from "@components/ui/Card/CardMeta.astro";
+import Link from "@components/ui/Link.astro";
+
+interface Props {
+  href: string;
+  title: string;
+  description?: string;
+  goalAmount: number;
+  raisedAmount: number;
+  donorCount: number;
+  currency: string;
+  deadline?: Date;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+}
+
+const {
+  href,
+  title,
+  description,
+  goalAmount,
+  raisedAmount,
+  donorCount,
+  currency,
+  deadline,
+  variant = 'initial'
+} = Astro.props as Props;
+
+const percent = goalAmount ? Math.min(100, Math.round((Number(raisedAmount) / Number(goalAmount)) * 100)) : 0;
+const daysLeft = deadline ? Math.max(0, Math.ceil((new Date(deadline).getTime() - Date.now()) / 86400000)) : null;
+---
+
+<Link href={href} variant={variant}>
+  <Card variant={variant} interactive>
+    <CardHeader>
+      <h3>{title}</h3>
+    </CardHeader>
+    <CardContent>
+      {description && <p>{description}</p>}
+      <div>
+        <p>{Number(raisedAmount).toLocaleString("fr-FR")} {currency} sur {Number(goalAmount).toLocaleString("fr-FR")} {currency}</p>
+        <p>{percent}% financé • {donorCount} donateurs{daysLeft !== null ? ` • ${daysLeft} jours restants` : ''}</p>
+      </div>
+    </CardContent>
+  </Card>
+</Link>

@@ -7,14 +7,13 @@ import translations from "@i18n/fr.json";
 import { getAuth } from "@lib/auth/auth";
 
 const user = Astro.locals.user;
-const redirectPath = "/fr/profil";
 const pageTitle =
     translations.auth.forgotPassword ??
     translations.auth.resetTitle ??
     "Mot de passe oublié ?";
 
 if (user) {
-    return Astro.redirect(redirectPath);
+    return Astro.redirect("/fr/profil");
 }
 
 const request = Astro.request;

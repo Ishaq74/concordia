@@ -1,0 +1,179 @@
+---
+// src/components/blog/single/CommentItem.astro
+import { actions } from "astro:actions";
+import Avatar from "@components/ui/Avatar/Avatar.astro";
+import Card from "@components/ui/Card/Card.astro";
+import Button from "@components/ui/Button.astro";
+import Grid from "@components/Tools/Grid.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
+import StarRating from "../ui/StarRating.astro";
+
+interface Props {
+  comment: any;
+  allComments: any[];
+  entityId: string;
+  entityType: string;
+  user: any;
+  lang: string;
+  depth?: number;
+}
+
+const {
+  comment,
+  allComments,
+  entityId,
+  entityType,
+  user,
+  lang,
+  depth = 0,
+} = Astro.props;
+
+// On trouve les enfants de ce commentaire
+const children = allComments.filter((c) => c.parentId === comment.id);
+
+function getInitials(name: string) {
+  return name ? name.substring(0, 2).toUpperCase() : "?";
+}
+
+function getContent(content: any) {
+  if (typeof content === "string") return content;
+  return content?.[lang] || content?.["fr"] || Object.values(content)[0] || "";
+}
+
+// On limite l'indentation visuelle pour ne pas sortir de l'écran sur mobile
+const maxDepth = 5;
+---
+
+<div class="comment-thread">
+  <Card
+    class={`comment-card ${depth > 0 ? "is-reply" : ""}`}
+  >
+    <Grid display="flex" gap="var(--space-3)" className="comment-row">
+      <Avatar variant="retro" size="lg" src={comment.authorAvatar} fallback={comment.authorName} />
+
+      <div class="comment-body">
+        <div class="comment-header-row">
+          <div>
+            <p class="comment-author-name">{comment.authorName}</p>
+            <p class="comment-date">
+              {new Date(comment.createdAt).toLocaleDateString()}
+            </p>
+          </div> 
+          {
+            /* On n'affiche les étoiles que pour les commentaires racine (optionnel) */
+          }
+          {
+            depth === 0 && (
+              <StarRating
+                rating={comment.rating || 0}
+                showCount={false}
+                size="sm"
+              />
+            )
+          }
+        </div>
+
+        <p class="comment-content">
+          {getContent(comment.content)}
+        </p>
+
+        {
+          user && (
+            <button
+              data-reply-to={comment.id}
+              class="reply-btn"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <>
+                  <path d="M9 14 4 9l5-5" />
+                  <path d="M4 9h12a5 5 0 0 1 5 5v5" />
+                </>
+              </svg>
+              Répondre
+            </button>
+          )
+        }
+      </div>
+    </div>
+
+    {/* Formulaire de réponse (toujours présent mais caché par défaut) */}
+    <div
+      id={`reply-slot-${comment.id}`}
+      class="reply-slot is-hidden"
+    >
+      <form method="POST" action={actions.createComment} class="comment-reply-form">
+        <input type="hidden" name="entityId" value={entityId} />
+        <input type="hidden" name="entityType" value={entityType} />
+        <input type="hidden" name="parentId" value={comment.id} />
+        <Avatar variant="retro" size="lg" src={user?.avatar_url} fallback={user?.name} />
+        <div class="reply-input-wrap">
+          <Textarea
+            id={`reply-${comment.id}`}
+            name="content"
+            required
+            placeholder={`Répondre à ${comment.authorName}...`}
+            rows={4}
+            variant="initial"
+          />
+          <div class="comment-actions">
+            <Button
+              size="sm"
+              variant="retro"
+              type="button"
+              class="cancel-reply"
+              data-target={comment.id}>Annuler</Button
+            >
+            <Button size="sm" type="submit">Répondre</Button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </Card>
+
+  {
+    /* RÉCURSIVITÉ : Si le commentaire a des enfants, on rappelle ce même composant */
+  }
+  {
+    children.length > 0 && (
+      <div class="comment-children">
+        {children.map((child) => (
+          <Astro.self
+            comment={child}
+            allComments={allComments}
+            entityId={entityId}
+            entityType={entityType}
+            user={user}
+            lang={lang}
+            depth={depth + 1}
+          />
+        ))}
+      </div>
+    )
+  }
+</div>
+
+<style>
+.comment-thread{margin:0}
+.comment-card{padding:1.25rem;background:var(--muted-bg);border:none;box-shadow:var(--shadow-sm);position:relative}
+.comment-row{align-items:flex-start}
+.comment-body{width:100%}
+.reply-btn{background:none;border:none;color:var(--color-primary);cursor:pointer;padding:0;font-weight:600}
+.reply-slot.is-hidden{display:none}
+.comment-actions{display:flex;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-2)}
+.comment-children{margin-left:1rem;border-left:2px solid var(--border-muted);padding-left:1rem;margin-top:var(--space-4)}
+.comment-header-row{display:flex;justify-content:space-between;align-items:flex-start}
+.comment-author-name{font-weight:700;font-size:.9rem;margin:0}
+.comment-date{font-size:.66rem;color:var(--text-muted-foreground);margin:0}
+.comment-content{font-size:0.95rem;line-height:1.6;color:var(--text-foreground);margin-top:0.5rem}
+.reply-input-wrap{width:100%}
+</style>

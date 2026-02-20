@@ -12,6 +12,12 @@ config();
 const urlLocal = process.env.DATABASE_URL_LOCAL;
 const urlProd = process.env.DATABASE_URL_PROD;
 
+function mask(u?: string) { return u ? u.replace(/:\/\/[^@]+@/, '://***@') : 'N/A'; }
+function dbName(u?: string) { try { return u ? new URL(u).pathname.replace(/^\//,'') : 'unknown'; } catch { return (u||'').split('/').pop() || 'unknown'; } }
+
+console.log(`Comparaison: local=${dbName(urlLocal)} (${mask(urlLocal)})  ↔  prod=${dbName(urlProd)} (${mask(urlProd)})`);
+console.log('\x1b[41m\x1b[97m PROD ATTENTION : cette opération lit la base PROD. Vérifiez avant d\'exécuter des actions destructrices. \x1b[0m');
+
 if (!urlLocal || !urlProd) throw new Error('DATABASE_URL_LOCAL ou DATABASE_URL_PROD manquant');
 
 function getClient(url: string) {

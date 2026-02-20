@@ -21,7 +21,12 @@ config();
   console.log('🔍 Configuration détectée:');
   console.log('  - USE_PROD_DB:', process.env.USE_PROD_DB || '(non défini)');
   console.log('  - USE_DB_TEST:', process.env.USE_DB_TEST || '(non défini)');
-  console.log('  - URL utilisée:', dbUrl || '❌ NON DÉFINIE');
+  console.log('  - URL utilisée:', dbUrl ? (dbUrl.replace(/:\/\/[^@]+@/, '://***@')) : '❌ NON DÉFINIE');
+
+  if (useProd) {
+    const dbName = (() => { try { return new URL(dbUrl!).pathname.replace(/^\//, ''); } catch { return 'unknown'; } })();
+    console.log('\x1b[41m\x1b[97m PROD ATTENTION !! Vous ciblez la base de production: ' + dbName + ' \x1b[0m');
+  }
 
   if (!dbUrl) {
     console.error('\n❌ Erreur: Aucune variable DATABASE_URL trouvée pour cet environnement');

@@ -1,0 +1,47 @@
+// 01 - Users (base de tout)
+export const user = [
+    {
+        id: "admin-user",
+        name: "Admin Salut Annecy",
+        email: "admin@salutannecy.com",
+        emailVerified: true,
+        role: "admin",
+        image: "/images/avatars/admin.jpg",
+        createdAt: new Date("2025-01-01T00:00:00Z"),
+        updatedAt: new Date("2025-01-01T00:00:00Z"),
+        banned: false,
+    },
+    {
+        id: "user-camille-dupont",
+        name: "Camille Dupont",
+        email: "camille.dupont@example.com",
+        emailVerified: true,
+        role: "user",
+        image: "/images/avatars/camille-dupond.png",
+        createdAt: new Date("2025-01-01T00:00:00Z"),
+        updatedAt: new Date("2025-01-01T00:00:00Z"),
+        banned: false,
+    },
+    {
+        id: "user-lucas-martin",
+        name: "Lucas Martin",
+        email: "lucas.martin@example.com",
+        emailVerified: true,
+        role: "user",
+        image: "/images/avatars/lucas-martin.png",
+        createdAt: new Date("2025-01-01T00:00:00Z"),
+        updatedAt: new Date("2025-01-01T00:00:00Z"),
+        banned: false,
+    },
+    {
+        id: "user-sarah-leroy",
+        name: "Sarah Leroy",
+        email: "sarah.leroy@example.com",
+        emailVerified: true,
+        role: "user",
+        image: "/images/avatars/sarah-leroy.png",
+        createdAt: new Date("2025-01-01T00:00:00Z"),
+        updatedAt: new Date("2025-01-01T00:00:00Z"),
+        banned: false,
+    }
+];

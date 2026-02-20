@@ -1,0 +1,40 @@
+---
+import Link from '@components/ui/Link.astro';
+
+interface Props {
+  currentPath?: string;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+}
+
+const { currentPath, variant = 'initial' } = Astro.props;
+const currentLocale = Astro.currentLocale || 'fr';
+const translations = await import(`../../../i18n/${currentLocale}.json`);
+const t = translations.default;
+---
+
+<aside class={`blog-sidebar variant-${variant}`}>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <h3 class="section-title">{t.nav.blog}</h3>
+      <ul class="nav-list">
+        <li class="nav-item"><Link href={`/${currentLocale}/blog`} variant={variant} style="link" className={currentPath === `/${currentLocale}/blog` ? 'active' : ''}>{t.nav.blog}</Link></li>
+        <li class="nav-item"><Link href={`/${currentLocale}/blog/categorie`} variant={variant} style="link" className={currentPath?.startsWith(`/${currentLocale}/blog/categorie`) ? 'active' : ''}>{t.magazine?.categories ?? 'Categories'}</Link></li>
+        <li class="nav-item"><Link href={`/${currentLocale}/blog/auteur`} variant={variant} style="link" className={currentPath?.startsWith(`/${currentLocale}/blog/auteur`) ? 'active' : ''}>{'Auteurs'}</Link></li>
+        <li class="nav-item"><Link href={`/${currentLocale}/blog/archives`} variant={variant} style="link" className={currentPath?.startsWith(`/${currentLocale}/blog/archives`) ? 'active' : ''}>{'Archives'}</Link></li>
+      </ul>
+    </div>
+  </nav>
+</aside>
+
+<style>
+  .blog-sidebar { position: sticky; top: 2rem; height: fit-content; max-height: calc(100vh - 4rem); overflow-y: auto; padding-right: 1rem; }
+  .sidebar-nav { border-right: 1px solid var(--border-default); padding-right: 1rem; }
+  .section-title { font-size: 0.875rem; font-weight:700; text-transform:uppercase; color:var(--text-default); margin-bottom:0.75rem }
+  .nav-list { list-style:none; padding:0; margin:0 }
+  .nav-item { margin-bottom:0.25rem }
+  .blog-sidebar :global(a) { display:block; padding:0.5rem 0.75rem; font-size:0.875rem; color:var(--text-muted); text-decoration:none; border-radius:var(--border-radius-sm); transition:all 0.2s }
+  .blog-sidebar :global(a:hover) { color:var(--text-default); background:var(--bg-subtle) }
+  .blog-sidebar :global(a.active) { color:var(--color-primary); background: color-mix(in srgb, var(--color-primary) 10%, transparent); font-weight:600 }
+  .blog-sidebar::-webkit-scrollbar { width:6px }
+  .blog-sidebar::-webkit-scrollbar-thumb { background:var(--border-default); border-radius:3px }
+</style>

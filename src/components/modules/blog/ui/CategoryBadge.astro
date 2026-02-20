@@ -1,0 +1,18 @@
+---
+import Badge from "@components/ui/Badge.astro";
+import Link from "@components/ui/Link.astro";
+
+interface Props {
+  name: string;
+  slug: string;
+  lang: string;
+}
+
+const { name, slug, lang } = Astro.props;
+---
+
+<Link href={`/${lang}/blog/${slug}`} className="category-link" style="link">
+  <Badge variant="retro" color="secondary" text={name}>
+    {name}
+  </Badge>
+</Link>

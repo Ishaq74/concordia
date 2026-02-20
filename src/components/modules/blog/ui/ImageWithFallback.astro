@@ -1,0 +1,37 @@
+---
+interface Props {
+  src?: string | null;
+  alt?: string;
+  text?: string;
+  class?: string;
+}
+
+const { src, alt, text = "Image", class: className } = Astro.props;
+
+const COLORS = [
+  { bg: "1e293b", txt: "f8fafc" },
+  { bg: "b91c1c", txt: "fef2f2" },
+  { bg: "0f766e", txt: "f0fdfa" },
+  { bg: "1d4ed8", txt: "eff6ff" },
+  { bg: "7e22ce", txt: "faf5ff" },
+  { bg: "c2410c", txt: "fff7ed" },
+];
+
+const safeText = text || "Image";
+const colorIndex = safeText.length % COLORS.length;
+const { bg, txt } = COLORS[colorIndex];
+const encodedText = encodeURIComponent(safeText.length > 30 ? safeText.substring(0, 30) + "..." : safeText);
+
+const placeholderUrl = `https://placehold.co/800x600/${bg}/${txt}.png?text=${encodedText}&font=raleway`;
+
+const initialSrc = src ? src : placeholderUrl;
+---
+
+<img 
+  src={initialSrc} 
+  alt={alt || safeText} 
+  class={className} 
+  loading="lazy" 
+  decoding="async"
+  onerror={`this.onerror=null; this.src='${placeholderUrl}';`}
+/>

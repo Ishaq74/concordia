@@ -1,0 +1,53 @@
+---
+import FormGroup from "@components/ui/Form/FormGroup.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Button from "@components/ui/Button.astro";
+
+interface Props {
+  name?: string;
+  value?: string;
+  placeholder?: string;
+  placeholderKey?: string;
+  translations?: Record<string, any> | null;
+  action?: string;
+  method?: 'get' | 'post';
+  className?: string;
+  ariaLabel?: string;
+}
+
+const {
+  name = 'q',
+  value = '',
+  placeholder,
+  placeholderKey,
+  translations = null,
+  action = '',
+  method = 'get',
+  className = '',
+  ariaLabel,
+} = Astro.props as Props;
+
+const tPlaceholder = placeholder ?? (placeholderKey && translations ? (translations[placeholderKey] ?? '') : '') ?? '';
+const computedAria = ariaLabel ?? (tPlaceholder ? `${tPlaceholder}` : 'Search');
+---
+
+<form role="search" method={method} action={action} class={['search-bar', className].filter(Boolean).join(' ')}>
+  <FormGroup>
+    <Label className="sr-only" htmlFor={name}>{computedAria}</Label>
+    <div class="search-bar-inner">
+      <Input id={name} name={name} type="search" value={value} placeholder={tPlaceholder} autocomplete="off" />
+      <Button type="submit" color="primary" ariaLabel={computedAria}>🔍</Button>
+    </div>
+  </FormGroup>
+</form>
+
+<style>
+/* minimal, token-driven layout only — visual styling comes from existing design tokens */
+.search-bar-inner {
+  display: flex;
+  gap: var(--space-2, 0.5rem);
+  align-items: center;
+}
+.search-bar-inner input { flex: 1; min-width: 0; }
+</style>

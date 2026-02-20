@@ -1,12 +1,277 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import translations from '../../i18n/fr.json';
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+import translations from "../../i18n/fr.json";
 
-const { welcome } = translations;
+const t = translations;
+const locale = "fr";
 ---
 
-<BaseLayout title={welcome}>
-  <main>
-    <h1>{welcome}</h1>
+<BaseLayout title={t.home.heroTitle} description={t.home.heroSubtitle}>
+  <main class="home">
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-inner">
+        <h1 id="hero-title">{t.home.heroTitle}</h1>
+        <p class="hero-subtitle">{t.home.heroSubtitle}</p>
+        <div class="hero-actions">
+          <a href={getRelativeLocaleUrl(locale, "places")} class="btn btn-primary">{t.home.heroCta}</a>
+          <a href={getRelativeLocaleUrl(locale, "auth/inscription")} class="btn btn-secondary">{t.home.heroCtaSecondary}</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="features" aria-labelledby="features-title">
+      <h2 id="features-title" class="sr-only">Fonctionnalités</h2>
+      <div class="features-grid">
+        <a href={getRelativeLocaleUrl(locale, "places")} class="feature-card">
+          <span class="feature-icon" aria-hidden="true">📍</span>
+          <h3>{t.home.sectionPlaces}</h3>
+          <p>{t.home.sectionPlacesDesc}</p>
+        </a>
+
+        <a href={getRelativeLocaleUrl(locale, "evenements")} class="feature-card">
+          <span class="feature-icon" aria-hidden="true">📅</span>
+          <h3>{t.home.sectionEvents}</h3>
+          <p>{t.home.sectionEventsDesc}</p>
+        </a>
+
+        <a href={getRelativeLocaleUrl(locale, "articles")} class="feature-card">
+          <span class="feature-icon" aria-hidden="true">📰</span>
+          <h3>{t.home.sectionMagazine}</h3>
+          <p>{t.home.sectionMagazineDesc}</p>
+        </a>
+
+        <a href={getRelativeLocaleUrl(locale, "forum")} class="feature-card">
+          <span class="feature-icon" aria-hidden="true">💬</span>
+          <h3>{t.home.sectionForum}</h3>
+          <p>{t.home.sectionForumDesc}</p>
+        </a>
+
+        <a href={getRelativeLocaleUrl(locale, "benevolat")} class="feature-card">
+          <span class="feature-icon" aria-hidden="true">🤝</span>
+          <h3>{t.home.sectionVolunteer}</h3>
+          <p>{t.home.sectionVolunteerDesc}</p>
+        </a>
+
+        <a href={getRelativeLocaleUrl(locale, "education")} class="feature-card">
+          <span class="feature-icon" aria-hidden="true">🎓</span>
+          <h3>{t.home.sectionEducation}</h3>
+          <p>{t.home.sectionEducationDesc}</p>
+        </a>
+
+        <a href={getRelativeLocaleUrl(locale, "places")} class="feature-card">
+          <span class="feature-icon" aria-hidden="true">🥾</span>
+          <h3>{t.home.sectionTrails}</h3>
+          <p>{t.home.sectionTrailsDesc}</p>
+        </a>
+
+        <a href={getRelativeLocaleUrl(locale, "financement")} class="feature-card">
+          <span class="feature-icon" aria-hidden="true">💰</span>
+          <h3>{t.home.sectionFunding}</h3>
+          <p>{t.home.sectionFundingDesc}</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats" aria-labelledby="stats-title">
+      <h2 id="stats-title">{t.home.stats}</h2>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-number">150+</span>
+          <span class="stat-label">{t.home.statsPlaces}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">2 000+</span>
+          <span class="stat-label">{t.home.statsMembers}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">30+</span>
+          <span class="stat-label">{t.home.statsEvents}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">45</span>
+          <span class="stat-label">{t.home.statsProjects}</span>
+        </div>
+      </div>
+    </section>
   </main>
 </BaseLayout>
+
+<style>
+  .home {
+    width: 100%;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: var(--space-10) var(--space-4) var(--space-8);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  }
+
+  .hero-inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: var(--space-3);
+    color: var(--text-heading);
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-6);
+    line-height: 1.5;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: var(--color-on-primary, #fff);
+  }
+
+  .btn-secondary {
+    background: var(--bg-default);
+    color: var(--text-default);
+    border: 2px solid var(--border-default);
+  }
+
+  /* Features grid */
+  .features {
+    padding: var(--space-8) var(--space-4);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-5);
+  }
+
+  .feature-card {
+    display: block;
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-default);
+    background: var(--bg-default);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .feature-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-card h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: var(--space-2);
+    color: var(--text-heading);
+  }
+
+  .feature-card p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* Stats */
+  .stats {
+    text-align: center;
+    padding: var(--space-8) var(--space-4);
+    background: var(--bg-muted, var(--bg-secondary));
+  }
+
+  .stats h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: var(--space-6);
+    color: var(--text-heading);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-5);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .stat-label {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      padding: var(--space-8) var(--space-3) var(--space-6);
+    }
+    .features {
+      padding: var(--space-6) var(--space-3);
+    }
+    .stats {
+      padding: var(--space-6) var(--space-3);
+    }
+  }
+</style>

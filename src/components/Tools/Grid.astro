@@ -1,0 +1,419 @@
+---
+// Ultimate Layout Component: Fused Grid + Wrapper with pure CSS.
+// Supports grid/flex display, variants, animations, spacing, and all props.
+// All Tailwind converted to CSS; assumes rem units for gaps/spacing/sizes.
+
+interface Props {
+  // Core
+  tag?: keyof HTMLElementTagNameMap;
+  display?: 'block' | 'flex' | 'grid' | 'inline-flex' | 'inline-grid';
+  
+  // Grid-specific (from Grid)
+  cols?: string;
+  autoFit?: boolean;
+  autoFill?: boolean;
+  xAlign?: 'left' | 'center' | 'right' | 'space-between' | 'space-around' | 'space-evenly' | 'normal';
+  yAlign?: 'top' | 'center' | 'bottom' | 'stretch';
+  align?: 'center';
+  textAlign?: 'left' | 'center' | 'right';
+  overflowHidden?: boolean;
+  hFull?: boolean;
+  wFull?: boolean;
+  zIndex?: string | number;
+  disabled?: boolean;
+  hidden?: boolean;
+  ariaLabel?: string;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic' | 'default' | 'primary' | 'secondary' | 'accent';
+  color?: 'default' | 'primary' | 'secondary' | 'accent' | 'error';
+  sameHeight?: boolean;
+  animate?: string;
+  hoverAnimate?: string;
+  focusAnimate?: string;
+  activeAnimate?: string;
+  transitionDuration?: string;
+  transitionTiming?: string;
+  clipPathTop?: string;
+  clipPathBottom?: string;
+  
+  // Wrapper-specific (flex/grid additions)
+  gridTemplateColumns?: string;
+  gap?: string;
+  rowGap?: string;
+  columnGap?: string;
+  flexDirection?: 'row' | 'row-reverse' | 'column' | 'column-reverse';
+  flexWrap?: 'nowrap' | 'wrap' | 'wrap-reverse';
+  alignItems?: 'flex-start' | 'center' | 'flex-end' | 'baseline' | 'stretch';
+  justifyContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
+  alignContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'stretch';
+  
+  // Spacing (shared)
+  yPadding?: string;
+  xPadding?: string;
+  xMargin?: string;
+  yMargin?: string;
+  padding?: string;
+  paddingBlock?: string;
+  paddingInline?: string;
+  paddingTop?: string;
+  paddingBottom?: string;
+  paddingLeft?: string;
+  paddingRight?: string;
+  margin?: string;
+  marginBlock?: string;
+  marginInline?: string;
+  marginTop?: string;
+  marginBottom?: string;
+  marginLeft?: string;
+  marginRight?: string;
+  
+  // Other
+  width?: string;
+  height?: string;
+  maxWidth?: string;
+  minHeight?: string;
+  backgroundColor?: string;
+  backgroundImage?: string;
+  border?: boolean;
+  borderType?: 'border1' | 'border2' | 'border3';
+  borderColor?: string;
+  borderWidth?: string;
+  borderStyle?: string;
+  borderRadius?: string;
+  boxShadow?: string;
+  id?: string;
+  customClasses?: string;
+  className?: string;
+  style?: string;
+  [key: string]: any;
+}
+
+const {
+  tag = 'div',
+  display = 'block',
+  id,
+  cols = '1fr',
+  autoFit = false,
+  autoFill = false,
+  gridTemplateColumns,
+  gap = '1rem',
+  rowGap,
+  columnGap,
+  xAlign = 'normal',
+  yAlign = 'top',
+  align,
+  textAlign = 'left',
+  overflowHidden = true,
+  hFull = false,
+  wFull = true,
+  zIndex,
+  disabled = false,
+  hidden = false,
+  variant = 'initial',
+  color = 'default',
+  sameHeight = false,
+  customClasses = '',
+  className = '',
+  animate = '',
+  hoverAnimate = '',
+  focusAnimate = '',
+  activeAnimate = '',
+  transitionDuration = '300ms',
+  transitionTiming = 'ease-in-out',
+  yPadding = '0',
+  xPadding = '0',
+  xMargin = '0',
+  yMargin = '0',
+  padding,
+  paddingBlock,
+  paddingInline,
+  paddingTop,
+  paddingBottom,
+  paddingLeft,
+  paddingRight,
+  margin,
+  marginBlock,
+  marginInline,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  width,
+  height,
+  maxWidth,
+  minHeight,
+  backgroundColor = 'transparent',
+  backgroundImage,
+  border = false,
+  ariaLabel,
+  borderType = 'border1',
+  borderColor = 'currentColor',
+  borderWidth,
+  borderStyle = 'solid',
+  borderRadius = '0',
+  boxShadow = 'none',
+  clipPathTop = 'none',
+  clipPathBottom = 'none',
+  flexDirection,
+  flexWrap,
+  alignItems = 'stretch',
+  justifyContent = 'flex-start',
+  alignContent = 'stretch',
+  style: inlineStyle = '',
+  ...restProps
+} = Astro.props as Props;
+
+const Tag = tag;
+
+// Determine display mode
+const isGrid = display === 'grid';
+const isFlex = display === 'flex' || display === 'inline-flex';
+
+// Grid template
+const getGridTemplateColumns = (): string => {
+  if (gridTemplateColumns) return gridTemplateColumns;
+  if (autoFit) return 'repeat(auto-fit, minmax(250px, 1fr))';
+  if (autoFill) return 'repeat(auto-fill, minmax(250px, 1fr))';
+  if (cols && !isNaN(Number(cols))) return `repeat(${cols}, 1fr)`;
+  return cols;
+};
+
+// Alignments
+const justifyContentMap: Record<string, string> = {
+  left: 'flex-start', center: 'center', right: 'flex-end',
+  'space-between': 'space-between', 'space-around': 'space-around', 'space-evenly': 'space-evenly', normal: 'normal'
+};
+const justifyContentFinal = align === 'center' ? 'center' : justifyContentMap[xAlign] || justifyContent;
+
+const alignItemsMap: Record<string, string> = {
+  top: 'flex-start', center: 'center', bottom: 'flex-end', stretch: 'stretch'
+};
+const alignItemsFinal = align === 'center' ? 'center' : alignItemsMap[yAlign] || alignItems;
+
+// Border
+const borderWidthComputed = border
+  ? borderWidth || { border1: '1px', border2: '2px', border3: '4px' }[borderType] || '1px'
+  : '0';
+
+// Build classes
+const classParts: string[] = [display === 'grid' ? 'u-grid' : display === 'flex' ? 'u-flex' : display === 'inline-flex' ? 'u-inline-flex' : 'u-block'];
+
+if (variant) classParts.push(`u-${variant}`);
+if (color) classParts.push(`u-${color}`);
+if (sameHeight) classParts.push('same-height');
+if (isGrid && cols && typeof cols === 'number') classParts.push(`u-cols-${cols}`);
+if (isGrid && (autoFit || cols === 'auto-fit')) classParts.push('u-cols-auto-fit');
+if (isGrid && (autoFill || cols === 'auto-fill')) classParts.push('u-cols-auto-fill');
+
+if (gap) classParts.push(`u-gap-${gap.replace(/[^0-9]/g, '')}`);
+if (rowGap) classParts.push(`u-rowgap-${rowGap.replace(/[^0-9]/g, '')}`);
+if (columnGap) classParts.push(`u-colgap-${columnGap.replace(/[^0-9]/g, '')}`);
+
+if (flexDirection) classParts.push(`u-flex-${flexDirection}`);
+if (flexWrap) classParts.push(`u-flex-${flexWrap}`);
+
+classParts.push(`u-items-${alignItemsFinal.replace('flex-', '')}`);
+classParts.push(`u-justify-${justifyContentFinal.replace('flex-', '')}`);
+classParts.push(`u-content-${alignContent.replace('flex-', '')}`);
+
+if (padding) classParts.push(`u-p-${padding.replace(/[^0-9]/g, '')}`);
+if (paddingTop || yPadding) classParts.push(`u-pt-${(paddingTop || yPadding).replace(/[^0-9]/g, '')}`);
+if (paddingBottom) classParts.push(`u-pb-${paddingBottom.replace(/[^0-9]/g, '')}`);
+if (paddingLeft || xPadding) classParts.push(`u-pl-${(paddingLeft || xPadding).replace(/[^0-9]/g, '')}`);
+if (paddingRight) classParts.push(`u-pr-${paddingRight.replace(/[^0-9]/g, '')}`);
+
+if (margin) classParts.push(`u-m-${margin.replace(/[^0-9]/g, '')}`);
+if (marginTop || yMargin) classParts.push(`u-mt-${(marginTop || yMargin).replace(/[^0-9]/g, '')}`);
+if (marginBottom) classParts.push(`u-mb-${marginBottom.replace(/[^0-9]/g, '')}`);
+if (marginLeft || xMargin) classParts.push(`u-ml-${(marginLeft || xMargin).replace(/[^0-9]/g, '')}`);
+if (marginRight) classParts.push(`u-mr-${marginRight.replace(/[^0-9]/g, '')}`);
+
+if (width) classParts.push(`u-w-${width.replace(/[^0-9]/g, '')}`);
+if (height) classParts.push(`u-h-${height.replace(/[^0-9]/g, '')}`);
+if (maxWidth) classParts.push(`u-maxw-${maxWidth.replace(/[^0-9]/g, '')}`);
+if (minHeight) classParts.push(`u-minh-${minHeight.replace(/[^0-9]/g, '')}`);
+
+classParts.push(animate, hoverAnimate ? `hover-${hoverAnimate}` : '', focusAnimate ? `focus-${focusAnimate}` : '', activeAnimate ? `active-${activeAnimate}` : '', hidden ? 'hidden' : '', disabled ? 'disabled' : '');
+
+const classes = [classParts.join(' '), customClasses, className].filter(Boolean).join(' ');
+
+// Styles
+const styles: Record<string, string> = {
+  'grid-template-columns': isGrid ? getGridTemplateColumns() : '',
+  'justify-content': justifyContentFinal,
+  'align-items': alignItemsFinal,
+  'align-content': alignContent,
+  'text-align': textAlign,
+  overflow: overflowHidden ? 'hidden' : 'visible',
+  height: hFull ? '100%' : 'auto',
+  width: wFull ? '100%' : 'auto',
+  'z-index': zIndex ? String(zIndex) : '',
+  'transition-property': 'all',
+  'transition-duration': transitionDuration,
+  'transition-timing-function': transitionTiming,
+  'background-color': backgroundColor,
+  'background-image': backgroundImage ? `url(${backgroundImage})` : '',
+  border: border ? `${borderWidthComputed} ${borderStyle} ${borderColor}` : '',
+  'border-radius': borderRadius,
+  'box-shadow': boxShadow,
+  'clip-path': clipPathTop !== 'none' ? clipPathTop : clipPathBottom !== 'none' ? clipPathBottom : '',
+};
+
+const styleString = Object.entries(styles).filter(([, v]) => v).map(([k, v]) => `${k}:${v}`).join(';') + (inlineStyle ? `;${inlineStyle}` : '');
+
+---
+
+<Tag id={id} class={classes} style={styleString} aria-label={ariaLabel} aria-disabled={disabled} aria-hidden={hidden} {...restProps}>
+  <slot />
+</Tag>
+
+<style>
+  /* Display */
+  .u-block { display: block; }
+  .u-flex { display: flex; }
+  .u-grid { display: grid; }
+  .u-inline-flex { display: inline-flex; }
+
+  /* Variants — token-driven, respects dark/light tokens */
+  .u-initial {
+    background: var(--card-bg);
+    color: var(--card-color);
+    border: 1px solid var(--card-border-color);
+    box-shadow: var(--card-shadow, none);
+    border-radius: var(--card-border-radius);
+  }
+
+  .u-retro {
+    background: var(--retro-card-bg);
+    color: var(--retro-card-color);
+    border: 1px solid var(--retro-card-border-color);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    border-radius: var(--card-border-radius);
+  }
+
+  .u-modern {
+    background: var(--modern-card-bg);
+    color: var(--modern-card-color);
+    border: 1px solid var(--modern-card-border-color);
+    box-shadow: var(--shadow-lg, 0 10px 15px rgba(0,0,0,0.06));
+    border-radius: var(--card-border-radius);
+  }
+
+  .u-futuristic {
+    background: var(--futuristic-card-bg);
+    color: var(--futuristic-card-color);
+    border: 1px solid var(--futuristic-card-border-color);
+    box-shadow: 0 8px 30px color-mix(in srgb, var(--color-primary) 12%, transparent);
+    border-radius: var(--card-border-radius);
+    background-image: var(--futuristic-card-bg-image, none);
+  }
+
+  /* Color variants (use button/color tokens for semantic consistency) */
+  .u-default { background: transparent; color: var(--text-default); border-color: var(--border-default); }
+  .u-primary { background: var(--button-primary-bg); color: var(--button-primary-color); border-color: color-mix(in srgb, var(--button-primary-bg) 85%, transparent); }
+  .u-secondary { background: var(--button-secondary-bg); color: var(--button-secondary-color); border-color: color-mix(in srgb, var(--button-secondary-bg) 85%, transparent); }
+  .u-accent { background: var(--button-accent-bg); color: var(--button-accent-color); border-color: color-mix(in srgb, var(--button-accent-bg) 85%, transparent); }
+  .u-error { background: var(--color-danger); color: var(--text-inverted); border-color: color-mix(in srgb, var(--color-danger) 85%, transparent); }
+
+  /* Hover / interactive microstates (subtle, token-aware) */
+  .u-primary:hover, .u-secondary:hover, .u-accent:hover { filter: brightness(0.98); transform: translateY(-1px); transition: transform 160ms ease, filter 160ms ease; }
+  .u-initial:hover, .u-retro:hover, .u-modern:hover, .u-futuristic:hover { transform: translateY(-2px); transition: transform 200ms ease; }
+
+  /* Dark-mode is handled by tokens in tokens/colors.css; these classes just consume tokens */
+
+  /* SAME HEIGHT helper — minimal: only applies min-height to direct children */
+  .same-height > * { min-height: 100%; }
+
+  /* Grid columns */
+  .u-cols-1 { grid-template-columns: repeat(1, 1fr); }
+  .u-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .u-cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .u-cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .u-cols-5 { grid-template-columns: repeat(5, 1fr); }
+  .u-cols-6 { grid-template-columns: repeat(6, 1fr); }
+  .u-cols-auto-fit { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+  .u-cols-auto-fill { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+
+  /* Gaps */
+  .u-gap-0 { gap: 0rem; }
+  .u-gap-1 { gap: 1rem; }
+  .u-gap-2 { gap: 2rem; }
+  .u-gap-3 { gap: 3rem; }
+  .u-gap-4 { gap: 4rem; }
+  .u-gap-5 { gap: 5rem; }
+  .u-gap-6 { gap: 6rem; }
+  .u-rowgap-1 { row-gap: 1rem; }
+  .u-colgap-1 { column-gap: 1rem; }
+
+  /* Flex */
+  .u-flex-row { flex-direction: row; }
+  .u-flex-row-reverse { flex-direction: row-reverse; }
+  .u-flex-column { flex-direction: column; }
+  .u-flex-column-reverse { flex-direction: column-reverse; }
+  .u-flex-nowrap { flex-wrap: nowrap; }
+  .u-flex-wrap { flex-wrap: wrap; }
+  .u-flex-wrap-reverse { flex-wrap: wrap-reverse; }
+
+  /* Alignments */
+  .u-items-start { align-items: flex-start; }
+  .u-items-center { align-items: center; }
+  .u-items-end { align-items: flex-end; }
+  .u-items-baseline { align-items: baseline; }
+  .u-items-stretch { align-items: stretch; }
+  .u-justify-start { justify-content: flex-start; }
+  .u-justify-center { justify-content: center; }
+  .u-justify-end { justify-content: flex-end; }
+  .u-justify-between { justify-content: space-between; }
+  .u-justify-around { justify-content: space-around; }
+  .u-justify-evenly { justify-content: space-evenly; }
+  .u-content-start { align-content: flex-start; }
+  .u-content-center { align-content: center; }
+  .u-content-end { align-content: flex-end; }
+  .u-content-between { align-content: space-between; }
+  .u-content-around { align-content: space-around; }
+  .u-content-stretch { align-content: stretch; }
+
+  /* Spacing */
+  .u-p-0 { padding: 0rem; }
+  .u-p-1 { padding: 1rem; }
+  .u-p-2 { padding: 2rem; }
+  .u-pt-0 { padding-top: 0rem; }
+  .u-pt-1 { padding-top: 1rem; }
+  .u-pb-1 { padding-bottom: 1rem; }
+  .u-pl-0 { padding-left: 0rem; }
+  .u-pl-1 { padding-left: 1rem; }
+  .u-pr-1 { padding-right: 1rem; }
+  .u-m-0 { margin: 0rem; }
+  .u-m-1 { margin: 1rem; }
+  .u-mt-0 { margin-top: 0rem; }
+  .u-mt-1 { margin-top: 1rem; }
+  .u-mb-1 { margin-bottom: 1rem; }
+  .u-ml-0 { margin-left: 0rem; }
+  .u-ml-1 { margin-left: 1rem; }
+  .u-mr-1 { margin-right: 1rem; }
+
+  /* Sizes */
+  .u-w-100 { width: 100rem; }
+  .u-h-50 { height: 50rem; }
+  .u-maxw-1200 { max-width: 1200rem; }
+  .u-minh-200 { min-height: 200rem; }
+
+  /* Animations */
+  @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+  .animate-pulse { animation: pulse 2s infinite; }
+  .fadeInUp { animation: fadeInUp 0.5s ease-out; }
+
+  /* Hover/Focus/Active */
+  .hover-animate-pulse:hover { animation: pulse 2s infinite; }
+  .focus-animate-pulse:focus { animation: pulse 2s infinite; }
+  .active-animate-pulse:active { animation: pulse 2s infinite; }
+
+  /* States */
+  .hidden { display: none; }
+  .disabled { pointer-events: none; opacity: 0.5; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .u-grid { grid-template-columns: 1fr !important; gap: 0.5rem !important; }
+  }
+</style>

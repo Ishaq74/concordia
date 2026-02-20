@@ -1,0 +1,59 @@
+---
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import CardMeta from "@components/ui/Card/CardMeta.astro";
+import Link from "@components/ui/Link.astro";
+import Badge from "@components/ui/Badge.astro";
+
+interface Props {
+  href: string;
+  title: string;
+  type?: string;
+  description?: string;
+  startAt: Date;
+  isPaid?: boolean;
+  price?: number;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+}
+
+const {
+  href,
+  title,
+  type,
+  description,
+  startAt,
+  isPaid = false,
+  price,
+  variant = 'initial'
+} = Astro.props as Props;
+---
+
+<Link href={href} variant={variant}>
+  <Card variant={variant} interactive>
+    <CardHeader>
+      <div>
+        <Badge variant={variant} color="primary">
+          {startAt.getDate()} {startAt.toLocaleDateString('fr', { month: 'short' })}
+        </Badge>
+        <h3>{title}</h3>
+        {type && <Badge variant={variant} color="secondary">{type}</Badge>}
+      </div>
+    </CardHeader>
+    <CardContent>
+      {description && <p>{description}</p>}
+    </CardContent>
+    <CardMeta
+      items={[
+        {
+          text: startAt.toLocaleDateString('fr', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+          label: "Date"
+        },
+        {
+          text: isPaid ? `${Number(price ?? 0).toFixed(2)} €` : 'Gratuit',
+          label: "Prix"
+        }
+      ]}
+    />
+  </Card>
+</Link>

@@ -6,7 +6,6 @@ import ResetPasswordForm from "@components/templates/auth/ResetPasswordForm.astr
 import translations from "@i18n/fr.json";
 import { getAuth } from "@lib/auth/auth";
 
-const redirectPath = "/fr/connexion";
 const pageTitle =
   translations.auth.resetPassword ?? "Réinitialiser le mot de passe";
 
@@ -57,7 +56,7 @@ if (request.method === "POST") {
           message: payload.message || "Erreur lors de la réinitialisation.",
         };
       } else {
-        return Astro.redirect(redirectPath + "?status=password_reset");
+        return Astro.redirect("/fr/connexion?status=password_reset");
       }
     } catch (e) {
       status = { type: "error", message: "Erreur serveur." };

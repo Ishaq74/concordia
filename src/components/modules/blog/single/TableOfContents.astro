@@ -1,0 +1,131 @@
+---
+// Ce composant scanne le contenu pour générer le sommaire.
+// On peut le rendre sticky via CSS.
+interface Props {
+  class?: string;
+  items?: { label: string; href: string; depth?: number }[];
+}
+
+const { class: className, items = undefined } = Astro.props as Props;
+---
+
+<nav class:list={["toc-container", className]} aria-label="Table des matières">
+  <h3 class="toc-title">Sommaire</h3>
+  {items ? (
+    <ul class="toc-list">
+      {items.map(item => (
+        <li>
+          <a class={item.depth === 3 ? 'toc-link toc-link--child' : 'toc-link'} href={item.href}>{item.label}</a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <ul id="toc-list" class="toc-list">
+      {/* Rempli par le script client */}
+    </ul>
+  )}
+</nav>
+
+<script>
+  // Script "Island" qui s'exécute côté client
+  function generateTOC() {
+    // Cherche plusieurs cibles possibles : .post-content (nouveau), .content, .prose, ou l'article lui‑même
+    const article = document.querySelector('article.post-content, article .content, article.prose, .post-content, .prose, article');
+    const tocList = document.getElementById('toc-list');
+
+    if (!article || !tocList) return;
+
+    // 1. Trouver tous les H2 et H3
+    const headers = article.querySelectorAll('h2, h3');
+    
+    // Si pas de H2/H3, essayer de générer une TOC à partir de <p><strong>... (fallback)
+    if (headers.length === 0) {
+      const strongs = article.querySelectorAll('p > strong, strong');
+      if (strongs.length > 0) {
+        strongs.forEach((s, i) => {
+          const fakeId = s.id || `section-strong-${i}`;
+          s.id = fakeId;
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `#${fakeId}`;
+          a.textContent = s.textContent || `Section ${i + 1}`;
+          a.className = 'toc-link';
+          a.addEventListener('click', (e) => { e.preventDefault(); s.scrollIntoView({ behavior: 'smooth' }); history.pushState(null, '', `#${fakeId}`); });
+          li.appendChild(a);
+          tocList.appendChild(li);
+        });
+        // continue to observe these pseudo‑headers
+        const fauxHeaders = Array.from(article.querySelectorAll('[id^="section-strong-"]'));
+        fauxHeaders.forEach(h => observer.observe(h));
+        return;
+      }
+
+      // Aucun titre détectable → afficher un petit message utile au lieu de supprimer
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = '#';
+      a.textContent = 'Aucun sommaire disponible';
+      a.className = 'toc-link disabled';
+      li.appendChild(a);
+      tocList.appendChild(li);
+      return;
+    }
+
+    headers.forEach((header, index) => {
+      // Si le header n'a pas d'ID, on en crée un
+      if (!header.id) {
+        header.id = `section-${index}`;
+      }
+
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      
+      a.href = `#${header.id}`;
+      a.textContent = header.textContent;
+      a.className = header.tagName === 'H3' ? 'toc-link toc-link--child' : 'toc-link';
+      
+      // Smooth scroll au clic
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        header.scrollIntoView({ behavior: 'smooth' });
+        history.pushState(null, '', `#${header.id}`);
+      });
+
+      li.appendChild(a);
+      tocList.appendChild(li);
+    });
+
+    // 2. Intersection Observer pour surligner la section active
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          const links = tocList.querySelectorAll('a');
+          links.forEach(link => {
+            link.classList.toggle('is-active', link.getAttribute('href') === `#${id}`);
+          });
+        }
+      });
+    }, { rootMargin: '-100px 0px -66%' });
+
+    headers.forEach(header => observer.observe(header));
+  }
+
+  // Lance la génération au chargement
+  generateTOC();
+  
+  // Supporte le View Transitions d'Astro
+  document.addEventListener('astro:page-load', generateTOC);
+</script>
+
+<style>
+.toc-container{display:none}
+@media(min-width:1024px){.toc-container{display:block}}
+.toc-title{font-weight:700;font-size:1rem;margin-bottom:1rem;color:var(--text-foreground)}
+.toc-list{list-style:none;margin:0;padding:0 0 0 1rem;border-left:2px solid var(--border-muted);gap:var(--space-2)}
+.toc-list li{margin-bottom:calc(var(--space-1) / 2)}
+.toc-link{display:block;color:var(--text-muted-foreground);text-decoration:none;padding:0.125rem 0;transition:color .12s ease}
+.toc-link--child{padding-left:1rem;font-size:.95rem}
+.toc-link.is-active{color:var(--color-primary);font-weight:600}
+.toc-link:hover{color:var(--color-primary)}
+</style>

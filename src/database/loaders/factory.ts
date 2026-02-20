@@ -49,12 +49,12 @@ export function createTranslationLoader<
         }
 
         for (const translation of translations) {
-          const lang = (translation as any)[langKey] as string;
+          const lang = translation[langKey] as string;
           
           // DEBUG: Vérifier le champ langue
           if (!lang) {
             logger.error(`❌ Missing language key '${String(langKey)}' in translation object.`);
-            console.log("Translation object keys:", Object.keys(translation as object));
+            console.log("Translation object keys:", Object.keys(translation));
             continue;
           }
 

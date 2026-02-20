@@ -1,0 +1,188 @@
+---
+import { actions } from "astro:actions";
+import { getDrizzle } from "@database/drizzle";
+import { comments } from "@database/schemas";
+import { eq, and, desc } from "drizzle-orm";
+
+import Avatar from "@components/ui/Avatar/Avatar.astro";
+import Card from "@components/ui/Card/Card.astro";
+import Button from "@components/ui/Button.astro";
+
+import Tabs from '@components/ui/Tabs/Tabs.astro';
+import Tab from '@components/ui/Tabs/Tab.astro';
+import TabPanel from '@components/ui/Tabs/TabPanel.astro';
+import CommentItem from "./CommentItem.astro";
+
+interface Props {
+  entityId: string;
+  entityType: "blog" | "place" | "event" | "hike" | "classified";
+}
+
+const { entityId, entityType } = Astro.props;
+const user = Astro.locals.user;
+const lang = Astro.locals.lang || "fr";
+
+let allComments = [];
+let rootComments = [];
+let dbError = null;
+try {
+  const db = await getDrizzle();
+  allComments = await db.query.comments.findMany({
+    where: and(
+      eq(comments.entityId, entityId),
+      eq(comments.entityType, entityType),
+    ),
+    orderBy: [desc(comments.createdAt)],
+  });
+  rootComments = allComments.filter((c) => !c.parentId);
+} catch (err) {
+  // Défensive : ne doit jamais casser la page article
+  dbError = err?.message || String(err);
+  console.error('PostComments: DB read error', dbError);
+}
+const loginUrl = `/${lang}/connexion?callbackURL=${Astro.url.pathname}`;
+---
+
+<section id="comments-section" class="comments-section">
+<Tabs variant="modern">
+  <div slot="tabs" class="tabs">
+    <Tab name="comments-tabs" checked>
+      Commentaires ({allComments.length})
+    </Tab>
+    <Tab name="comments-tabs" icon="mdi:pencil">
+      Laisser un avis
+    </Tab>
+  </div>
+
+  <div slot="panels" class="tabs-panels">
+    <TabPanel>
+      {
+        rootComments.length === 0 ? (
+          <div>
+            Aucun commentaire pour le moment.
+          </div>
+        ) : (
+          rootComments.map((comment) => (
+            <CommentItem
+              comment={comment}
+              allComments={allComments}
+              entityId={entityId}
+              entityType={entityType}
+              user={user}
+              lang={lang}
+            />
+          ))
+        )
+      }
+    </TabPanel>
+
+    <TabPanel>
+      <Card>
+        {
+          !user ? (
+            <div>
+              <p>
+                Connectez-vous pour laisser un avis.
+              </p>
+              <Button asChild>
+                <a href={loginUrl}>Connexion</a>
+              </Button>
+            </div>
+          ) : (
+            <form
+              method="POST"
+              action={actions.createComment}
+            >
+              <input type="hidden" name="entityId" value={entityId} />
+              <input type="hidden" name="entityType" value={entityType} />
+
+              <div>
+                <span>Note :</span>
+                <div>
+                  {[5, 4, 3, 2, 1].map((n) => (
+                    <>
+                      <input
+                        type="radio"
+                        id={`r-${n}`}
+                        name="rating"
+                        value={n}
+                        required
+                        checked={n === 5}
+                      />
+                      <label for={`r-${n}`}>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                        >
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                      </label>
+                    </>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label>
+                  Message
+                </label>
+                <textarea
+                  name="content"
+                  required
+                  minlength="3"
+                  placeholder="Partagez votre avis..."
+                />
+              </div>
+
+              <Button type="submit">
+                Publier le commentaire
+              </Button>
+            </form>
+          )
+        }
+      </Card>
+    </TabPanel>
+  </div>
+</Tabs>
+</section>
+
+<script>
+  function initCommentInteractions() {
+    const section = document.getElementById("comments-section");
+    if (!section) return;
+
+    section.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      const replyBtn = target.closest(".reply-btn");
+      const cancelBtn = target.closest(".cancel-reply");
+
+      if (replyBtn) {
+        const id = replyBtn.getAttribute("data-reply-to");
+        document.getElementById(`reply-slot-${id}`)?.classList.remove("hidden");
+        replyBtn.classList.add("hidden");
+      }
+
+      if (cancelBtn) {
+        const id = cancelBtn.getAttribute("data-target");
+        document.getElementById(`reply-slot-${id}`)?.classList.add("hidden");
+        section
+          .querySelector(`[data-reply-to="${id}"]`)
+          ?.classList.remove("hidden");
+      }
+    });
+  }
+
+  initCommentInteractions();
+  document.addEventListener("astro:page-load", initCommentInteractions);
+</script>
+
+<style>
+  .rating-selector input:checked ~ label,
+  .rating-selector label:hover ~ label {
+    color: #fbce03;
+  }
+  .comments-section{margin-top:var(--space-6)}
+</style>

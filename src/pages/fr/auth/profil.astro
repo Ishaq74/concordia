@@ -368,7 +368,6 @@ const canManageOrganization = memberRole === "owner" || memberRole === "admin";
 const isOwner = memberRole === "owner";
 
 const activeOrganizationId = (session as any)?.activeOrganizationId ?? null;
-const hasOrganizations = organizations.length > 0;
 const hasActiveOrganization = Boolean(activeOrganizationId);
 
 let invitationCount = 0;

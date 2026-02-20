@@ -1,0 +1,40 @@
+---
+import Link from '@components/ui/Link.astro';
+import AvatarCard from '@components/ui/Avatar/AvatarCard.astro';
+
+interface Props {
+  author: {
+    name: string;
+    slug: string;
+    avatar: string | null; // Le loader nous donne l'URL finale ici
+    bio: string;
+  };
+  lang: string;
+}
+
+const { author, lang } = Astro.props;
+
+
+    
+---
+
+<AvatarCard
+  src={author.avatar ?? undefined}
+  fallback={author.name}
+  name={author.name}
+  description={author.bio}
+  size="lg"
+  className="author-card"
+>
+  <div class="author-actions">
+    <Link href={`/${lang}/blog/auteur/${author.slug}`} style="button" variant="retro" color="primary" size="sm">
+      Voir ses articles →
+    </Link>
+  </div>
+
+</AvatarCard>
+
+<style>
+.author-card { background: var(--card-bg); border: none; box-shadow: var(--shadow-sm); }
+.author-actions { padding-top: var(--space-2); text-align: center; }
+</style>

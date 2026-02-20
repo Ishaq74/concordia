@@ -14,22 +14,11 @@ if (user) {
   return Astro.redirect(redirectPath);
 }
 
-const verifyEmailPage =
-  typeof translations.verifyEmailPageUrl === "string" &&
-  translations.verifyEmailPageUrl.startsWith("/")
-    ? translations.verifyEmailPageUrl
-    : undefined;
 const pendingVerificationCookie = "pending_verification_email";
 const request = Astro.request;
 let status: { type: "success" | "error"; message: string } | null = null;
 let lastEmail = "";
 let lastName = "";
-
-const safeRedirect = (url?: string | null) => {
-  if (!url || typeof url !== "string") return redirectPath;
-  if (!url.startsWith("/")) return redirectPath;
-  return url;
-};
 
 const rememberPendingEmail = (email: string) => {
   if (!email) return;
@@ -229,9 +218,14 @@ if (request.method === "POST") {
 
         rememberPendingEmail(email);
 
-        const payload = await response.json().catch(() => ({}));
-        const preferredRedirect = verifyEmailPage ?? payload?.redirect;
-        return Astro.redirect(safeRedirect(preferredRedirect ?? redirectPath));
+        return Astro.redirect(
+          verifyEmailPageUrl ??
+          (await (async () => {
+            const body = await response.json().catch(() => ({}));
+            if (typeof body?.redirect === "string" && body.redirect.startsWith("/")) return body.redirect;
+            return redirectPath;
+          })())
+        );
       }
     } catch (error) {
       const code = codeFromUnknownError(error);

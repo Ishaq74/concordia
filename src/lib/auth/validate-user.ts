@@ -12,7 +12,8 @@ const dangerousPatterns = [
   /&&|\|\||\|/, // shell chaining
   /cat\s+\/etc\/passwd/i, // classic command injection
   /whoami|id|uname|ls|pwd|echo|nc|curl|wget|ping|sleep|base64|bash|sh|zsh|dash|ksh/i, // shell commands
-  /\b(select|insert|update|delete|drop|union|--|#)\b/i, // SQL
+  /\b(select|insert|update|delete|drop|union|#)\b/i, // SQL (word-based)
+  /--/, // SQL comment token (catch anywhere)
   /\b(db\.|\$where|\$ne|\$gt|\$lt|\$in|\$nin|\$or|\$and)\b/i, // NoSQL
   /\.\./, // path traversal
   /\x00/, // null byte
