@@ -10,3 +10,5 @@ export * from "./schemas/blog_comments.schema";
 export * from "./schemas/blog_media.schema";
 export * from "./schemas/blog_organization.schema";
 export * from "./schemas/blog_translations.schema";
+// Notifications
+export * from "./schemas/notification.schema";

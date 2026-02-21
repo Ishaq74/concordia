@@ -35,22 +35,24 @@ Este proyecto demuestra una aplicación web full-stack usando tecnologías moder
 
 - **@astrojs/check**: `^0.9.6`
 - **@astrojs/mdx**: `^4.3.13`
-- **@astrojs/node**: `^9.5.3`
+- **@astrojs/node**: `^9.5.4`
 - **@astrojs/vercel**: `^9.0.4`
 - **@babel/preset-typescript**: `^7.28.5`
 - **@iconify-json/circle-flags**: `^1.2.10`
 - **@iconify-json/mdi**: `^1.2.3`
-- **@iconify-json/openmoji**: `^1.2.21`
-- **astro**: `^5.17.2`
+- **@iconify-json/openmoji**: `^1.2.22`
+- **astro**: `^5.17.3`
 - **astro-font**: `^1.1.0`
 - **astro-icon**: `^1.1.5`
-- **better-auth**: `^1.4.17`
-- **dotenv**: `^17.2.3`
+- **better-auth**: `^1.4.18`
+- **dotenv**: `^17.3.1`
 - **drizzle-orm**: `^0.45.1`
 - **jose**: `^6.1.3`
+- **leaflet**: `^1.9.4`
+- **markdown-it**: `^14.1.1`
 - **nanoid**: `^5.1.6`
-- **nodemailer**: `^7.0.12`
-- **pg**: `^8.17.2`
+- **nodemailer**: `^7.0.13`
+- **pg**: `^8.18.0`
 - **typescript**: `^5.9.3`
 - **validator**: `^13.15.26`
 
@@ -115,6 +117,7 @@ npm install
       - lucas-martin.png
       - sarah-leroy.png
     - placeholder.jpg
+  - **videos**
 - README.ar.md
 - README.es.md
 - README.fr.md
@@ -181,6 +184,9 @@ npm install
         - SignUpCard.astro
         - verify-email.client.ts
         - VerifyEmailCard.astro
+      - **BannerPage**
+        - AuthorBannerPage.astro
+      - BannerPage.astro
       - **blog**
         - BlogLayout.astro
         - MainBlog.astro
@@ -317,14 +323,20 @@ npm install
       - 07-blog_posts.data.ts
       - 07-blog_post_authors.data.ts
       - 10-blog_translations.data.ts
+      - 11-blog_comments.data.ts
+      - 11-notification.data.ts
     - drizzle.ts
     - **loaders**
       - blog.ts
       - factory.ts
     - **migrations**
       - 0008_smiling_landau.sql
+      - 0009_giant_zzzax.sql
+      - 0010_blue_frog_thor.sql
       - **meta**
         - 0008_snapshot.json
+        - 0009_snapshot.json
+        - 0010_snapshot.json
         - _journal.json
     - **schemas**
       - audit-log.schema.ts
@@ -336,7 +348,7 @@ npm install
       - blog_organization.schema.ts
       - blog_posts.schema.ts
       - blog_translations.schema.ts
-      - comments.schema.ts
+      - notification.schema.ts
     - schemas.ts
   - env.d.ts
   - **i18n**
@@ -372,9 +384,9 @@ npm install
     - **smtp**
       - smtp.check.ts
       - smtp.ts
+    - theme.ts
     - types.ts
     - **wallet**
-      - wallet.ts
   - middleware.ts
   - **pages**
     - 404.astro
@@ -395,6 +407,8 @@ npm install
     - **ar**
       - index.astro
     - **en**
+      - **blog**
+        - index.astro
       - **docs**
         - **components**
           - accordion.astro
@@ -434,8 +448,16 @@ npm install
           - table-of-contents.astro
       - index.astro
     - **es**
+      - **blog**
+        - **auteur**
+          - [slug].astro
+        - index.astro
+        - **[category]**
+          - [slug].astro
+        - [category].astro
       - index.astro
     - **fr**
+      - a-propos.astro
       - **auth**
         - connexion.astro
         - inscription.astro
@@ -452,6 +474,7 @@ npm install
         - **[category]**
           - [slug].astro
         - [category].astro
+      - contact.astro
       - **docs**
         - **components**
           - accordion.astro
@@ -523,6 +546,10 @@ npm install
     - comments.test.ts
     - **loaders**
       - blog-loader.test.ts
+  - **modules**
+    - **blog**
+      - **cards**
+        - PostCard.astro.test.ts
   - **pages**
     - README.md
   - README.md
@@ -539,6 +566,8 @@ npm install
     - ArticleCard.astro.test.ts
     - Avatar.astro.test.ts
     - Badge.astro.test.ts
+    - BannerPage.astro.test.ts
+    - BannerPage.video.test.ts
     - Breadcrumb.astro.test.ts
     - Button.astro.test.ts
     - Card.astro.test.ts
@@ -547,6 +576,7 @@ npm install
     - EventCard.astro.test.ts
     - FundingCampaignCard.astro.test.ts
     - Gallery.astro.test.ts
+    - Grid.astro.test.ts
     - GroupCard.astro.test.ts
     - Kbd.astro.test.ts
     - Link.astro.test.ts
@@ -559,6 +589,7 @@ npm install
     - ServiceCard.astro.test.ts
     - Sheet.astro.test.ts
     - Skeleton.astro.test.ts
+    - ThemeSwitch.astro.test.ts
     - ThreadCard.astro.test.ts
     - Timeline.astro.test.ts
     - Tooltip.astro.test.ts
@@ -566,6 +597,7 @@ npm install
     - **loaders**
       - factory.test.ts
     - smtp.test.ts
+    - theme.test.ts
     - validation.test.ts
   - **utils**
     - api-helpers.ts
@@ -597,47 +629,254 @@ Better Auth está configurado con plugins para OAuth, gestión de sesiones y má
 
 ## Base de datos
 
+### Tablas exportadas (fuente: barrel file)
+
 - **auth-schema.ts**
-  - Table _user_ (const _user_)
-    - Champ : _id_ `(text)`
-    - Champ : _name_ `(text)`
-    - Champ : _email_ `(text)`
-    - Champ : _emailVerified_ `(boolean)`
-    - Champ : _image_ `(text)`
-    - Champ : _createdAt_ `(timestamp)`
-    - Champ : _updatedAt_ `(timestamp)`
-    - Champ : _username_ `(text)`
-    - Champ : _displayUsername_ `(text)`
-    - Champ : _role_ `(text)`
-    - Champ : _banned_ `(boolean)`
-    - Champ : _banReason_ `(text)`
-    - Champ : _banExpires_ `(timestamp)`
-  - Table _account_ (const _account_)
-    - Champ : _id_ `(text)`
-    - Champ : _accountId_ `(text)`
-    - Champ : _providerId_ `(text)`
-    - Champ : _userId_ `(text)`
-  - Table _verification_ (const _verification_)
-    - Champ : _id_ `(text)`
-    - Champ : _identifier_ `(text)`
-    - Champ : _value_ `(text)`
-    - Champ : _expiresAt_ `(timestamp)`
-    - Champ : _usedAt_ `(timestamp)`
-    - Champ : _createdAt_ `(timestamp)`
-    - Champ : _updatedAt_ `(timestamp)`
-  - Table _organization_ (const _organization_)
-    - Champ : _id_ `(text)`
-    - Champ : _name_ `(text)`
-    - Champ : _slug_ `(text)`
-    - Champ : _logo_ `(text)`
-    - Champ : _createdAt_ `(timestamp)`
-    - Champ : _metadata_ `(text)`
-  - Table _member_ (const _member_)
-    - Champ : _id_ `(text)`
-    - Champ : _organizationId_ `(text)`
-  - Table _invitation_ (const _invitation_)
-    - Champ : _id_ `(text)`
-    - Champ : _organizationId_ `(text)`
+  - user (const: user)
+    - id: text
+    - name: text
+    - email: text
+    - emailVerified: boolean
+    - image: text
+    - createdAt: timestamp
+    - updatedAt: timestamp
+    - username: text
+    - displayUsername: text
+    - role: text
+    - banned: boolean
+    - banReason: text
+    - banExpires: timestamp
+    - Relations:
+      - sessions: many
+      - accounts: many
+      - members: many
+      - invitations: many
+  - session (const: session)
+    - id: text
+    - expiresAt: timestamp
+    - token: text
+    - createdAt: timestamp
+    - updatedAt: timestamp
+    - ipAddress: text
+    - userAgent: text
+    - userId: text
+    - Relations:
+      - user: one
+  - account (const: account)
+    - id: text
+    - accountId: text
+    - providerId: text
+    - userId: text
+    - Relations:
+      - user: one
+  - verification (const: verification)
+    - id: text
+    - identifier: text
+    - value: text
+    - expiresAt: timestamp
+    - usedAt: timestamp
+    - createdAt: timestamp
+    - updatedAt: timestamp
+  - organization (const: organization)
+    - id: text
+    - name: text
+    - slug: text
+    - logo: text
+    - createdAt: timestamp
+    - metadata: text
+    - Relations:
+      - members: many
+      - invitations: many
+  - member (const: member)
+    - id: text
+    - organizationId: text
+    - Relations:
+      - organization: one
+      - user: one
+  - invitation (const: invitation)
+    - id: text
+    - organizationId: text
+    - Relations:
+      - organization: one
+      - user: one
+  - rate_limit (const: rateLimit)
+    - id: text
+    - key: text
+    - count: integer
+    - lastRequest: bigint
+- **audit-log.schema.ts**
+  - audit_logs (const: auditLog)
+    - id: text
+    - action: text
+    - userId: text
+    - targetId: text
+    - ip: text
+    - userAgent: text
+    - data: jsonb
+    - createdAt: timestamp
+- **blog_posts.schema.ts**
+  - blog_posts (const: blogPosts)
+    - id: text
+    - slug: text
+    - status: text
+    - publishedAt: timestamp
+    - displayInHome: boolean
+    - displayInBlog: boolean
+    - isFeatured: boolean
+    - readingTime: text
+    - wordCount: text
+    - timeRequired: text
+    - allowComments: boolean
+    - inLanguage: text
+    - license: text
+    - discussionUrl: text
+    - url: text
+    - identifier: text
+    - createdAt: timestamp
+    - updatedAt: timestamp
+    - Relations:
+      - authors: many
+      - categories: many
+      - media: many
+      - translations: many
+      - comments: many
+  - blog_post_authors (const: blogPostAuthors)
+    - postId: text
+    - authorId: text
+    - Relations:
+      - post: one
+      - author: one
+  - blog_post_categories (const: blogPostCategories)
+    - postId: text
+    - categoryId: text
+    - Relations:
+      - post: one
+      - category: one
+  - blog_post_media (const: blogPostMedia)
+    - postId: text
+    - mediaId: text
+    - type: text
+    - position: text
+    - Relations:
+      - post: one
+      - media: one
+- **blog_authors.schema.ts**
+  - blog_authors (const: blogAuthors)
+    - id: text
+    - slug: text
+    - givenName: jsonb
+    - familyName: jsonb
+    - displayName: jsonb
+    - bio: jsonb
+    - jobTitle: jsonb
+    - email: text
+    - avatarId: text
+    - avatarUrl: text
+    - website: text
+    - sameAs: jsonb
+    - worksForId: text
+    - displayInHome: boolean
+    - displayInBlog: boolean
+    - isFeatured: boolean
+    - seoTitle: jsonb
+    - seoDescription: jsonb
+    - seoKeywords: jsonb
+    - canonicalUrl: jsonb
+    - createdAt: timestamp
+    - updatedAt: timestamp
+    - Relations:
+      - avatar: one
+      - organization: one
+- **blog_categories.schema.ts**
+  - blog_categories (const: blogCategories)
+    - id: text
+    - slug: text
+    - name: jsonb
+    - description: jsonb
+    - featuredImageId: text
+    - displayInHome: boolean
+    - displayInMenu: boolean
+    - displayInBlog: boolean
+    - isFeatured: boolean
+    - parentId: text
+    - seoTitle: jsonb
+    - seoDescription: jsonb
+    - seoKeywords: jsonb
+    - canonicalUrl: jsonb
+    - createdAt: timestamp
+    - updatedAt: timestamp
+    - Relations:
+      - featuredImage: one
+- **blog_comments.schema.ts**
+  - blog_comments (const: blogComments)
+    - id: text
+    - entityId: text
+    - entityType: text
+    - parentId: text
+    - authorName: text
+    - authorEmail: text
+    - content: jsonb
+    - rating: integer
+    - status: text
+    - inLanguage: text
+    - createdAt: timestamp
+    - updatedAt: timestamp
+    - Relations:
+      - parent: one
+      - replies: many
+- **blog_media.schema.ts**
+  - blog_media (const: blogMedia)
+    - id: text
+    - url: text
+    - contentUrl: text
+    - type: text
+    - encodingFormat: text
+    - width: text
+    - height: text
+    - duration: text
+    - license: text
+    - copyrightHolder: text
+    - caption: jsonb
+    - description: jsonb
+    - alt: jsonb
+    - thumbnailUrl: text
+    - createdAt: timestamp
+    - updatedAt: timestamp
+- **blog_organization.schema.ts**
+  - blog_organizations (const: blogOrganizations)
+    - id: text
+    - name: text
+- **blog_translations.schema.ts**
+  - blog_translations (const: blogTranslations)
+    - id: text
+    - postId: text
+    - inLanguage: text
+    - headline: jsonb
+    - alternativeHeadline: jsonb
+    - articleBody: jsonb
+    - excerpt: jsonb
+    - seoTitle: jsonb
+    - seoDescription: jsonb
+    - seoKeywords: jsonb
+    - canonicalUrl: jsonb
+    - createdAt: timestamp
+    - updatedAt: timestamp
+    - Relations:
+      - post: one
+- **notification.schema.ts**
+  - notification (const: notification)
+    - id: text
+    - userId: text
+    - message: text
+    - type: text
+    - status: text
+    - isRead: boolean
+    - createdAt: timestamp
+    - updatedAt: timestamp
+
+### Bonus: archivos de esquema no exportados
+
+_Todos los archivos de esquema están exportados._
 
 ## Variables de entorno
 
@@ -750,6 +989,10 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - comments.test.ts
   - **loaders**
     - blog-loader.test.ts
+- **modules**
+  - **blog**
+    - **cards**
+      - PostCard.astro.test.ts
 - **pages**
   - README.md
 - README.md
@@ -766,6 +1009,8 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - ArticleCard.astro.test.ts
   - Avatar.astro.test.ts
   - Badge.astro.test.ts
+  - BannerPage.astro.test.ts
+  - BannerPage.video.test.ts
   - Breadcrumb.astro.test.ts
   - Button.astro.test.ts
   - Card.astro.test.ts
@@ -774,6 +1019,7 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - EventCard.astro.test.ts
   - FundingCampaignCard.astro.test.ts
   - Gallery.astro.test.ts
+  - Grid.astro.test.ts
   - GroupCard.astro.test.ts
   - Kbd.astro.test.ts
   - Link.astro.test.ts
@@ -786,6 +1032,7 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - ServiceCard.astro.test.ts
   - Sheet.astro.test.ts
   - Skeleton.astro.test.ts
+  - ThemeSwitch.astro.test.ts
   - ThreadCard.astro.test.ts
   - Timeline.astro.test.ts
   - Tooltip.astro.test.ts
@@ -793,6 +1040,7 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - **loaders**
     - factory.test.ts
   - smtp.test.ts
+  - theme.test.ts
   - validation.test.ts
 - **utils**
   - api-helpers.ts
@@ -822,9 +1070,9 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 - **smtp**
   - smtp.check.ts
   - smtp.ts
+- theme.ts
 - types.ts
 - **wallet**
-  - wallet.ts
 - **src/database**
 - **admin**
   - loaders.ts
@@ -837,14 +1085,20 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - 07-blog_posts.data.ts
   - 07-blog_post_authors.data.ts
   - 10-blog_translations.data.ts
+  - 11-blog_comments.data.ts
+  - 11-notification.data.ts
 - drizzle.ts
 - **loaders**
   - blog.ts
   - factory.ts
 - **migrations**
   - 0008_smiling_landau.sql
+  - 0009_giant_zzzax.sql
+  - 0010_blue_frog_thor.sql
   - **meta**
     - 0008_snapshot.json
+    - 0009_snapshot.json
+    - 0010_snapshot.json
     - _journal.json
 - **schemas**
   - audit-log.schema.ts
@@ -856,7 +1110,7 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - blog_organization.schema.ts
   - blog_posts.schema.ts
   - blog_translations.schema.ts
-  - comments.schema.ts
+  - notification.schema.ts
 - schemas.ts
 - **src/pages/api**
 - **admin**
@@ -970,6 +1224,8 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - logs error on missing lang key in translation
     - logs error if two translations produce same id
 
+- `tests\modules\blog\cards\PostCard.astro.test.ts`
+
 - `tests\security\security.test.ts`
   - **RBAC/ABAC**
     - refuse accès admin sans rôle
@@ -1007,6 +1263,16 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 
 - `tests\ui\Badge.astro.test.ts`
 
+- `tests\ui\BannerPage.astro.test.ts`
+  - **BannerPage template**
+    - renders title and subtitle
+    - applies variant and color classes and shows meta
+    - renders breadcrumbs when passed
+
+- `tests\ui\BannerPage.video.test.ts`
+  - **BannerPage template with video background**
+    - renders a video background when videoUrl is provided
+
 - `tests\ui\Breadcrumb.astro.test.ts`
   - **Breadcrumb.astro**
     - renders breadcrumb items from slot
@@ -1039,6 +1305,8 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 
 - `tests\ui\Gallery.astro.test.ts`
 
+- `tests\ui\Grid.astro.test.ts`
+
 - `tests\ui\GroupCard.astro.test.ts`
 
 - `tests\ui\Kbd.astro.test.ts`
@@ -1062,6 +1330,8 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 - `tests\ui\Sheet.astro.test.ts`
 
 - `tests\ui\Skeleton.astro.test.ts`
+
+- `tests\ui\ThemeSwitch.astro.test.ts`
 
 - `tests\ui\ThreadCard.astro.test.ts`
 
@@ -1107,6 +1377,15 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - **Error Handling**
     - should handle timeout gracefully
     - should classify auth errors
+
+- `tests\unit\theme.test.ts`
+  - **theme utility**
+    - getTheme prefers stored value over media
+    - getTheme falls back to cookie when localStorage throws
+    - getTheme defaults to prefers-color-scheme when nothing stored
+    - setTheme applies attribute and persists
+    - initTheme writes initial attribute
+    - dispatches themechange event when set
 
 - `tests\unit\validation.test.ts`
   - **Input Validation Unit Tests**

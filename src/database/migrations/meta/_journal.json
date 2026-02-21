@@ -69,6 +69,13 @@
       "when": 1771696501771,
       "tag": "0009_giant_zzzax",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1771707741599,
+      "tag": "0010_blue_frog_thor",
+      "breakpoints": true
     }
   ]
 }

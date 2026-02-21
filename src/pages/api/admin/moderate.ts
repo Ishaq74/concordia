@@ -2,11 +2,8 @@ import type { APIRoute } from "astro";
 import { getAuth } from "@lib/auth/auth";
 import { getDrizzle } from "@database/drizzle";
 import {
-  review,
-  comment,
-  forumPost,
-  forumThread,
-  classified,
+  blogComments,
+
 } from "@database/schemas";
 import { eq } from "drizzle-orm";
 import { getUserRoles } from "@lib/auth/roles";
@@ -16,11 +13,7 @@ import { createNotification } from "@lib/notifications/notifications";
 export const prerender = false;
 
 const entityMap = {
-  review: { table: review, statusField: "status", authorField: "authorId" },
-  comment: { table: comment, statusField: "status", authorField: "authorId" },
-  forum_post: { table: forumPost, statusField: "status", authorField: "authorId" },
-  forum_thread: { table: forumThread, statusField: "status", authorField: "authorId" },
-  classified: { table: classified, statusField: "status", authorField: "sellerId" },
+  blogComments: { table: blogComments, statusField: "status", authorField: "authorId" },
 } as const;
 
 type EntityType = keyof typeof entityMap;

@@ -1,32 +1,13 @@
 ---
-// Simple map component using Leaflet.js (client:load)
-import { onMount } from 'astro/client';
 import type { ArticleMapPoint } from '@lib/types';
-
-interface Props {
-  points: ArticleMapPoint[];
-  height?: string;
-}
-
-const { points, height = '400px' } = Astro.props;
-
-onMount(async () => {
-  if (typeof window === 'undefined') return;
-  if (!window.L) {
-    await import('leaflet/dist/leaflet.css');
-    await import('leaflet');
-  }
-  const L = window.L;
-  const map = L.map('article-map').setView([45.899, 6.129], 12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
-  }).addTo(map);
-  points.forEach((pt) => {
-    if (pt.lat && pt.lng) {
-      L.marker([pt.lat, pt.lng]).addTo(map).bindPopup(`<b>${pt.title}</b>`);
-    }
-  });
-});
+// Ajoute ici tes props ou logique serveur si besoin
 ---
-
-<div id="article-map" style={`width:100%;height:${height};border-radius:12px;overflow:hidden;box-shadow:0 2px 8px #0002;`} />
+<div id="map" style="height: 400px;"></div>
+<script type="module" is:inline>
+  import { Map, TileLayer } from 'leaflet';
+  const map = new Map('map').setView([51.505, -0.09], 13);
+  new TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+</script>

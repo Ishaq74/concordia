@@ -92,4 +92,41 @@ export const i18n = {
     ar: 'تم إعداد الاختبارات باستخدام Vitest (وحدات/تكامل) و Playwright (E2E). يحتوي المستودع على ملفات التكوين وأدوات المساعدة وأمثلة على مجموعات الاختبار للمصادقة وقاعدة البيانات ومسارات API وتدفقات واجهة المستخدم.',
     es: 'Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright (E2E). El repositorio incluye archivos de configuración, helpers y suites de ejemplo para auth, DB, rutas API y flujos UI.',
   },
+  // Database section subtitles/messages
+  databaseExportedTitle: {
+    en: 'Exported Tables (Source: barrel file)',
+    fr: 'Tables exportées (source : barrel file)',
+    ar: 'الجداول المصدرة (من ملف البرميل)',
+    es: 'Tablas exportadas (fuente: barrel file)'
+  },
+  databaseBonusTitle: {
+    en: 'Bonus: Schema files not exported',
+    fr: 'Bonus : fichiers de schéma non exportés',
+    ar: 'مكافأة: ملفات المخطط غير المصدرة',
+    es: 'Bonus: archivos de esquema no exportados'
+  },
+  databaseNoExported: {
+    en: '_No exported tables found._',
+    fr: '_Aucune table exportée trouvée._',
+    ar: '_لم يتم العثور على جداول مصدرة._',
+    es: '_No se encontraron tablas exportadas._'
+  },
+  databaseNoFields: {
+    en: '_No fields found._',
+    fr: '_Aucun champ trouvé._',
+    ar: '_لم يتم العثور على حقول._',
+    es: '_No se encontraron campos._'
+  },
+  databaseNoTables: {
+    en: '_No tables found._',
+    fr: '_Aucune table trouvée._',
+    ar: '_لم يتم العثور على جداول._',
+    es: '_No se encontraron tablas._'
+  },
+  databaseAllExported: {
+    en: '_All schema files are exported._',
+    fr: '_Tous les fichiers de schéma sont exportés._',
+    ar: '_جميع ملفات المخطط تم تصديرها._',
+    es: '_Todos los archivos de esquema están exportados._'
+  },
 } as const;
