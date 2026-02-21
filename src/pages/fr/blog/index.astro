@@ -43,8 +43,8 @@ posts.forEach(p => console.log(`[blog/index] slug=${p.data.slug} categories=`, p
 
 <BaseLayout title="Blog" lang={LANG}>
   <BannerPage
-    title={t.blog?.heading || 'Blog'}
-    subtitle={t.blog?.subheading}
+    title={t.blog?.title || 'Blog'}
+    subtitle={t.blog?.description || 'Découvrez nos derniers articles sur la technologie, l’innovation et les tendances du secteur.'}
     type="blog"
     color="accent"
   />

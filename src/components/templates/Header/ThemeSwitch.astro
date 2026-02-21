@@ -32,32 +32,36 @@ const buttonClass = [
   function initTheme() {
     const html = document.documentElement;
     const button = document.getElementById('theme-switch');
-    
-    const getTheme = () => {
-      return localStorage.getItem('theme') || 
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    };
-    
-    const setTheme = (theme: string) => {
+
+    function getTheme() {
+      return localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    }
+
+    function setTheme(theme: string) {
       html.setAttribute('data-theme', theme);
-      localStorage.setItem('theme', theme);
+      try {
+        localStorage.setItem('theme', theme);
+      } catch (e) {}
       button?.setAttribute('data-theme', theme);
-    };
-    
-    const toggleTheme = () => {
+    }
+
+    function toggleTheme() {
       const current = html.getAttribute('data-theme') || 'light';
       setTheme(current === 'dark' ? 'light' : 'dark');
-    };
-    
+    }
+
     setTheme(getTheme());
-    button?.addEventListener('click', toggleTheme);
+    if (button) {
+      button.removeEventListener('click', toggleTheme);
+      button.addEventListener('click', toggleTheme);
+    }
   }
-  
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initTheme);
   } else {
     initTheme();
   }
-  
+
   document.addEventListener('astro:after-swap', initTheme);
 </script>

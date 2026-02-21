@@ -1,37 +1,95 @@
 ---
-// Flex component for flexbox layouts
-export interface Props {
-  direction?: 'row' | 'col' | 'row-reverse' | 'col-reverse';
+// Flex component: DX identique à Grid, spacing tokens stricts, margin/padding complets
+interface Props {
+  direction?: 'row' | 'row-reverse' | 'column' | 'column-reverse';
   wrap?: 'nowrap' | 'wrap' | 'wrap-reverse';
-  alignItems?: 'start' | 'center' | 'end' | 'stretch' | 'baseline';
-  justifyContent?: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly';
-  gap?: 'sm' | 'md' | 'lg' | 'xl';
-  class?: string;
+  alignItems?: 'flex-start' | 'center' | 'flex-end' | 'baseline' | 'stretch';
+  justifyContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
+  gap?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  padding?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  margin?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  paddingTop?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  paddingBottom?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  paddingLeft?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  paddingRight?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  marginTop?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  marginBottom?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  marginLeft?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  marginRight?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+  className?: string;
+  style?: string;
+  [key: string]: any;
+}
+
+const spacingTokens = {
+  none: '0',
+  xs: 'var(--space-1)',
+  sm: 'var(--space-2)',
+  md: 'var(--space-4)',
+  lg: 'var(--space-6)',
+  xl: 'var(--space-8)',
+  xxl: 'var(--space-10)',
+} as const;
+type SpacingKey = keyof typeof spacingTokens;
+function getSpacingToken(val: SpacingKey | undefined): string {
+  if (!val) return '';
+  return spacingTokens[val] ?? '';
 }
 
 const {
   direction = 'row',
   wrap = 'nowrap',
-  alignItems,
-  justifyContent,
+  alignItems = 'stretch',
+  justifyContent = 'flex-start',
   gap = 'md',
-  class: className = '',
-} = Astro.props;
+  padding,
+  margin,
+  paddingTop,
+  paddingBottom,
+  paddingLeft,
+  paddingRight,
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  className = '',
+  style: inlineStyle = '',
+  ...restProps
+} = Astro.props as Props;
+
+const styles: Record<string, string> = {
+  gap: getSpacingToken(gap),
+  padding: getSpacingToken(padding),
+  margin: getSpacingToken(margin),
+  'padding-top': getSpacingToken(paddingTop),
+  'padding-bottom': getSpacingToken(paddingBottom),
+  'padding-left': getSpacingToken(paddingLeft),
+  'padding-right': getSpacingToken(paddingRight),
+  'margin-top': getSpacingToken(marginTop),
+  'margin-bottom': getSpacingToken(marginBottom),
+  'margin-left': getSpacingToken(marginLeft),
+  'margin-right': getSpacingToken(marginRight),
+};
+
+const styleString = Object.entries(styles)
+  .filter(([, v]) => typeof v === 'string' && v !== undefined && v !== '')
+  .map(([k, v]) => `${k}:${v}`)
+  .join(';') + (inlineStyle ? `;${inlineStyle}` : '');
 
 const classes = [
   'flex',
-  direction === 'col' && 'flex-col',
+  direction === 'column' && 'flex-col',
   direction === 'row-reverse' && 'flex-row-reverse',
-  direction === 'col-reverse' && 'flex-col-reverse',
+  direction === 'column-reverse' && 'flex-col-reverse',
   wrap !== 'nowrap' && `flex-${wrap}`,
   alignItems && `items-${alignItems}`,
   justifyContent && `justify-${justifyContent}`,
-  `gap-${gap === 'sm' ? '2' : gap === 'md' ? '4' : gap === 'lg' ? '6' : '8'}`,
   className
 ].filter(Boolean).join(' ');
+
 ---
 
-<div class={classes}>
+<div class={classes} style={styleString} {...restProps}>
   <slot />
 </div>
 
@@ -39,42 +97,30 @@ const classes = [
   .flex {
     display: flex;
   }
-
   .flex-col {
     flex-direction: column;
   }
-
   .flex-row-reverse {
     flex-direction: row-reverse;
   }
-
   .flex-col-reverse {
     flex-direction: column-reverse;
   }
-
   .flex-wrap {
     flex-wrap: wrap;
   }
-
   .flex-wrap-reverse {
     flex-wrap: wrap-reverse;
   }
-
-  .gap-2 { gap: var(--space-2); }
-  .gap-4 { gap: var(--space-4); }
-  .gap-6 { gap: var(--space-6); }
-  .gap-8 { gap: var(--space-8); }
-
-  .items-start { align-items: flex-start; }
+  .items-flex-start { align-items: flex-start; }
   .items-center { align-items: center; }
-  .items-end { align-items: flex-end; }
-  .items-stretch { align-items: stretch; }
+  .items-flex-end { align-items: flex-end; }
   .items-baseline { align-items: baseline; }
-
-  .justify-start { justify-content: flex-start; }
+  .items-stretch { align-items: stretch; }
+  .justify-flex-start { justify-content: flex-start; }
   .justify-center { justify-content: center; }
-  .justify-end { justify-content: flex-end; }
-  .justify-between { justify-content: space-between; }
-  .justify-around { justify-content: space-around; }
-  .justify-evenly { justify-content: space-evenly; }
+  .justify-flex-end { justify-content: flex-end; }
+  .justify-space-between { justify-content: space-between; }
+  .justify-space-around { justify-content: space-around; }
+  .justify-space-evenly { justify-content: space-evenly; }
 </style>

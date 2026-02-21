@@ -1,4 +1,6 @@
 ---
+import Grid from "@components/Tools/Grid.astro";
+import Flex from "@components/Tools/Flex.astro";
 import CategoryBadge from "../ui/CategoryBadge.astro";
 import PostMeta from "../ui/PostMeta.astro";
 
@@ -19,39 +21,32 @@ function getInitials(name: string) {
 }
 ---
 
-<header class="post-header">
+<Grid tag="div" align="center" textAlign="center" gap="lg">
   {/* Catégories */}
-  <div class="post-categories">
     {post.data.categories.map((c: any) => (
       <CategoryBadge name={c.name} slug={c.slug} lang={lang} />
     ))}
-  </div>
 
   {/* Titre H1 */}
-  <h1 class="post-title">
+  <h1>
     {post.data.title}
   </h1>
 
   {/* Méta + Auteurs */}
-  <div class="post-meta-row">
-    
+  <Flex justifyContent="center" alignItems="center" direction="column"> 
     {/* Groupe d'avatars */}
-    <AvatarGroup className="author-avatars">
       {post.data.authors.map((a: any) => (
-        <a href={`/${lang}/blog/auteur/${a.slug}`} title={a.name} class="author-link">
-          <Avatar variant="retro" size="lg" src={a.avatar_url} fallback={a.name}  />
-        </a>
+          <a href={`/${lang}/blog/auteur/${a.slug}`} title={a.name} class="author-link">
+            <Avatar variant="retro" direction="column" size="lg" src={a.avatar_url} fallback={a.name}  />
+          </a>
       ))}
-    </AvatarGroup>
 
     {/* Texte infos */}
     <div class="author-info">
-        <p class="author-names">
-            {post.data.authors.map((a: any) => a.name).join(", ")}
-        </p>
+        {post.data.authors.map((a: any) => a.name).join(", ")}
         <PostMeta publishedAt={post.data.publishedAt} readingTime={post.data.readingTime} lang={lang} />
-    </div> 
-  </div>
+    </div>
+  </Flex>
 
   {/* Cover Image */}
   <figure class="post-cover">
@@ -62,21 +57,4 @@ function getInitials(name: string) {
         class="cover-img"
       />
   </figure> 
-</header>
-
-<style>
-.post-header{max-width:58rem;margin:0 auto;text-align:center;margin-bottom:1.5rem;display:block;padding:0}
-.post-categories{display:flex;justify-content:center;flex-wrap:wrap;gap:var(--space-2)}
-.post-title{font-size:clamp(2rem,4vw,3rem);font-weight:800;margin:0}
-.post-meta-row{display:flex;flex-direction:column;gap:var(--space-2);align-items:center;justify-content:center;padding-block:var(--space-2);border-top:1px solid var(--border-muted);border-bottom:1px solid var(--border-muted)}
-@media (min-width:640px){.post-meta-row{flex-direction:row;align-items:center}}
-.author-avatars{display:flex;gap:0;align-items:center}
-.author-link{display:inline-block;transition:transform .12s ease}
-.author-link:hover{transform:scale(1.05);z-index:10}
-.post-cover{border-radius:var(--card-border-radius);overflow:hidden;box-shadow:var(--shadow-xl);aspect-ratio:16/9;margin-top:var(--space-6);background:var(--muted-bg)}
-.cover-img{width:100%;height:100%;object-fit:cover;display:block}
-
-.author-info{text-align:center}
-@media(min-width:640px){.author-info{text-align:left}}
-.author-names{font-size:.875rem;font-weight:600;margin:0;color:var(--text-muted-foreground)}
-</style>  
+</Grid>

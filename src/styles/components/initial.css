@@ -809,7 +809,7 @@ a.button.accent { background-color: var(--button-accent-bg); color: var(--button
 
 /* AVATAR */
 .avatar {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: var(--avatar-size);
@@ -823,6 +823,19 @@ a.button.accent { background-color: var(--button-accent-bg); color: var(--button
   overflow: hidden;
   position: relative;
 }
+.avatar-row {
+  flex-direction: row !important;
+}
+.avatar-column {
+  flex-direction: column !important;
+}
+
+  .avatar-row {
+    flex-direction: row;
+  }
+  .avatar-column {
+    flex-direction: column;
+  }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 .avatar-sm { --avatar-size: 2rem; }

@@ -1,5 +1,6 @@
 /* Tokens - Couleurs */
 :root {
+  color-scheme: light dark;
   /* Couleurs principales */
   --color-primary: #eab308;
   --color-secondary: #8b5cf6;
@@ -310,6 +311,7 @@
 
 /* Dark Theme */
 :root[data-theme="dark"] {
+  color-scheme: dark;
   /* Couleurs principales (identiques en dark) */
   --color-primary: #eab308;
   --color-secondary: #8b5cf6;

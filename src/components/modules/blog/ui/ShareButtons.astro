@@ -41,7 +41,7 @@ const shareLinks = [
 <div class={`share-container ${variant}`}>
   <span class="share-label">Partager :</span>
   {shareLinks.map(link => (
-    <Button variant={variant} color="primary" size="icon" asChild> 
+    <Button variant={variant} color="accent" size="icon" asChild> 
       <a href={link.href} target="_blank" rel="noopener noreferrer" aria-label={`Partager sur ${link.name}`}>
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
@@ -75,5 +75,4 @@ const shareLinks = [
     color: var(--text-muted-foreground);
   }
 
-.share-container a:hover { color: var(--color-primary); }
 </style>

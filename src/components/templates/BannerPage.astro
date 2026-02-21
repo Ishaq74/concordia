@@ -64,7 +64,7 @@ const backgroundImage = featuredImg || '/images/placeholder.jpg';
 
   <div class="banner-content">
     <Grid columns={layout === 'split' ? 2 : 1} gap="8" align="center">
-      <Flex direction="col" gap="sm" alignItems="start" class="banner-main-content">
+      <Flex direction="column" gap="sm" alignItems="flex-start" class="banner-main-content">
         {breadcrumbs.length > 0 && (
           <nav aria-label={t.nav.breadcrumbs || 'Breadcrumb'} class="banner-breadcrumbs">
             <ul>

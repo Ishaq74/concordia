@@ -54,7 +54,7 @@ const link = propHref ?? (primaryCat ? `/${lang}/blog/${primaryCat}/${post.data.
 
   <CardHeader class="post-header">
     <div class="post-header-top">
-      <Flex alignItems="center" justifyContent="between">
+      <Flex alignItems="center" justifyContent="space-between" marginBottom="md">
           {
             cats
               .slice(0, 1)
@@ -100,7 +100,7 @@ const link = propHref ?? (primaryCat ? `/${lang}/blog/${primaryCat}/${post.data.
           Astro.locals.user?.id === post.ownerId) && (
       <Flex 
         alignItems="center" 
-        justifyContent="end"
+        justifyContent="flex-end"
         class="post-edit">
             <Link 
               href={`/${lang}/admin/posts/${post.id}`}

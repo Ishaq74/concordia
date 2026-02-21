@@ -43,7 +43,6 @@ interface Props {
   flexDirection?: 'row' | 'row-reverse' | 'column' | 'column-reverse';
   flexWrap?: 'nowrap' | 'wrap' | 'wrap-reverse';
   alignItems?: 'flex-start' | 'center' | 'flex-end' | 'baseline' | 'stretch';
-  justifyContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
   alignContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'stretch';
   justifyItems?: boolean;
   
@@ -96,7 +95,7 @@ const {
   autoFit = false,
   autoFill = false,
   gridTemplateColumns,
-  gap = '1rem',
+  gap = 'md',
   rowGap,
   columnGap,
   xAlign = 'normal',
@@ -120,18 +119,18 @@ const {
   activeAnimate = '',
   transitionDuration = '300ms',
   transitionTiming = 'ease-in-out',
-  yPadding = '0',
-  xPadding = '0',
-  xMargin = '0',
-  yMargin = '0',
-  padding,
+  yPadding = 'md',
+  xPadding = 'md',
+  xMargin = 'md',
+  yMargin = 'md',
+  padding = 'md',
   paddingBlock,
   paddingInline,
   paddingTop,
   paddingBottom,
   paddingLeft,
   paddingRight,
-  margin,
+  margin = 'md',
   marginBlock,
   marginInline,
   marginTop,
@@ -164,6 +163,21 @@ const {
   ...restProps
 } = Astro.props as Props;
 
+const spacingTokens = {
+  none: '0',
+  xs: 'var(--space-1)',
+  sm: 'var(--space-2)',
+  md: 'var(--space-4)',
+  lg: 'var(--space-6)',
+  xl: 'var(--space-8)',
+  xxl: 'var(--space-10)',
+} as const;
+
+type SpacingKey = keyof typeof spacingTokens;
+function getSpacingToken(val: string | undefined): string {
+  if (!val) return '';
+  return spacingTokens[val as SpacingKey] ?? '';
+}
 const Tag = tag;
 
 // Determine display mode
@@ -272,21 +286,26 @@ const styles: Record<string, string> = {
   border: border ? `${borderWidthComputed} ${borderStyle} ${borderColor}` : '',
   'border-radius': borderRadius,
   'box-shadow': boxShadow,
-  // custom spacing passed via props should override utility classes
-  padding: padding && (isNaN(Number(padding)) || Number(padding) > 6) ? padding : '',
-  'padding-top': (paddingTop || yPadding) && ((isNaN(Number(paddingTop || yPadding)) || Number(paddingTop || yPadding) > 6) ? (paddingTop || yPadding) : ''),
-  'padding-bottom': paddingBottom && (isNaN(Number(paddingBottom)) || Number(paddingBottom) > 6) ? paddingBottom : '',
-  'padding-left': (paddingLeft || xPadding) && ((isNaN(Number(paddingLeft || xPadding)) || Number(paddingLeft || xPadding) > 6) ? (paddingLeft || xPadding) : ''),
-  'padding-right': paddingRight && (isNaN(Number(paddingRight)) || Number(paddingRight) > 6) ? paddingRight : '',
-  margin: margin && (isNaN(Number(margin)) || Number(margin) > 6) ? margin : '',
-  'margin-top': (marginTop || yMargin) && ((isNaN(Number(marginTop || yMargin)) || Number(marginTop || yMargin) > 6) ? (marginTop || yMargin) : ''),
-  'margin-bottom': marginBottom && (isNaN(Number(marginBottom)) || Number(marginBottom) > 6) ? marginBottom : '',
-  'margin-left': (marginLeft || xMargin) && ((isNaN(Number(marginLeft || xMargin)) || Number(marginLeft || xMargin) > 6) ? (marginLeft || xMargin) : ''),
-  'margin-right': marginRight && (isNaN(Number(marginRight)) || Number(marginRight) > 6) ? marginRight : '',
+  gap: getSpacingToken(gap) ?? spacingTokens['md'],
+  rowGap: getSpacingToken(rowGap),
+  columnGap: getSpacingToken(columnGap),
+  padding: getSpacingToken(padding) ?? spacingTokens['md'],
+  margin: getSpacingToken(margin) ?? spacingTokens['md'],
+  'padding-top': getSpacingToken(paddingTop),
+  'padding-bottom': getSpacingToken(paddingBottom),
+  'padding-left': getSpacingToken(paddingLeft),
+  'padding-right': getSpacingToken(paddingRight),
+  'margin-top': getSpacingToken(marginTop),
+  'margin-bottom': getSpacingToken(marginBottom),
+  'margin-left': getSpacingToken(marginLeft),
+  'margin-right': getSpacingToken(marginRight),
   'clip-path': clipPathTop !== 'none' ? clipPathTop : clipPathBottom !== 'none' ? clipPathBottom : '',
 };
 
-const styleString = Object.entries(styles).filter(([, v]) => v).map(([k, v]) => `${k}:${v}`).join(';') + (inlineStyle ? `;${inlineStyle}` : '');
+const styleString = Object.entries(styles)
+  .filter(([, v]) => typeof v === 'string' && v !== undefined && v !== '')
+  .map(([k, v]) => `${k}:${v}`)
+  .join(';') + (inlineStyle ? `;${inlineStyle}` : '');
 
 ---
 
@@ -341,7 +360,6 @@ const styleString = Object.entries(styles).filter(([, v]) => v).map(([k, v]) => 
   .u-secondary { background: var(--button-secondary-bg); color: var(--button-secondary-color); border-color: color-mix(in srgb, var(--button-secondary-bg) 85%, transparent); }
   .u-accent { background: var(--button-accent-bg); color: var(--button-accent-color); border-color: color-mix(in srgb, var(--button-accent-bg) 85%, transparent); }
   .u-error { background: var(--color-danger); color: var(--text-inverted); border-color: color-mix(in srgb, var(--color-danger) 85%, transparent); }
-
   /* Hover / interactive microstates (subtle, token-aware) */
   .u-primary:hover, .u-secondary:hover, .u-accent:hover { filter: brightness(0.98); transform: translateY(-1px); transition: transform 160ms ease, filter 160ms ease; }
   .u-initial:hover, .u-retro:hover, .u-modern:hover, .u-futuristic:hover { transform: translateY(-2px); transition: transform 200ms ease; }

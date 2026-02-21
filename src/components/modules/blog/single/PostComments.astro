@@ -78,71 +78,56 @@ const loginUrl = `/${lang}/connexion?callbackURL=${Astro.url.pathname}`;
 
     <TabPanel>
       <Card>
-        {
-          !user ? (
-            <div>
-              <p>
-                Connectez-vous pour laisser un avis.
-              </p>
-              <Button asChild>
-                <a href={loginUrl}>Connexion</a>
-              </Button>
-            </div>
-          ) : (
-            <form
-              method="POST"
-              action={actions.createComment}
-            >
-              <input type="hidden" name="entityId" value={entityId} />
-              <input type="hidden" name="entityType" value={entityType} />
+        <form method="POST" action={actions.createComment}>
+          <input type="hidden" name="entityId" value={entityId} />
+          <input type="hidden" name="entityType" value={entityType} />
 
-              <div>
-                <span>Note :</span>
+          {
+            !user && (
+              <div class="anon-info">
+                <p>Vous pouvez laisser un avis sans vous connecter. Indiquez votre nom et votre email (optionnel).</p>
                 <div>
-                  {[5, 4, 3, 2, 1].map((n) => (
-                    <>
-                      <input
-                        type="radio"
-                        id={`r-${n}`}
-                        name="rating"
-                        value={n}
-                        required
-                        checked={n === 5}
-                      />
-                      <label for={`r-${n}`}>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
-                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                        </svg>
-                      </label>
-                    </>
-                  ))}
+                  <label>Nom</label>
+                  <input type="text" name="authorName" placeholder="Votre nom" />
+                </div>
+                <div>
+                  <label>Email</label>
+                  <input type="email" name="authorEmail" placeholder="votre@email.com" />
                 </div>
               </div>
+            )
+          }
 
-              <div>
-                <label>
-                  Message
-                </label>
-                <textarea
-                  name="content"
-                  required
-                  minlength="3"
-                  placeholder="Partagez votre avis..."
-                />
-              </div>
+          <div>
+            <span>Note :</span>
+            <div class="rating-selector">
+              {[5, 4, 3, 2, 1].map((n) => (
+                <>
+                  <input
+                    type="radio"
+                    id={`r-${n}`}
+                    name="rating"
+                    value={n}
+                    required
+                    checked={n === 5}
+                  />
+                  <label for={`r-${n}`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </label>
+                </>
+              ))}
+            </div>
+          </div>
 
-              <Button type="submit">
-                Publier le commentaire
-              </Button>
-            </form>
-          )
-        }
+          <div>
+            <label>Message</label>
+            <textarea name="content" required minlength="3" placeholder="Partagez votre avis..." />
+          </div>
+
+          <Button type="submit">Publier le commentaire</Button>
+        </form>
       </Card>
     </TabPanel>
   </div>

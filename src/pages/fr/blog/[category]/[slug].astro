@@ -1,28 +1,37 @@
 ---
 import { getEntry } from "astro:content";
+import MarkdownIt from "markdown-it";
 import BlogLayout from "@components/templates/blog/BlogLayout.astro";
-
+import Grid from "@components/Tools/Grid.astro";
+import Flex from "@components/Tools/Flex.astro";
 // Import des composants
 import PostHeader from "@components/modules/blog/single/PostHeader.astro";
-import PostContent from "@components/modules/blog/single/PostContent.astro";
 import TableOfContents from "@components/modules/blog/single/TableOfContents.astro";
 import AuthorCard from "@components/modules/blog/cards/AuthorCard.astro";
 import ShareButtons from "@components/modules/blog/ui/ShareButtons.astro";
 import PostComments from "@components/modules/blog/single/PostComments.astro";
 
-// 1. On récupère les paramètres de l'URL
 const { slug } = Astro.params;
 const LANG = "fr";
 
-// 2. On va chercher l'article dans la collection "blog"
-// Ton loader génère des IDs sous la forme "slug-lang"
 const post = await getEntry("blog", `${slug}-${LANG}`);
 
-// 3. Sécurité : Si l'article n'existe pas, on renvoie vers une 404
 if (!post) {
   return Astro.redirect("/404");
 }
+
+// Le contenu est du Markdown (sécurisé selon toi).
+// Convertir en HTML côté serveur avec markdown-it.
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+});
+const renderedHtml = md.render(String(post.data.content ?? ""));
+
+console.log("Post data:", post.data);
 ---
+
 
 <BlogLayout
   title={post.data.seo?.title || post.data.title}
@@ -30,29 +39,24 @@ if (!post) {
   variant="initial"
 >
   <main class="page-container">
-    {/* 1. HEADER (Titre, Image, Méta) - Centré en haut */}
-    <div class="page-header">
-      <PostHeader post={post} lang={LANG} />
-    </div>
+    <PostHeader post={post} lang={LANG} />
 
     <article class="content-column">
-      <!-- inline TOC (client island) -->
       <TableOfContents />
 
-      <PostContent>
-        <div set:html={post.data.content} />
-      </PostContent>
+      <!-- Insertion directe du HTML rendu (trusted content selon toi) -->
+      <article class="post-content" role="article" set:html={renderedHtml}></article>
 
-      <div class="article-cta">
+      <Flex gap="md" alignItems="center" justifyContent="space-between">
         <p class="article-cta-title">Vous avez aimé cet article ?</p>
-        <ShareButtons title={post.data.title} />
-      </div>
+        <ShareButtons variant="retro" title={post.data.title} />
+      </Flex>
 
-      <div class="article-authors">
+      <Grid tag="div" variant="retro" align="center" textAlign="center" gap="md" marginTop="lg">
         {post.data.authors.map((author: any) => (
           <AuthorCard author={author} lang={LANG} />
         ))}
-      </div>
+      </Grid>
 
       <section id="comments" class="article-comments">
         <PostComments entityId={post.data.id} entityType="blog" />
@@ -62,13 +66,11 @@ if (!post) {
 
   <style>
     .page-container{max-width:1200px;margin:0 auto;padding:3rem 1rem}
-    .page-header{margin-bottom:2rem}
     .content-column{max-width:68ch;margin:0 auto}
 
     .article-cta{display:flex;flex-direction:column;gap:var(--space-3);align-items:flex-start;background:var(--muted-bg);padding:var(--space-4);border-radius:var(--card-border-radius);margin:2rem 0}
     @media(min-width:640px){.article-cta{flex-direction:row;justify-content:space-between;align-items:center}}
     .article-cta-title{font-weight:700;margin:0}
-
     .article-authors{margin-top:2rem;display:flex;flex-direction:column;gap:var(--space-4)}
     .article-comments{margin-top:2rem}
   </style>

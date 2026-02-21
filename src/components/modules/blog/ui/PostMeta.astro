@@ -3,6 +3,7 @@ import Flex from "@components/Tools/Flex.astro";
 import Link from "@components/ui/Link.astro";
 import { Icon } from 'astro-icon/components';
 import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+import Avatar from '@components/ui/Avatar/Avatar.astro';
 
 interface Props {
   publishedAt?: never;
@@ -20,7 +21,7 @@ const t = translations.default;
 ---
 <Flex
   alignItems="center"
-  justifyContent="between"
+  justifyContent="space-between"
 >
   {/* TEMPS DE LECTURE */}
   {readingTime && (
@@ -38,14 +39,7 @@ const t = translations.default;
 
   {/* AUTEURS */}
   {authors && authors.length > 0 && (
-    <Flex alignItems="end" gap="sm">
-      <span
-        role="img"
-        aria-label={authors.length === 1 ? t.blog.author : t.blog.authors}
-        class="inline-block"
-      >
-        <Icon name="openmoji:bust-in-silhouette" width="20" height="20" />
-      </span>
+    <Flex justifyContent="flex-end" alignItems="center" gap="sm">
       {t.blog.by}
 
       {authors.map((author, index) => (
@@ -58,7 +52,10 @@ const t = translations.default;
             transition:name="author"
             aria-label={`${author.name} (${t.blog.author})`}
           >
-            {author.name}
+            <span style="display:inline-flex;align-items:center;gap:0.5em">
+              <Avatar src={author.avatar ?? undefined} fallback={author.name} size="sm" direction="row" />
+              {author.name}
+            </span>
           </Link>
         </>
       ))}

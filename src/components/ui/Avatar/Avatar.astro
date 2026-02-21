@@ -6,6 +6,7 @@ interface Props {
   fallback?: string;
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
+  direction?: "row" | "column";
 }
 
 const {
@@ -15,12 +16,14 @@ const {
   fallback,
   size = "md",
   className = "",
+  direction = "row",
 } = Astro.props;
 
 const classes = [
   "avatar",
   variant !== "initial" && variant,
   size !== "md" && `avatar-${size}`,
+  direction && `avatar-${direction}`,
   className,
 ]
   .filter(Boolean)
