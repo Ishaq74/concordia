@@ -8,7 +8,7 @@
     "contact": "Contact",
     "docs": "Docs",
     "places": "Annuaire",
-    "magazine": "Magazine",
+    "blog": "Blog",
     "forum": "Forum",
     "events": "Événements",
     "education": "Éducation",
@@ -33,7 +33,11 @@
   "blog": {
     "news": "Actualités",
     "tutorials": "Tutoriels",
-    "releases": "Versions"
+    "releases": "Versions",
+    "readingTime": "Temps de lecture",
+    "author": "Auteur",
+    "authors": "Auteurs",
+    "by": "Par"
   },
   "home": {
     "heroTitle": "Concordia Annecy",
@@ -44,8 +48,8 @@
     "sectionPlacesDesc": "Découvrez les restaurants, boutiques, activités et hébergements autour du lac d'Annecy.",
     "sectionEvents": "Événements",
     "sectionEventsDesc": "Festivals, marchés, ateliers — ne manquez rien de ce qui se passe ici.",
-    "sectionMagazine": "Magazine",
-    "sectionMagazineDesc": "Reportages, portraits et nouvelles de notre territoire.",
+    "sectionBlog": "Blog",
+    "sectionBlogDesc": "Reportages, portraits et nouvelles de notre territoire.",
     "sectionForum": "Forum",
     "sectionForumDesc": "Échangez avec les habitants sur la vie de quartier, l'entraide et les projets.",
     "sectionVolunteer": "Bénévolat",
@@ -356,19 +360,19 @@
     "share": "Partager",
     "report": "Signaler"
   },
-  "magazine": {
-    "title": "Magazine",
-    "description": "Articles, guides et reportages sur le territoire",
+  "blog": {
+    "title": "Blog",
+    "description": "Publications, guides et reportages sur le territoire",
     "featured": "À la une",
-    "latest": "Derniers articles",
+    "latest": "Derniers billets",
     "readMore": "Lire la suite",
     "by": "Par",
     "publishedOn": "Publié le",
     "categories": "Catégories",
-    "relatedArticles": "Articles similaires",
+    "relatedArticles": "Billets similaires",
     "comments": "Commentaires",
     "writeComment": "Écrire un commentaire",
-    "noArticles": "Aucun article pour le moment"
+    "noArticles": "Aucun billet pour le moment"
   },
   "forumPage": {
     "title": "Forum",
@@ -432,6 +436,7 @@
     "goalReached": "Objectif atteint",
     "noProjects": "Aucun projet en cours"
   },
+  "contactPage": { "title": "Contact", "subtitle": "Nous écrire" },
   "classifiedsPage": {
     "title": "Annonces",
     "description": "Petites annonces de la communauté",
@@ -481,7 +486,7 @@
     "title": "Tableau de bord",
     "profile": "Mon profil",
     "myPlaces": "Mes lieux",
-    "myArticles": "Mes articles",
+    "myArticles": "Mon blog",
     "myAds": "Mes annonces",
     "myServices": "Mes services",
     "myBookings": "Mes réservations",
@@ -516,7 +521,7 @@
     "audit": "Journal d'audit",
     "config": "Configuration",
     "pendingPlaces": "Lieux en attente",
-    "pendingArticles": "Articles en attente",
+    "pendingArticles": "Billets en attente",
     "pendingAds": "Annonces en attente",
     "reports": "Signalements",
     "approve": "Approuver",

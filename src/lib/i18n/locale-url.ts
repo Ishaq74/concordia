@@ -4,8 +4,8 @@
  * Works with i18n.routing.prefixDefaultLocale: true.
  *
  * @param locale - Locale code (fr, en, ar, es)
- * @param path - Page path (e.g. "/articles", "services")
- * @returns Prefixed relative URL (e.g. "/fr/articles")
+ * @param path - Page path (e.g. "/blog", "services")
+ * @returns Prefixed relative URL (e.g. "/fr/blog")
  */
 export function getRelativeLocaleUrl(locale: string, path: string = ""): string {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;

@@ -1,5 +1,6 @@
 ---
 import Grid from "@components/Tools/Grid.astro";
+import Flex from "@components/Tools/Flex.astro";
 import Link from "@components/ui/Link.astro";
 import Button from "@components/ui/Button.astro";
 import Card from "@components/ui/Card/Card.astro";
@@ -53,15 +54,20 @@ const link = propHref ?? (primaryCat ? `/${lang}/blog/${primaryCat}/${post.data.
 
   <CardHeader class="post-header">
     <div class="post-header-top">
-      <div class="post-categories">
-        {
-          cats
-            .slice(0, 1)
-            .map((cat: any) => (
-              <CategoryBadge name={cat.name} slug={cat.slug} lang={lang} />
-            ))
-        }
-      </div>
+      <Flex alignItems="center" justifyContent="between">
+          {
+            cats
+              .slice(0, 1)
+              .map((cat: any) => (
+                <CategoryBadge name={cat.name} slug={cat.slug} lang={lang} />
+              ))
+          }
+        {post.data.publishedAt && (
+          <time class="post-date" datetime={post.data.publishedAt.toISOString()}>
+            {post.data.publishedAt.toLocaleDateString(lang, { day: 'numeric', month: 'short' })}
+          </time>
+        )}
+      </Flex>
 
       <StarRating rating={displayRating} count={displayCount} size="sm" variant={variant} color="primary" />
     </div>
@@ -81,18 +87,21 @@ const link = propHref ?? (primaryCat ? `/${lang}/blog/${primaryCat}/${post.data.
     </p>
   </CardContent>
 
-  <CardFooter class="post-footer">
+  <CardFooter className="post-footer">
     <PostMeta
       publishedAt={post.data.publishedAt}
       readingTime={post.data.readingTime}
       authors={post.data.authors}
       lang={lang}
+      className="post-meta"
     />
     {
         (Astro.locals.user?.role === "admin" ||
           Astro.locals.user?.id === post.ownerId) && (
-          <Grid display="flex" justifyContent="flex-end" alignItems="center" gap="var(--space-2)">
-
+      <Flex 
+        alignItems="center" 
+        justifyContent="end"
+        class="post-edit">
             <Link 
               href={`/${lang}/admin/posts/${post.id}`}
               aria-label={`Éditer ${post.data.title}`}
@@ -100,40 +109,41 @@ const link = propHref ?? (primaryCat ? `/${lang}/blog/${primaryCat}/${post.data.
               color="secondary"
               icon={{ name: "mdi:edit", side: "left" }}
             />
-          <form
-            method="POST"
-            action={actions.blog.changeStatus}
-            class="post-status-form"
-          >
-            <input type="hidden" name="id" value={post.id} />
-            <Button
-              type="submit"
-              name="status"
-              value="published"
-              title="Publier"
-              aria-label={`Publier ${post.data.title}`}
-              class="post-status-button"
-              disabled={post.status === "published"}
+            <form
+              method="POST"
+              action={actions.blog.changeStatus}
+              class="post-status-form"
             >
-              📝
-            </Button>
-          </form>
-          </Grid>
+              <input type="hidden" name="id" value={post.id} />
+              <Button
+                type="submit"
+                name="status"
+                value="published"
+                title="Publier"
+                aria-label={`Publier ${post.data.title}`}
+                class="post-status-button"
+                disabled={post.status === "published"}
+              >
+                📝
+              </Button>
+            </form>
+          </Flex>
         )
       }
   </CardFooter>
 </Card>
 
-<style>
+<style scoped>
 .card { max-width: 400px; }
 
 .post-image-link { display:block; width:100%; height: 220px; overflow:hidden; border-radius: var(--card-border-radius); }
+.post-date { margin-left: var(--space-2); font-size: 0.875rem; color: var(--text-muted-foreground); }
 .post-image { width:100%; height:100%; object-fit: cover; display:block; transition: transform 220ms ease; }
 .post-image-link:hover .post-image { transform: scale(1.03); }
 .post-title-row { margin-top: var(--space-3); }
 .post-title { margin: 0; font-size: 1.125rem; font-weight: 700; color: var(--text-foreground); }
 .post-excerpt { color: var(--text-muted-foreground); margin: 0; }
-.post-footer { display:flex; align-items:center; justify-content:space-between; gap: var(--space-2); width:100%; }
 .post-title-link { text-decoration: none; display: inline-block; width:100%; }
 .post-title-link:hover .post-title { text-decoration: underline; }
+.post-edit { background-color: red; margin-top:40px; }
 </style>

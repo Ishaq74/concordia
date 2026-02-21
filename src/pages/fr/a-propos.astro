@@ -1,0 +1,15 @@
+---
+import BannerPage from '@templates/BannerPage.astro';
+const t = await import('../../i18n/fr.json');
+---
+
+<BannerPage
+  title="À propos"
+  description="Qui nous sommes et ce que nous faisons."
+  type="flex"
+  color="primary"
+/>
+
+<section class="about-content">
+  <!-- contenu libre de la page "À propos" -->
+</section>

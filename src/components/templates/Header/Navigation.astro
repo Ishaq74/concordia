@@ -27,7 +27,7 @@ const navClass = ["nav", variant !== "initial" && variant, className]
 // Locale-aware slug mapping
 const isFr = currentLocale === "fr";
 
-// Découvrir: Places, Sentiers, Magazine, Événements
+// Découvrir: Places, Sentiers, Blog, Événements
 const discoverItems = [
   {
     label: t.nav.places,
@@ -38,8 +38,8 @@ const discoverItems = [
     href: getRelativeLocaleUrl(currentLocale, isFr ? "sentiers" : "trails"),
   },
   {
-    label: t.nav.magazine,
-    href: getRelativeLocaleUrl(currentLocale, isFr ? "articles" : "articles"),
+    label: t.nav.blog,
+    href: getRelativeLocaleUrl(currentLocale, isFr ? "blog" : "blog"),
   },
   {
     label: t.nav.events,

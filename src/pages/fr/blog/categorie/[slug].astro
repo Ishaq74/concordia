@@ -1,0 +1,18 @@
+---
+import BannerPage from '@templates/BannerPage.astro';
+const { slug } = Astro.params;
+const t = await import('../../../../i18n/fr.json');
+// fetch category name / posts here as needed
+const categoryName = slug.replace(/-/g, ' ');
+---
+
+<BannerPage
+  title={categoryName}
+  type="category"
+  breadcrumbs={[{ label: t.blog?.heading || 'Blog', href: '/fr/blog' }]}
+  color="secondary"
+/>
+
+<section class="category-posts">
+  <!-- liste des articles pour la catégorie {categoryName} -->
+</section>

@@ -11,7 +11,7 @@
     "community": "Comunidad",
     "engage": "Participar",
     "places": "Directorio",
-    "magazine": "Revista",
+    "blog": "Revista",
     "forum": "Foro",
     "events": "Eventos",
     "education": "Educación",
@@ -31,7 +31,11 @@
   "blog": {
     "news": "Noticias",
     "tutorials": "Tutoriales",
-    "releases": "Versiones"
+    "releases": "Versiones",
+    "readingTime": "Tiempo de lectura",
+    "author": "Autor",
+    "authors": "Autores",
+    "by": "Por"
   },
   "docs": {
     "ui": "UI",
@@ -74,8 +78,8 @@
     "sectionPlacesDesc": "Descubre restaurantes, tiendas, actividades y alojamientos alrededor del lago de Annecy.",
     "sectionEvents": "Eventos",
     "sectionEventsDesc": "Festivales, mercados, talleres — no te pierdas nada de lo que pasa aquí.",
-    "sectionMagazine": "Revista",
-    "sectionMagazineDesc": "Reportajes, retratos y noticias de nuestro territorio.",
+    "sectionBlog": "Revista",
+    "sectionBlogDesc": "Reportajes, retratos y noticias de nuestro territorio.",
     "sectionForum": "Foro",
     "sectionForumDesc": "Intercambia con los habitantes sobre la vida de barrio, la ayuda mutua y los proyectos.",
     "sectionVolunteer": "Voluntariado",

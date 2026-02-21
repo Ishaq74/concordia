@@ -5,10 +5,12 @@ import { getDrizzle } from "@database/drizzle";
 import { comments } from "@database/schemas";
 import { sql, and, eq } from "drizzle-orm";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import BannerPage from "@templates/BannerPage.astro";
 import PostGrid from "@components/modules/blog/lists/PostGrid.astro";
 import PostCard from "@components/modules/blog/cards/PostCard.astro";
 
 const LANG = "fr";
+const t = await import('../../../i18n/fr.json');
 const allPosts = await getCollection("blog");
 
 // On récupère les vraies stats SQL depuis la nouvelle table générique
@@ -40,6 +42,12 @@ posts.forEach(p => console.log(`[blog/index] slug=${p.data.slug} categories=`, p
 ---
 
 <BaseLayout title="Blog" lang={LANG}>
+  <BannerPage
+    title={t.blog?.heading || 'Blog'}
+    subtitle={t.blog?.subheading}
+    type="blog"
+    color="accent"
+  />
   <main class="container py-12">
     <PostGrid>
       {

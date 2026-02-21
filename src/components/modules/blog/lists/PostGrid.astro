@@ -5,13 +5,29 @@ import Grid from '@components/Tools/Grid.astro';
 <Grid
   tag="section"
   display="grid"
-  cols="3"
-  gap="var(--space-1)"
-  variant="retro"
+  justifyItems
+  autoFit
+  gap="var(--space-3)"
   color="secondary"
   sameHeight
-  margin="40px"
+  padding="var(--space-6)"
+  gridTemplateColumns="repeat(auto-fit, minmax(320px, 1fr))"
   ariaLabel="Liste d'articles"
+  className="post-grid"
 >
   <slot />
 </Grid>
+
+<style scoped>
+  .post-grid {
+    max-width: var(--max-width, 1200px);
+    margin: 0 auto;
+  }
+
+  @media (max-width: 768px) {
+    .post-grid {
+      padding-left: var(--space-4);
+      padding-right: var(--space-4);
+    }
+  }
+</style>

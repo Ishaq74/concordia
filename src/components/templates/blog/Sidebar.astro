@@ -18,7 +18,7 @@ const t = translations.default;
       <h3 class="section-title">{t.nav.blog}</h3>
       <ul class="nav-list">
         <li class="nav-item"><Link href={`/${currentLocale}/blog`} variant={variant} style="link" className={currentPath === `/${currentLocale}/blog` ? 'active' : ''}>{t.nav.blog}</Link></li>
-        <li class="nav-item"><Link href={`/${currentLocale}/blog/categorie`} variant={variant} style="link" className={currentPath?.startsWith(`/${currentLocale}/blog/categorie`) ? 'active' : ''}>{t.magazine?.categories ?? 'Categories'}</Link></li>
+        <li class="nav-item"><Link href={`/${currentLocale}/blog/categorie`} variant={variant} style="link" className={currentPath?.startsWith(`/${currentLocale}/blog/categorie`) ? 'active' : ''}>{t.blog?.categories ?? 'Categories'}</Link></li>
         <li class="nav-item"><Link href={`/${currentLocale}/blog/auteur`} variant={variant} style="link" className={currentPath?.startsWith(`/${currentLocale}/blog/auteur`) ? 'active' : ''}>{'Auteurs'}</Link></li>
         <li class="nav-item"><Link href={`/${currentLocale}/blog/archives`} variant={variant} style="link" className={currentPath?.startsWith(`/${currentLocale}/blog/archives`) ? 'active' : ''}>{'Archives'}</Link></li>
       </ul>

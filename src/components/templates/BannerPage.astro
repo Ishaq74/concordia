@@ -1,0 +1,233 @@
+---
+// filepath: src/components/templates/BannerPage.astro
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import Flex from '@components/Tools/Flex.astro';
+import Grid from '@components/Tools/Grid.astro';
+
+interface Breadcrumb { label: string; href: string; }
+interface Props {
+  title: string;
+  subtitle?: string;
+  description?: string;
+  category?: string;
+  author?: string;
+  date?: string;
+  featuredImg?: string;
+  videoUrl?: string;
+  type?: 'flex' | 'blog' | 'category' | 'article' | 'hero' | 'split' | 'minimal' | 'default';
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  color?: 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'neutral';
+  breadcrumbs?: Breadcrumb[];
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  title,
+  subtitle,
+  description,
+  category,
+  author,
+  date,
+  featuredImg,
+  videoUrl,
+  type = 'flex',
+  variant = 'initial',
+  color = 'primary',
+  breadcrumbs = [],
+  className = '',
+  ...rest
+} = Astro.props as Props;
+
+// maintain backward compatibility if someone still passes `variant` for layout
+const layout = (Astro.props as any).variant || type;
+
+const currentLocale = Astro.currentLocale || 'fr';
+// use import.meta.glob with eager option (supported by Astro/Vite)
+const translations = import.meta.glob('../../../i18n/*.json', { eager: true }) as Record<string, { default: any }>;
+const t = translations[`../../../i18n/${currentLocale}.json`]?.default || translations['../../../i18n/fr.json']?.default;
+
+const backgroundImage = featuredImg || '/images/placeholder.jpg';
+
+// meta rendering will be handled directly in the template to avoid JSX in frontmatter
+---
+
+<header class={`banner-page ${layout} ${color} ${variant} ${className}`} role="banner" {...rest}>
+  <div class="banner-background" aria-hidden="true">
+    {videoUrl ? (
+      <video class="banner-media" src={videoUrl} autoplay loop muted playsinline />
+    ) : (
+      <img class="banner-media" src={backgroundImage} alt="" loading="eager" />
+    )}
+    <div class="banner-overlay" />
+  </div>
+
+  <div class="banner-content">
+    <Grid columns={layout === 'split' ? 2 : 1} gap="8" align="center">
+      <Flex direction="col" gap="sm" alignItems="start" class="banner-main-content">
+        {breadcrumbs.length > 0 && (
+          <nav aria-label={t.nav.breadcrumbs || 'Breadcrumb'} class="banner-breadcrumbs">
+            <ul>
+              <li>
+                <a href={getRelativeLocaleUrl(currentLocale, '/')}>{t.nav.home}</a>
+              </li>
+              {breadcrumbs.map((bc) => [
+                <li class="separator">/</li>,
+                <li>
+                  <a href={getRelativeLocaleUrl(currentLocale, bc.href)}>{bc.label}</a>
+                </li>
+              ])}
+              <li class="separator">/</li>
+              <li aria-current="page">{title}</li>
+            </ul>
+          </nav>
+        )}
+
+        <div class="banner-heading">
+          {category && <span class="banner-category">{category}</span>}
+          <h1 class="banner-title" set:html={title} />
+          {subtitle && <p class="banner-subtitle">{subtitle}</p>}
+          {description && <p class="banner-description">{description}</p>}
+          {(layout === 'blog' || layout === 'article') && (
+            <div class="banner-meta">
+              {author && <span class="meta-author">{author}</span>}
+              {date && <time class="meta-date" datetime={date}>{date}</time>}
+            </div>
+          )}
+        </div>
+
+        <div class="banner-actions">
+          <slot name="actions" />
+        </div>
+      </Flex>
+
+      {layout === 'split' && (
+        <div class="banner-side">
+          <slot name="side-content" />
+        </div>
+      )}
+    </Grid>
+  </div>
+</header>
+
+<style scoped>
+/* base container uses background from token and ensures correct stacking */
+.banner-page {
+  position: relative;
+  width: 100%;
+  color: var(--color-white);
+  background-color: var(--bg-default);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-page.primary { --theme-color: var(--color-primary); }
+.banner-page.secondary { --theme-color: var(--color-secondary); }
+.banner-page.accent { --theme-color: var(--color-accent); }
+.banner-page.success { --theme-color: var(--color-success); }
+.banner-page.warning { --theme-color: var(--color-warning); }
+.banner-page.neutral { --theme-color: var(--color-neutral-700); }
+
+.banner-page.flex { min-height: 400px; padding: var(--space-8) 0; }
+.banner-page.blog { min-height: 500px; padding: var(--space-12) 0; }
+.banner-page.category { min-height: 350px; padding: var(--space-10) 0; }
+.banner-page.article { min-height: 550px; padding: var(--space-14) 0; }
+.banner-page.hero { min-height: 85vh; padding: var(--space-20) 0; }
+.banner-page.split { min-height: 85vh; padding: var(--space-20) 0; }
+.banner-page.minimal { min-height: 300px; padding: var(--space-6) 0; }
+.banner-page.default { min-height: 450px; padding: var(--space-10) 0; }
+
+.banner-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.banner-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.55); /* slightly darker for better contrast */
+}
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--bg-default) 0%, rgba(0,0,0,0.5) 100%);
+  z-index: 1;
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+.banner-breadcrumbs {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-200);
+}
+.banner-breadcrumbs ul { display: flex; flex-wrap: wrap; gap: var(--space-2); list-style:none; padding:0; margin:0;}
+.banner-breadcrumbs a { color: var(--color-white); text-decoration: none;}
+.banner-breadcrumbs .separator { margin: 0 var(--space-1); }
+
+.banner-heading { text-align: center; max-width: 80ch; margin: 0 auto; }
+.banner-category {
+  display: inline-block;
+  background: var(--theme-color);
+  color: var(--color-neutral-900);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.banner-title {
+  margin: var(--space-2) 0;
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  line-height: 1.1;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--color-white);
+  text-shadow: 0 0 20px var(--theme-color);
+}
+.banner-subtitle {
+  font-size: var(--font-size-xl);
+  color: var(--color-neutral-200);
+  margin-top: var(--space-2);
+}
+.banner-description {
+  font-size: var(--font-size-lg);
+  color: var(--color-neutral-200);
+  max-width: 60ch;
+  margin: var(--space-4) auto;
+}
+
+.banner-meta {
+  display: flex;
+  gap: var(--space-4);
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-200);
+  background: rgba(0,0,0,0.4);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--border-radius-md);
+}
+.meta-author:before { content: '👤 '; }
+.meta-date:before { content:'📅 '; }
+
+.banner-actions { margin-top: var(--space-6); display: flex; gap: var(--space-4); flex-wrap: wrap; justify-content: center; }
+.banner-side { margin-top: var(--space-6); }
+
+.banner-page.split .banner-content { flex-direction: row; align-items: center; }
+.banner-page.split .banner-side { flex:1; }
+
+@media(max-width:768px) {
+  .banner-page.split .banner-content { flex-direction: column; }
+  .banner-title { font-size: 2.5rem; }
+}
+</style>

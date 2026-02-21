@@ -30,7 +30,7 @@ interface SidebarItem {
 const sidebarItems: SidebarItem[] = [
   { key: "profile", label: t.dashboard.profile, href: getRelativeLocaleUrl(currentLocale, currentLocale === "fr" ? "/profil" : "/profile"), icon: "mdi:account" },
   { key: "places", label: t.dashboard.myPlaces, href: getRelativeLocaleUrl(currentLocale, "/dashboard/places"), icon: "mdi:map-marker" },
-  { key: "articles", label: t.dashboard.myArticles, href: getRelativeLocaleUrl(currentLocale, "/dashboard/articles"), icon: "mdi:newspaper" },
+  { key: "blog", label: t.dashboard.myArticles, href: getRelativeLocaleUrl(currentLocale, "/dashboard/blog"), icon: "mdi:newspaper" },
   { key: "ads", label: t.dashboard.myAds, href: getRelativeLocaleUrl(currentLocale, "/dashboard/classifieds"), icon: "mdi:tag" },
   { key: "services", label: t.dashboard.myServices, href: getRelativeLocaleUrl(currentLocale, "/dashboard/services"), icon: "mdi:briefcase" },
   { key: "bookings", label: t.dashboard.myBookings, href: getRelativeLocaleUrl(currentLocale, "/dashboard/bookings"), icon: "mdi:calendar-check" },

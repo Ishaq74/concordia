@@ -8,7 +8,7 @@
     "contact": "Contact",
     "docs": "Docs",
     "places": "Directory",
-    "magazine": "Magazine",
+    "blog": "Blog",
     "forum": "Forum",
     "events": "Events",
     "education": "Education",
@@ -33,7 +33,11 @@
   "blog": {
     "news": "News",
     "tutorials": "Tutorials",
-    "releases": "Releases"
+    "releases": "Releases",
+    "readingTime": "Reading time",
+    "author": "Author",
+    "authors": "Authors",
+    "by": "By"
   },
   "docs": {
     "ui": "UI",
@@ -57,8 +61,8 @@
     "sectionPlacesDesc": "Discover restaurants, shops, activities and accommodations around Lake Annecy.",
     "sectionEvents": "Events",
     "sectionEventsDesc": "Festivals, markets, workshops — don't miss what's happening here.",
-    "sectionMagazine": "Magazine",
-    "sectionMagazineDesc": "Reports, portraits and news from our territory.",
+    "sectionBlog": "Blog",
+    "sectionBlogDesc": "Reports, portraits and news from our territory.",
     "sectionForum": "Forum",
     "sectionForumDesc": "Connect with locals about neighborhood life, mutual aid and projects.",
     "sectionVolunteer": "Volunteer",
@@ -275,19 +279,19 @@
     "share": "Share",
     "report": "Report"
   },
-  "magazine": {
-    "title": "Magazine",
-    "description": "Articles, guides and reports about the territory",
+  "blog": {
+    "title": "Blog",
+    "description": "Publications, guides and reports about the territory",
     "featured": "Featured",
-    "latest": "Latest articles",
+    "latest": "Latest posts",
     "readMore": "Read more",
     "by": "By",
     "publishedOn": "Published on",
     "categories": "Categories",
-    "relatedArticles": "Related articles",
+    "relatedArticles": "Related posts",
     "comments": "Comments",
     "writeComment": "Write a comment",
-    "noArticles": "No articles yet"
+    "noArticles": "No posts yet"
   },
   "forumPage": {
     "title": "Forum",
@@ -351,6 +355,7 @@
     "goalReached": "Goal reached",
     "noProjects": "No active projects"
   },
+  "contactPage": { "title": "Contact", "subtitle": "Write to us" },
   "classifiedsPage": {
     "title": "Classifieds",
     "description": "Community classifieds",
@@ -400,7 +405,7 @@
     "title": "Dashboard",
     "profile": "My Profile",
     "myPlaces": "My Places",
-    "myArticles": "My Articles",
+    "myArticles": "My blog",
     "myAds": "My Classifieds",
     "myServices": "My Services",
     "myBookings": "My Bookings",
@@ -435,7 +440,7 @@
     "audit": "Audit Log",
     "config": "Configuration",
     "pendingPlaces": "Pending places",
-    "pendingArticles": "Pending articles",
+    "pendingArticles": "Pending posts",
     "pendingAds": "Pending classifieds",
     "reports": "Reports",
     "approve": "Approve",

@@ -1,0 +1,16 @@
+---
+import BannerPage from '@templates/BannerPage.astro';
+const t = await import('../../i18n/fr.json');
+---
+
+<BannerPage
+  title={t.contactPage?.title || t.contact || 'Contact'}
+  subtitle={t.contactPage?.subtitle}
+  type="minimal"
+  color="neutral"
+/>
+
+<!-- reste de la page -->
+<div class="contact-form">
+  <!-- formulaire ou contenu ici -->
+</div>

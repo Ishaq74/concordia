@@ -50,7 +50,7 @@ Concepteur IA
 ### Références
 
 - **PRD Concordia** — Vision : restaurer l'humanité. Marketplace solidaire, médiation, cartographie participative, éducation, micro-financement, bénévolat, transparence.
-- **PRD Ville Numérique Vivante** — Annuaire de lieux, magazine d'articles, forum, messagerie, portefeuille numérique, réservations.
+- **PRD Ville Numérique Vivante** — Annuaire de lieux, blog d'articles, forum, messagerie, portefeuille numérique, réservations.
 - **Schema Supabase existant** (`schema.txt`) — 35 tables implémentées dans un projet Supabase antérieur, servant de référence pour certains modèles de données.
 - **Infrastructure Concordia existante** — 9 tables Better Auth/audit, 30+ composants UI, système auth complet, 4 variantes CSS, i18n 4 locales.
 
@@ -68,7 +68,7 @@ Concepteur IA
 #### Livrables
 
 - Annuaire de lieux avec soumission propriétaire, attributs dynamiques, traductions multilingues.
-- Magazine d'articles (CMS) avec intégration lieux et catégories.
+- Blog d'articles (CMS) avec intégration lieux et catégories.
 - Système d'avis et commentaires avec sous-notations et modération.
 - Forum thématique hiérarchique.
 - Place de marché solidaire (annonces classées, services locaux).
@@ -111,7 +111,7 @@ Concepteur IA
 | Terme | Définition |
 |---|---|
 | **Annonce classée** | Offre de bien ou service entre citoyens sur la place du marché solidaire |
-| **Article** | Contenu rédactionnel publié dans le magazine, lié aux catégories et lieux |
+| **Article** | Contenu rédactionnel publié dans le blog, lié aux catégories et lieux |
 | **Attribut** | Caractéristique dynamique et typée d'un lieu (ex : « Wifi : Oui ») |
 | **Avis (Review)** | Retour structuré d'un citoyen sur un lieu : notation globale, sous-notations, texte |
 | **Campagne de micro-financement** | Collecte de fonds pour un projet communautaire avec objectif et échéance |
@@ -184,7 +184,7 @@ Concepteur IA
 | 26 | `gallery_item` | Image dans une galerie | `id` (uuid) | Créateur | Médias |
 | 27 | `place_tag` | Liaison lieu ↔ tag | `place_id` + `tag_id` | Système | Taxonomie |
 | 28 | `favorite` | Marque-page utilisateur | `id` (uuid) | Utilisateur | Interactions |
-| 29 | `article` | Article de magazine | `id` (uuid) | Auteur | Contenu |
+| 29 | `article` | Article de blog | `id` (uuid) | Auteur | Contenu |
 | 30 | `article_content` | Contenu riche d'un article (JSON) | `id` (uuid) | Auteur | Contenu |
 | 31 | `article_category_link` | Liaison article ↔ catégorie | `article_id` + `category_id` | Auteur | Contenu |
 | 32 | `article_place_link` | Liaison article ↔ lieu | `article_id` + `place_id` | Auteur | Contenu |
@@ -331,7 +331,7 @@ Concepteur IA
 | `created_at` | timestamp | Oui | Non | now() | — | — |
 | `updated_at` | timestamp | Oui | Non | now() | — | — |
 
-**Enum `category_type`** : `place`, `magazine`, `forum`, `classified`, `service`, `education`, `project`
+**Enum `category_type`** : `place`, `blog`, `forum`, `classified`, `service`, `education`, `project`
 
 **Contraintes** : Unique composite `(parent_id, slug)`. `level` = 1 si `parent_id` est null, sinon `parent.level + 1`. Max level = 3. `parent_id` ne peut pas créer de cycle (un ancêtre ne peut pas être son propre descendant).
 
@@ -760,7 +760,7 @@ archived       → pending_review (Propriétaire réactive, repasse en revue)
 
 ### `article`
 
-**Description** : Article de magazine, rédigé par un auteur, lié à des catégories et des lieux.
+**Description** : Article de blog, rédigé par un auteur, lié à des catégories et des lieux.
 
 **Champs** :
 
@@ -812,12 +812,12 @@ archived       → draft           (Auteur réactive)
 
 ### `article_category_link` et `article_place_link`
 
-**`article_category_link`** : Liaison N-N entre article et catégorie(s) magazine.
+**`article_category_link`** : Liaison N-N entre article et catégorie(s) blog.
 
 | Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
 |---|---|---|---|---|---|---|
 | `article_id` | uuid FK → article.id | Oui | Non | — | — | — |
-| `category_id` | uuid FK → category.id | Oui | Non | — | Catégorie de type `magazine` | — |
+| `category_id` | uuid FK → category.id | Oui | Non | — | Catégorie de type `blog` | — |
 | `created_at` | timestamp | Oui | Non | now() | — | — |
 
 PK composite `(article_id, category_id)`.
@@ -1797,7 +1797,7 @@ donation 1──1 transaction
 | **Anonyme** | — | Automatique (non authentifié) | — | Consultation publique uniquement |
 | **Citoyen** | `citizen` | Automatique (inscription) | Base | Rôle par défaut de tout utilisateur authentifié |
 | **Propriétaire** | `owner` | Attribution admin ou auto-attribution contrôlée | Oui | Gère des lieux et leurs services |
-| **Auteur** | `author` | Attribution admin | Oui | Publie des articles dans le magazine |
+| **Auteur** | `author` | Attribution admin | Oui | Publie des articles dans le blog |
 | **Médiateur** | `mediator` | Attribution admin (certification requise) | Oui | Anime les cas de médiation |
 | **Éducateur** | `educator` | Attribution admin | Oui | Crée des modules d'éducation |
 | **Modérateur** | `moderator` | Attribution admin | Oui | Modère le contenu communautaire |
@@ -2238,13 +2238,13 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 - **Sorties** : `{ items: Place[], total: number, page: number, page_size: number }`.
 - **Note** : La recherche full-text est configurée sur `place_translation.name` et `place_translation.description` via `pg_trgm`.
 
-## 3.4 Domaine : Contenu (Magazine)
+## 3.4 Domaine : Contenu (Blog)
 
 ### OP-030 : Créer un article
 
 - **Acteur** : Auteur
 - **Entrées** : `{ title, slug, summary?, cover_image_url?, category_ids: uuid[], content_json }`
-- **Préconditions** : Utilisateur a le rôle `author`. Slug unique. Catégories de type `magazine`.
+- **Préconditions** : Utilisateur a le rôle `author`. Slug unique. Catégories de type `blog`.
 - **Étapes** :
   1. Créer `article` avec `status = draft`.
   2. Créer `article_content` avec `content_json` et `language` de l'auteur.
@@ -2858,7 +2858,7 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 5. Prévisualisation
 6. Soumission [OP-031]
 7. Admin valide [OP-032]
-8. Article publié → accessible /{locale}/magazine/{slug}
+8. Article publié → accessible /{locale}/blog/{slug}
 ```
 
 ## PU-05 : Parcours de réservation
@@ -2983,7 +2983,7 @@ B. Prestataire annule [OP-084] : remboursement total automatique
 ### Navigation principale (Header)
 
 ```
-Logo | Annuaire | Magazine | Forum | Services | Événements | Éducation | Bénévolat | Transparence | [Langue] | [Thème] | [Auth/Profil]
+Logo | Annuaire | Blog | Forum | Services | Événements | Éducation | Bénévolat | Transparence | [Langue] | [Thème] | [Auth/Profil]
 ```
 
 Sur mobile (≤ 1024px) : menu hamburger dans un `Sheet` drawer (comportement existant).
@@ -3043,12 +3043,12 @@ Configuration (paramètres système)
 - **Données** : `place` + `place_translation` + `place_attribute_value` + `review[]` + `sub_rating[]`
 - **Interactions** : Écrire un avis (if auth + not owner + not already reviewed), répondre (if owner), ajouter favori, partager, signaler
 
-### Page : Magazine (`/{locale}/magazine`)
+### Page : Blog (`/{locale}/blog`)
 
 - **Composants** : FeaturedArticle, ArticleGrid, CategoryFilter, Pagination
 - **Données** : Articles `published`, triés par `published_at` DESC
 
-### Page : Article (`/{locale}/magazine/{slug}`)
+### Page : Article (`/{locale}/blog/{slug}`)
 
 - **Composants** : ArticleHeader (couverture, titre, auteur, date), ArticleContent (rendu des blocs JSON), PlaceEmbedCard, ComparisonTable, CommentSection, RelatedArticles
 - **Données** : `article` + `article_content` + `article_place_link[]` + `article_place_comparison[]` + `comment[]`
@@ -3469,7 +3469,7 @@ Versioning via préfixe `/api/v1/`. Documentation OpenAPI générée automatique
 
 **Sous-total WP-3** : ~5.5j
 
-## WP-4 : Contenu éditorial (Magazine)
+## WP-4 : Contenu éditorial (Blog)
 
 | # | Tâche | Dépendance | Estimation | Priorité |
 |---|---|---|---|---|
@@ -3477,7 +3477,7 @@ Versioning via préfixe `/api/v1/`. Documentation OpenAPI générée automatique
 | T-061 | Créer tables `article_place_link` + `article_place_comparison` + migration | T-060, WP-2 | 0.5j | P1 |
 | T-062 | Éditeur de contenu riche (blocs JSON) | T-060 | 4j | P0 |
 | T-063 | API CRUD article (OP-030, OP-031, OP-032, OP-034) | T-060 | 2j | P0 |
-| T-064 | Page magazine (listing) | T-063 | 1.5j | P0 |
+| T-064 | Page blog (listing) | T-063 | 1.5j | P0 |
 | T-065 | Page article (rendu bloc, intégrations lieu) | T-063, T-061 | 2j | P0 |
 | T-066 | Dashboard auteur | T-063 | 1.5j | P0 |
 
@@ -3814,7 +3814,7 @@ Extension des tests de sécurité existants aux nouvelles entités.
 ```
 /places/{year}/{month}/{uuid}.webp          — Photos de lieux
 /places/{year}/{month}/{uuid}_thumb.webp     — Thumbnails
-/articles/{year}/{month}/{uuid}.webp         — Images d'articles
+/blog/{year}/{month}/{uuid}.webp         — Images d'articles
 /profiles/{year}/{month}/{uuid}.webp         — Avatars
 /trails/{year}/{month}/{uuid}.gpx            — Fichiers GPX
 /mediation/{year}/{month}/{uuid}.pdf         — Documents de médiation

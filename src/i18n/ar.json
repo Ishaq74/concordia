@@ -11,7 +11,7 @@
     "community": "المجتمع",
     "engage": "شارك",
     "places": "الدليل",
-    "magazine": "المجلة",
+    "blog": "المجلة",
     "forum": "المنتدى",
     "events": "الأحداث",
     "education": "التعليم",
@@ -31,7 +31,11 @@
   "blog": {
     "news": "الأخبار",
     "tutorials": "دروس",
-    "releases": "الإصدارات"
+    "releases": "الإصدارات",
+    "readingTime": "مدة القراءة",
+    "author": "المؤلف",
+    "authors": "المؤلفون",
+    "by": "بواسطة"
   },
   "docs": {
     "ui": "الواجهة",
@@ -74,8 +78,8 @@
     "sectionPlacesDesc": "اكتشف المطاعم والمتاجر والأنشطة والإقامات حول بحيرة أنسي.",
     "sectionEvents": "الأحداث",
     "sectionEventsDesc": "المهرجانات والأسواق وورش العمل — لا تفوت شيئاً مما يحدث هنا.",
-    "sectionMagazine": "المجلة",
-    "sectionMagazineDesc": "تقارير وصور شخصية وأخبار من منطقتنا.",
+    "sectionBlog": "المجلة",
+    "sectionBlogDesc": "تقارير وصور شخصية وأخبار من منطقتنا.",
     "sectionForum": "المنتدى",
     "sectionForumDesc": "تبادل مع السكان حول الحياة اليومية والتعاون والمشاريع.",
     "sectionVolunteer": "التطوع",

@@ -1,56 +1,67 @@
 ---
-import Grid from "@components/Tools/Grid.astro";
+import Flex from "@components/Tools/Flex.astro";
 import Link from "@components/ui/Link.astro";
+import { Icon } from 'astro-icon/components';
+import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+
 interface Props {
-  publishedAt: Date | null;
+  publishedAt?: never;
   readingTime?: string | null;
-  // 👇 Ajout de la prop authors (tableau)
-  authors?: { name: string; slug: string; avatar?: string | null }[]; 
+  authors?: { name: string; slug: string; avatar?: string | null }[];
   lang: string;
   className?: string;
 }
 
-const { publishedAt, readingTime, authors = [], lang, className = "" } = Astro.props;
+const { readingTime, authors = [], lang, className = "" } = Astro.props;
+const currentLocale = lang || Astro.currentLocale || "fr";
+const translations = await import(`../../../../i18n/${currentLocale}.json`);
+const t = translations.default;
+
 ---
-
-<Grid display="flex" alignItems="center" gap="var(--space-1)" className={`post-meta ${className}`}>
-  
-  {/* DATE */}
-  {publishedAt && (
-    <time datetime={publishedAt.toISOString()} class="whitespace-nowrap">
-      {publishedAt.toLocaleDateString(lang, { day: 'numeric', month: 'long', year: 'numeric' })}
-    </time>
-  )}
-
+<Flex
+  alignItems="center"
+  justifyContent="between"
+>
   {/* TEMPS DE LECTURE */}
   {readingTime && (
-    <>
-      <span class="meta-sep">•</span>
-      <span class="whitespace-nowrap">{readingTime}</span>
-    </>
+    <Flex gap="sm">
+      <span
+        role="img"
+        aria-label={t.blog.readingTime}
+        class="inline-block"
+      >
+        <Icon name="openmoji:hourglass-not-done" width="20" height="20" />
+      </span>
+      {readingTime}
+    </Flex>
   )}
 
   {/* AUTEURS */}
   {authors && authors.length > 0 && (
-    <>
-      <span class="meta-sep">•</span>
-      <div class="meta-authors">
-        <span>Par</span>
-        {authors.map((author, index) => (
-          <>
-            {index > 0 && <span>, </span>}
-            <Link 
-              href={`/${lang}/blog/auteur/${author.slug}`} 
-              className="author-link"
-              style="link"
-              transition:name="author"
-            >
-              {author.name}
-            </Link>
-          </>
-        ))}
-      </div>
-    </>
+    <Flex alignItems="end" gap="sm">
+      <span
+        role="img"
+        aria-label={authors.length === 1 ? t.blog.author : t.blog.authors}
+        class="inline-block"
+      >
+        <Icon name="openmoji:bust-in-silhouette" width="20" height="20" />
+      </span>
+      {t.blog.by}
+
+      {authors.map((author, index) => (
+        <>
+          {index > 0 && <span>, </span>}
+          <Link
+            href={getRelativeLocaleUrl(lang, `blog/auteur/${author.slug}`)}
+            className="author-link"
+            style="link"
+            transition:name="author"
+            aria-label={`${author.name} (${t.blog.author})`}
+          >
+            {author.name}
+          </Link>
+        </>
+      ))}
+    </Flex>
   )}
-  
-</div>
+</Flex>

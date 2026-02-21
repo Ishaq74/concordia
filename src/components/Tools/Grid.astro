@@ -45,6 +45,7 @@ interface Props {
   alignItems?: 'flex-start' | 'center' | 'flex-end' | 'baseline' | 'stretch';
   justifyContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
   alignContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'stretch';
+  justifyItems?: boolean;
   
   // Spacing (shared)
   yPadding?: string;
@@ -158,6 +159,7 @@ const {
   alignItems = 'stretch',
   justifyContent = 'flex-start',
   alignContent = 'stretch',
+  justifyItems = false,
   style: inlineStyle = '',
   ...restProps
 } = Astro.props as Props;
@@ -187,7 +189,11 @@ const justifyContentFinal = align === 'center' ? 'center' : justifyContentMap[xA
 const alignItemsMap: Record<string, string> = {
   top: 'flex-start', center: 'center', bottom: 'flex-end', stretch: 'stretch'
 };
-const alignItemsFinal = align === 'center' ? 'center' : alignItemsMap[yAlign] || alignItems;
+let alignItemsFinal = align === 'center' ? 'center' : alignItemsMap[yAlign] || alignItems;
+// if sameHeight is requested, we must ensure grid items stretch to fill row
+if (sameHeight) {
+  alignItemsFinal = 'stretch';
+}
 
 // Border
 const borderWidthComputed = border
@@ -214,18 +220,28 @@ if (flexWrap) classParts.push(`u-flex-${flexWrap}`);
 classParts.push(`u-items-${alignItemsFinal.replace('flex-', '')}`);
 classParts.push(`u-justify-${justifyContentFinal.replace('flex-', '')}`);
 classParts.push(`u-content-${alignContent.replace('flex-', '')}`);
+if (justifyItems) classParts.push('u-justify-items-center');
 
-if (padding) classParts.push(`u-p-${padding.replace(/[^0-9]/g, '')}`);
-if (paddingTop || yPadding) classParts.push(`u-pt-${(paddingTop || yPadding).replace(/[^0-9]/g, '')}`);
-if (paddingBottom) classParts.push(`u-pb-${paddingBottom.replace(/[^0-9]/g, '')}`);
-if (paddingLeft || xPadding) classParts.push(`u-pl-${(paddingLeft || xPadding).replace(/[^0-9]/g, '')}`);
-if (paddingRight) classParts.push(`u-pr-${paddingRight.replace(/[^0-9]/g, '')}`);
+// padding/margin utilities: only generate class when value is small integer <=6 and no explicit units
+const pushSpacingClass = (prefix: string, val?: string) => {
+  if (!val) return;
+  const num = parseFloat(val);
+  const hasUnit = /[a-z%]+$/i.test(val);
+  if (!isNaN(num) && !hasUnit && num <= 6) {
+    classParts.push(`u-${prefix}-${String(num).replace(/[^0-9]/g, '')}`);
+  }
+};
+pushSpacingClass('p', padding);
+pushSpacingClass('pt', paddingTop || yPadding);
+pushSpacingClass('pb', paddingBottom);
+pushSpacingClass('pl', paddingLeft || xPadding);
+pushSpacingClass('pr', paddingRight);
 
-if (margin) classParts.push(`u-m-${margin.replace(/[^0-9]/g, '')}`);
-if (marginTop || yMargin) classParts.push(`u-mt-${(marginTop || yMargin).replace(/[^0-9]/g, '')}`);
-if (marginBottom) classParts.push(`u-mb-${marginBottom.replace(/[^0-9]/g, '')}`);
-if (marginLeft || xMargin) classParts.push(`u-ml-${(marginLeft || xMargin).replace(/[^0-9]/g, '')}`);
-if (marginRight) classParts.push(`u-mr-${marginRight.replace(/[^0-9]/g, '')}`);
+pushSpacingClass('m', margin);
+pushSpacingClass('mt', marginTop || yMargin);
+pushSpacingClass('mb', marginBottom);
+pushSpacingClass('ml', marginLeft || xMargin);
+pushSpacingClass('mr', marginRight);
 
 if (width) classParts.push(`u-w-${width.replace(/[^0-9]/g, '')}`);
 if (height) classParts.push(`u-h-${height.replace(/[^0-9]/g, '')}`);
@@ -242,6 +258,7 @@ const styles: Record<string, string> = {
   'justify-content': justifyContentFinal,
   'align-items': alignItemsFinal,
   'align-content': alignContent,
+  'justify-items': justifyItems ? 'center' : '',
   'text-align': textAlign,
   overflow: overflowHidden ? 'hidden' : 'visible',
   height: hFull ? '100%' : 'auto',
@@ -255,6 +272,17 @@ const styles: Record<string, string> = {
   border: border ? `${borderWidthComputed} ${borderStyle} ${borderColor}` : '',
   'border-radius': borderRadius,
   'box-shadow': boxShadow,
+  // custom spacing passed via props should override utility classes
+  padding: padding && (isNaN(Number(padding)) || Number(padding) > 6) ? padding : '',
+  'padding-top': (paddingTop || yPadding) && ((isNaN(Number(paddingTop || yPadding)) || Number(paddingTop || yPadding) > 6) ? (paddingTop || yPadding) : ''),
+  'padding-bottom': paddingBottom && (isNaN(Number(paddingBottom)) || Number(paddingBottom) > 6) ? paddingBottom : '',
+  'padding-left': (paddingLeft || xPadding) && ((isNaN(Number(paddingLeft || xPadding)) || Number(paddingLeft || xPadding) > 6) ? (paddingLeft || xPadding) : ''),
+  'padding-right': paddingRight && (isNaN(Number(paddingRight)) || Number(paddingRight) > 6) ? paddingRight : '',
+  margin: margin && (isNaN(Number(margin)) || Number(margin) > 6) ? margin : '',
+  'margin-top': (marginTop || yMargin) && ((isNaN(Number(marginTop || yMargin)) || Number(marginTop || yMargin) > 6) ? (marginTop || yMargin) : ''),
+  'margin-bottom': marginBottom && (isNaN(Number(marginBottom)) || Number(marginBottom) > 6) ? marginBottom : '',
+  'margin-left': (marginLeft || xMargin) && ((isNaN(Number(marginLeft || xMargin)) || Number(marginLeft || xMargin) > 6) ? (marginLeft || xMargin) : ''),
+  'margin-right': marginRight && (isNaN(Number(marginRight)) || Number(marginRight) > 6) ? marginRight : '',
   'clip-path': clipPathTop !== 'none' ? clipPathTop : clipPathBottom !== 'none' ? clipPathBottom : '',
 };
 
@@ -320,7 +348,8 @@ const styleString = Object.entries(styles).filter(([, v]) => v).map(([k, v]) => 
 
   /* Dark-mode is handled by tokens in tokens/colors.css; these classes just consume tokens */
 
-  /* SAME HEIGHT helper — minimal: only applies min-height to direct children */
+  /* SAME HEIGHT helper — container forces stretch and children fill it */
+  .same-height { align-items: stretch; }
   .same-height > * { min-height: 100%; }
 
   /* Grid columns */
@@ -371,6 +400,7 @@ const styleString = Object.entries(styles).filter(([, v]) => v).map(([k, v]) => 
   .u-content-between { align-content: space-between; }
   .u-content-around { align-content: space-around; }
   .u-content-stretch { align-content: stretch; }
+  .u-justify-items-center { justify-items: center; }
 
   /* Spacing */
   .u-p-0 { padding: 0rem; }
