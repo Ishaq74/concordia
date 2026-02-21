@@ -3,5 +3,8 @@
     "chat.useAgentSkills": true,
     "chat.tools.terminal.autoApprove": {
         "npx astro": true
-    }
+    },
+    "postman.settings.dotenv-detection-notification-visibility": false,
+    "workbench.browser.openLocalhostLinks": true,
+    "workbench.externalBrowser": "firefox"
 }

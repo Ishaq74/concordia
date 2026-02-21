@@ -57,7 +57,7 @@ export async function generateTests(lang: Lang, t: any): Promise<string> {
   const lines: string[] = [];
 
   // Heading (no leading/trailing blank lines; parent caller controls spacing)
-  lines.push(`### ${t.sections.tests[lang]}`);
+  lines.push(`## ${t.sections.tests[lang]}`);
   lines.push('');
 
   if (t.testsIntro) {
@@ -66,7 +66,7 @@ export async function generateTests(lang: Lang, t: any): Promise<string> {
   }
 
   // Recommended files tree (tests/ + src tests)
-  lines.push('#### Recommended test configs and files');
+  lines.push('### Recommended test configs and files');
   lines.push('');
 
   const testsTree = await listTree(PATHS.root + '/tests');
@@ -111,7 +111,10 @@ export async function generateTests(lang: Lang, t: any): Promise<string> {
       for (const d of describes) {
         lines.push(`  - **${d.title}**`);
         for (const it of d.its) {
-          lines.push(`    - ${it}`);
+          // Format emails and URLs with < > for Markdown compliance (MD034/no-bare-urls)
+          let formatted = it.replace(/\b([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})\b/g, '<$1>');
+          formatted = formatted.replace(/\bhttps?:\/\/[^\s)]+/g, match => `<${match}>`);
+          lines.push(`    - ${formatted}`);
         }
       }
     } catch (err) {

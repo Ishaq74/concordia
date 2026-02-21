@@ -17,6 +17,7 @@ _Este README se genera automáticamente para proporcionar contexto completo a la
 - [Base de datos](#base-de-datos)
 - [Variables de entorno](#variables-de-entorno)
 - [Tokens CSS y Estilos](#tokens-css-y-estilos)
+- [Pruebas](#pruebas)
 
 ## Descripción general
 
@@ -33,6 +34,7 @@ Este proyecto demuestra una aplicación web full-stack usando tecnologías moder
 ## Stack tecnológico
 
 - **@astrojs/check**: `^0.9.6`
+- **@astrojs/mdx**: `^4.3.13`
 - **@astrojs/node**: `^9.5.3`
 - **@astrojs/vercel**: `^9.0.4`
 - **@babel/preset-typescript**: `^7.28.5`
@@ -46,6 +48,7 @@ Este proyecto demuestra una aplicación web full-stack usando tecnologías moder
 - **dotenv**: `^17.2.3`
 - **drizzle-orm**: `^0.45.1`
 - **jose**: `^6.1.3`
+- **nanoid**: `^5.1.6`
 - **nodemailer**: `^7.0.12`
 - **pg**: `^8.17.2`
 - **typescript**: `^5.9.3`
@@ -76,7 +79,7 @@ npm install
 - `npm run test:ui`: vitest --ui
 - `npm run test:coverage`: vitest --coverage
 - `npm run test:unit`: vitest run tests/unit
-- `npm run test:integration`: vitest run tests/integration
+- `npm run test:integration`: vitest run tests/integration --maxWorkers 1 --no-file-parallelism
 - `npm run test:e2e`: vitest run tests/e2e
 - `npm run test:security`: vitest run tests/e2e/security.test.ts
 - `npm run test:api`: vitest run tests/e2e/api-auth.test.ts
@@ -106,6 +109,12 @@ npm install
       - PalanquinDark-Medium.ttf
       - PalanquinDark-Regular.ttf
       - PalanquinDark-SemiBold.ttf
+  - **images**
+    - **avatars**
+      - camille-dupond.png
+      - lucas-martin.png
+      - sarah-leroy.png
+    - placeholder.jpg
 - README.ar.md
 - README.es.md
 - README.fr.md
@@ -114,13 +123,16 @@ npm install
   - sonda-report.html
 - **scripts**
   - **db**
-    - check-pseudo.ts
     - db.check.ts
     - db.compare.ts
     - db.generate.ts
     - db.migrate.ts
     - db.seed.ts
     - db.sync.ts
+  - debug-auth-api.ts
+  - debug-auth-login.ts
+  - debug-check-permission.ts
+  - debug-rate-limit.ts
   - **readme**
     - generateDatabase.ts
     - generateDeps.ts
@@ -134,7 +146,31 @@ npm install
   - readme-generate.ts
   - run-sonda.mjs
 - **src**
+  - **actions**
+    - blog.ts
+    - comments.ts
+    - index.ts
   - **components**
+    - **modules**
+      - **blog**
+        - **cards**
+          - AuthorCard.astro
+          - PostCard.astro
+        - **lists**
+          - PostGrid.astro
+        - **single**
+          - CommentItem.astro
+          - PostComments.astro
+          - PostContent.astro
+          - PostFooter.astro
+          - PostHeader.astro
+          - TableOfContents.astro
+        - **ui**
+          - CategoryBadge.astro
+          - ImageWithFallback.astro
+          - PostMeta.astro
+          - ShareButtons.astro
+          - StarRating.astro
     - **templates**
       - **auth**
         - AuthLayout.astro
@@ -145,6 +181,12 @@ npm install
         - SignUpCard.astro
         - verify-email.client.ts
         - VerifyEmailCard.astro
+      - **blog**
+        - BlogLayout.astro
+        - MainBlog.astro
+        - navigation.ts
+        - Sidebar.astro
+        - TableOfContents.astro
       - **docs**
         - MainDoc.astro
         - navigation.ts
@@ -159,6 +201,10 @@ npm install
         - Navigation.astro
         - ThemeSwitch.astro
         - User.astro
+    - **Tools**
+      - Flex.astro
+      - Grid.astro
+      - SmartBreadcrumb.astro
     - **ui**
       - **Accordion**
         - Accordion.astro
@@ -189,7 +235,6 @@ npm install
         - CardHeader.astro
         - CardImage.astro
         - CardMeta.astro
-      - Container.astro
       - **Dialog**
         - Dialog.astro
         - DialogClose.astro
@@ -201,7 +246,6 @@ npm install
         - DialogTrigger.astro
       - Dropdown.astro
       - EventCard.astro
-      - Flex.astro
       - **Form**
         - Checkbox.astro
         - DatePicker.astro
@@ -216,7 +260,6 @@ npm install
         - Textarea.astro
       - FundingCampaignCard.astro
       - Gallery.astro
-      - Grid.astro
       - GroupCard.astro
       - Kbd.astro
       - Link.astro
@@ -226,7 +269,6 @@ npm install
       - PlaceCard.astro
       - ProductCard.astro
       - ProgressBar.astro
-      - QueryLoop.astro
       - SearchBar.astro
       - SearchFilter.astro
       - ServiceCard.astro
@@ -264,128 +306,37 @@ npm install
       - VolunteerProjectCard.astro
   - content.config.ts
   - **database**
+    - **admin**
+      - loaders.ts
     - **data**
       - 01-user.data.ts
-      - 02-account.data.ts
-      - 03-profile.data.ts
-      - 04-userRole.data.ts
-      - 05-wallet.data.ts
-      - 06-category.data.ts
-      - 07-categoryTranslation.data.ts
-      - 08-tag.data.ts
-      - 09-tagTranslation.data.ts
-      - 10-address.data.ts
-      - 11-place.data.ts
-      - 12-placeTranslation.data.ts
-      - 13-gastronomyDetail.data.ts
-      - 14-accommodationDetail.data.ts
-      - 15-activityDetail.data.ts
-      - 16-professional.data.ts
-      - 17-trail.data.ts
-      - 18-poi.data.ts
-      - 19-article.data.ts
-      - 20-articleContent.data.ts
-      - 21-event.data.ts
-      - 22-eventRegistration.data.ts
-      - 23-review.data.ts
-      - 24-subRating.data.ts
-      - 25-comment.data.ts
-      - 26-forumThread.data.ts
-      - 27-forumPost.data.ts
-      - 28-classified.data.ts
-      - 29-product.data.ts
-      - 30-localService.data.ts
-      - 31-serviceAvailability.data.ts
-      - 32-booking.data.ts
-      - 33-conversation.data.ts
-      - 34-conversationParticipant.data.ts
-      - 35-message.data.ts
-      - 36-group.data.ts
-      - 37-groupMember.data.ts
-      - 38-mediationCase.data.ts
-      - 39-mediationSession.data.ts
-      - 40-mediationAgreement.data.ts
-      - 41-educationModule.data.ts
-      - 42-educationLesson.data.ts
-      - 43-educationEnrollment.data.ts
-      - 44-educationProgress.data.ts
-      - 45-volunteerProject.data.ts
-      - 46-volunteerTask.data.ts
-      - 47-volunteerParticipation.data.ts
-      - 48-fundingCampaign.data.ts
-      - 49-donation.data.ts
-      - 50-impactMetric.data.ts
-      - 51-transparencyReport.data.ts
-      - 52-gallery.data.ts
-      - 53-galleryItem.data.ts
-      - 54-placeTag.data.ts
-      - 55-favorite.data.ts
-      - 56-notification.data.ts
-      - 57-systemCommission.data.ts
+      - 02-blog_authors.data.ts
+      - 03-blog_categories.data.ts
+      - 05-blog_media.data.ts
+      - 06-blog_organization.data.ts
+      - 07-blog_posts.data.ts
+      - 07-blog_post_authors.data.ts
+      - 10-blog_translations.data.ts
     - drizzle.ts
     - **loaders**
-      - articles-loader.ts
-      - categories-loader.ts
-      - events-loader.ts
+      - blog.ts
       - factory.ts
-      - places-loader.ts
     - **migrations**
-      - 0000_loving_blue_blade.sql
-      - 0001_famous_tarantula.sql
-      - 0002_ambitious_lady_ursula.sql
-      - 0003_condemned_iron_lad.sql
-      - 0003_create_audit_logs.sql
-      - 0004_sloppy_arachne.sql
-      - 0005_magenta_nico_minoru.sql
-      - 0006_unique_thanos.sql
-      - 0007_slim_mentor.sql
-      - 0008_fix_user_pseudo_data.sql
+      - 0008_smiling_landau.sql
       - **meta**
-        - 0000_snapshot.json
-        - 0001_snapshot.json
-        - 0002_snapshot.json
-        - 0003_snapshot.json
-        - 0004_snapshot.json
-        - 0005_snapshot.json
-        - 0006_snapshot.json
-        - 0007_snapshot.json
+        - 0008_snapshot.json
         - _journal.json
     - **schemas**
-      - address.ts
-      - article.ts
-      - attribute.ts
-      - audit-log.ts
+      - audit-log.schema.ts
       - auth-schema.ts
-      - category.ts
-      - classified.ts
-      - comment.ts
-      - conversation.ts
-      - education.ts
-      - event.ts
-      - favorite.ts
-      - forum.ts
-      - funding.ts
-      - gallery.ts
-      - group.ts
-      - image.ts
-      - impact.ts
-      - local-service.ts
-      - mediation.ts
-      - notification.ts
-      - place-attribute-value.ts
-      - place-detail.ts
-      - place-tag.ts
-      - place.ts
-      - product.ts
-      - professional.ts
-      - profile.ts
-      - review.ts
-      - system-commission.ts
-      - tag.ts
-      - trail.ts
-      - user-role.ts
-      - volunteer.ts
-      - wallet.ts
+      - blog_authors.schema.ts
+      - blog_categories.schema.ts
+      - blog_comments.schema.ts
+      - blog_media.schema.ts
+      - blog_organization.schema.ts
+      - blog_posts.schema.ts
+      - blog_translations.schema.ts
+      - comments.schema.ts
     - schemas.ts
   - env.d.ts
   - **i18n**
@@ -398,6 +349,14 @@ npm install
     - DashboardLayout.astro
     - DocLayout.astro
   - **lib**
+    - **admin**
+      - config.ts
+      - history.ts
+      - loaders.ts
+      - organizations.ts
+      - permissions.ts
+      - policy-store.ts
+      - users.ts
     - **auth**
       - auth-client.ts
       - auth.test.ts
@@ -423,85 +382,15 @@ npm install
     - **api**
       - **admin**
         - moderate.ts
+        - organizations.ts
         - roles.ts
-      - **articles**
-        - index.ts
-        - **[slug]**
-          - status.ts
-        - [slug].ts
+        - users.ts
       - **auth**
         - [...all].ts
       - **auth-client**
         - forgot-password.ts
         - verification.ts
-      - **bookings**
-        - index.ts
-      - **categories**
-        - index.ts
-      - **classifieds**
-        - index.ts
-      - **comments**
-        - index.ts
-      - **conversations**
-        - index.ts
-        - [id].ts
-      - **education**
-        - **modules**
-          - index.ts
-          - [slug].ts
-      - **events**
-        - index.ts
-        - [slug].ts
-      - **favorites**
-        - index.ts
-      - **forum**
-        - **threads**
-          - index.ts
-          - [slug].ts
-      - **funding**
-        - **campaigns**
-          - index.ts
-          - [slug].ts
-      - **galleries**
-        - index.ts
-        - [id].ts
-      - **groups**
-        - index.ts
-        - [slug].ts
-      - **impact**
-        - index.ts
-      - **mediation**
-        - index.ts
-      - **notifications**
-        - index.ts
-      - **places**
-        - index.ts
-        - **[slug]**
-          - moderate.ts
-        - [slug].ts
-      - **products**
-        - index.ts
-        - [id].ts
       - **profile**
-        - index.ts
-      - query.ts
-      - **reviews**
-        - index.ts
-        - [id].ts
-      - **services**
-        - index.ts
-      - **sse**
-        - notifications.ts
-      - **tags**
-        - index.ts
-      - **transparency**
-        - index.ts
-        - [slug].ts
-      - **volunteer**
-        - **projects**
-          - index.ts
-          - [slug].ts
-      - **wallet**
         - index.ts
     - **ar**
       - index.astro
@@ -547,14 +436,6 @@ npm install
     - **es**
       - index.astro
     - **fr**
-      - **admin**
-        - index.astro
-      - **annonces**
-        - index.astro
-        - [id].astro
-      - **articles**
-        - index.astro
-        - [slug].astro
       - **auth**
         - connexion.astro
         - inscription.astro
@@ -564,24 +445,13 @@ npm install
         - profil.astro
         - reinitialiser-mot-de-passe.astro
         - verifier-email.astro
-      - **benevolat**
+      - **blog**
+        - **auteur**
+          - [slug].astro
         - index.astro
-        - [slug].astro
-      - **dashboard**
-        - **bookings**
-          - index.astro
-        - **favorites**
-          - index.astro
-        - index.astro
-        - **mediation**
-          - index.astro
-        - **messages**
-          - index.astro
-          - [id].astro
-        - **notifications**
-          - index.astro
-        - **wallet**
-          - index.astro
+        - **[category]**
+          - [slug].astro
+        - [category].astro
       - **docs**
         - **components**
           - accordion.astro
@@ -619,33 +489,7 @@ npm install
           - footer.astro
           - header.astro
           - table-of-contents.astro
-      - **education**
-        - index.astro
-        - [slug].astro
-      - **evenements**
-        - index.astro
-        - [slug].astro
-      - **financement**
-        - index.astro
-        - [slug].astro
-      - **forum**
-        - index.astro
-        - [slug].astro
-      - **groupes**
-        - index.astro
-        - [slug].astro
       - index.astro
-      - **places**
-        - index.astro
-        - [slug].astro
-      - **produits-locaux**
-        - index.astro
-      - **services**
-        - index.astro
-        - [id].astro
-      - **transparence**
-        - index.astro
-        - [slug].astro
   - **styles**
     - base.css
     - **components**
@@ -660,17 +504,67 @@ npm install
       - spacing.css
       - typography.css
 - **tests**
+  - **a11y**
+    - a11y-performance.test.ts
+    - a11y-utils.ts
+  - **api**
   - **config**
     - test-db.ts
     - test-env.ts
+  - **e2e**
+    - critical-flows.test.ts
   - **fixtures**
     - auth-fixtures.ts
     - security-payloads.ts
+  - **hooks**
   - **integration**
     - auth-emails.test.ts
+    - auth-flow.test.ts
+    - comments.test.ts
+    - **loaders**
+      - blog-loader.test.ts
+  - **pages**
+    - README.md
   - README.md
+  - **security**
+    - security.test.ts
   - setup.ts
+  - **ssr**
+    - ssr-hydration-errors.test.ts
+    - ssr-utils.ts
+  - **templates**
+  - **ui**
+    - AdCard.astro.test.ts
+    - Alert.astro.test.ts
+    - ArticleCard.astro.test.ts
+    - Avatar.astro.test.ts
+    - Badge.astro.test.ts
+    - Breadcrumb.astro.test.ts
+    - Button.astro.test.ts
+    - Card.astro.test.ts
+    - Dialog.astro.test.ts
+    - Dropdown.astro.test.ts
+    - EventCard.astro.test.ts
+    - FundingCampaignCard.astro.test.ts
+    - Gallery.astro.test.ts
+    - GroupCard.astro.test.ts
+    - Kbd.astro.test.ts
+    - Link.astro.test.ts
+    - Map.astro.test.ts
+    - MenuDropdown.astro.test.ts
+    - Pagination.astro.test.ts
+    - PlaceCard.astro.test.ts
+    - ProductCard.astro.test.ts
+    - ProgressBar.astro.test.ts
+    - ServiceCard.astro.test.ts
+    - Sheet.astro.test.ts
+    - Skeleton.astro.test.ts
+    - ThreadCard.astro.test.ts
+    - Timeline.astro.test.ts
+    - Tooltip.astro.test.ts
   - **unit**
+    - **loaders**
+      - factory.test.ts
     - smtp.test.ts
     - validation.test.ts
   - **utils**
@@ -703,41 +597,6 @@ Better Auth está configurado con plugins para OAuth, gestión de sesiones y má
 
 ## Base de datos
 
-- **address.ts**
-  - Table _address_ (const _address_)
-    - Champ : _id_ `(text)`
-    - Champ : _street_ `(text)`
-    - Champ : _city_ `(text)`
-    - Champ : _postcode_ `(text)`
-    - Champ : _region_ `(text)`
-    - Champ : _country_ `(text)`
-    - Champ : _latitude_ `(decimal)`
-- **article.ts**
-  - Table _article_ (const _article_)
-    - Champ : _id_ `(text)`
-    - Champ : _authorId_ `(text)`
-  - Table _article_content_ (const _articleContent_)
-    - Champ : _id_ `(text)`
-    - Champ : _articleId_ `(text)`
-  - Table _article_category_link_ (const _articleCategoryLink_)
-    - Champ : _articleId_ `(text)`
-  - Table _article_place_link_ (const _articlePlaceLink_)
-    - Champ : _articleId_ `(text)`
-  - Table _article_place_comparison_ (const _articlePlaceComparison_)
-    - Champ : _id_ `(text)`
-    - Champ : _articleId_ `(text)`
-- **attribute.ts**
-  - Table _attribute_definition_ (const _attributeDefinition_)
-    - Champ : _id_ `(text)`
-    - Champ : _slug_ `(text)`
-    - Champ : _valueType_ `(attributeValueTypeEnum)`
-    - Champ : _possibleValues_ `(text)`
-    - Champ : _applicableCategoryIds_ `(text)`
-    - Champ : _isActive_ `(boolean)`
-    - Champ : _createdAt_ `(timestamp)`
-  - Table _attribute_def_translation_ (const _attributeDefTranslation_)
-    - Champ : _id_ `(text)`
-    - Champ : _attributeDefinitionId_ `(text)`
 - **auth-schema.ts**
   - Table _user_ (const _user_)
     - Champ : _id_ `(text)`
@@ -779,209 +638,6 @@ Better Auth está configurado con plugins para OAuth, gestión de sesiones y má
   - Table _invitation_ (const _invitation_)
     - Champ : _id_ `(text)`
     - Champ : _organizationId_ `(text)`
-- **category.ts**
-  - Table _category_ (const _category_)
-    - Champ : _id_ `(text)`
-    - Champ : _parentId_ `(text)`
-    - Champ : _slug_ `(text)`
-    - Champ : _type_ `(categoryTypeEnum)`
-    - Champ : _icon_ `(text)`
-    - Champ : _level_ `(integer)`
-    - Champ : _sortOrder_ `(integer)`
-    - Champ : _isActive_ `(boolean)`
-    - Champ : _createdAt_ `(timestamp)`
-    - Champ : _updatedAt_ `(timestamp)`
-  - Table _category_translation_ (const _categoryTranslation_)
-    - Champ : _id_ `(text)`
-    - Champ : _categoryId_ `(text)`
-- **classified.ts**
-  - Table _classified_ (const _classified_)
-    - Champ : _id_ `(text)`
-    - Champ : _categoryId_ `(text)`
-- **comment.ts**
-  - Table _comment_ (const _comment_)
-    - Champ : _id_ `(text)`
-    - Champ : _authorId_ `(text)`
-- **conversation.ts**
-  - Table _conversation_ (const _conversation_)
-    - Champ : _id_ `(text)`
-    - Champ : _type_ `(conversationTypeEnum)`
-    - Champ : _subject_ `(text)`
-    - Champ : _createdAt_ `(timestamp)`
-    - Champ : _lastMessageAt_ `(timestamp)`
-  - Table _conversation_participant_ (const _conversationParticipant_)
-    - Champ : _id_ `(text)`
-    - Champ : _conversationId_ `(text)`
-  - Table _message_ (const _message_)
-    - Champ : _id_ `(text)`
-    - Champ : _conversationId_ `(text)`
-- **education.ts**
-  - Table _education_module_ (const _educationModule_)
-    - Champ : _id_ `(text)`
-    - Champ : _educatorId_ `(text)`
-  - Table _education_lesson_ (const _educationLesson_)
-    - Champ : _id_ `(text)`
-    - Champ : _moduleId_ `(text)`
-  - Table _education_enrollment_ (const _educationEnrollment_)
-    - Champ : _id_ `(text)`
-    - Champ : _moduleId_ `(text)`
-  - Table _education_progress_ (const _educationProgress_)
-    - Champ : _id_ `(text)`
-    - Champ : _enrollmentId_ `(text)`
-- **event.ts**
-  - Table _event_ (const _event_)
-    - Champ : _id_ `(text)`
-    - Champ : _createdBy_ `(text)`
-  - Table _event_registration_ (const _eventRegistration_)
-    - Champ : _id_ `(text)`
-    - Champ : _eventId_ `(text)`
-- **favorite.ts**
-  - Table _favorite_ (const _favorite_)
-    - Champ : _id_ `(text)`
-    - Champ : _userId_ `(text)`
-- **forum.ts**
-  - Table _forum_thread_ (const _forumThread_)
-    - Champ : _id_ `(text)`
-    - Champ : _categoryId_ `(text)`
-  - Table _forum_post_ (const _forumPost_)
-    - Champ : _id_ `(text)`
-    - Champ : _threadId_ `(text)`
-- **funding.ts**
-  - Table _funding_campaign_ (const _fundingCampaign_)
-    - Champ : _id_ `(text)`
-    - Champ : _creatorId_ `(text)`
-  - Table _donation_ (const _donation_)
-    - Champ : _id_ `(text)`
-    - Champ : _campaignId_ `(text)`
-- **gallery.ts**
-  - Table _gallery_ (const _gallery_)
-    - Champ : _id_ `(text)`
-    - Champ : _title_ `(text)`
-    - Champ : _description_ `(text)`
-    - Champ : _createdBy_ `(text)`
-  - Table _gallery_item_ (const _galleryItem_)
-    - Champ : _id_ `(text)`
-    - Champ : _galleryId_ `(text)`
-- **group.ts**
-  - Table _group_ (const _group_)
-    - Champ : _id_ `(text)`
-    - Champ : _name_ `(text)`
-    - Champ : _slug_ `(text)`
-    - Champ : _description_ `(text)`
-    - Champ : _createdBy_ `(text)`
-  - Table _group_member_ (const _groupMember_)
-    - Champ : _groupId_ `(text)`
-- **image.ts**
-  - Table _image_ (const _image_)
-    - Champ : _id_ `(text)`
-    - Champ : _uploadedBy_ `(text)`
-- **impact.ts**
-  - Table _impact_metric_ (const _impactMetric_)
-    - Champ : _id_ `(text)`
-    - Champ : _type_ `(impactMetricTypeEnum)`
-    - Champ : _value_ `(decimal)`
-  - Table _transparency_report_ (const _transparencyReport_)
-    - Champ : _id_ `(text)`
-    - Champ : _title_ `(text)`
-    - Champ : _slug_ `(text)`
-    - Champ : _contentJson_ `(jsonb)`
-    - Champ : _periodStart_ `(date)`
-    - Champ : _periodEnd_ `(date)`
-    - Champ : _metricIds_ `(text)`
-    - Champ : _publishedBy_ `(text)`
-- **local-service.ts**
-  - Table _local_service_ (const _localService_)
-    - Champ : _id_ `(text)`
-    - Champ : _categoryId_ `(text)`
-  - Table _service_availability_ (const _serviceAvailability_)
-    - Champ : _id_ `(text)`
-    - Champ : _serviceId_ `(text)`
-  - Table _booking_ (const _booking_)
-    - Champ : _id_ `(text)`
-    - Champ : _customerId_ `(text)`
-- **mediation.ts**
-  - Table _mediation_case_ (const _mediationCase_)
-    - Champ : _id_ `(text)`
-    - Champ : _reporterId_ `(text)`
-  - Table _mediation_session_ (const _mediationSession_)
-    - Champ : _id_ `(text)`
-    - Champ : _caseId_ `(text)`
-  - Table _mediation_agreement_ (const _mediationAgreement_)
-    - Champ : _id_ `(text)`
-    - Champ : _caseId_ `(text)`
-- **notification.ts**
-  - Table _notification_ (const _notification_)
-    - Champ : _id_ `(text)`
-    - Champ : _userId_ `(text)`
-- **place-attribute-value.ts**
-  - Table _place_attribute_value_ (const _placeAttributeValue_)
-    - Champ : _id_ `(text)`
-    - Champ : _placeId_ `(text)`
-- **place-detail.ts**
-  - Table _accommodation_detail_ (const _accommodationDetail_)
-    - Champ : _placeId_ `(text)`
-- **place-tag.ts**
-  - Table _place_tag_ (const _placeTag_)
-    - Champ : _placeId_ `(text)`
-- **place.ts**
-  - Table _place_ (const _place_)
-    - Champ : _id_ `(text)`
-    - Champ : _ownerId_ `(text)`
-  - Table _place_translation_ (const _placeTranslation_)
-    - Champ : _id_ `(text)`
-    - Champ : _placeId_ `(text)`
-- **profile.ts**
-  - Table _profile_ (const _profile_)
-    - Champ : _id_ `(text)`
-    - Champ : _userId_ `(text)`
-- **review.ts**
-  - Table _review_ (const _review_)
-    - Champ : _id_ `(text)`
-    - Champ : _placeId_ `(text)`
-  - Table _sub_rating_ (const _subRating_)
-    - Champ : _id_ `(text)`
-    - Champ : _reviewId_ `(text)`
-- **system-commission.ts**
-  - Table _system_commission_ (const _systemCommission_)
-    - Champ : _id_ `(text)`
-    - Champ : _name_ `(text)`
-    - Champ : _percentage_ `(decimal)`
-- **tag.ts**
-  - Table _tag_ (const _tag_)
-    - Champ : _id_ `(text)`
-    - Champ : _slug_ `(text)`
-    - Champ : _createdAt_ `(timestamp)`
-  - Table _tag_translation_ (const _tagTranslation_)
-    - Champ : _id_ `(text)`
-    - Champ : _tagId_ `(text)`
-- **trail.ts**
-  - Table _trail_ (const _trail_)
-    - Champ : _id_ `(text)`
-    - Champ : _createdBy_ `(text)`
-  - Table _poi_ (const _poi_)
-    - Champ : _id_ `(text)`
-    - Champ : _trailId_ `(text)`
-- **user-role.ts**
-  - Table _user_role_ (const _userRole_)
-    - Champ : _id_ `(text)`
-    - Champ : _userId_ `(text)`
-- **volunteer.ts**
-  - Table _volunteer_project_ (const _volunteerProject_)
-    - Champ : _id_ `(text)`
-    - Champ : _coordinatorId_ `(text)`
-  - Table _volunteer_task_ (const _volunteerTask_)
-    - Champ : _id_ `(text)`
-    - Champ : _projectId_ `(text)`
-  - Table _volunteer_participation_ (const _volunteerParticipation_)
-    - Champ : _id_ `(text)`
-    - Champ : _taskId_ `(text)`
-- **wallet.ts**
-  - Table _wallet_ (const _wallet_)
-    - Champ : _id_ `(text)`
-    - Champ : _userId_ `(text)`
-  - Table _transaction_ (const _transaction_)
-    - Champ : _id_ `(text)`
-    - Champ : _walletId_ `(text)`
 
 ## Variables de entorno
 
@@ -1069,23 +725,73 @@ Temas de estilos disponibles:
 
 - `base.css`- `global.css`
 
-### Pruebas
+## Pruebas
 
 Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright (E2E). El repositorio incluye archivos de configuración, helpers y suites de ejemplo para auth, DB, rutas API y flujos UI.
 
-#### Recommended test configs and files
+### Recommended test configs and files
 
+- **a11y**
+  - a11y-performance.test.ts
+  - a11y-utils.ts
+- **api**
 - **config**
   - test-db.ts
   - test-env.ts
+- **e2e**
+  - critical-flows.test.ts
 - **fixtures**
   - auth-fixtures.ts
   - security-payloads.ts
+- **hooks**
 - **integration**
   - auth-emails.test.ts
+  - auth-flow.test.ts
+  - comments.test.ts
+  - **loaders**
+    - blog-loader.test.ts
+- **pages**
+  - README.md
 - README.md
+- **security**
+  - security.test.ts
 - setup.ts
+- **ssr**
+  - ssr-hydration-errors.test.ts
+  - ssr-utils.ts
+- **templates**
+- **ui**
+  - AdCard.astro.test.ts
+  - Alert.astro.test.ts
+  - ArticleCard.astro.test.ts
+  - Avatar.astro.test.ts
+  - Badge.astro.test.ts
+  - Breadcrumb.astro.test.ts
+  - Button.astro.test.ts
+  - Card.astro.test.ts
+  - Dialog.astro.test.ts
+  - Dropdown.astro.test.ts
+  - EventCard.astro.test.ts
+  - FundingCampaignCard.astro.test.ts
+  - Gallery.astro.test.ts
+  - GroupCard.astro.test.ts
+  - Kbd.astro.test.ts
+  - Link.astro.test.ts
+  - Map.astro.test.ts
+  - MenuDropdown.astro.test.ts
+  - Pagination.astro.test.ts
+  - PlaceCard.astro.test.ts
+  - ProductCard.astro.test.ts
+  - ProgressBar.astro.test.ts
+  - ServiceCard.astro.test.ts
+  - Sheet.astro.test.ts
+  - Skeleton.astro.test.ts
+  - ThreadCard.astro.test.ts
+  - Timeline.astro.test.ts
+  - Tooltip.astro.test.ts
 - **unit**
+  - **loaders**
+    - factory.test.ts
   - smtp.test.ts
   - validation.test.ts
 - **utils**
@@ -1093,6 +799,14 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - auth-test-utils.ts
   - cleanup.ts
 - **src/lib**
+- **admin**
+  - config.ts
+  - history.ts
+  - loaders.ts
+  - organizations.ts
+  - permissions.ts
+  - policy-store.ts
+  - users.ts
 - **auth**
   - auth-client.ts
   - auth.test.ts
@@ -1112,211 +826,50 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 - **wallet**
   - wallet.ts
 - **src/database**
+- **admin**
+  - loaders.ts
 - **data**
   - 01-user.data.ts
-  - 02-account.data.ts
-  - 03-profile.data.ts
-  - 04-userRole.data.ts
-  - 05-wallet.data.ts
-  - 06-category.data.ts
-  - 07-categoryTranslation.data.ts
-  - 08-tag.data.ts
-  - 09-tagTranslation.data.ts
-  - 10-address.data.ts
-  - 11-place.data.ts
-  - 12-placeTranslation.data.ts
-  - 13-gastronomyDetail.data.ts
-  - 14-accommodationDetail.data.ts
-  - 15-activityDetail.data.ts
-  - 16-professional.data.ts
-  - 17-trail.data.ts
-  - 18-poi.data.ts
-  - 19-article.data.ts
-  - 20-articleContent.data.ts
-  - 21-event.data.ts
-  - 22-eventRegistration.data.ts
-  - 23-review.data.ts
-  - 24-subRating.data.ts
-  - 25-comment.data.ts
-  - 26-forumThread.data.ts
-  - 27-forumPost.data.ts
-  - 28-classified.data.ts
-  - 29-product.data.ts
-  - 30-localService.data.ts
-  - 31-serviceAvailability.data.ts
-  - 32-booking.data.ts
-  - 33-conversation.data.ts
-  - 34-conversationParticipant.data.ts
-  - 35-message.data.ts
-  - 36-group.data.ts
-  - 37-groupMember.data.ts
-  - 38-mediationCase.data.ts
-  - 39-mediationSession.data.ts
-  - 40-mediationAgreement.data.ts
-  - 41-educationModule.data.ts
-  - 42-educationLesson.data.ts
-  - 43-educationEnrollment.data.ts
-  - 44-educationProgress.data.ts
-  - 45-volunteerProject.data.ts
-  - 46-volunteerTask.data.ts
-  - 47-volunteerParticipation.data.ts
-  - 48-fundingCampaign.data.ts
-  - 49-donation.data.ts
-  - 50-impactMetric.data.ts
-  - 51-transparencyReport.data.ts
-  - 52-gallery.data.ts
-  - 53-galleryItem.data.ts
-  - 54-placeTag.data.ts
-  - 55-favorite.data.ts
-  - 56-notification.data.ts
-  - 57-systemCommission.data.ts
+  - 02-blog_authors.data.ts
+  - 03-blog_categories.data.ts
+  - 05-blog_media.data.ts
+  - 06-blog_organization.data.ts
+  - 07-blog_posts.data.ts
+  - 07-blog_post_authors.data.ts
+  - 10-blog_translations.data.ts
 - drizzle.ts
 - **loaders**
-  - articles-loader.ts
-  - categories-loader.ts
-  - events-loader.ts
+  - blog.ts
   - factory.ts
-  - places-loader.ts
 - **migrations**
-  - 0000_loving_blue_blade.sql
-  - 0001_famous_tarantula.sql
-  - 0002_ambitious_lady_ursula.sql
-  - 0003_condemned_iron_lad.sql
-  - 0003_create_audit_logs.sql
-  - 0004_sloppy_arachne.sql
-  - 0005_magenta_nico_minoru.sql
-  - 0006_unique_thanos.sql
-  - 0007_slim_mentor.sql
-  - 0008_fix_user_pseudo_data.sql
+  - 0008_smiling_landau.sql
   - **meta**
-    - 0000_snapshot.json
-    - 0001_snapshot.json
-    - 0002_snapshot.json
-    - 0003_snapshot.json
-    - 0004_snapshot.json
-    - 0005_snapshot.json
-    - 0006_snapshot.json
-    - 0007_snapshot.json
+    - 0008_snapshot.json
     - _journal.json
 - **schemas**
-  - address.ts
-  - article.ts
-  - attribute.ts
-  - audit-log.ts
+  - audit-log.schema.ts
   - auth-schema.ts
-  - category.ts
-  - classified.ts
-  - comment.ts
-  - conversation.ts
-  - education.ts
-  - event.ts
-  - favorite.ts
-  - forum.ts
-  - funding.ts
-  - gallery.ts
-  - group.ts
-  - image.ts
-  - impact.ts
-  - local-service.ts
-  - mediation.ts
-  - notification.ts
-  - place-attribute-value.ts
-  - place-detail.ts
-  - place-tag.ts
-  - place.ts
-  - product.ts
-  - professional.ts
-  - profile.ts
-  - review.ts
-  - system-commission.ts
-  - tag.ts
-  - trail.ts
-  - user-role.ts
-  - volunteer.ts
-  - wallet.ts
+  - blog_authors.schema.ts
+  - blog_categories.schema.ts
+  - blog_comments.schema.ts
+  - blog_media.schema.ts
+  - blog_organization.schema.ts
+  - blog_posts.schema.ts
+  - blog_translations.schema.ts
+  - comments.schema.ts
 - schemas.ts
 - **src/pages/api**
 - **admin**
   - moderate.ts
+  - organizations.ts
   - roles.ts
-- **articles**
-  - index.ts
-  - **[slug]**
-    - status.ts
-  - [slug].ts
+  - users.ts
 - **auth**
   - [...all].ts
 - **auth-client**
   - forgot-password.ts
   - verification.ts
-- **bookings**
-  - index.ts
-- **categories**
-  - index.ts
-- **classifieds**
-  - index.ts
-- **comments**
-  - index.ts
-- **conversations**
-  - index.ts
-  - [id].ts
-- **education**
-  - **modules**
-    - index.ts
-    - [slug].ts
-- **events**
-  - index.ts
-  - [slug].ts
-- **favorites**
-  - index.ts
-- **forum**
-  - **threads**
-    - index.ts
-    - [slug].ts
-- **funding**
-  - **campaigns**
-    - index.ts
-    - [slug].ts
-- **galleries**
-  - index.ts
-  - [id].ts
-- **groups**
-  - index.ts
-  - [slug].ts
-- **impact**
-  - index.ts
-- **mediation**
-  - index.ts
-- **notifications**
-  - index.ts
-- **places**
-  - index.ts
-  - **[slug]**
-    - moderate.ts
-  - [slug].ts
-- **products**
-  - index.ts
-  - [id].ts
 - **profile**
-  - index.ts
-- query.ts
-- **reviews**
-  - index.ts
-  - [id].ts
-- **services**
-  - index.ts
-- **sse**
-  - notifications.ts
-- **tags**
-  - index.ts
-- **transparency**
-  - index.ts
-  - [slug].ts
-- **volunteer**
-  - **projects**
-    - index.ts
-    - [slug].ts
-- **wallet**
   - index.ts
 
 #### Test file summaries
@@ -1375,6 +928,16 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - permission inexistante = deny
     - context manquant pour ABAC = deny
 
+- `tests\a11y\a11y-performance.test.ts`
+  - **Accessibilité**
+  - **Performance**
+
+- `tests\e2e\critical-flows.test.ts`
+  - **Parcours critique - Connexion**
+  - **Parcours critique - Inscription**
+  - **Parcours critique - Multi-variant**
+  - **Parcours critique - Erreurs serveur**
+
 - `tests\integration\auth-emails.test.ts`
   - **BetterAuth Email Functions**
   - **Email Verification**
@@ -1385,6 +948,135 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - should have sendResetPassword config
     - should call sendResetPassword without error
     - should log mock SMTP when password reset is called
+
+- `tests\integration\auth-flow.test.ts`
+  - **Auth — critical integration tests**
+    - sign-up creates user and audit log
+    - sign-in returns token for valid credentials
+    - sign-in with invalid password logs login_failed
+    - duplicate sign-up is rejected
+
+- `tests\integration\comments.test.ts`
+  - **Comments actions (createComment)**
+    - throws UNAUTHORIZED when no user in context
+    - inserts comment into DB with correct fields (root comment)
+    - inserts comment with parentId when reply
+
+- `tests\integration\loaders\blog-loader.test.ts`
+  - **loadBlogPosts (integration via mocked DB)**
+    - transforms DB row into content store entries (slug-lang ids)
+    - handles multiple translations and languages
+    - logs error and continues if transformer throws
+    - logs error on missing lang key in translation
+    - logs error if two translations produce same id
+
+- `tests\security\security.test.ts`
+  - **RBAC/ABAC**
+    - refuse accès admin sans rôle
+    - autorise accès admin avec rôle
+    - refuse escalade de privilège
+  - **XSS**
+    - rejette payload XSS dans formulaire
+  - **Injection**
+    - rejette payload SQLi
+    - rejette payload NoSQLi
+  - **Escalade**
+    - refuse modification de rôle sans autorisation
+
+- `tests\ssr\ssr-hydration-errors.test.ts`
+  - **SSR rendering**
+    - renders all pages correctly on server
+    - renders with all variants and locales
+  - **Hydration**
+    - hydrates interactive islands only
+  - **Server errors**
+    - returns 500 for uncaught exceptions
+    - returns 404 for unknown routes
+
+- `tests\ui\AdCard.astro.test.ts`
+
+- `tests\ui\Alert.astro.test.ts`
+
+- `tests\ui\ArticleCard.astro.test.ts`
+
+- `tests\ui\Avatar.astro.test.ts`
+  - **Avatar.astro**
+    - renders with default props and slot
+    - applies variant and className props
+    - renders alt text for accessibility
+
+- `tests\ui\Badge.astro.test.ts`
+
+- `tests\ui\Breadcrumb.astro.test.ts`
+  - **Breadcrumb.astro**
+    - renders breadcrumb items from slot
+    - applies variant and className props
+    - renders aria-label for accessibility
+
+- `tests\ui\Button.astro.test.ts`
+
+- `tests\ui\Card.astro.test.ts`
+  - **Card.astro**
+    - renders slot content and default classes
+    - applies variant and color props
+    - renders with role and aria-label for a11y
+
+- `tests\ui\Dialog.astro.test.ts`
+  - **Dialog.astro**
+    - renders slot content and dialog role
+    - applies variant and className props
+    - renders aria-modal for accessibility
+
+- `tests\ui\Dropdown.astro.test.ts`
+  - **Dropdown.astro**
+    - renders slot content and default classes
+    - applies variant and color props
+    - renders with aria-haspopup for accessibility
+
+- `tests\ui\EventCard.astro.test.ts`
+
+- `tests\ui\FundingCampaignCard.astro.test.ts`
+
+- `tests\ui\Gallery.astro.test.ts`
+
+- `tests\ui\GroupCard.astro.test.ts`
+
+- `tests\ui\Kbd.astro.test.ts`
+
+- `tests\ui\Link.astro.test.ts`
+
+- `tests\ui\Map.astro.test.ts`
+
+- `tests\ui\MenuDropdown.astro.test.ts`
+
+- `tests\ui\Pagination.astro.test.ts`
+
+- `tests\ui\PlaceCard.astro.test.ts`
+
+- `tests\ui\ProductCard.astro.test.ts`
+
+- `tests\ui\ProgressBar.astro.test.ts`
+
+- `tests\ui\ServiceCard.astro.test.ts`
+
+- `tests\ui\Sheet.astro.test.ts`
+
+- `tests\ui\Skeleton.astro.test.ts`
+
+- `tests\ui\ThreadCard.astro.test.ts`
+
+- `tests\ui\Timeline.astro.test.ts`
+
+- `tests\ui\Tooltip.astro.test.ts`
+
+- `tests\unit\loaders\factory.test.ts`
+  - **createTranslationLoader (unit)**
+    - stores translated entries with id "slug-lang" and includes slug/lang in data
+    - logs and continues when translations missing or empty
+    - logs error and continues if transformer throws
+    - handles multiple translations and languages
+    - logs error on missing lang key in translation
+    - logs error if two translations produce same id
 
 - `tests\unit\smtp.test.ts`
   - **SmtpService Unit Tests**
@@ -1399,11 +1091,11 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - should require subject
     - should require content (text or html)
     - should reject subject longer than 998 chars
-    - should accept valid email: user@example.com
+    - should accept valid email: <user@example.com>
   - **Security - XSS Protection**
   - **Security - SQL Injection**
   - **Security - Null Bytes**
-    - should accept valid email without null byte: user@example.com
+    - should accept valid email without null byte: <user@example.com>
   - **Batch Operations**
     - should send batch emails
     - should batch with custom concurrency
@@ -1419,7 +1111,7 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 - `tests\unit\validation.test.ts`
   - **Input Validation Unit Tests**
   - **Email Validation**
-    - should accept valid email: user@example.com
+    - should accept valid email: <user@example.com>
   - **Password Validation**
   - **Username Validation**
     - should accept valid usernames
