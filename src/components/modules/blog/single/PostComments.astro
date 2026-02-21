@@ -1,7 +1,7 @@
 ---
 import { actions } from "astro:actions";
 import { getDrizzle } from "@database/drizzle";
-import { comments } from "@database/schemas";
+import { blogComments } from "@database/schemas";
 import { eq, and, desc } from "drizzle-orm";
 
 import Avatar from "@components/ui/Avatar/Avatar.astro";
@@ -20,24 +20,24 @@ interface Props {
 
 const { entityId, entityType } = Astro.props;
 const user = Astro.locals.user;
-const lang = Astro.locals.lang || "fr";
+const lang = Astro.currentLocale ?? "fr";
 
-let allComments = [];
-let rootComments = [];
+let allComments: any[] = [];
+let rootComments: any[] = [];
 let dbError = null;
 try {
   const db = await getDrizzle();
-  allComments = await db.query.comments.findMany({
+  allComments = await db.query.blogComments.findMany({
     where: and(
-      eq(comments.entityId, entityId),
-      eq(comments.entityType, entityType),
+      eq(blogComments.entityId, entityId),
+      eq(blogComments.entityType, entityType),
     ),
-    orderBy: [desc(comments.createdAt)],
+    orderBy: [desc(blogComments.createdAt)],
   });
   rootComments = allComments.filter((c) => !c.parentId);
 } catch (err) {
   // Défensive : ne doit jamais casser la page article
-  dbError = err?.message || String(err);
+  dbError = (err instanceof Error && err.message) ? err.message : String(err);
   console.error('PostComments: DB read error', dbError);
 }
 const loginUrl = `/${lang}/connexion?callbackURL=${Astro.url.pathname}`;

@@ -14,7 +14,7 @@ interface Props {
   date?: string;
   featuredImg?: string;
   videoUrl?: string;
-  type?: 'flex' | 'blog' | 'category' | 'article' | 'hero' | 'split' | 'minimal' | 'default';
+  type?: 'flex' | 'blog' | 'category' | 'article' | 'author' | 'hero' | 'split' | 'minimal' | 'default';
   variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
   color?: 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'neutral';
   breadcrumbs?: Breadcrumb[];
@@ -42,7 +42,7 @@ const {
 // maintain backward compatibility if someone still passes `variant` for layout
 const layout = (Astro.props as any).variant || type;
 
-const currentLocale = Astro.currentLocale || 'fr';
+const currentLocale = Astro.currentLocale;
 // use import.meta.glob with eager option (supported by Astro/Vite)
 const translations = import.meta.glob('../../../i18n/*.json', { eager: true }) as Record<string, { default: any }>;
 const t = translations[`../../../i18n/${currentLocale}.json`]?.default || translations['../../../i18n/fr.json']?.default;
@@ -134,6 +134,7 @@ const backgroundImage = featuredImg || '/images/placeholder.jpg';
 .banner-page.blog { min-height: 500px; padding: var(--space-12) 0; }
 .banner-page.category { min-height: 350px; padding: var(--space-10) 0; }
 .banner-page.article { min-height: 550px; padding: var(--space-14) 0; }
+.banner-page.author { min-height: 550px; padding: var(--space-14) 0; }
 .banner-page.hero { min-height: 85vh; padding: var(--space-20) 0; }
 .banner-page.split { min-height: 85vh; padding: var(--space-20) 0; }
 .banner-page.minimal { min-height: 300px; padding: var(--space-6) 0; }

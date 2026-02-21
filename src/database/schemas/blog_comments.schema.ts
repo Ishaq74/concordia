@@ -1,11 +1,12 @@
 import { pgTable, integer, text, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { blogPosts } from "./blog_posts.schema";
 
+// Un seul schéma universel "blog_comments"
 export const blogComments = pgTable("blog_comments", {
   id: text("id").primaryKey(),
-  postId: text("post_id").notNull(),
-  parentId: text("parent_id"),
+  entityId: text("entity_id").notNull(), // ID de l'entité reliée (blog, event...)
+  entityType: text("entity_type").notNull(), // 'blog', 'place', 'event', 'hike', 'classified'
+  parentId: text("parent_id"), // Pour la récursivité/thread
   authorName: text("author_name").notNull(),
   authorEmail: text("author_email").notNull(),
   content: jsonb("content").notNull(),
@@ -16,12 +17,21 @@ export const blogComments = pgTable("blog_comments", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const blogCommentsRelations = relations(blogComments, ({ one }) => ({
-  post: one(blogPosts, { fields: [blogComments.postId], references: [blogPosts.id] }),
+// Relations pour threading, parent/replies
+export const blogCommentsRelations = relations(blogComments, ({ one, many }) => ({
+  parent: one(blogComments, {
+    fields: [blogComments.parentId],
+    references: [blogComments.id],
+    relationName: "comment_replies",
+  }),
+  replies: many(blogComments, {
+    relationName: "comment_replies",
+  }),
 }));
 
 export const blogCommentsIndexes = `
-CREATE INDEX idx_blog_comments_post ON blog_comments(post_id);
+CREATE INDEX idx_blog_comments_entity ON blog_comments(entity_id);
+CREATE INDEX idx_blog_comments_type ON blog_comments(entity_type);
 CREATE INDEX idx_blog_comments_status ON blog_comments(status);
 CREATE INDEX idx_blog_comments_parent ON blog_comments(parent_id);
 `;

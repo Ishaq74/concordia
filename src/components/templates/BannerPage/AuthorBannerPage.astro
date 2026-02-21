@@ -1,0 +1,73 @@
+---
+import Grid from '@components/Tools/Grid.astro';
+import Flex from '@components/Tools/Flex.astro';
+import Avatar from '@components/ui/Avatar/Avatar.astro';
+import Badge from '@components/ui/Badge.astro';
+
+interface Props {  
+  name: string;
+  avatar?: string;
+  role?: string;
+  bio?: string;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  color?: "primary" | "secondary" | "accent" | "default" | "error" | undefined;
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  name,
+  avatar,
+  role,
+  bio,
+  variant = 'initial',
+  color = 'primary',
+  className = '',
+  ...rest
+} = Astro.props as Props;
+
+const currentLocale = Astro.currentLocale;
+// use import.meta.glob with eager option (supported by Astro/Vite)
+const translations = import.meta.glob('../../../i18n/*.json', { eager: true }) as Record<string, { default: any }>;
+const t = translations[`../../../i18n/${currentLocale}.json`]?.default || translations['../../../i18n/fr.json']?.default;
+
+const backgroundImage = avatar || '/images/placeholder.jpg';
+---
+
+<Grid
+  as="header"
+  columns={2}
+  gap="md"
+  align="center"
+  width="auto"
+  Padding="none"
+  marginInline="auto"
+  flexDirection="column"
+  zIndex={2}
+  variant={variant}
+  color={color}
+  backgroundImage={avatar}
+  className="banner-overlay"
+  role="banner"
+  {...rest}
+>
+  {avatar && <Avatar src={avatar} alt={name} size="xl" className='author-avatar' />}
+  <Grid zIndex={99} columns={1} padding="none" paddingTop="md" margin="none" gap="none" align="center">
+    <Badge variant="futuristic" className='author-name'>{name}</Badge>
+    {role && <Badge variant="retro" color="accent" className="author-role">{role}</Badge>}
+    {bio && <p class="author-bio">{bio}</p>}
+  </Grid>
+</Grid>
+
+<style scoped>
+
+.banner-overlay {
+  background: linear-gradient(var(--bg-default) 0%, rgba(0,0,0,0.5) 100%);
+  filter: brightness(0.55);
+}
+
+.author-name, .author-role, .author-bio {
+  z-index: 99;
+}
+
+</style>

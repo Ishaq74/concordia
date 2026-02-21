@@ -12,7 +12,7 @@ import ShareButtons from "@components/modules/blog/ui/ShareButtons.astro";
 import PostComments from "@components/modules/blog/single/PostComments.astro";
 
 const { slug } = Astro.params;
-const LANG = "fr";
+const LANG = "es";
 
 const post = await getEntry("blog", `${slug}-${LANG}`);
 
@@ -47,7 +47,7 @@ const renderedHtml = md.render(String(post.data.content ?? ""));
       <article class="post-content" role="article" set:html={renderedHtml}></article>
 
       <Flex gap="md" alignItems="center" justifyContent="space-between">
-        <p class="article-cta-title">Vous avez aimé cet article ?</p>
+        <p class="article-cta-title">¿Te ha gustado este artículo?</p>
         <ShareButtons variant="retro" title={post.data.title} />
       </Flex>
 

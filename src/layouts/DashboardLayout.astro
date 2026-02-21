@@ -1,8 +1,9 @@
 ---
+export const prerender = false;
+
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
 
-export const prerender = false;
 
 interface Props {
   title: string;
@@ -11,7 +12,7 @@ interface Props {
 }
 
 const { title, description, activeSection } = Astro.props;
-const currentLocale = Astro.currentLocale || "fr";
+const currentLocale = Astro.currentLocale;
 const t = await import(`../i18n/${currentLocale}.json`);
 
 const user = Astro.locals.user;

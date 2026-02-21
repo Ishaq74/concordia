@@ -17,7 +17,7 @@ const {
 } = Astro.props;
 
 // Detect current locale from URL
-const currentLocale = lang || Astro.currentLocale || "fr";
+const currentLocale = Astro.currentLocale;
 
 // Get current path without locale prefix
 const pathWithoutLocale = Astro.url.pathname.replace(

@@ -10,7 +10,7 @@ interface Props {
 const { currentPath, variant = 'initial' } = Astro.props;
 
 // Get current locale
-const currentLocale = Astro.currentLocale || 'fr';
+const currentLocale = Astro.currentLocale;
 
 // Import translations
 const translations = await import(`../../../i18n/${currentLocale}.json`);

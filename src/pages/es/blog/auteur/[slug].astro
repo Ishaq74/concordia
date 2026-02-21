@@ -12,12 +12,12 @@ import AuthorBannerPage from "@templates/BannerPage/AuthorBannerPage.astro";
 export const prerender = true;
 
 export async function getStaticPaths() {
-  const LANG = "fr";
+  const LANG = "es";
   const allPosts = await getCollection("blog");
-  const frPosts = allPosts.filter((p) => p.data.lang === LANG);
+  const esPosts = allPosts.filter((p) => p.data.lang === LANG);
 
   const authors = new Map();
-  frPosts.forEach((post) => {
+  esPosts.forEach((post) => {
     post.data.authors.forEach((author) => {
       if (!authors.has(author.slug)) {
         authors.set(author.slug, author);
@@ -33,7 +33,7 @@ export async function getStaticPaths() {
 
 const { author } = Astro.props;
 const { slug } = Astro.params;
-const LANG = "fr";
+const LANG = "es";
 
 const allPosts = await getCollection("blog");
 
@@ -59,22 +59,22 @@ function getInitials(name: string) {
 ---
 
 <BaseLayout
-  title={`Articles de ${author.name}`}
-  description={`Découvrez les articles écrits par ${author.name}`}
+  title={`Artículos de ${author.name}`}
+  description={`Descubre los artículos escritos por ${author.name}`}
   lang={LANG}
 >
  <AuthorBannerPage
       name={author.name}
       bio={author.bio}
       avatar={author.avatar}
-      role="Auteur"
+      role="Autor"
       variant="retro"
       color="secondary" />
 
     {/* LISTE DES ARTICLES (Réutilisation Grid + Card) */}
     <Grid tag="section" columns={1} gap="lg" margin="none" justifyContent="start">
       <h2>
-        {posts.length} Article{posts.length > 1 ? "s" : ""} publié{
+        {posts.length} Artículo{posts.length > 1 ? "s" : ""} publicado{
           posts.length > 1 ? "s" : ""
         }
       </h2>

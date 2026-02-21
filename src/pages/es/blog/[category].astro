@@ -1,0 +1,73 @@
+---
+export const prerender = false;
+import { getCollection } from "astro:content";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+// 1. Réutilisation des composants
+import PageBanner from "@templates/BannerPage.astro";
+import PostGrid from "@components/modules/blog/lists/PostGrid.astro";
+import PostCard from "@components/modules/blog/cards/PostCard.astro";
+
+
+export async function getStaticPaths() {
+  const LANG = "es";
+  const allPosts = await getCollection("blog");
+  const esPosts = allPosts.filter((p) => p.data.lang === LANG);
+
+  const categories = new Map();
+  esPosts.forEach((post) => {
+    post.data.categories.forEach((cat) => {
+      if (!categories.has(cat.slug)) {
+        categories.set(cat.slug, cat.name);
+      }
+    });
+  });
+
+  return Array.from(categories.entries()).map(([slug, name]) => ({
+    params: { category: slug },
+    props: { name },
+  }));
+}
+
+const { category } = Astro.params;
+const { name } = Astro.props;
+const LANG = "es";
+
+const allPosts = await getCollection("blog");
+const posts = allPosts
+  .filter((p) => p.data.lang === LANG)
+  .filter((p) => p.data.categories.some((c) => c.slug === category))
+  .sort(
+    (a, b) =>
+      new Date(b.data.publishedAt || 0).getTime() -
+      new Date(a.data.publishedAt || 0).getTime(),
+  );
+---
+
+<BaseLayout
+  title={`${name} - Blog`}
+  description={`Todos los artículos de la categoría ${name}`}
+  lang={LANG}
+>
+  <main class="container mx-auto px-4 py-12" transition:name="category">
+    {/* EN-TÊTE CATÉGORIE */}
+    <PageBanner title={name} subtitle={`Explora nuestros artículos sobre el tema "${name}"`} />
+
+    {/* GRILLE D'ARTICLES */}
+    {
+      posts.length > 0 ? (
+        <PostGrid>
+          {posts.map((post) => (
+            <PostCard post={post} lang={LANG} />
+          ))}
+        </PostGrid>
+      ) : (
+        <div class="py-12 text-center border-2 border-dashed rounded-lg">
+          <p class="text-muted-foreground">
+            Ningún artículo encontrado en esta categoría por el momento.
+          </p>
+        </div>
+      )
+    }
+  </main>
+</BaseLayout>

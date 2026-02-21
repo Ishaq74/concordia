@@ -1,7 +1,7 @@
 import { defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { getDrizzle } from "@database/drizzle";
-import { comments } from "@database/schemas/comments.schema";
+import { blogComments } from "@database/schemas/blog_comments.schema";
 import { nanoid } from "nanoid";
 
 export const commentActions = {
@@ -19,9 +19,11 @@ export const commentActions = {
             if (!user) throw new Error("UNAUTHORIZED");
 
             const db = await getDrizzle();
-            const lang = context.locals.lang || "fr";
+            const url = context.request.url;
+            const localeMatch = url.match(/\/([a-z]{2})\//);
+            const lang = localeMatch?.[1] ?? "fr";
 
-            await db.insert(comments).values({
+            await db.insert(blogComments).values({
                 id: nanoid(),
                 entityId: input.entityId,
                 entityType: input.entityType,

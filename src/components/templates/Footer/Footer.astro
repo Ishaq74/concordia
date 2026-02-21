@@ -28,7 +28,7 @@ const {
   class: className = '',
 } = Astro.props;
 
-const currentLocale = Astro.currentLocale || 'fr';
+const currentLocale = Astro.currentLocale;
 
 // Import translations
 const translations = await import(`../../../i18n/${currentLocale}.json`);
@@ -42,7 +42,8 @@ const footerClass = [
 
 const currentYear = new Date().getFullYear();
 
-const isFr = currentLocale === 'fr';
+const lang: string = Astro.currentLocale || 'fr';
+const isFr = lang === 'fr';
 
 // Social links
 const socialLinks = [
@@ -53,24 +54,24 @@ const socialLinks = [
 
 // Footer nav columns
 const discoverLinks = [
-  { label: t.nav.places, href: getRelativeLocaleUrl(currentLocale, 'places') },
-  { label: t.nav.events, href: getRelativeLocaleUrl(currentLocale, isFr ? 'evenements' : 'events') },
-  { label: t.nav.trails, href: getRelativeLocaleUrl(currentLocale, isFr ? 'sentiers' : 'trails') },
-  { label: t.nav.blog, href: getRelativeLocaleUrl(currentLocale, isFr ? 'blog' : 'blog') },
+  { label: t.nav.places, href: getRelativeLocaleUrl(lang as string, 'places') },
+  { label: t.nav.events, href: getRelativeLocaleUrl(lang as string, isFr ? 'evenements' : 'events') },
+  { label: t.nav.trails, href: getRelativeLocaleUrl(lang as string, isFr ? 'sentiers' : 'trails') },
+  { label: t.nav.blog, href: getRelativeLocaleUrl(lang as string, isFr ? 'blog' : 'blog') },
 ];
 
 const communityLinks = [
-  { label: t.nav.forum, href: getRelativeLocaleUrl(currentLocale, 'forum') },
-  { label: t.nav.groups, href: getRelativeLocaleUrl(currentLocale, isFr ? 'groupes' : 'groups') },
-  { label: t.nav.classifieds, href: getRelativeLocaleUrl(currentLocale, isFr ? 'annonces' : 'classifieds') },
-  { label: t.nav.services, href: getRelativeLocaleUrl(currentLocale, 'services') },
+  { label: t.nav.forum, href: getRelativeLocaleUrl(lang as string, 'forum') },
+  { label: t.nav.groups, href: getRelativeLocaleUrl(lang as string, isFr ? 'groupes' : 'groups') },
+  { label: t.nav.classifieds, href: getRelativeLocaleUrl(lang as string, isFr ? 'annonces' : 'classifieds') },
+  { label: t.nav.services, href: getRelativeLocaleUrl(lang as string, 'services') },
 ];
 
 const engageLinks = [
-  { label: t.nav.volunteer, href: getRelativeLocaleUrl(currentLocale, isFr ? 'benevolat' : 'volunteer') },
-  { label: t.nav.education, href: getRelativeLocaleUrl(currentLocale, 'education') },
-  { label: t.nav.funding, href: getRelativeLocaleUrl(currentLocale, isFr ? 'financement' : 'funding') },
-  { label: t.nav.transparency, href: getRelativeLocaleUrl(currentLocale, isFr ? 'transparence' : 'transparency') },
+  { label: t.nav.volunteer, href: getRelativeLocaleUrl(lang as string, isFr ? 'benevolat' : 'volunteer') },
+  { label: t.nav.education, href: getRelativeLocaleUrl(lang as string, 'education') },
+  { label: t.nav.funding, href: getRelativeLocaleUrl(lang as string, isFr ? 'financement' : 'funding') },
+  { label: t.nav.transparency, href: getRelativeLocaleUrl(lang as string, isFr ? 'transparence' : 'transparency') },
 ];
 ---
 
@@ -171,11 +172,11 @@ const engageLinks = [
       <!-- Legal Links -->
       {config.showLegalInfo && (
         <div class="footer-legal">
-          <a href={getRelativeLocaleUrl(currentLocale, 'legal')} class="footer-link">{t.footer.legal}</a>
+          <a href={getRelativeLocaleUrl(lang as string, 'legal')} class="footer-link">{t.footer.legal}</a>
           <span class="footer-separator">•</span>
-          <a href={getRelativeLocaleUrl(currentLocale, 'privacy')} class="footer-link">{t.footer.privacy}</a>
+          <a href={getRelativeLocaleUrl(lang as string, 'privacy')} class="footer-link">{t.footer.privacy}</a>
           <span class="footer-separator">•</span>
-          <a href={getRelativeLocaleUrl(currentLocale, 'terms')} class="footer-link">{t.footer.terms}</a>
+          <a href={getRelativeLocaleUrl(lang as string, 'terms')} class="footer-link">{t.footer.terms}</a>
         </div>
       )}
       

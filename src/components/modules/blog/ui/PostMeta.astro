@@ -14,7 +14,7 @@ interface Props {
 }
 
 const { readingTime, authors = [], lang, className = "" } = Astro.props;
-const currentLocale = lang || Astro.currentLocale || "fr";
+const currentLocale = Astro.currentLocale;
 const translations = await import(`../../../../i18n/${currentLocale}.json`);
 const t = translations.default;
 

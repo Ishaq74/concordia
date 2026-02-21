@@ -14,7 +14,7 @@ const {
   class: className = "",
 } = Astro.props;
 
-const currentLocale = Astro.currentLocale || "fr";
+const currentLocale = Astro.currentLocale;
 const currentPath = Astro.url.pathname;
 
 const translations = await import(`../../../i18n/${currentLocale}.json`);

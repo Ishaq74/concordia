@@ -1,5 +1,5 @@
 ---
-// src/pages/fr/blog/index.astro
+// src/pages/es/blog/index.astro
 import { getCollection } from "astro:content";
 import { getDrizzle } from "@database/drizzle";
 import { blogComments } from "@database/schemas";
@@ -9,7 +9,7 @@ import BannerPage from "@templates/BannerPage.astro";
 import PostGrid from "@components/modules/blog/lists/PostGrid.astro";
 import PostCard from "@components/modules/blog/cards/PostCard.astro";
 
-const LANG = Astro.currentLocale || "fr";
+const LANG = Astro.currentLocale || "es";
 const t = await import(`../../../i18n/${LANG}.json`);
 const allPosts = await getCollection("blog");
 

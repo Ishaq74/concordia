@@ -53,7 +53,7 @@ const siteTitle = "Default Title";
 const pageTitle = rawTitle ? `${siteTitle} > ${rawTitle}` : siteTitle;
 
 // Get current locale from Astro
-const currentLocale = Astro.currentLocale || "fr";
+const currentLocale = Astro.currentLocale;
 
 // Safe fallbacks from site identity
 const htmlLang = lang ?? currentLocale;

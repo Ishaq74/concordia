@@ -45,7 +45,7 @@ vi.mock('astro:schema', () => {
 import { commentActions } from '@/actions/comments'
 import { createTestUser, generateUniqueEmail, generateUniqueUsername, generateSecurePassword } from '@tests/utils/auth-test-utils'
 import { getDrizzle } from '@database/drizzle'
-import { comments } from '@database/schemas'
+import { blogComments } from '@database/schemas'
 import { eq } from 'drizzle-orm'
 
 describe('Comments actions (createComment)', () => {
@@ -73,7 +73,7 @@ describe('Comments actions (createComment)', () => {
     expect(res.success).toBe(true)
 
     const db = await getDrizzle()
-    const rows = await db.select().from(comments).where(eq(comments.entityId, 'post-test-root'))
+    const rows = await db.select().from(blogComments).where(eq(blogComments.entityId, 'post-test-root'))
     const found = rows.find((r: any) => r.authorEmail === user.email)
     expect(found).toBeDefined()
     if (!found) throw new Error('Comment not found')
@@ -103,7 +103,7 @@ describe('Comments actions (createComment)', () => {
     expect(res.success).toBe(true)
 
     const db = await getDrizzle()
-    const rows = await db.select().from(comments).where(eq(comments.entityId, 'post-test-reply'))
+    const rows = await db.select().from(blogComments).where(eq(blogComments.entityId, 'post-test-reply'))
     const found = rows.find((r: any) => r.authorEmail === user.email && r.parentId === 'parent-123')
     expect(found).toBeDefined()
     if (!found) throw new Error('Reply comment not found')
