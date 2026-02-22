@@ -1,0 +1,172 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Concordia" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: Concordia
+      - generic:
+        - navigation:
+          - link:
+            - /url: /fr/
+      - link:
+        - /url: /fr/
+      - generic [ref=e6]:
+        - link:
+          - /url: /fr/
+        - link "I Ishaq Achour Se déconnecter" [ref=e8] [cursor=pointer]:
+          - /url: /fr/
+          - checkbox "I Ishaq Achour Se déconnecter"
+          - generic [ref=e10]:
+            - generic [ref=e12]: I
+            - generic [ref=e14]: Ishaq Achour
+            - img [ref=e15]
+        - generic [ref=e17]:
+          - checkbox "🇫🇷 ▼"
+          - generic [ref=e18] [cursor=pointer]:
+            - generic [ref=e19]: 🇫🇷
+            - generic [ref=e20]: ▼
+        - button "Changer le thème" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+          - img
+  - main [ref=e24]:
+    - link "Aller au contenu principal" [ref=e26] [cursor=pointer]:
+      - /url: "#maincontent"
+    - main [ref=e27]:
+      - generic [ref=e28]:
+        - paragraph [ref=e29]: Profil
+        - heading "Profil" [level=1] [ref=e30]
+        - paragraph [ref=e31]: Gérez vos informations personnelles et suivez vos connexions.
+      - 'generic "{translations.auth.profileDetails ?? ''Détails du profil''}" [ref=e33]':
+        - generic [ref=e34]:
+          - term [ref=e35]: Nom complet
+          - definition [ref=e36]: Ishaq Achour
+        - generic [ref=e37]:
+          - term [ref=e38]: Email
+          - definition [ref=e39]: ishaq.achour@gmail.com
+        - generic [ref=e40]:
+          - term [ref=e41]: Administration
+          - definition [ref=e42]: Utilisateur
+        - generic [ref=e43]:
+          - term [ref=e44]: Organisation
+          - definition [ref=e45]:
+            - generic [ref=e46]:
+              - checkbox "Créer une organisation"
+              - button "Créer une organisation" [active] [ref=e48] [cursor=pointer]
+        - generic [ref=e49]:
+          - term [ref=e50]: Invitations
+          - definition [ref=e51]:
+            - link "Aucune" [ref=e52] [cursor=pointer]:
+              - /url: /fr/invitations
+        - generic [ref=e53]:
+          - term [ref=e54]: Dernière activité
+          - definition [ref=e55]: 22/02/2026 16:17:29
+        - generic [ref=e56]:
+          - term [ref=e57]: Organisations
+          - definition [ref=e58]: Aucune organisation
+      - 'region "{translations.auth.organizationSection ?? ''Section organisation''}"'
+  - contentinfo [ref=e59]:
+    - generic [ref=e60]:
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - heading "Concordia Annecy" [level=3] [ref=e63]
+          - paragraph [ref=e64]: Plateforme citoyenne et collaborative du bassin annécien. Découvrez, participez, construisez ensemble.
+          - paragraph [ref=e65]: Association loi 1901
+        - generic [ref=e66]:
+          - heading "Découvrir" [level=3] [ref=e67]
+          - list [ref=e68]:
+            - listitem [ref=e69]:
+              - link "Annuaire" [ref=e70] [cursor=pointer]:
+                - /url: /fr/places
+            - listitem [ref=e71]:
+              - link "Événements" [ref=e72] [cursor=pointer]:
+                - /url: /fr/evenements
+            - listitem [ref=e73]:
+              - link "Sentiers" [ref=e74] [cursor=pointer]:
+                - /url: /fr/sentiers
+            - listitem [ref=e75]:
+              - link "Blog" [ref=e76] [cursor=pointer]:
+                - /url: /fr/blog
+        - generic [ref=e77]:
+          - heading "Communauté" [level=3] [ref=e78]
+          - list [ref=e79]:
+            - listitem [ref=e80]:
+              - link "Forum" [ref=e81] [cursor=pointer]:
+                - /url: /fr/forum
+            - listitem [ref=e82]:
+              - link "Groupes" [ref=e83] [cursor=pointer]:
+                - /url: /fr/groupes
+            - listitem [ref=e84]:
+              - link "Annonces" [ref=e85] [cursor=pointer]:
+                - /url: /fr/annonces
+            - listitem [ref=e86]:
+              - link "Services" [ref=e87] [cursor=pointer]:
+                - /url: /fr/services
+        - generic [ref=e88]:
+          - heading "S'engager" [level=3] [ref=e89]
+          - list [ref=e90]:
+            - listitem [ref=e91]:
+              - link "Bénévolat" [ref=e92] [cursor=pointer]:
+                - /url: /fr/benevolat
+            - listitem [ref=e93]:
+              - link "Éducation" [ref=e94] [cursor=pointer]:
+                - /url: /fr/education
+            - listitem [ref=e95]:
+              - link "Financement" [ref=e96] [cursor=pointer]:
+                - /url: /fr/financement
+            - listitem [ref=e97]:
+              - link "Transparence" [ref=e98] [cursor=pointer]:
+                - /url: /fr/transparence
+        - generic [ref=e99]:
+          - heading "Contact" [level=3] [ref=e100]
+          - list [ref=e101]:
+            - listitem [ref=e102]:
+              - link "contact@concordia-annecy.fr" [ref=e103] [cursor=pointer]:
+                - /url: mailto:contact@concordia-annecy.fr
+                - img [ref=e104]
+                - text: contact@concordia-annecy.fr
+            - listitem [ref=e106]:
+              - link "+33 4 50 00 00 00" [ref=e107] [cursor=pointer]:
+                - /url: tel:+33450000000
+                - img [ref=e108]
+                - text: +33 4 50 00 00 00
+          - generic [ref=e110]:
+            - paragraph [ref=e111]: 12 Rue Royale
+            - paragraph [ref=e112]: 74000 Annecy, France
+        - generic [ref=e113]:
+          - heading "Suivez-nous" [level=3] [ref=e114]
+          - generic [ref=e115]:
+            - link "Facebook" [ref=e116] [cursor=pointer]:
+              - /url: https://facebook.com/concordia-annecy
+              - img [ref=e117]
+            - link "Instagram" [ref=e119] [cursor=pointer]:
+              - /url: https://instagram.com/concordia_annecy
+              - img [ref=e120]
+            - link "Twitter" [ref=e122] [cursor=pointer]:
+              - /url: https://twitter.com/concordia_ancy
+              - img [ref=e123]
+      - generic [ref=e125]:
+        - generic [ref=e126]:
+          - link "Mentions légales" [ref=e127] [cursor=pointer]:
+            - /url: /fr/legal
+          - generic [ref=e128]: •
+          - link "Politique de confidentialité" [ref=e129] [cursor=pointer]:
+            - /url: /fr/privacy
+          - generic [ref=e130]: •
+          - link "Conditions d'utilisation" [ref=e131] [cursor=pointer]:
+            - /url: /fr/terms
+        - paragraph [ref=e133]: © 2026 Concordia Annecy. Tous droits réservés.
+  - generic [ref=e136]:
+    - button "Menu" [ref=e137]:
+      - img [ref=e139]
+      - generic: Menu
+    - button "Inspect" [ref=e143]:
+      - img [ref=e145]
+      - generic: Inspect
+    - button "Audit" [ref=e147]:
+      - generic [ref=e148]:
+        - img [ref=e149]
+        - img [ref=e152]
+      - generic: Audit
+    - button "Settings" [ref=e155]:
+      - img [ref=e157]
+      - generic: Settings

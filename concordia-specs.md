@@ -1220,7 +1220,7 @@ PK unique composite `(conversation_id, user_id)`.
 | `type` | enum | Oui | Non | — | `external_credit`, `p2p_transfer`, `service_payment`, `refund`, `commission` | `"p2p_transfer"` |
 | `status` | enum | Oui | Non | `"pending"` | `pending`, `completed`, `failed`, `cancelled` | `"completed"` |
 | `description` | text | Non | Non | null | Max 255 chars | `"Paiement réservation plomberie"` |
-| `related_entity_type` | text | Non | Non | null | `booking`, `donation`, etc. | `"booking"` |
+| `related_post_type` | text | Non | Non | null | `booking`, `donation`, etc. | `"booking"` |
 | `related_entity_id` | uuid | Non | Non | null | ID de l'entité liée | — |
 | `idempotency_key` | text | Non | Oui | null | Clé d'idempotence pour prévenir les doublons | — |
 | `created_at` | timestamp | Oui | Non | now() | — | — |
@@ -1319,7 +1319,7 @@ confirmed  → no_show                (Client absent)
 | `reporter_id` | uuid FK → user.id | Oui | Non | — | Citoyen ayant signalé | — |
 | `reported_user_id` | uuid FK → user.id | Non | Non | null | Utilisateur mis en cause | — |
 | `mediator_id` | uuid FK → user.id | Non | Non | null | Médiateur assigné (rôle `mediator`) | — |
-| `related_entity_type` | text | Non | Non | null | `review`, `comment`, `forum_post`, `classified`, `booking`, `message` | `"review"` |
+| `related_post_type` | text | Non | Non | null | `review`, `comment`, `forum_post`, `classified`, `booking`, `message` | `"review"` |
 | `related_entity_id` | uuid | Non | Non | null | — | — |
 | `title` | text | Oui | Non | — | 5-200 chars | `"Litige sur avis diffamatoire"` |
 | `description` | text | Oui | Non | — | 10-2000 chars | — |
@@ -2336,7 +2336,7 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 ### OP-044 : Modérer un contenu
 
 - **Acteur** : Modérateur ou Admin
-- **Entrées** : `{ entity_type: 'review' | 'comment' | 'forum_post' | 'forum_thread' | 'classified', entity_id, reason }`
+- **Entrées** : `{ post_type: 'review' | 'comment' | 'forum_post' | 'forum_thread' | 'classified', entity_id, reason }`
 - **Préconditions** : Entité existe. Status actuel ≠ `moderated`. Le modérateur n'est pas l'auteur.
 - **Étapes** :
   1. Changer status de l'entité à `moderated`.
@@ -2535,7 +2535,7 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 ### OP-090 : Ouvrir un cas de médiation
 
 - **Acteur** : Citoyen
-- **Entrées** : `{ title, description, category?, related_entity_type?, related_entity_id?, reported_user_id? }`
+- **Entrées** : `{ title, description, category?, related_post_type?, related_entity_id?, reported_user_id? }`
 - **Préconditions** : Si reported_user_id : utilisateur existe. Si entity liée : entité existe.
 - **Étapes** :
   1. Créer `mediation_case` avec `status = opened`.
@@ -3881,7 +3881,7 @@ Chaque job :
 | Champ | Contenu |
 |---|---|
 | `action` | Nom de l'opération (ex: `place.create`, `review.create`, `wallet.debit`) |
-| `entity_type` | Type d'entité (ex: `place`, `review`, `transaction`) |
+| `post_type` | Type d'entité (ex: `place`, `review`, `transaction`) |
 | `entity_id` | ID de l'entité concernée |
 | `user_id` | Utilisateur ayant effectué l'action |
 | `metadata` | JSON : données avant/après, contexte additionnel |

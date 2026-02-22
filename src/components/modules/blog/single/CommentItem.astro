@@ -11,8 +11,8 @@ import StarRating from "../ui/StarRating.astro";
 interface Props {
   comment: any;
   allComments: any[];
-  entityId: string;
-  entityType: string;
+  postId: string;
+  postType: string;
   user: any;
   lang: string;
   depth?: number;
@@ -21,8 +21,8 @@ interface Props {
 const {
   comment,
   allComments,
-  entityId,
-  entityType,
+  postId,
+  postType,
   user,
   lang,
   depth = 0,
@@ -45,6 +45,9 @@ const maxDepth = 5;
 ---
 
 <div class="comment-thread">
+  <div style="background: #ffeeba; color: #7c4700; padding: 0.25rem 0.5rem; font-size: 0.85rem; margin-bottom: 0.5rem;">
+    [DEBUG] CommentItem rendu — id: {comment.id}, auteur: {comment.authorName}, contenu: {getContent(comment.content)}
+  </div>
   <Card
     class={`comment-card ${depth > 0 ? "is-reply" : ""}`}
   >
@@ -112,8 +115,8 @@ const maxDepth = 5;
       class="reply-slot is-hidden"
     >
       <form method="POST" action={actions.createComment} class="comment-reply-form">
-        <input type="hidden" name="entityId" value={entityId} />
-        <input type="hidden" name="entityType" value={entityType} />
+        <input type="hidden" name="postId" value={postId} />
+        <input type="hidden" name="postType" value={postType} />
         <input type="hidden" name="parentId" value={comment.id} />
         <Avatar variant="retro" size="lg" src={user?.avatar_url} fallback={user?.name} />
         <div class="reply-input-wrap">
@@ -150,8 +153,8 @@ const maxDepth = 5;
           <Astro.self
             comment={child}
             allComments={allComments}
-            entityId={entityId}
-            entityType={entityType}
+            postId={postId}
+            postType={postType}
             user={user}
             lang={lang}
             depth={depth + 1}

@@ -43,7 +43,7 @@ const {
         condition ? { text: condition, label: "État" } : null,
         location ? { text: location, label: "Lieu" } : null,
         { text: createdAt.toLocaleDateString('fr'), label: "Publié" }
-      ].filter(Boolean)}
+      ].filter((item): item is { text: string; label: string } => Boolean(item))}
     />
   </Card>
 </Link>

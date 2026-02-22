@@ -13,7 +13,9 @@ export const blogActions = {
   savePost: defineAction({
     accept: "form",
     handler: async (formData, context) => {
-      if (!context.locals.isAdmin) throw new Error("Unauthorized");
+      // only admin users may call this action
+      const actingUser = context.locals.user;
+      if (!actingUser || actingUser.role !== 'admin') throw new Error("Unauthorized");
       const db = await getDrizzle();
       const id = (formData.get("id") as string) || nanoid();
       const slug = formData.get("slug") as string;
@@ -39,11 +41,12 @@ export const blogActions = {
           const headline = formData.get(`headline_${l}`);
           if (!headline) continue;
           
-          const data = {
+          const data: any = {
             headline: { [l]: headline },
             articleBody: { [l]: formData.get(`content_${l}`) },
+            excerpt: { [l]: formData.get(`excerpt_${l}`) || "" },
             updatedAt: new Date()
-          };
+          }; // excerpt is required by schema
 
           const exist = await tx.query.blogTranslations.findFirst({
             where: and(eq(blogTranslations.postId, id), eq(blogTranslations.inLanguage, l))
@@ -64,10 +67,10 @@ export const blogActions = {
       const db = await getDrizzle();
       const user = context.locals.user;
       if (!user) throw new Error("UNAUTHORIZED");
-      // Vérifie admin ou owner
+      // only admins are allowed (ownerId not tracked in schema)
       const post = await db.query.blogPosts.findFirst({ where: eq(blogPosts.id, id) });
       if (!post) throw new Error("POST_NOT_FOUND");
-      if (!(user.role === 'admin' || user.id === post.ownerId)) {
+      if (user.role !== 'admin') {
         throw new Error("FORBIDDEN");
       }
       await db.update(blogPosts).set({ status, updatedAt: new Date() }).where(eq(blogPosts.id, id));
@@ -84,7 +87,7 @@ export const blogActions = {
       if (!user) throw new Error("UNAUTHORIZED");
       const post = await db.query.blogPosts.findFirst({ where: eq(blogPosts.id, id) });
       if (!post) throw new Error("POST_NOT_FOUND");
-      if (!(user.role === 'admin' || user.id === post.ownerId)) {
+      if (user.role !== 'admin') {
         throw new Error("FORBIDDEN");
       }
       await db.delete(blogPosts).where(eq(blogPosts.id, id));

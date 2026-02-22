@@ -1,22 +1,11 @@
 ---
 // src/components/ui/SmartBreadcrumb.astro
-import {
-    Breadcrumb,
-    BreadcrumbList,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/starwind/breadcrumb";
+// Generic breadcrumb component without external dependencies
 import { Icon } from "astro-icon/components";
 
-// Imports i18n
-import translationsFr from "@i18n/fr.json";
-import translationsEn from "@i18n/en.json";
-import translationsEs from "@i18n/es.json";
-import translationsAr from "@i18n/ar.json";
-import translationsDe from "@i18n/de.json";
-import translationsZh from "@i18n/zh.json";
+// i18n will be loaded dynamically below to avoid TS json-import issues
+
+// Note: de.json and zh.json do not exist, so they were removed.
 
 interface Props {
     excludeLevels?: string[];
@@ -46,13 +35,21 @@ const {
 
 if (hide) return null;
 
+// load translations dynamically (TS may complain about json modules)
+// @ts-ignore: JSON imports
+const translationsFr = (await import('../i18n/fr.json')).default;
+// @ts-ignore: JSON imports
+const translationsEn = (await import('../i18n/en.json')).default;
+// @ts-ignore: JSON imports
+const translationsEs = (await import('../i18n/es.json')).default;
+// @ts-ignore: JSON imports
+const translationsAr = (await import('../i18n/ar.json')).default;
+
 const translationsMap: Record<string, any> = {
     fr: translationsFr,
     en: translationsEn,
     es: translationsEs,
     ar: translationsAr,
-    de: translationsDe,
-    zh: translationsZh,
 };
 
 const t = translationsMap[lang] ?? translationsFr;
@@ -120,34 +117,26 @@ if (hideOnDetails && isDetailPage) return null;
 if (breadcrumbSegments.length === 0) return null;
 ---
 
-<Breadcrumb class={className}>
-    <BreadcrumbList>
-        <BreadcrumbItem>
-            <BreadcrumbLink href={`/${lang}/`} class="flex items-center gap-1">
+<nav aria-label="breadcrumb" class={className}>
+    <ol class="breadcrumb-list flex items-center gap-1">
+        <li class="breadcrumb-item">
+            <a href={`/${lang}/`} class="flex items-center gap-1">
                 {showIcons && <Icon name={homeIcon} class="size-4" />}
                 <span>{t.home || "Home"}</span>
-            </BreadcrumbLink>
-        </BreadcrumbItem>
-
-        {
-            finalCrumbs.map((crumb, index) => {
-                const isLast = index === finalCrumbs.length - 1;
-
-                return (
-                    <>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            {isLast ? (
-                                <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
-                            ) : (
-                                <BreadcrumbLink href={crumb.href}>
-                                    {crumb.label}
-                                </BreadcrumbLink>
-                            )}
-                        </BreadcrumbItem>
-                    </>
-                );
-            })
-        }
-    </BreadcrumbList>
-</Breadcrumb>
+            </a>
+        </li>
+        {finalCrumbs.map((crumb, index) => {
+            const isLast = index === finalCrumbs.length - 1;
+            return (
+                <li class="breadcrumb-item flex items-center">
+                    <span class="breadcrumb-separator mx-1">/</span>
+                    {isLast ? (
+                        <span aria-current="page">{crumb.label}</span>
+                    ) : (
+                        <a href={crumb.href}>{crumb.label}</a>
+                    )}
+                </li>
+            );
+        })}
+    </ol>
+</nav>

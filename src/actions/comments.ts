@@ -8,8 +8,8 @@ export const commentActions = {
     createComment: defineAction({
         accept: "form",
         input: z.object({
-            entityId: z.string(),
-            entityType: z.enum(["blog", "place", "event", "hike", "classified"]),
+            postId: z.string(),
+            postType: z.enum(["blog", "place", "event", "hike", "classified"]),
             parentId: z.string().optional(),
             content: z.string().min(3),
             rating: z.string().optional().transform(v => v ? parseInt(v) : 0),
@@ -25,8 +25,8 @@ export const commentActions = {
 
             await db.insert(blogComments).values({
                 id: nanoid(),
-                entityId: input.entityId,
-                entityType: input.entityType,
+                postId: input.postId,
+                postType: input.postType,
                 parentId: input.parentId || null,
                 authorName: user.name || "Anonyme",
                 authorEmail: user.email || "",

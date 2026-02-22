@@ -50,7 +50,7 @@ const {
       items={[
         postCount ? { text: `${postCount} réponses`, label: "Réponses" } : null,
         lastPostAt ? { text: lastPostAt.toLocaleDateString('fr'), label: "Dernière activité" } : null
-      ].filter(Boolean)}
+      ].filter((item): item is { text: string; label: string } => Boolean(item))}
     />
   </Card>
 </Link>

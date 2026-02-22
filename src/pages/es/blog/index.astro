@@ -17,15 +17,15 @@ const allPosts = await getCollection("blog");
 const db = await getDrizzle();
 const liveStats = await db
   .select({
-    entityId: blogComments.entityId,
+    postId: blogComments.postId,
     avgRating: sql<number>`avg(${blogComments.rating})`.mapWith(Number),
     count: sql<number>`count(${blogComments.id})`.mapWith(Number),
   })
   .from(blogComments)
-  .where(eq(blogComments.entityType, "blog"))
-  .groupBy(blogComments.entityId);
+  .where(eq(blogComments.postType, "blog"))
+  .groupBy(blogComments.postId);
 
-const statsMap = new Map(liveStats.map((s) => [s.entityId, s]));
+const statsMap = new Map(liveStats.map((s) => [s.postId, s]));
 
 const posts = allPosts
   .filter((post) => post.data.lang === LANG)

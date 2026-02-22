@@ -5,7 +5,7 @@ import Card from "@components/ui/Card/Card.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
 import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
 
-const currentLocale = Astro.currentLocale;
+const currentLocale = Astro.currentLocale || "fr";
 const translations = await import(`../i18n/${currentLocale}.json`);
 const t = translations.default.errors || {
     notFound: {
@@ -71,19 +71,17 @@ const error = t.notFound;
                                     href={getRelativeLocaleUrl(
                                         currentLocale,
                                         "",
-                                    )}
-                                    class="inline-link">{error.returnHome}</a
-                                >
+                                    ) || '#'}
+                                    class="inline-link">{error.returnHome}</a>
                             </li>
                             <li>
                                 <a
                                     href={getRelativeLocaleUrl(
                                         currentLocale,
                                         "contact",
-                                    )}
+                                    ) || '#'}
                                     class="inline-link"
-                                    >{error.contactSupport}</a
-                                >
+                                    >{error.contactSupport}</a>
                             </li>
                         </ul>
                     </div>
@@ -91,7 +89,7 @@ const error = t.notFound;
                     <!-- Actions -->
                     <div class="error-actions">
                         <Button
-                            href={getRelativeLocaleUrl(currentLocale, "")}
+                            href={getRelativeLocaleUrl(currentLocale, "") || '#'}
                             color="primary"
                             variant="initial"
                         >
@@ -101,7 +99,7 @@ const error = t.notFound;
                             href={getRelativeLocaleUrl(
                                 currentLocale,
                                 "contact",
-                            )}
+                            ) || '#'}
                             color="secondary"
                             variant="initial"
                         >

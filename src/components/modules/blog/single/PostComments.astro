@@ -14,13 +14,15 @@ import TabPanel from '@components/ui/Tabs/TabPanel.astro';
 import CommentItem from "./CommentItem.astro";
 
 interface Props {
-  entityId: string;
-  entityType: "blog" | "place" | "event" | "hike" | "classified";
+  postId: string;
+  postType: "blog" | "place" | "event" | "hike" | "classified";
 }
 
-const { entityId, entityType } = Astro.props;
+const { postId, postType } = Astro.props;
 const user = Astro.locals.user;
 const lang = Astro.currentLocale ?? "fr";
+
+console.log('[PostComments] props', { postId, postType });
 
 let allComments: any[] = [];
 let rootComments: any[] = [];
@@ -29,14 +31,15 @@ try {
   const db = await getDrizzle();
   allComments = await db.query.blogComments.findMany({
     where: and(
-      eq(blogComments.entityId, entityId),
-      eq(blogComments.entityType, entityType),
+      eq(blogComments.postId, postId),
+      eq(blogComments.postType, postType),
     ),
     orderBy: [desc(blogComments.createdAt)],
   });
+  console.log('[PostComments] allComments', allComments);
   rootComments = allComments.filter((c) => !c.parentId);
+  console.log('[PostComments] rootComments', rootComments);
 } catch (err) {
-  // Défensive : ne doit jamais casser la page article
   dbError = (err instanceof Error && err.message) ? err.message : String(err);
   console.error('PostComments: DB read error', dbError);
 }
@@ -44,93 +47,87 @@ const loginUrl = `/${lang}/connexion?callbackURL=${Astro.url.pathname}`;
 ---
 
 <section id="comments-section" class="comments-section">
-<Tabs variant="modern">
-  <div slot="tabs" class="tabs">
-    <Tab name="comments-tabs" checked>
-      Commentaires ({allComments.length})
-    </Tab>
-    <Tab name="comments-tabs" icon="mdi:pencil">
-      Laisser un avis
-    </Tab>
+  <div style="background: #ff0; color: #000; font-weight: bold; padding: 8px; border: 2px solid #f00; margin-bottom: 16px; font-size: 1.2em;">
+    [DEBUG] PostComments.astro rendu — rootComments: {rootComments.length} — postId: {postId}
   </div>
 
-  <div slot="panels" class="tabs-panels">
-    <TabPanel>
-      {
-        rootComments.length === 0 ? (
-          <div>
-            Aucun commentaire pour le moment.
-          </div>
-        ) : (
-          rootComments.map((comment) => (
-            <CommentItem
-              comment={comment}
-              allComments={allComments}
-              entityId={entityId}
-              entityType={entityType}
-              user={user}
-              lang={lang}
-            />
-          ))
-        )
-      }
-    </TabPanel>
 
-    <TabPanel>
-      <Card>
-        <form method="POST" action={actions.createComment}>
-          <input type="hidden" name="entityId" value={entityId} />
-          <input type="hidden" name="entityType" value={entityType} />
+<Tabs variant="modern">
+  <Tab name="comments-tabs" checked>
+    Commentaires ({allComments.length})
+  </Tab>
+  <TabPanel>
+    {rootComments.length === 0 ? (
+      <div>Aucun commentaire pour le moment.</div>
+    ) : (
+      rootComments.map((comment) => (
+        <CommentItem
+          comment={comment}
+          allComments={allComments}
+          postId={postId}
+          postType={postType}
+          user={user}
+          lang={lang}
+        />
+      ))
+    )}
+  </TabPanel>
 
-          {
-            !user && (
-              <div class="anon-info">
-                <p>Vous pouvez laisser un avis sans vous connecter. Indiquez votre nom et votre email (optionnel).</p>
-                <div>
-                  <label>Nom</label>
-                  <input type="text" name="authorName" placeholder="Votre nom" />
-                </div>
-                <div>
-                  <label>Email</label>
-                  <input type="email" name="authorEmail" placeholder="votre@email.com" />
-                </div>
-              </div>
-            )
-          }
+  <Tab name="comments-tabs" icon="mdi:pencil">
+    Laisser un avis
+  </Tab>
+  <TabPanel>
+    <Card>
+      <form method="POST" action={actions.createComment}>
+        <input type="hidden" name="postId" value={postId} />
+        <input type="hidden" name="postType" value={postType} />
 
-          <div>
-            <span>Note :</span>
-            <div class="rating-selector">
-              {[5, 4, 3, 2, 1].map((n) => (
-                <>
-                  <input
-                    type="radio"
-                    id={`r-${n}`}
-                    name="rating"
-                    value={n}
-                    required
-                    checked={n === 5}
-                  />
-                  <label for={`r-${n}`}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                  </label>
-                </>
-              ))}
+        {!user && (
+          <div class="anon-info">
+            <p>Vous pouvez laisser un avis sans vous connecter. Indiquez votre nom et votre email (optionnel).</p>
+            <div>
+              <label>Nom</label>
+              <input type="text" name="authorName" placeholder="Votre nom" />
+            </div>
+            <div>
+              <label>Email</label>
+              <input type="email" name="authorEmail" placeholder="votre@email.com" />
             </div>
           </div>
+        )}
 
-          <div>
-            <label>Message</label>
-            <textarea name="content" required minlength="3" placeholder="Partagez votre avis..." />
+        <div>
+          <span>Note :</span>
+          <div class="rating-selector">
+            {[5, 4, 3, 2, 1].map((n) => (
+              <>
+                <input
+                  type="radio"
+                  id={`r-${n}`}
+                  name="rating"
+                  value={n}
+                  required
+                  checked={n === 5}
+                />
+                <label for={`r-${n}`}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                </label>
+              </>
+            ))}
           </div>
+        </div>
 
-          <Button type="submit">Publier le commentaire</Button>
-        </form>
-      </Card>
-    </TabPanel>
-  </div>
+        <div>
+          <label>Message</label>
+          <textarea name="content" required minlength="3" placeholder="Partagez votre avis..." />
+        </div>
+
+        <Button type="submit">Publier le commentaire</Button>
+      </form>
+    </Card>
+  </TabPanel>
 </Tabs>
 </section>
 

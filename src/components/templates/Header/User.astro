@@ -24,11 +24,19 @@ const detectedLang =
         : "en");
 
 // Routes multilingues
-// Note: Actuellement, seul le français a des pages d'auth dédiées sous /fr/auth/
+// Chaque langue a ses propres slugs, en attendant de copier/adapter
 const loginRoute =
-  detectedLang === "fr" ? "/fr/auth/connexion" : "/fr/auth/connexion"; // Fallback to FR for now as requested
+  detectedLang === "fr" ? "/fr/auth/connexion" :
+  detectedLang === "en" ? "/en/auth/sign-in" :
+  detectedLang === "es" ? "/es/auth/sign-in" :
+  detectedLang === "ar" ? "/ar/auth/sign-in" :
+  "/fr/auth/connexion"; // fallback
 const profileRoute =
-  detectedLang === "fr" ? "/fr/auth/profil" : "/fr/auth/profil";
+  detectedLang === "fr" ? "/fr/auth/profil" :
+  detectedLang === "en" ? "/en/auth/profile" :
+  detectedLang === "es" ? "/es/auth/profile" :
+  detectedLang === "ar" ? "/ar/auth/profile" :
+  "/fr/auth/profil";
 
 // Traductions locales avec fallback robustes
 const dictionaries: Record<string, any> = {

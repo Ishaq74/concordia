@@ -9,15 +9,15 @@ interface Props {
 
 const { currentPath, variant = 'initial' } = Astro.props;
 
-// Get current locale
-const currentLocale = Astro.currentLocale;
+// Get current locale with fallback
+const currentLocale = Astro.currentLocale || 'fr';
 
 // Import translations
 const translations = await import(`../../../i18n/${currentLocale}.json`);
 const t = translations.default;
 
 // Generate navigation with current locale
-const navigation = getDocNavConfig(currentLocale, t);
+const navigation = getDocNavConfig(currentLocale, t) || [];
 ---
 
 <aside class={`doc-sidebar variant-${variant}`}>
@@ -29,7 +29,7 @@ const navigation = getDocNavConfig(currentLocale, t);
           {section.items.map((item) => (
             <li class="nav-item">
               <Link
-                href={item.href}
+                href={item.href || '#'}
                 variant={variant}
                 style="link"
                 className={currentPath === item.href ? 'active' : ''}

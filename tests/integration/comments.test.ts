@@ -51,7 +51,7 @@ import { eq } from 'drizzle-orm'
 describe('Comments actions (createComment)', () => {
   it('throws UNAUTHORIZED when no user in context', async () => {
     const handler = (commentActions as any).createComment.handler
-    await expect(handler({ entityId: 'x', entityType: 'blog', content: 'hi' }, { locals: {} })).rejects.toThrow('UNAUTHORIZED')
+    await expect(handler({ postId: 'x', postType: 'blog', content: 'hi' }, { locals: {} })).rejects.toThrow('UNAUTHORIZED')
   })
 
   it('inserts comment into DB with correct fields (root comment)', async () => {
@@ -61,8 +61,8 @@ describe('Comments actions (createComment)', () => {
     const handler = (commentActions as any).createComment.handler
 
     const input = {
-      entityId: 'post-test-root',
-      entityType: 'blog',
+      postId: 'post-test-root',
+      postType: 'blog',
       content: 'Ceci est un commentaire de test',
       rating: '5',
     }
@@ -73,7 +73,7 @@ describe('Comments actions (createComment)', () => {
     expect(res.success).toBe(true)
 
     const db = await getDrizzle()
-    const rows = await db.select().from(blogComments).where(eq(blogComments.entityId, 'post-test-root'))
+    const rows = await db.select().from(blogComments).where(eq(blogComments.postId, 'post-test-root'))
     const found = rows.find((r: any) => r.authorEmail === user.email)
     expect(found).toBeDefined()
     if (!found) throw new Error('Comment not found')
@@ -90,8 +90,8 @@ describe('Comments actions (createComment)', () => {
     const handler = (commentActions as any).createComment.handler
 
     const input = {
-      entityId: 'post-test-reply',
-      entityType: 'blog',
+      postId: 'post-test-reply',
+      postType: 'blog',
       parentId: 'parent-123',
       content: 'Réponse au commentaire',
       rating: '4',
@@ -103,7 +103,7 @@ describe('Comments actions (createComment)', () => {
     expect(res.success).toBe(true)
 
     const db = await getDrizzle()
-    const rows = await db.select().from(blogComments).where(eq(blogComments.entityId, 'post-test-reply'))
+    const rows = await db.select().from(blogComments).where(eq(blogComments.postId, 'post-test-reply'))
     const found = rows.find((r: any) => r.authorEmail === user.email && r.parentId === 'parent-123')
     expect(found).toBeDefined()
     if (!found) throw new Error('Reply comment not found')

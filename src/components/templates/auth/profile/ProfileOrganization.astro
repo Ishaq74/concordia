@@ -1,0 +1,157 @@
+---
+// src/components/templates/auth/profile/ProfileOrganization.astro
+import Grid from "@components/Tools/Grid.astro";
+import Flex from "@components/Tools/Flex.astro";
+import Card from "@components/ui/Card/Card.astro";
+
+import Button from "@components/ui/Button.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Checkbox from "@components/ui/Form/Checkbox.astro";
+
+import Dialog from "@components/ui/Dialog/Dialog.astro";
+import DialogTrigger from "@components/ui/Dialog/DialogTrigger.astro";
+import DialogContent from "@components/ui/Dialog/DialogContent.astro";
+import DialogFooter from "@components/ui/Dialog/DialogFooter.astro";
+import DialogHeader from "@components/ui/Dialog/DialogHeader.astro";
+import DialogTitle from "@components/ui/Dialog/DialogTitle.astro";
+
+interface Org { id: string; name?: string | null; slug?: string | null; role?: string | null; }
+interface Member { id: string; userId: string; role: string; organizationId?: string; email?: string | null; user?: { name?: string | null; email?: string | null } | null; }
+
+interface Props {
+  organizations?: Org[];
+  activeOrganization?: any;
+  activeOrganizationId?: string | null;
+  members?: Member[];
+  canManageOrganization?: boolean;
+  isOwner?: boolean;
+  session?: any;
+  translations?: Record<string, any>;
+}
+
+const { 
+  organizations = [], 
+  activeOrganization = null, 
+  activeOrganizationId = null, 
+  members = [], 
+  canManageOrganization = false, 
+  isOwner = false, 
+  session = null, 
+  translations = {} 
+} = Astro.props as Props;
+---
+
+<Card variant="modern" elevation="sm" className="w-full" aria-label={translations.auth.organizationSection ?? 'Section organisation'}>
+  <Grid gap="6">
+  {activeOrganizationId && (
+    <Dialog id="dialog-organization-main">
+      <DialogContent>
+        <Flex direction="column" gap="sm">
+          <Flex justify="between" align="start" gap="sm">
+            <Flex direction="column">
+              <p class="text-sm uppercase tracking-wide text-slate-500">Organisation</p>
+              <h2 class="text-xl font-semibold text-slate-900">
+                {activeOrganization?.organization?.name ?? activeOrganization?.name ?? activeOrganizationId}
+              </h2>
+              <p class="mt-1 text-sm text-slate-600">
+                Membres, invitations, mise à jour et suppression.
+              </p>
+            </Flex>
+            <Button type="button" variant="modern" color="secondary" data-close-org-dialog>
+              Fermer
+            </Button>
+          </Flex>
+
+          <Grid cols="2fr" gap="sm">
+            {/* Mettre à jour l'organisation */}
+            <Card variant="modern" elevation="sm" className="p-4">
+              <h3 class="text-base font-semibold text-slate-900">Mettre à jour</h3>
+              <form method="POST" class="mt-3 space-y-3">
+                <input type="hidden" name="intent" value="update-active-organization" />
+                <Label htmlFor="org-update-name">Nouveau nom</Label>
+                <Input id="org-update-name" name="name" placeholder="Nom" />
+                <Label htmlFor="org-update-slug">Nouveau slug</Label>
+                <Input id="org-update-slug" name="slug" placeholder="slug" />
+                <Label htmlFor="org-update-logo">Logo (URL)</Label>
+                <Input id="org-update-logo" name="logo" placeholder="https://..." />
+                <Button type="submit" variant="modern" color="primary" disabled={!canManageOrganization}>
+                  Mettre à jour
+                </Button>
+              </form>
+            </Card>
+
+            {/* Invitation membre */}
+            <Card variant="modern" elevation="sm" className="p-4">
+              <h3 class="text-base font-semibold text-slate-900">Inviter un membre</h3>
+              <Dialog id="dialog-invite-main">
+                <DialogTrigger for="dialog-invite-main">
+                  <Button variant="modern" color="secondary">Inviter un membre</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Inviter un membre</DialogTitle>
+                  </DialogHeader>
+                  <form method="POST" class="mt-3 space-y-3">
+                    <input type="hidden" name="intent" value="invite-member" />
+                    <Label htmlFor="invite-email">{translations.auth.email ?? 'Email'}</Label>
+                    <Input id="invite-email" type="email" name="email" required placeholder="membre@exemple.com" />
+                    <Label htmlFor="invite-role">{translations.auth.admin ?? 'Rôle'}</Label>
+                    <Select id="invite-role" name="role" className="rounded border border-slate-300 px-2 py-1 text-sm">
+                      <option value="member">Membre</option>
+                      <option value="admin">Admin</option>
+                      <option value="owner">Owner</option>
+                    </Select>
+                    <Checkbox id="invite-resend" name="resend">{translations.auth.resendInvite ?? 'Renvoyer si déjà invité'}</Checkbox>
+                    <DialogFooter>
+                      <Button type="submit" variant="modern" color="primary" disabled={!canManageOrganization}>
+                        Inviter
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </Card>
+          </Grid>
+
+          {/* Liste des membres */}
+          <Card variant="modern" elevation="sm" className="p-4" as="div">
+            <Flex justify="between" align="center">
+              <h3 class="text-base font-semibold text-slate-900">Membres</h3>
+              {activeOrganizationId && (
+                <form method="POST">
+                  <input type="hidden" name="intent" value="leave-organization" />
+                  <input type="hidden" name="organizationId" value={activeOrganizationId} />
+                  <Button type="submit" variant="modern" color="secondary">Quitter l'organisation</Button>
+                </form>
+              )}
+            </Flex>
+
+            {members.length === 0 ? (
+              <p class="mt-3 text-sm text-slate-600">Aucun membre à afficher.</p>
+            ) : (
+              <Grid gap="sm">
+                {members.map(member => (
+                  <Flex key={member.id} justify="between" align="center" class="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                    <Flex direction="column">
+                      <p class="font-semibold text-slate-900">
+                        {member.user?.name ?? member.user?.email ?? member.email ?? member.userId}
+                      </p>
+                      <p class="text-xs text-slate-500">{member.role}</p>
+                    </Flex>
+                    <Flex gap="sm">
+                      {/* ici boutons modifier / supprimer membre si nécessaire */}
+                    </Flex>
+                  </Flex>
+                ))}
+              </Grid>
+            )}
+          </Card>
+        </Flex>
+      </DialogContent>
+    </Dialog>
+  )}
+  </Grid>
+</Card>
+

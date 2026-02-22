@@ -1,0 +1,39 @@
+---
+// src/components/templates/auth/profile/ProfileForm.astro
+import FormGroup from "@components/ui/Form/FormGroup.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Button from "@components/ui/Button.astro";
+import Card from "@components/ui/Card/Card.astro";
+
+interface Props {
+  user: { id: string; name?: string | null; email: string };
+}
+
+const { user } = Astro.props as Props;
+---
+
+<Card variant="modern" elevation="sm" className="max-w-lg">
+  <form method="POST" class="grid gap-4 p-6">
+  <input type="hidden" name="intent" value="update-profile" />
+
+  <FormGroup>
+    <Label htmlFor="profile-edit-name">Nom complet</Label>
+    <Input id="profile-edit-name" name="name" value={user.name ?? ''} />
+  </FormGroup>
+
+  <FormGroup>
+    <Label htmlFor="profile-edit-email">Adresse e-mail</Label>
+    <Input id="profile-edit-email" name="email" type="email" value={user.email} required />
+  </FormGroup>
+
+  <FormGroup>
+    <Label htmlFor="profile-edit-password">Nouveau mot de passe</Label>
+    <Input id="profile-edit-password" name="password" type="password" placeholder="Optionnel" />
+  </FormGroup>
+
+  <Button type="submit" variant="modern" color="primary">
+    Mettre à jour
+  </Button>
+</form>
+</Card>

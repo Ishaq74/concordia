@@ -5,7 +5,7 @@ import Card from "@components/ui/Card/Card.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
 import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
 
-const currentLocale = Astro.currentLocale;
+const currentLocale = Astro.currentLocale || "fr";
 const translations = await import(`../i18n/${currentLocale}.json`);
 const t = translations.default.errors || {
     serverError: {
@@ -80,7 +80,7 @@ const error = t.serverError;
                                     href={getRelativeLocaleUrl(
                                         currentLocale,
                                         "contact",
-                                    )}
+                                    ) || '#'}
                                     class="inline-link"
                                     >{error.contactSupport}</a
                                 >
@@ -91,7 +91,7 @@ const error = t.serverError;
                     <!-- Actions -->
                     <div class="error-actions">
                         <Button
-                            href={getRelativeLocaleUrl(currentLocale, "")}
+                            href={getRelativeLocaleUrl(currentLocale, "") || '#'}
                             variant="modern"
                             color="primary"
                             size="large"
@@ -102,7 +102,7 @@ const error = t.serverError;
                             href={getRelativeLocaleUrl(
                                 currentLocale,
                                 "contact",
-                            )}
+                            ) || '#'}
                             variant="modern"
                             color="secondary"
                             size="large"

@@ -37,19 +37,24 @@ const {
       {description && <p>{description}</p>}
     </CardContent>
     {(ratingAvg || ratingCount) && (
-      <CardMeta
-        items={[
-          ratingAvg ? {
+      // build items array without nulls so types align
+      (() => {
+        const metaItems: { icon?: string; text: string; label?: string }[] = [];
+        if (ratingAvg) {
+          metaItems.push({
             icon: "mdi:star",
             text: ratingAvg.toFixed(1),
-            label: "Rating"
-          } : null,
-          ratingCount ? {
+            label: "Rating",
+          });
+        }
+        if (ratingCount) {
+          metaItems.push({
             text: `${ratingCount} reviews`,
-            label: "Reviews"
-          } : null
-        ].filter(Boolean)}
-      />
+            label: "Reviews",
+          });
+        }
+        return <CardMeta items={metaItems} />;
+      })()
     )}
   </Card>
 </Link>

@@ -179,6 +179,9 @@ const {
 <script>
     import { authClient } from "@lib/auth/auth-client";
 
+    // derive current language from URL path (client-side)
+    const detectedLang = (window.location.pathname.split("/")[1] || "fr").toLowerCase();
+
     const btn = document.getElementById("resend-btn");
     const status = document.getElementById("resend-status");
 
@@ -202,7 +205,7 @@ const {
             try {
                 const { data: _data, error } = await authClient.sendVerificationEmail({
                     email: decodeURIComponent(email),
-                    callbackURL: "/fr/auth/profil",
+                    callbackURL: `/${detectedLang}/auth/${detectedLang === 'fr' ? 'profil' : 'profile'}`,
                 });
 
                 if (error) {

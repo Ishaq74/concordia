@@ -192,6 +192,7 @@ CREATE TABLE "blog_categories" (
 CREATE TABLE "blog_comments" (
 	"id" text PRIMARY KEY NOT NULL,
 	"post_id" text NOT NULL,
+	"post_type" text NOT NULL,
 	"parent_id" text,
 	"author_name" text NOT NULL,
 	"author_email" text NOT NULL,
@@ -243,19 +244,15 @@ CREATE TABLE "blog_translations" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "comments" (
+CREATE TABLE "notification" (
 	"id" text PRIMARY KEY NOT NULL,
-	"entity_id" text NOT NULL,
-	"entity_type" text NOT NULL,
-	"parent_id" text,
-	"author_name" text NOT NULL,
-	"author_email" text NOT NULL,
-	"content" jsonb NOT NULL,
-	"rating" integer DEFAULT 0,
+	"userId" text NOT NULL,
+	"message" text NOT NULL,
+	"type" text NOT NULL,
 	"status" text NOT NULL,
-	"in_language" text NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
+	"isRead" boolean DEFAULT false,
+	"createdAt" timestamp NOT NULL,
+	"updatedAt" timestamp
 );
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

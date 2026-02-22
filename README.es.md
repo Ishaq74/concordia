@@ -330,13 +330,9 @@ npm install
       - blog.ts
       - factory.ts
     - **migrations**
-      - 0008_smiling_landau.sql
-      - 0009_giant_zzzax.sql
-      - 0010_blue_frog_thor.sql
+      - 0001_massive_dust.sql
       - **meta**
-        - 0008_snapshot.json
-        - 0009_snapshot.json
-        - 0010_snapshot.json
+        - 0001_snapshot.json
         - _journal.json
     - **schemas**
       - audit-log.schema.ts
@@ -810,8 +806,8 @@ Better Auth está configurado con plugins para OAuth, gestión de sesiones y má
 - **blog_comments.schema.ts**
   - blog_comments (const: blogComments)
     - id: text
-    - entityId: text
-    - entityType: text
+    - postId: text
+    - postType: text
     - parentId: text
     - authorName: text
     - authorEmail: text
@@ -1092,13 +1088,9 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - blog.ts
   - factory.ts
 - **migrations**
-  - 0008_smiling_landau.sql
-  - 0009_giant_zzzax.sql
-  - 0010_blue_frog_thor.sql
+  - 0001_massive_dust.sql
   - **meta**
-    - 0008_snapshot.json
-    - 0009_snapshot.json
-    - 0010_snapshot.json
+    - 0001_snapshot.json
     - _journal.json
 - **schemas**
   - audit-log.schema.ts

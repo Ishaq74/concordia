@@ -58,7 +58,7 @@ const renderedHtml = md.render(String(post.data.content ?? ""));
       </Grid>
 
       <section id="comments" class="article-comments">
-        <PostComments entityId={post.data.id} entityType="blog" />
+        <PostComments postId={post.data.id} postType="blog" />
       </section>
     </article>
   </main>

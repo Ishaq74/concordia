@@ -17,7 +17,7 @@ const {
 } = Astro.props;
 
 // Detect current locale from URL
-const currentLocale = Astro.currentLocale;
+const currentLocale = Astro.currentLocale || "fr";
 
 // Get current path without locale prefix
 const pathWithoutLocale = Astro.url.pathname.replace(
@@ -29,25 +29,25 @@ const languages = [
   {
     label: "Français",
     icon: "🇫🇷",
-    href: getRelativeLocaleUrl("fr", pathWithoutLocale),
+    href: getRelativeLocaleUrl("fr", pathWithoutLocale) || '#',
     value: "fr",
   },
   {
     label: "English",
     icon: "🇬🇧",
-    href: getRelativeLocaleUrl("en", pathWithoutLocale),
+    href: getRelativeLocaleUrl("en", pathWithoutLocale) || '#',
     value: "en",
   },
   {
     label: "العربية",
     icon: "🇸🇦",
-    href: getRelativeLocaleUrl("ar", pathWithoutLocale),
+    href: getRelativeLocaleUrl("ar", pathWithoutLocale) || '#',
     value: "ar",
   },
   {
     label: "Español",
     icon: "🇪🇸",
-    href: getRelativeLocaleUrl("es", pathWithoutLocale),
+    href: getRelativeLocaleUrl("es", pathWithoutLocale) || '#',
     value: "es",
   },
 ];

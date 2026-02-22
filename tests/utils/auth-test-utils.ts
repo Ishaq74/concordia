@@ -70,7 +70,7 @@ export async function createTestUser(options: {
   organizationId?: string
 }) {
   const email = options.email || generateUniqueEmail()
-  const password = options.password || generateSecurePassword()
+  let password = options.password || generateSecurePassword()
   const username = options.username || generateUniqueUsername()
 
   try {
@@ -87,9 +87,25 @@ export async function createTestUser(options: {
     const finalName = options.name || finalUsername
 
     // Local validation (mirror server validation) so tests that inject
-    // malicious payloads are rejected deterministically here.
+    // malicious payloads are rejected deterministically here.  Password
+    // generation can occasionally create an unfortunate string that trips the
+    // validator; retry a few times if that happens.
     const { validateUserInput } = await import('@/lib/auth/validate-user')
-    validateUserInput({ email, password, username: finalUsername, name: finalName })
+    let attempts = 0
+    while (true) {
+      try {
+        validateUserInput({ email, password, username: finalUsername, name: finalName })
+        break
+      } catch (err: any) {
+        if (/password/i.test(err.message) && !options.password && attempts < 3) {
+          // regenerate and retry
+          password = generateSecurePassword()
+          attempts++
+          continue
+        }
+        throw err
+      }
+    }
 
     const body: Record<string, any> = {
       email,

@@ -2,8 +2,8 @@ export const blogCommentsSeed = [
     // Article 1 : post-fete-du-lac-2025 (1 commentaire root)
     {
         id: "comment-1",
-        entityId: "post-fete-du-lac-2025",
-        entityType: "blog",
+        postId: "post-fete-du-lac-2025",
+        postType: "blog",
         authorName: "Alice",
         authorEmail: "alice@email.com",
         content: { fr: "Super article !" },
@@ -17,8 +17,8 @@ export const blogCommentsSeed = [
     // Article 2 : post-randonnee-foret-2025 (nested comments)
     {
         id: "comment-2",
-        entityId: "post-randonnee-foret-2025",
-        entityType: "blog",
+        postId: "post-randonnee-foret-2025",
+        postType: "blog",
         authorName: "Bob",
         authorEmail: "bob@email.com",
         content: { fr: "J'ai adoré la randonnée !" },
@@ -30,8 +30,8 @@ export const blogCommentsSeed = [
     },
     {
         id: "comment-3",
-        entityId: "post-randonnee-foret-2025",
-        entityType: "blog",
+        postId: "post-randonnee-foret-2025",
+        postType: "blog",
         parentId: "comment-2",
         authorName: "Charlie",
         authorEmail: "charlie@email.com",
@@ -44,8 +44,8 @@ export const blogCommentsSeed = [
     },
     {
         id: "comment-4",
-        entityId: "post-randonnee-foret-2025",
-        entityType: "blog",
+        postId: "post-randonnee-foret-2025",
+        postType: "blog",
         parentId: "comment-3",
         authorName: "Diane",
         authorEmail: "diane@email.com",

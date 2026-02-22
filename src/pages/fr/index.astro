@@ -15,8 +15,8 @@ const locale = "fr";
         <h1 id="hero-title">{t.home.heroTitle}</h1>
         <p class="hero-subtitle">{t.home.heroSubtitle}</p>
         <div class="hero-actions">
-          <a href={getRelativeLocaleUrl(locale, "places")} class="btn btn-primary">{t.home.heroCta}</a>
-          <a href={getRelativeLocaleUrl(locale, "auth/inscription")} class="btn btn-secondary">{t.home.heroCtaSecondary}</a>
+          <a href={getRelativeLocaleUrl(locale, "places") || '#'} class="btn btn-primary">{t.home.heroCta}</a>
+          <a href={getRelativeLocaleUrl(locale, "auth/inscription") || '#'} class="btn btn-secondary">{t.home.heroCtaSecondary}</a>
         </div>
       </div>
     </section>
@@ -25,49 +25,49 @@ const locale = "fr";
     <section class="features" aria-labelledby="features-title">
       <h2 id="features-title" class="sr-only">Fonctionnalités</h2>
       <div class="features-grid">
-        <a href={getRelativeLocaleUrl(locale, "places")} class="feature-card">
+        <a href={getRelativeLocaleUrl(locale, "places") || '#'} class="feature-card">
           <span class="feature-icon" aria-hidden="true">📍</span>
           <h3>{t.home.sectionPlaces}</h3>
           <p>{t.home.sectionPlacesDesc}</p>
         </a>
 
-        <a href={getRelativeLocaleUrl(locale, "evenements")} class="feature-card">
+        <a href={getRelativeLocaleUrl(locale, "evenements") || '#'} class="feature-card">
           <span class="feature-icon" aria-hidden="true">📅</span>
           <h3>{t.home.sectionEvents}</h3>
           <p>{t.home.sectionEventsDesc}</p>
         </a>
 
-        <a href={getRelativeLocaleUrl(locale, "blog")} class="feature-card">
+        <a href={getRelativeLocaleUrl(locale, "blog") || '#'} class="feature-card">
           <span class="feature-icon" aria-hidden="true">📰</span>
           <h3>{t.home.sectionBlog}</h3>
           <p>{t.home.sectionBlogDesc}</p>
         </a>
 
-        <a href={getRelativeLocaleUrl(locale, "forum")} class="feature-card">
+        <a href={getRelativeLocaleUrl(locale, "forum") || '#'} class="feature-card">
           <span class="feature-icon" aria-hidden="true">💬</span>
           <h3>{t.home.sectionForum}</h3>
           <p>{t.home.sectionForumDesc}</p>
         </a>
 
-        <a href={getRelativeLocaleUrl(locale, "benevolat")} class="feature-card">
+        <a href={getRelativeLocaleUrl(locale, "benevolat") || '#'} class="feature-card">
           <span class="feature-icon" aria-hidden="true">🤝</span>
           <h3>{t.home.sectionVolunteer}</h3>
           <p>{t.home.sectionVolunteerDesc}</p>
         </a>
 
-        <a href={getRelativeLocaleUrl(locale, "education")} class="feature-card">
+        <a href={getRelativeLocaleUrl(locale, "education") || '#'} class="feature-card">
           <span class="feature-icon" aria-hidden="true">🎓</span>
           <h3>{t.home.sectionEducation}</h3>
           <p>{t.home.sectionEducationDesc}</p>
         </a>
 
-        <a href={getRelativeLocaleUrl(locale, "places")} class="feature-card">
+        <a href={getRelativeLocaleUrl(locale, "places") || '#'} class="feature-card">
           <span class="feature-icon" aria-hidden="true">🥾</span>
           <h3>{t.home.sectionTrails}</h3>
           <p>{t.home.sectionTrailsDesc}</p>
         </a>
 
-        <a href={getRelativeLocaleUrl(locale, "financement")} class="feature-card">
+        <a href={getRelativeLocaleUrl(locale, "financement") || '#'} class="feature-card">
           <span class="feature-icon" aria-hidden="true">💰</span>
           <h3>{t.home.sectionFunding}</h3>
           <p>{t.home.sectionFundingDesc}</p>

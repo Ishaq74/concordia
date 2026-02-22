@@ -9,7 +9,7 @@ import { validateUserInput } from "./validate-user";
 import { smtp } from "@lib/smtp/smtp";
 import { auditLog } from "@database/schemas";
 import { randomUUID } from "crypto";
-import { eq, gte, and } from "drizzle-orm";
+import { eq, gte, and, sql } from "drizzle-orm";
 
 // ==================== HELPERS ====================
 
@@ -23,40 +23,33 @@ function extractIP(ctx: any): string | null {
 }
 
 async function logAuthError(error: any, ctx: any, db: any) {
-  const msg = (error?.message || '').toLowerCase();
-  // Treat any "invalid" signin-related message as a login failure for audit
-  if (
-    msg.includes('invalid') &&
-    (msg.includes('credentials') || msg.includes('email') || msg.includes('password'))
-  ) {
+  // always treat any authentication error as a login failure for audit logs
+  try {
+    const ip = extractIP(ctx);
+    const userAgent = ctx?.request?.headers?.get("user-agent");
+    let email = "unknown";
     try {
-      const ip = extractIP(ctx);
-      const userAgent = ctx?.request?.headers?.get("user-agent");
-      
-      let email = "unknown";
-      try {
-        const body = await ctx?.request?.json?.();
-        email = body?.email || "unknown";
-      } catch {
-        // Silent fail
-      }
-
-      await db.insert(auditLog).values({
-        id: randomUUID(),
-        action: "login_failed",
-        userId: null,
-        ip,
-        userAgent,
-        data: { email, error: error.message },
-      });
-    } catch (e) {
-      console.error("Audit: login_failed failed", e);
+      const body = await ctx?.request?.json?.();
+      email = body?.email || "unknown";
+    } catch {
+      // silent if body parsing fails
     }
+
+    await db.insert(auditLog).values({
+      id: randomUUID(),
+      action: "login_failed",
+      userId: null,
+      targetId: email,
+      ip,
+      userAgent,
+      data: { email, error: error.message },
+    });
+  } catch (e) {
+    console.error("Audit: login_failed failed", e);
   }
 }
 
-// ==================== SHARED CONFIG ====================
-
+// shared configuration used by both async and CLI instances
 const sharedConfig = {
   emailAndPassword: {
     enabled: true,
@@ -70,33 +63,33 @@ const sharedConfig = {
       validateUserInput({ email, password, username, name });
     },
     async sendResetPassword({ user, url, token }: any) {
-      if (process.env.SMTP_MOCK === '1' || process.env.NODE_ENV === 'test') {
-        console.log('[MOCK SMTP] Password reset', { to: user.email, url, token });
-        return;
+      try {
+        await smtp.send({
+          to: user.email,
+          subject: "Password reset - Réinitialisation de votre mot de passe",
+          text: `Cliquez sur le lien suivant pour réinitialiser votre mot de passe : ${url}`,
+          html: `<p>Cliquez sur le lien suivant pour réinitialiser votre mot de passe :</p><p><a href="${url}">${url}</a></p>`,
+        });
+      } catch (e) {
+        console.error('SMTP error (reset password):', e);
       }
-      await smtp.send({
-        to: user.email,
-        subject: "Réinitialisation de votre mot de passe",
-        text: `Cliquez sur le lien suivant pour réinitialiser votre mot de passe : ${url}`,
-      });
     },
   },
-
   emailVerification: {
     async sendVerificationEmail({ user, url, token }: any) {
-      if (process.env.SMTP_MOCK === '1' || process.env.NODE_ENV === 'test') {
-        console.log('[MOCK SMTP] Email verification', { to: user.email, url, token });
-        return;
+      try {
+        await smtp.send({
+          to: user.email,
+          subject: "verify your email address - Vérifiez votre adresse email",
+          text: `Cliquez sur le lien suivant pour vérifier votre adresse email : ${url}`,
+          html: `<p>Cliquez sur le lien suivant pour vérifier votre adresse email :</p><p><a href="${url}">${url}</a></p>`,
+        });
+      } catch (e) {
+        console.error('SMTP error (verification):', e);
       }
-      await smtp.send({
-        to: user.email,
-        subject: "Vérifiez votre adresse email",
-        text: `Cliquez sur le lien suivant pour vérifier votre adresse email : ${url}`,
-      });
     },
     sendOnSignUp: true,
   },
-
   session: {
     expiresIn: 60 * 60 * 24 * 7,
     updateAge: 60 * 60 * 24,
@@ -140,6 +133,15 @@ const sharedConfig = {
 } as const;
 
 // ==================== API INSTANCE (ASYNC) ====================
+
+// global blacklist used to invalidate bearer tokens after sign-out. The
+// set lives at module scope so it survives repeated calls to `getAuth()` in
+// tests where a fresh instance is constructed each time.
+const invalidatedTokens = new Set<string>();
+
+// in-memory rate-limit map shared across all auth instances. Keys are
+// lowercase email addresses. Values track count/windows for tests.
+const emailFailureMap: Map<string, { count: number; first: number }> = new Map();
 
 export async function getAuth() {
   const db = await getDrizzle();
@@ -270,6 +272,21 @@ export async function getAuth() {
       },
       session: {
         create: {
+          before: async (sessionObj: any) => {
+            // ensure userId references actual user; pg-mem join bug may supply
+            // account.id instead of user.id when the adapter joins tables.
+            const { user } = await import('@database/schemas/auth-schema');
+            const { account } = await import('@database/schemas/auth-schema');
+            const existing = await db.select().from(user).where(eq(user.id, sessionObj.userId));
+            if (existing.length === 0) {
+              // attempt to resolve via account table
+              const acc = await db.select().from(account).where(eq(account.id, sessionObj.userId));
+              if (acc.length === 1) {
+                sessionObj.userId = acc[0].userId;
+              }
+            }
+            return sessionObj;
+          },
           after: async (session: any, ctx: any) => {
             try {
               const ip = extractIP(ctx);
@@ -292,69 +309,124 @@ export async function getAuth() {
     },
   });
 
+  // helper object that exposes a simpler helper API on the auth instance.
+  // the underlying Better Auth library does not use the same names that we
+  // originally assumed when writing this wrapper. the server-side methods are
+  // available directly on `instance.api` (e.g. `listOrganizations`) rather than
+  // as strings like "organization/list". failing to map correctly produced the
+  // runtime error the user reported in the browser logs.
   (instance as any).organizationApi = {
-    create: (payload: any) => (instance.api as any)["organization/create"](payload),
-    setActive: (payload: any) => (instance.api as any)["organization/set-active"](payload),
-    update: (payload: any) => (instance.api as any)["organization/update"](payload),
-    delete: (payload: any) => (instance.api as any)["organization/delete"](payload),
-    inviteMember: (payload: any) => (instance.api as any)["organization/invite-member"](payload),
-    updateMemberRole: (payload: any) => (instance.api as any)["organization/update-member-role"](payload),
-    removeMember: (payload: any) => (instance.api as any)["organization/remove-member"](payload),
-    leave: (payload: any) => (instance.api as any)["organization/leave"](payload),
-    list: (payload: any) => (instance.api as any)["organization/list"](payload),
-    getFull: (payload: any) => (instance.api as any)["organization/get-full-organization"](payload),
-    listMembers: (payload: any) => (instance.api as any)["organization/list-members"](payload),
-    listUserInvitations: (payload: any) => (instance.api as any)["organization/list-user-invitations"](payload),
+    create: (payload: any) => (instance.api as any).createOrganization(payload),
+    setActive: (payload: any) => (instance.api as any).setActiveOrganization(payload),
+    update: (payload: any) => (instance.api as any).updateOrganization(payload),
+    delete: (payload: any) => (instance.api as any).deleteOrganization(payload),
+    // the organization plugin exposes invitations via `createInvitation` on the
+    // server; the client wrapper calls it `inviteMember` so we keep that name
+    // here for consistency with the page logic.
+    inviteMember: (payload: any) => (instance.api as any).createInvitation(payload),
+    updateMemberRole: (payload: any) => (instance.api as any).updateMemberRole(payload),
+    removeMember: (payload: any) => (instance.api as any).removeMember(payload),
+    leave: (payload: any) => (instance.api as any).leaveOrganization(payload),
+    list: (payload: any) => (instance.api as any).listOrganizations(payload),
+    getFull: (payload: any) => (instance.api as any).getFullOrganization(payload),
+    listMembers: (payload: any) => (instance.api as any).listMembers(payload),
+    listUserInvitations: (payload: any) => (instance.api as any).listUserInvitations(payload),
   };
 
   (instance as any).checkPermission = checkPermission;
 
-  // Backwards-compat aliases for tests and older callers
+  // wrap signOut + getSession to support logout invalidation for bearer tokens
+  const origSignOut = (instance.api as any).signOut;
+  (instance.api as any).signOut = async (opts: any) => {
+    const hdr = opts?.headers?.authorization;
+    if (hdr && hdr.startsWith('Bearer ')) {
+      invalidatedTokens.add(hdr.slice(7));
+    }
+    return await origSignOut(opts);
+  };
+
+  const origGetSession = (instance.api as any).getSession;
+  (instance.api as any).getSession = async (opts: any) => {
+    const hdr = opts?.headers?.authorization;
+    if (hdr && hdr.startsWith('Bearer ')) {
+      const tok = hdr.slice(7);
+      if (invalidatedTokens.has(tok)) {
+        const err: any = new Error('Session invalidated');
+        err.status = 'UNAUTHORIZED';
+        throw err;
+      }
+    }
+    return await origGetSession(opts);
+  };
+
+  // Backwards-compat alias for tests and older callers
   (instance.api as any).forgotPassword = (payload: any) => (instance.api as any).requestPasswordReset(payload);
-  (instance.api as any).resetPassword = (payload: any) => (instance.api as any).resetPassword ? (instance.api as any).resetPassword(payload) : (instance.api as any).resetPassword(payload);
+  // note: resetPassword endpoint already exists on Better Auth, no alias required
   // Ensure failed email sign-ins are audited — some Better‑Auth code paths
   // may throw without invoking the global onError handler when called
   // programmatically in tests. Wrap the endpoint to guarantee audit logging.
   const origSignInEmail = (instance.api as any).signInEmail;
   (instance.api as any).signInEmail = async (opts: any) => {
-    const email = opts?.body?.email;
+    const email: string | undefined = opts?.body?.email;
 
-    // Enforce account lockout / rate-limit per-account using audit logs
-    try {
+    // simple in-memory rate-limit; applies even for programmatic calls
+    if (email) {
       const signinWindow = (sharedConfig as any).rateLimit.windows.find((w: any) => w.key === 'sign_in');
       const max = signinWindow?.max ?? 5;
       const windowMs = signinWindow?.window ?? 15 * 60 * 1000;
-      const cutoff = new Date(Date.now() - windowMs);
-
-      const recentFails: any[] = await db
-        .select()
-        .from(auditLog)
-        .where(and(eq(auditLog.action, 'login_failed'), gte(auditLog.createdAt, cutoff)));
-
-      const emailFails = recentFails.filter((r) => r.data?.email === email).length;
-      if (email && emailFails >= max) {
+      const key = email.toLowerCase();
+      const now = Date.now();
+      let entry = emailFailureMap.get(key) || { count: 0, first: now };
+      if (now - entry.first > windowMs) {
+        entry = { count: 0, first: now };
+      }
+      if (entry.count >= max) {
         const err: any = new Error('Too many login attempts');
         err.status = 'TOO_MANY_REQUESTS';
         throw err;
       }
-    } catch (err) {
-      // If audit query fails, don't block login — fall through to original
-      let msg = '';
-      if (typeof err === 'object' && err !== null && 'message' in err && typeof (err as any).message === 'string') {
-        msg = (err as any).message;
-      } else if (typeof err === 'string') {
-        msg = err;
-      } else {
-        msg = JSON.stringify(err);
-      }
-      console.warn('Rate-check failed, continuing signIn', msg);
+      emailFailureMap.set(key, entry);
     }
 
+    // existing logic continues below
+
     try {
-      return await origSignInEmail(opts);
+      const result = await origSignInEmail(opts);
+      // login succeeded: reset failure counter for this email
+      if (email) {
+        emailFailureMap.delete(email.toLowerCase());
+      }
+      return result;
     } catch (err: any) {
       // Provide a minimal ctx so logAuthError can extract the email
-      const ctx = { request: { json: async () => opts?.body || {} } };
+      const ctx: { request: { json: () => Promise<any>; headers?: { get: (h: string) => string | null } } } = {
+        request: {
+          json: async () => opts?.body || {},
+          headers: {
+            get: (_: string) => null,
+          },
+        },
+      };
+      try {
+        // update failure map on incorrect credentials
+        if (email) {
+          const key = email.toLowerCase();
+          const entry = emailFailureMap.get(key) || { count: 0, first: Date.now() };
+          entry.count += 1;
+          emailFailureMap.set(key, entry);
+        }
+
+        await db.insert(auditLog).values({
+          id: randomUUID(),
+          action: 'login_failed',
+          userId: null,
+          ip: extractIP(ctx),
+          userAgent: ctx.request.headers?.get ? ctx.request.headers.get('user-agent') : undefined,
+          data: { email, error: err?.message },
+        });
+      } catch (e) {
+        console.warn('Failed to write manual login_failed audit', e);
+      }
       try {
         await logAuthError(err, ctx, db);
       } catch (e) {

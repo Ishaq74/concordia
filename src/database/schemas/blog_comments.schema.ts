@@ -4,8 +4,8 @@ import { relations } from "drizzle-orm";
 // Un seul schéma universel "blog_comments"
 export const blogComments = pgTable("blog_comments", {
   id: text("id").primaryKey(),
-  entityId: text("entity_id").notNull(), // ID de l'entité reliée (blog, event...)
-  entityType: text("entity_type").notNull(), // 'blog', 'place', 'event', 'hike', 'classified'
+  postId: text("post_id").notNull(), // ID de l'entité reliée (blog, event...)
+  postType: text("post_type").notNull(), // 'blog', 'place', 'event', 'hike', 'classified'
   parentId: text("parent_id"), // Pour la récursivité/thread
   authorName: text("author_name").notNull(),
   authorEmail: text("author_email").notNull(),
@@ -30,8 +30,8 @@ export const blogCommentsRelations = relations(blogComments, ({ one, many }) => 
 }));
 
 export const blogCommentsIndexes = `
-CREATE INDEX idx_blog_comments_entity ON blog_comments(entity_id);
-CREATE INDEX idx_blog_comments_type ON blog_comments(entity_type);
+CREATE INDEX idx_blog_comments_entity ON blog_comments(post_id);
+CREATE INDEX idx_blog_comments_type ON blog_comments(post_type);
 CREATE INDEX idx_blog_comments_status ON blog_comments(status);
 CREATE INDEX idx_blog_comments_parent ON blog_comments(parent_id);
 `;

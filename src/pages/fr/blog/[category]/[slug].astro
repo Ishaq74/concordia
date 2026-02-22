@@ -9,7 +9,7 @@ import PostHeader from "@components/modules/blog/single/PostHeader.astro";
 import TableOfContents from "@components/modules/blog/single/TableOfContents.astro";
 import AuthorCard from "@components/modules/blog/cards/AuthorCard.astro";
 import ShareButtons from "@components/modules/blog/ui/ShareButtons.astro";
-import PostComments from "@components/modules/blog/single/PostComments.astro";
+import PostFooter from "@components/modules/blog/single/PostFooter.astro";
 
 const { slug } = Astro.params;
 const LANG = "fr";
@@ -57,9 +57,7 @@ const renderedHtml = md.render(String(post.data.content ?? ""));
         ))}
       </Grid>
 
-      <section id="comments" class="article-comments">
-        <PostComments entityId={post.data.id} entityType="blog" />
-      </section>
+      <PostFooter postId={post.data.id} postType="blog" />
     </article>
   </main>
 

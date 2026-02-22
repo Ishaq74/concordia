@@ -5,6 +5,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import SignUpCard from "@components/templates/auth/SignUpCard.astro";
 import translationsRaw from "@i18n/fr.json";
 const translations = translationsRaw as any;
+const verifyEmailPageUrl = translations.auth.verifyEmailPageUrl;
 import { getAuth } from "@lib/auth/auth";
 
 const user = Astro.locals.user;

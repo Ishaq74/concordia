@@ -6,7 +6,8 @@ export async function listOrganizations(
   headers: Headers,
   query: Record<string, string | number | undefined> = {},
 ) {
-  return auth.api.listOrganizations({
+  if (!auth) throw new Error("Auth not initialized");
+  return (auth.api as any).listOrganizations({
     headers,
     query,
   });
@@ -19,7 +20,8 @@ export async function createOrganization(
     slug: string;
   },
 ) {
-  return auth.api.createOrganization({
+  if (!auth) throw new Error("Auth not initialized");
+  return (auth.api as any).createOrganization({
     headers,
     body: {
       name: params.name,
@@ -29,7 +31,8 @@ export async function createOrganization(
 }
 
 export async function listOrganizationMembers(headers: Headers, organizationId: string) {
-  return auth.api.listMembers({
+  if (!auth) throw new Error("Auth not initialized");
+  return (auth.api as any).listMembers({
     headers,
     query: {
       organizationId,
@@ -45,7 +48,8 @@ export async function addOrganizationMember(
     role: OrganizationRoleValue;
   },
 ) {
-  return auth.api.addMember({
+  if (!auth) throw new Error("Auth not initialized");
+  return (auth.api as any).addMember({
     headers,
     body: {
       organizationId: params.organizationId,
@@ -64,7 +68,8 @@ export async function updateOrganizationMember(
     role: OrganizationRoleValue;
   },
 ) {
-  return auth.api.updateMemberRole({
+  if (!auth) throw new Error("Auth not initialized");
+  return (auth.api as any).updateMemberRole({
     headers,
     body: {
       organizationId: params.organizationId,
@@ -75,7 +80,8 @@ export async function updateOrganizationMember(
 }
 
 export async function setActiveOrganization(headers: Headers, organizationId: string) {
-  return auth.api.setActiveOrganization({
+  if (!auth) throw new Error("Auth not initialized");
+  return (auth.api as any).setActiveOrganization({
     headers,
     body: {
       organizationId,

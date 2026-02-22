@@ -1,0 +1,696 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+---
+<BaseLayout title="Mentions Légales" description="Consultez les mentions légales du site Recrutement Gagnant, y compris les informations sur l'identité du site, l'hébergement, la publication, la collecte de données personnelles et les droits des utilisateurs.">
+
+<section id="faq-1720">
+    <div class="cs-container">
+        <div class="cs-content">
+            <span class="cs-topper">Obligatoire</span>
+            <h2 class="cs-title">Mentions Légales</h2>
+        </div>
+        <div class="cs-flex-group">
+            <div class="cs-button-group">
+                <!--If you need to add another button, make sure to copy and paste from one of the buttons here and increment the data-filter value, so the next one would be data-filter="four", and so on-->
+                <div class="cs-flex">
+                    <button class="cs-option" data-filter="one">
+                        <img class="cs-icon" src="https://csimg.nyc3.cdn.digitaloceanspaces.com/Images/Graphics/plus.svg" alt="plus graphic" width="12" height="12" decoding="async" aria-hidden="true">
+                        Mentions Légales
+                    </button>
+                    <button class="cs-option" data-filter="two">
+                        <img class="cs-icon" src="https://csimg.nyc3.cdn.digitaloceanspaces.com/Images/Graphics/plus.svg" alt="plus graphic" width="12" height="12" decoding="async" aria-hidden="true">
+                        Politique de Confidentialité
+                    </button>
+                    <button class="cs-option" data-filter="three">
+                        <img class="cs-icon" src="https://csimg.nyc3.cdn.digitaloceanspaces.com/Images/Graphics/plus.svg" alt="plus graphic" width="12" height="12" decoding="async" aria-hidden="true">
+                        Conditions Générales de vente
+                    </button>
+                </div>
+                <picture class="cs-picture">
+                    <!--Mobile Image-->
+                    <source media="(max-width: 600px)" srcset="https://csimg.nyc3.cdn.digitaloceanspaces.com/Images/People/people2.jpg">
+                    <!--Tablet and above Image-->
+                    <source media="(min-width: 601px)" srcset="https://csimg.nyc3.cdn.digitaloceanspaces.com/Images/People/people2.jpg">
+                    <img loading="lazy" decoding="async" src="https://csimg.nyc3.cdn.digitaloceanspaces.com/Images/People/people2.jpg" alt="people" width="353" height="493">
+                </picture>
+            </div>
+            <!--We need this wrapper so the absolutely positioned FAQ lists can be positioned to the top of it to so the animations don't amke it overlap the buttons group above it. We needed a wrapper div around it for the faq lists to be relatively positioned to in order to get the effect we wanted-->
+            <div class="cs-wrapper">
+                <!--If you add more FAQ's, copy and paste of of the .cs-faq-grop lists and increment the data-category to the next number. We have three right now, if you added a fourth you'd change it to data-category="four" to correspond to the new button you created in the .cs-button-group. The filter and category data attributes need to match so they can work together-->
+                <ul class="cs-faq-group" data-category="one">
+                    <!-- Active class added as default -->
+                    <span class="cs-title">
+                        Mentions Légales
+                    </span>
+                <!-- Contenu de la mention légale -->
+                <p class="cs-text">
+                    Conformément aux dispositions de la loi n° 2004-575 du 21 juin 2004 pour la confiance en l’économie numérique, nous tenons à vous informer de l’identité des différents intervenants impliqués dans la réalisation et le suivi du site "Recrutement Gagnant".
+                </p>
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">
+                                Identité du Site
+                            </span>
+                        </button>
+                        <p class="cs-item-p">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sit convallis nunc neque, bibendum pulvinar vitae commodo velit. Proin diam tortor sed malesuada nunc, habitant. Dignissim ipsum porta enim, magna urna, quam. 
+                        </p>
+                    </li>
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">
+                                Hébergement
+                            </span>
+                        </button>
+                        <p class="cs-item-p">
+                            Le Site est hébergé par la société Site.Data.faq_legales.hebergement.societe, située au Site.Data.faq_legales.hebergement.adresse (contact téléphonique ou email : Site.Data.faq_legales.hebergement.contact ).
+                        </p>
+                    </li>
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">
+                                Directeur de publication
+                            </span>
+                        </button>
+                        <p class="cs-item-p">
+                            Le Directeur de la publication du Site est Site.Data.faq_legales.directeur_publication.
+                        </p>
+                    </li>
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">
+                                Nous contacter
+                            </span>
+                        </button>
+                        <p class="cs-item-p">
+                            Par téléphone : Site.Data.hero.contact.phone<br>
+                            Par email : Site.Data.hero.contact.email<br>
+                            Par courrier : Site.Data.faq_legales.contact.adresse
+                        </p>
+                    </li>
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">
+                                Données personnelles
+                            </span>
+                        </button>
+                        <p class="cs-item-p">
+                            Le traitement de vos données à caractère personnel est régi par notre Politique de Confidentialité, disponible dans la section « Politique de Confidentialité », conformément au Règlement Général sur la Protection des Données 2016/679 du 27 avril 2016 (« RGPD »).
+                        </p>
+                    </li>
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">
+                                Litiges
+                            </span>
+                        </button>
+                        <p class="cs-item-p">
+                            En cas de litige entre le professionnel et le consommateur, ceux-ci s’efforceront de trouver une solution amiable.
+                            A défaut d’accord amiable, le consommateur a la possibilité de saisir gratuitement le médiateur de la consommation dont relève le professionnel, à savoir Site.Data.faq_legales.mediateur.nom, dans un délai d’un an à compter de la réclamation écrite adressée au professionnel.
+                            La saisine du médiateur de la consommation devra s’effectuer :
+                            - soit en complétant le formulaire prévu à cet effet sur le site internet de Site.Data.faq_legales.mediateur.site : [Site.Data.faq_legales.mediateur.site ](Site.Data.faq_legales.mediateur.site)
+                            - soit par courrier adressé à Site.Data.faq_legales.mediateur.adresse .
+                        </p>
+                    </li>
+                </ul>
+
+                <ul class="cs-faq-group cs-hidden" data-category="two">
+                    <!-- Informations sur l'entreprise -->
+                    <span class="cs-title">
+                        Politique de Confidentialité
+                    </span>
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Informations sur l'entreprise</span>
+                        </button>
+                        <p class="cs-item-p">
+                            L'entreprise XYZ, située au 123 rue Principale, 75000 Ville, France, est responsable du traitement des données personnelles collectées sur ce site.
+                        </p>
+                    </li>
+                
+                    <!-- Collecte des données personnelles -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Collecte des données personnelles</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Nous collectons des données personnelles telles que le nom, l'adresse e-mail, l'adresse postale, etc., uniquement dans le cadre de la fourniture de nos services et produits, et avec le consentement explicite de l'utilisateur.
+                        </p>
+                    </li>
+                
+                    <!-- But de la collecte des données -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">But de la collecte des données</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Les données personnelles collectées sont utilisées dans le but de fournir nos services, de traiter les commandes, d'améliorer notre site et nos produits, et de communiquer avec nos utilisateurs.
+                        </p>
+                    </li>
+                
+                    <!-- Consentement -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Consentement</span>
+                        </button>
+                        <p class="cs-item-p">
+                            En utilisant ce site, vous consentez à la collecte et au traitement de vos données personnelles conformément à notre politique de confidentialité.
+                        </p>
+                    </li>
+                
+                    <!-- Utilisation des données -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Utilisation des données</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Les données personnelles sont utilisées uniquement aux fins spécifiées lors de la collecte et sont protégées conformément aux lois sur la protection des données en vigueur.
+                        </p>
+                    </li>
+                
+                    <!-- Partage des données -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Partage des données</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Nous ne partageons pas vos données personnelles avec des tiers, sauf dans les cas prévus par la loi ou avec votre consentement explicite.
+                        </p>
+                    </li>
+                
+                    <!-- Droits des utilisateurs -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Droits des utilisateurs</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Vous avez le droit d'accéder à vos données personnelles, de les corriger, de les supprimer et de vous opposer à leur traitement. Pour exercer ces droits, veuillez nous contacter à [adresse e-mail].
+                        </p>
+                    </li>
+                
+                    <!-- Cookies et suivi en ligne -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Cookies et suivi en ligne</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Ce site utilise des cookies et d'autres technologies de suivi pour améliorer votre expérience de navigation et pour collecter des informations sur la manière dont vous utilisez le site.
+                        </p>
+                    </li>
+                
+                    <!-- Mises à jour de la politique de confidentialité -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Mises à jour de la politique de confidentialité</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Cette politique de confidentialité peut être mise à jour périodiquement pour refléter les changements dans nos pratiques en matière de confidentialité. Toute modification importante sera clairement indiquée sur cette page.
+                        </p>
+                    </li>
+                
+                    <!-- Coordonnées de contact -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Coordonnées de contact</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Si vous avez des questions ou des préoccupations concernant notre politique de confidentialité, veuillez nous contacter à [adresse e-mail] ou par courrier à [adresse postale].
+                        </p>
+                    </li>
+                </ul>
+                <ul class="cs-faq-group cs-hidden" data-category="three">
+                    <span class="cs-title">
+                        Conditions Générales de Vente
+                    </span>
+                    <!-- Champ d'application -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Champ d'application</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Les présentes Conditions Générales de Vente (CGV) s'appliquent à toutes les commandes passées par le client (ci-après dénommé "le Client") auprès de l'entreprise XYZ (ci-après dénommée "le Vendeur") via le site web [URL du site].
+                        </p>
+                    </li>
+                
+                    <!-- Commandes -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Commandes</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Le Client peut passer commande via le site web [URL du site]. Toute commande implique l'acceptation expresse et sans réserve des présentes CGV.
+                        </p>
+                    </li>
+                
+                    <!-- Prix -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Prix</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Les prix des produits sont indiqués en euros toutes taxes comprises (TTC). Le Vendeur se réserve le droit de modifier ses prix à tout moment, mais les produits seront facturés sur la base des tarifs en vigueur au moment de la validation de la commande.
+                        </p>
+                    </li>
+                
+                    <!-- Paiement -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Paiement</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Le paiement s'effectue en ligne par carte bancaire ou tout autre moyen de paiement sécurisé accepté par le Vendeur. La commande ne sera traitée qu'après réception du paiement.
+                        </p>
+                    </li>
+                
+                    <!-- Livraison -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Livraison</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Les produits seront livrés à l'adresse indiquée par le Client lors de la commande. Les délais de livraison sont donnés à titre indicatif et peuvent varier en fonction du lieu de livraison et de la disponibilité des produits.
+                        </p>
+                    </li>
+                
+                    <!-- Droit de rétractation -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Droit de rétractation</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Conformément à la législation en vigueur, le Client dispose d'un délai de [nombre de jours] jours pour exercer son droit de rétractation à compter de la réception des produits, sans avoir à justifier de motifs ni à payer de pénalités.
+                        </p>
+                    </li>
+                
+                    <!-- Garantie -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Garantie</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Les produits vendus sont soumis à la garantie légale de conformité et à la garantie des vices cachés prévues par la loi. En cas de non-conformité ou de vice caché, le Client peut choisir entre la réparation, le remplacement ou le remboursement du produit.
+                        </p>
+                    </li>
+                
+                    <!-- Responsabilité -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Responsabilité</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Le Vendeur ne saurait être tenu pour responsable des dommages directs ou indirects causés par l'utilisation des produits vendus. La responsabilité du Vendeur est limitée au montant de la commande.
+                        </p>
+                    </li>
+                
+                    <!-- Litiges -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Litiges</span>
+                        </button>
+                        <p class="cs-item-p">
+                            En cas de litige, une solution amiable sera recherchée en priorité. À défaut d'accord amiable, le litige sera soumis aux tribunaux compétents.
+                        </p>
+                    </li>
+                
+                    <!-- Coordonnées de contact -->
+                    <li class="cs-faq-item">
+                        <button class="cs-button">
+                            <span class="cs-button-text">Coordonnées de contact</span>
+                        </button>
+                        <p class="cs-item-p">
+                            Pour toute question ou réclamation concernant les CGV, le Client peut contacter le Vendeur par e-mail à [adresse e-mail] ou par courrier à [adresse postale].
+                        </p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+</BaseLayout>
+
+<style is:inline>
+/* Mobile - 360px */
+@media only screen and (min-width: 0rem) {
+  #faq-1720 {
+    padding: var(--spacing-8, 2rem) var(--spacing-4, 1rem) var(--spacing-16, 4rem);
+    position: relative;
+  }
+  #faq-1720 .cs-container {
+    width: 100%;
+    max-width: 80rem;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 48px - 64px */
+    gap: clamp(3rem, 6vw, 4rem);
+    position: relative;
+    z-index: 1;
+  }
+  #faq-1720 .cs-content {
+    /* set text align to left if content needs to be left aligned */
+    text-align: left;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    /* centers content horizontally, set to flex-start to left align */
+    align-items: flex-start;
+  }
+  #faq-1720 .cs-title {
+    margin: 0;
+  }
+  #faq-1720 .cs-flex-group {
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    /* 16px - 20px */
+    gap: clamp(1rem, 2.3vw, 1.25rem);
+    position: relative;
+  }
+  #faq-1720 .cs-wrapper {
+    width: 100%;
+    position: relative;
+  }
+  #faq-1720 .cs-button-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    /* 16px - 20px */
+    gap: clamp(1rem, 2.5vw, 1.25rem);
+    /* prevents flexbox from squishing it */
+    flex: none;
+  }
+  #faq-1720 .cs-flex {
+    width: 100%;
+    /* 24px - 32px */
+    padding: clamp(1.5rem, 3vw, 2rem);
+    background-color: #F7F7F7;
+    display: flex;
+    flex-direction: column;
+    order: 3;
+    gap: 1.25rem;
+  }
+  #faq-1720 .cs-option {
+    /* 16px - 20px */
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    line-height: 1.2em;
+    font-weight: 700;
+    padding: 0;
+    color: var(--bodyTextColor);
+    background-color: transparent;
+    border: none;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+    transition: color .3s;
+    text-align: left;
+  }
+  #faq-1720 .cs-option:hover {
+    color: var(--color-primary);
+    cursor: pointer;
+  }
+  #faq-1720 .cs-option.cs-active {
+    color: var(--color-primary);
+  }
+  #faq-1720 .cs-picture {
+    width: 100%;
+    /* 328px - 450px */
+    height: clamp(20.5rem, 30vw, 28.125rem);
+    /* 16px - 20px */
+    margin: 0 0 clamp(1rem, 2.4vw, 1.25rem);
+    order: 2;
+    position: relative;
+    z-index: 1;
+  }
+  #faq-1720 .cs-picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  #faq-1720 .cs-faq-group {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    order: 3;
+    gap: 0.5rem;
+    transition: transform 0.7s,
+                opacity 0.3s,
+                visibility 0.5s,
+                top 0.3s,
+                left 0.3s;
+    /* makes the transfrom scaling orgin the top left corner, dictates the direction by which the scale transforms animate towards */
+    transform-origin: top;
+    transform-style: preserve-3d;
+    perspective: 900px;
+  }
+  #faq-1720 .cs-faq-group.cs-hidden {
+    /* by using visibility:hidden instead of display:none, we can see the animations from the opacity and transforms, display:none won't render animations. */
+    visibility: hidden;
+    /* prevents the mouse from interacting with it */
+    pointer-events: none;
+    /* hidden galleries have a 0 opacity, and we animate the opacity to 1 when they become active */
+    opacity: 0;
+    /* this top and left value help control the animation, by setting it to position absolute and left 0, the FAQ won't fly off screen to the left, it will stop its position to be at the left edge of the .cs-flex-group (left: 0). Same for the bottom:0 value, the FAQ won't go past that position when it animates */
+    top: 0;
+    left: 0;
+    position: absolute;
+    /* prevents the hidden galleries from overflowing the section, and makes a nice animations to transition to and from */
+    transform: scaleY(0);
+  }
+  #faq-1720 .cs-faq-group.cs-hidden .cs-faq-item {
+    transform: rotateX(270deg);
+    opacity: 0;
+  }
+  #faq-1720 .cs-faq-item {
+    list-style: none;
+    width: 100%;
+    /* clips all corners of the button that overlap the rounded border */
+    overflow: hidden;
+    opacity: 1;
+    top: 0;
+    transform: rotateX(0deg);
+    transition: transform 0.6s,
+                opacity 0.3s;
+  }
+  #faq-1720 .cs-faq-item:nth-of-type(2) {
+    transition-delay: 0.1s;
+  }
+  #faq-1720 .cs-faq-item:nth-of-type(3) {
+    transition-delay: 0.2s;
+  }
+  #faq-1720 .cs-faq-item:nth-of-type(4) {
+    transition-delay: 0.3s;
+  }
+  #faq-1720 .cs-faq-item:nth-of-type(5) {
+    transition-delay: 0.4s;
+  }
+  #faq-1720 .cs-faq-item:nth-of-type(6) {
+    transition-delay: 0.5s;
+  }
+  #faq-1720 .cs-faq-item:nth-of-type(7) {
+    transition-delay: 0.6s;
+  }
+  #faq-1720 .cs-faq-item:nth-of-type(8) {
+    transition-delay: 0.7s;
+  }
+  #faq-1720 .cs-faq-item:nth-of-type(9) {
+    transition-delay: 0.8s;
+  }
+  #faq-1720 .cs-faq-item:nth-of-type(10) {
+    transition-delay: 0.9s;
+  }
+  #faq-1720 .cs-faq-item.active .cs-button {
+    color: var(--color-primary);
+  }
+  #faq-1720 .cs-faq-item.active .cs-button:before {
+    background-color: var(--color-primary);
+    transform: rotate(315deg);
+  }
+  #faq-1720 .cs-faq-item.active .cs-button:after {
+    background-color: var(--color-primary);
+    transform: rotate(-315deg);
+  }
+  #faq-1720 .cs-faq-item.active .cs-item-p {
+    height: auto;
+    /* 20px - 24px bottom */
+    /* 16px - 24px left & right */
+    padding: 0 clamp(1rem, 2vw, 1.5rem) clamp(1.25rem, 1.3vw, 1.5rem);
+    opacity: 1;
+  }
+  #faq-1720 .cs-button {
+    /* 16px - 20px */
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    line-height: 1.2em;
+    text-align: left;
+    font-weight: bold;
+    /* 16px - 24px top & bottom */
+    /* 16px - 20px left & right */
+    padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 2vw, 1.25rem);
+    background-color: #f7f7f7;
+    border: none;
+    color: var(--color-primary);
+    display: block;
+    width: 100%;
+    position: relative;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  #faq-1720 .cs-button:hover {
+    cursor: pointer;
+  }
+  #faq-1720 .cs-button:before {
+    /* left line */
+    content: "";
+    width: 0.5rem;
+    height: 0.125rem;
+    background-color: var(--color-primary);
+    opacity: 1;
+    border-radius: 50%;
+    position: absolute;
+    display: block;
+    top: 50%;
+    right: 1.5rem;
+    transform: rotate(45deg);
+    /* animate the transform from the left side of the x axis, and the center of the y */
+    transform-origin: left center;
+    transition: transform 0.5s;
+  }
+  #faq-1720 .cs-button:after {
+    /* right line */
+    content: "";
+    width: 0.5rem;
+    height: 0.125rem;
+    background-color: var(--color-primary);
+    opacity: 1;
+    border-radius: 50%;
+    position: absolute;
+    display: block;
+    top: 50%;
+    right: 1.3125rem;
+    transform: rotate(-45deg);
+    /* animate the transform from the right side of the x axis, and the center of the y */
+    transform-origin: right center;
+    transition: transform 0.5s;
+  }
+  #faq-1720 .cs-button-text {
+    width: 80%;
+    display: block;
+  }
+  #faq-1720 .cs-item-p {
+    /* 14px - 16px */
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    line-height: 1.5em;
+    width: 100%;
+    height: 0;
+    margin: 0;
+    /* 16px - 24px */
+    padding: 0 clamp(1rem, 2vw, 1.5rem);
+    opacity: 0;
+    background-color: #f7f7f7;
+    color: var(--color-primary);
+    /* clips the text so it doesn't show up */
+    overflow: hidden;
+    transition: opacity 0.3s, padding-bottom 0.3s;
+  }
+}
+/* Inbetween - 600px */
+@media only screen and (min-width: 37.5rem) {
+  #faq-1720 .cs-button-group {
+    width: 80%;
+    max-width: 22.0625rem;
+    flex-direction: row;
+    align-items: stretch;
+    flex: none;
+  }
+  #faq-1720 .cs-content {
+    width: 100%;
+  }
+  #faq-1720 .cs-picture {
+    /* 300px - 493px */
+    min-height: clamp(18.75rem, 30vw, 30.8125rem);
+    margin: 0;
+    height: 100%;
+    flex: none;
+    order: 3;
+  }
+}
+/* Desktop - 1024px */
+@media only screen and (min-width: 48rem) {
+  #faq-1720 .cs-flex-group {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    /* 20px - 80px */
+    column-gap: clamp(1.25rem, 3vw, 5rem);
+  }
+  #faq-1720 .cs-button-group {
+    flex-direction: column;
+    flex: auto;
+  }
+  #faq-1720 .cs-picture {
+    max-height: 31.25rem;
+  }
+}
+</style>
+
+<script type="module" is:inline>
+    const faqItems = Array.from(document.querySelectorAll('.cs-faq-item'));
+        for (const item of faqItems) {
+            const onClick = () => {
+            item.classList.toggle('active')
+        }
+        item.addEventListener('click', onClick)
+        }
+
+        class FAQFilter {
+        filtersSelector = '.cs-option'
+        FAQselector = '.cs-faq-group'
+        activeClass = 'cs-active'
+        hiddenClass = 'cs-hidden'
+
+        constructor() {
+            const $filters = document.querySelectorAll(this.filtersSelector)
+            this.$activeFilter = $filters[0]
+            this.$images = document.querySelectorAll(this.FAQselector)
+
+            this.$activeFilter.classList.add(this.activeClass)
+
+            for (const $filter of $filters) {
+            $filter.addEventListener('click', () => this.onClick($filter))
+            }
+        }
+
+        onClick($filter) {
+            this.filter($filter.dataset.filter)
+
+            const { activeClass } = this
+
+            this.$activeFilter.classList.remove(activeClass)
+            $filter.classList.add(activeClass)
+
+            this.$activeFilter = $filter
+        }
+
+        filter(filter) {
+            const showAll = filter == 'all'
+            const { hiddenClass } = this
+
+            for (const $image of this.$images) {
+            const show = showAll || $image.dataset.category == filter
+            $image.classList.toggle(hiddenClass, !show)
+            }
+        }
+        }
+
+        new FAQFilter()
+</script>

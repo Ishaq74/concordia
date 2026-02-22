@@ -1,0 +1,21 @@
+---
+import Card from "@components/ui/Card/Card.astro";
+
+interface Props {
+  count: number;
+  translations: Record<string, any>;
+}
+const { count, translations } = Astro.props as Props;
+---
+
+<Card variant="modern" elevation="sm" className="mt-6 p-4">
+  <p class="text-sm font-medium text-slate-500">{translations.auth.invitation ?? 'Invitations'}</p>
+  <p class="text-lg font-semibold text-slate-900">
+    <a
+      class="text-slate-900 underline decoration-slate-300 underline-offset-2 hover:decoration-slate-600"
+      href="/fr/invitations"
+    >
+      {count > 0 ? `${count} en attente` : translations.auth.noInvitations ?? 'Aucune'}
+    </a>
+  </p>
+</Card>

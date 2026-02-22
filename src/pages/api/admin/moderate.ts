@@ -16,7 +16,7 @@ const entityMap = {
   blogComments: { table: blogComments, statusField: "status", authorField: "authorId" },
 } as const;
 
-type EntityType = keyof typeof entityMap;
+type postType = keyof typeof entityMap;
 
 /** Moderate a piece of content (set status to 'moderated'). */
 export const POST: APIRoute = async ({ request }) => {
@@ -39,21 +39,21 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const body = await request.json();
-  const { entityType, entityId, reason } = body;
+  const { postType, postId, reason } = body;
 
-  if (!entityType || !entityId || !reason) {
+  if (!postType || !postId|| !reason) {
     return new Response(
       JSON.stringify({
         error: "VAL_REQUIRED_FIELD",
-        message: "entityType, entityId, reason required",
+        message: "postType, postId, reason required",
       }),
       { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
 
-  if (!Object.keys(entityMap).includes(entityType)) {
+  if (!Object.keys(entityMap).includes(postType)) {
     return new Response(
-      JSON.stringify({ error: "VAL_INVALID_ENUM", field: "entityType" }),
+      JSON.stringify({ error: "VAL_INVALID_ENUM", field: "postType" }),
       { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
@@ -65,14 +65,14 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  const config = entityMap[entityType as EntityType];
+  const config = entityMap[postType as postType];
   const db = await getDrizzle();
 
   // Fetch the entity
   const rows = await db
     .select()
     .from(config.table)
-    .where(eq((config.table as any).id, entityId))
+    .where(eq((config.table as any).id, postId))
     .limit(1);
 
   if (rows.length === 0) {
@@ -105,7 +105,7 @@ export const POST: APIRoute = async ({ request }) => {
   await db
     .update(config.table)
     .set({ status: "moderated" } as any)
-    .where(eq((config.table as any).id, entityId));
+    .where(eq((config.table as any).id, postId));
 
   // Notify the author
   await createNotification({
@@ -113,12 +113,12 @@ export const POST: APIRoute = async ({ request }) => {
     type: "moderation",
     title: "Contenu modéré",
     body: `Votre contenu a été modéré. Raison : ${reason}`,
-    targetType: entityType,
-    targetId: entityId,
+    targetType: postType,
+    targetId: postId,
   });
 
   return new Response(
-    JSON.stringify({ success: true, entityType, entityId, status: "moderated" }),
+    JSON.stringify({ success: true, postType, postId, status: "moderated" }),
     { status: 200, headers: { "Content-Type": "application/json" } },
   );
 };

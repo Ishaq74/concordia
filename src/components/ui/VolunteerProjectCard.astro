@@ -63,7 +63,7 @@ const fundingPercent = fundingGoal ? Math.min(100, Math.round((Number(fundingRai
         items={[
           startDate ? { text: `Du ${startDate.toLocaleDateString('fr')}`, label: "Dates" } : null,
           endDate ? { text: `Au ${endDate.toLocaleDateString('fr')}`, label: "Fin" } : null
-        ].filter(Boolean)}
+        ].filter((item): item is { text: string; label: string } => Boolean(item))}
       />
     )}
   </Card>

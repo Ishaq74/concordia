@@ -14,85 +14,61 @@ const {
   class: className = "",
 } = Astro.props;
 
-const currentLocale = Astro.currentLocale;
+// Astro.currentLocale can occasionally be undefined during some page renders
+// so we fall back to French and log the value for debugging purposes.
+const currentLocale = Astro.currentLocale || "fr";
+console.log("Navigation currentLocale=", currentLocale);
 const currentPath = Astro.url.pathname;
+const isFr = currentLocale === "fr";
 
-const translations = await import(`../../../i18n/${currentLocale}.json`);
-const t = translations.default;
+let t;
+try {
+  const translations = await import(`../../../i18n/${currentLocale}.json`);
+  t = translations.default;
+} catch (err) {
+  console.error("Failed to load translations for locale", currentLocale, err);
+  // Fallback to French translations in case of error
+  const translations = await import(`../../../i18n/fr.json`);
+  t = translations.default;
+}
 
 const navClass = ["nav", variant !== "initial" && variant, className]
   .filter(Boolean)
   .join(" ");
 
-// Locale-aware slug mapping
-const isFr = currentLocale === "fr";
-
-// Découvrir: Places, Sentiers, Blog, Événements
+// Navigation sections with locale-aware slugs. `isFr` only affects paths
+// where the French version differs from the English slug.
 const discoverItems = [
-  {
-    label: t.nav.places,
-    href: getRelativeLocaleUrl(currentLocale, isFr ? "places" : "places"),
-  },
-  {
-    label: t.nav.trails,
-    href: getRelativeLocaleUrl(currentLocale, isFr ? "sentiers" : "trails"),
-  },
-  {
-    label: t.nav.blog,
-    href: getRelativeLocaleUrl(currentLocale, isFr ? "blog" : "blog"),
-  },
-  {
-    label: t.nav.events,
-    href: getRelativeLocaleUrl(currentLocale, isFr ? "evenements" : "events"),
-  },
+  { label: t.nav.places, href: getRelativeLocaleUrl(currentLocale, isFr ? "places" : "places") || "#" },
+  { label: t.nav.trails, href: getRelativeLocaleUrl(currentLocale, isFr ? "sentiers" : "trails") || "#" },
+  { label: t.nav.blog, href: getRelativeLocaleUrl(currentLocale, isFr ? "blog" : "blog") || "#" },
+  { label: t.nav.events, href: getRelativeLocaleUrl(currentLocale, isFr ? "evenements" : "events") || "#" },
 ];
 
-// Communauté: Forum, Groupes, Annonces, Services
 const communityItems = [
-  {
-    label: t.nav.forum,
-    href: getRelativeLocaleUrl(currentLocale, "forum"),
-  },
-  {
-    label: t.nav.groups,
-    href: getRelativeLocaleUrl(currentLocale, isFr ? "groupes" : "groups"),
-  },
-  {
-    label: t.nav.classifieds,
-    href: getRelativeLocaleUrl(currentLocale, isFr ? "annonces" : "classifieds"),
-  },
-  {
-    label: t.nav.services,
-    href: getRelativeLocaleUrl(currentLocale, "services"),
-  },
+  { label: t.nav.forum, href: getRelativeLocaleUrl(currentLocale, "forum") || "#" },
+  { label: t.nav.groups, href: getRelativeLocaleUrl(currentLocale, isFr ? "groupes" : "groups") || "#" },
+  { label: t.nav.classifieds, href: getRelativeLocaleUrl(currentLocale, isFr ? "annonces" : "classifieds") || "#" },
+  { label: t.nav.services, href: getRelativeLocaleUrl(currentLocale, "services") || "#" },
 ];
 
-// S'engager: Bénévolat, Éducation, Financement, Transparence
 const engageItems = [
-  {
-    label: t.nav.volunteer,
-    href: getRelativeLocaleUrl(currentLocale, isFr ? "benevolat" : "volunteer"),
-  },
-  {
-    label: t.nav.education,
-    href: getRelativeLocaleUrl(currentLocale, "education"),
-  },
-  {
-    label: t.nav.funding,
-    href: getRelativeLocaleUrl(currentLocale, isFr ? "financement" : "funding"),
-  },
-  {
-    label: t.nav.transparency,
-    href: getRelativeLocaleUrl(currentLocale, isFr ? "transparence" : "transparency"),
-  },
+  { label: t.nav.volunteer, href: getRelativeLocaleUrl(currentLocale, isFr ? "benevolat" : "volunteer") || "#" },
+  { label: t.nav.education, href: getRelativeLocaleUrl(currentLocale, "education") || "#" },
+  { label: t.nav.funding, href: getRelativeLocaleUrl(currentLocale, isFr ? "financement" : "funding") || "#" },
+  { label: t.nav.transparency, href: getRelativeLocaleUrl(currentLocale, isFr ? "transparence" : "transparency") || "#" },
+];
+
+const docsItems = [
+  { label: "DATA", href: getRelativeLocaleUrl(currentLocale, "docs/data") || "#" },
+  { label: "DESIGN", href: getRelativeLocaleUrl(currentLocale, "docs/design") || "#" },
 ];
 ---
 
 <nav class={navClass}>
   <a
     href={getRelativeLocaleUrl(currentLocale, "")}
-    class:list={["nav-link", { active: currentPath === getRelativeLocaleUrl(currentLocale, "") }]}
-  >
+    class:list={["nav-link", { active: currentPath === getRelativeLocaleUrl(currentLocale, "") }]}>
     {t.nav.home}
   </a>
 
@@ -134,8 +110,7 @@ const engageItems = [
 
   <a
     href={getRelativeLocaleUrl(currentLocale, "docs")}
-    class:list={["nav-link", { active: currentPath.startsWith(getRelativeLocaleUrl(currentLocale, "docs")) }]}
-  >
+    class:list={["nav-link", { active: currentPath.startsWith(getRelativeLocaleUrl(currentLocale, "docs")) }]}> 
     {t.nav.docs}
   </a>
 </nav>

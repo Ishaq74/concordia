@@ -2,7 +2,16 @@
 import PostComments from "@components/modules/blog/single/PostComments.astro";
 ---
 <div class="post-footer">
-    <PostComments />
+    {/* Le composant PostFooter affiche les commentaires et le formulaire d'avis s'ils existent ou di qu'il y a 0 commentaires */
+    }
+    {/* On passe postId et postType pour que le composant puisse récupérer les commentaires liés à ce post depuis la table générique blog_comments */
+    }
+    {/* PostComments gère lui-même l'affichage du nombre de commentaires et du formulaire d'avis, pas besoin de le faire ici dans le parent */
+    
+    }
+    {/* On pourrait aussi envisager de faire un composant plus générique CommentSection qui serait utilisé à la fois pour les articles de blog, les lieux, les événements, etc. et qui prendrait en props postId et postType pour s'adapter au contexte d'utilisation */
+    }
+    <PostComments postId={Astro.props.postId} postType={Astro.props.postType} />
 </div>
 
 <style>

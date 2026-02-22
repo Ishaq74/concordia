@@ -14,7 +14,7 @@ interface Props {
 }
 
 const { readingTime, authors = [], lang, className = "" } = Astro.props;
-const currentLocale = Astro.currentLocale;
+const currentLocale = Astro.currentLocale || "fr";
 const translations = await import(`../../../../i18n/${currentLocale}.json`);
 const t = translations.default;
 
@@ -46,7 +46,7 @@ const t = translations.default;
         <>
           {index > 0 && <span>, </span>}
           <Link
-            href={getRelativeLocaleUrl(lang, `blog/auteur/${author.slug}`)}
+            href={getRelativeLocaleUrl(lang, `blog/auteur/${author.slug}`) || '#'}
             className="author-link"
             style="link"
             transition:name="author"

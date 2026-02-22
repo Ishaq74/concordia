@@ -1,0 +1,64 @@
+---
+// src/components/templates/auth/profile/ProfileHeader.astro
+
+import Grid from "@components/Tools/Grid.astro";
+import Flex from "@components/Tools/Flex.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Alert from "@components/ui/Alert.astro";
+
+
+interface Props {
+  title: string;
+  description?: string;
+  status?: { type: "success" | "error"; message: string } | null;
+  // variants mirror those supported by Grid/Tools
+  variant?:
+    | "initial"
+    | "retro"
+    | "modern"
+    | "futuristic"
+    | "default"
+    | "primary"
+    | "secondary";
+  color?: "error" | "default" | "primary" | "secondary" | "accent";
+  avatar?: string;
+}
+
+const {
+  title,
+  description = "",
+  status = null,
+  // default to modern/primary for a cleaner look
+  variant = "modern",
+  color = "primary",
+  avatar = "",
+} = Astro.props as Props;
+
+const backgroundImage = avatar || '/images/placeholder.jpg';
+---
+
+<Grid
+  tag="header"
+  gap="md"
+  align="center"
+  width="auto"
+  Padding="none"
+  marginInline="auto"
+  flexDirection="column"
+  zIndex={2}
+  variant={variant}
+  color={color}
+  backgroundImage={backgroundImage}
+  className="profile-header"
+  role="banner"
+>
+  {status && (
+    <Alert status={status.type === "error" ? "danger" : "success"}>
+      {status.message}
+    </Alert>
+  )}
+
+  <h1>{title}</h1>
+  {description && <p>{description}</p>}
+</Grid>

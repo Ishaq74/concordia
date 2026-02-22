@@ -8,7 +8,6 @@
     "contact": "Contact",
     "docs": "Docs",
     "places": "Annuaire",
-    "blog": "Blog",
     "forum": "Forum",
     "events": "Événements",
     "education": "Éducation",
@@ -29,15 +28,6 @@
     "consulting": "Conseil",
     "development": "Développement",
     "design": "Design"
-  },
-  "blog": {
-    "news": "Actualités",
-    "tutorials": "Tutoriels",
-    "releases": "Versions",
-    "readingTime": "Temps de lecture",
-    "author": "Auteur",
-    "authors": "Auteurs",
-    "by": "Par"
   },
   "home": {
     "heroTitle": "Concordia Annecy",
@@ -256,13 +246,15 @@
     "lastActivity": "Dernière activité",
     "organizations": "Organisations",
     "resendInvite": "Renvoyer si déjà invité",
+    "organizationSection": "Section organisation",
+    "organizationDialog": "Organisation",
     "deleteOrganization": "Supprimer l'organisation",
     "deleteOrganizationHint": "Disponible uniquement si vous êtes owner.",
     "confirmDeleteLabel": "Tapez SUPPRIMER pour confirmer",
     "confirmDeletePlaceholder": "SUPPRIMER",
     "updateProfileLabel": "Mettre à jour le profil",
     "organization": "Organisation",
-    "admin": "Administration",
+    "admin": "Rôle",
     "changePassword": "Changer le mot de passe",
     "success": "Succès",
     "error": "Erreur",
@@ -306,7 +298,8 @@
     "resetPasswordUrl": "/fr/auth/reinitialiser-mot-de-passe",
     "emailMissing": "Adresse email requise.",
     "forgotSuccess": "Email envoyé.",
-    "verifyEmailReminder": ""
+    "verifyEmailReminder": "N'oubliez pas de vérifier votre boîte mail pour activer votre compte.",
+    "profileTitle": "Mon profil"
   },
   "errors": {
     "notFound": {
@@ -372,7 +365,13 @@
     "relatedArticles": "Billets similaires",
     "comments": "Commentaires",
     "writeComment": "Écrire un commentaire",
-    "noArticles": "Aucun billet pour le moment"
+    "noArticles": "Aucun billet pour le moment",
+    "news": "Actualités",
+    "tutorials": "Tutoriels",
+    "releases": "Versions",
+    "readingTime": "Temps de lecture",
+    "author": "Auteur",
+    "authors": "Auteurs"
   },
   "forumPage": {
     "title": "Forum",

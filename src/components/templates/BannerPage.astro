@@ -1,6 +1,6 @@
 ---
 // filepath: src/components/templates/BannerPage.astro
-import { getRelativeLocaleUrl } from 'astro:i18n';
+import { getRelativeLocaleUrl } from '@lib/i18n/locale-url';
 import Flex from '@components/Tools/Flex.astro';
 import Grid from '@components/Tools/Grid.astro';
 
@@ -39,10 +39,9 @@ const {
   ...rest
 } = Astro.props as Props;
 
-// maintain backward compatibility if someone still passes `variant` for layout
-const layout = (Astro.props as any).variant || type;
+// Ensure fallback for currentLocale
+const currentLocale = Astro.currentLocale || 'fr';
 
-const currentLocale = Astro.currentLocale;
 // use import.meta.glob with eager option (supported by Astro/Vite)
 const translations = import.meta.glob('../../../i18n/*.json', { eager: true }) as Record<string, { default: any }>;
 const t = translations[`../../../i18n/${currentLocale}.json`]?.default || translations['../../../i18n/fr.json']?.default;
@@ -52,7 +51,7 @@ const backgroundImage = featuredImg || '/images/placeholder.jpg';
 // meta rendering will be handled directly in the template to avoid JSX in frontmatter
 ---
 
-<header class={`banner-page ${layout} ${color} ${variant} ${className}`} role="banner" {...rest}>
+<header class={`banner-page ${type} ${color} ${variant} ${className}`} role="banner" {...rest}>
   <div class="banner-background" aria-hidden="true">
     {videoUrl ? (
       <video class="banner-media" src={videoUrl} autoplay loop muted playsinline />
@@ -63,18 +62,18 @@ const backgroundImage = featuredImg || '/images/placeholder.jpg';
   </div>
 
   <div class="banner-content">
-    <Grid columns={layout === 'split' ? 2 : 1} gap="8" align="center">
+    <Grid columns={type === 'split' ? 2 : 1} gap="8" align="center">
       <Flex direction="column" gap="sm" alignItems="flex-start" class="banner-main-content">
         {breadcrumbs.length > 0 && (
           <nav aria-label={t.nav.breadcrumbs || 'Breadcrumb'} class="banner-breadcrumbs">
             <ul>
               <li>
-                <a href={getRelativeLocaleUrl(currentLocale, '/')}>{t.nav.home}</a>
+                <a href={getRelativeLocaleUrl(currentLocale, '/') || '#'}>{t.nav.home}</a>
               </li>
               {breadcrumbs.map((bc) => [
                 <li class="separator">/</li>,
                 <li>
-                  <a href={getRelativeLocaleUrl(currentLocale, bc.href)}>{bc.label}</a>
+                  <a href={getRelativeLocaleUrl(currentLocale, bc.href) || '#'}>{bc.label}</a>
                 </li>
               ])}
               <li class="separator">/</li>
@@ -88,7 +87,7 @@ const backgroundImage = featuredImg || '/images/placeholder.jpg';
           <h1 class="banner-title" set:html={title} />
           {subtitle && <p class="banner-subtitle">{subtitle}</p>}
           {description && <p class="banner-description">{description}</p>}
-          {(layout === 'blog' || layout === 'article') && (
+          {(type === 'blog' || type === 'article') && (
             <div class="banner-meta">
               {author && <span class="meta-author">{author}</span>}
               {date && <time class="meta-date" datetime={date}>{date}</time>}
@@ -101,7 +100,7 @@ const backgroundImage = featuredImg || '/images/placeholder.jpg';
         </div>
       </Flex>
 
-      {layout === 'split' && (
+      {type === 'split' && (
         <div class="banner-side">
           <slot name="side-content" />
         </div>
