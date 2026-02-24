@@ -78,11 +78,11 @@ npm install
 - `npm run smtp:check`: tsx src/lib/smtp/smtp.check.ts
 - `npm run test`: vitest
 - `npm run test:watch`: vitest --watch
-- `npm run test:ui`: vitest --ui
 - `npm run test:coverage`: vitest --coverage
 - `npm run test:unit`: vitest run tests/unit
 - `npm run test:integration`: vitest run tests/integration --maxWorkers 1 --no-file-parallelism
 - `npm run test:e2e`: vitest run tests/e2e
+- `npm run test:ui`: pnpm exec playwright test tests/e2e/ui
 - `npm run test:security`: vitest run tests/e2e/security.test.ts
 - `npm run test:api`: vitest run tests/e2e/api-auth.test.ts
 - `npm run test:all`: vitest run
@@ -97,7 +97,13 @@ npm install
 - concordia-specs.md
 - drizzle-dev.config.ts
 - drizzle-prod.config.ts
+- **instructions**
+  - a11y.instructions.md
+  - astro.instructions.md
+  - copilot.instructions.md
+  - think.instructions.md
 - package.json
+- playwright-log.txt
 - playwright.config.ts
 - pnpm-lock.yaml
 - pnpm-workspace.yaml
@@ -148,6 +154,7 @@ npm install
     - utils.ts
   - readme-generate.ts
   - run-sonda.mjs
+- snapshot-profile-2.md
 - **src**
   - **actions**
     - blog.ts
@@ -179,6 +186,12 @@ npm install
         - AuthLayout.astro
         - forgot-password.client.ts
         - ForgotPasswordForm.astro
+        - **profile**
+          - ProfileDetails.astro
+          - ProfileForm.astro
+          - ProfileHeader.astro
+          - ProfileInvitations.astro
+          - ProfileOrganization.astro
         - ResetPasswordForm.astro
         - SignInCard.astro
         - SignUpCard.astro
@@ -330,9 +343,9 @@ npm install
       - blog.ts
       - factory.ts
     - **migrations**
-      - 0001_massive_dust.sql
+      - 0002_narrow_silver_samurai.sql
       - **meta**
-        - 0001_snapshot.json
+        - 0002_snapshot.json
         - _journal.json
     - **schemas**
       - audit-log.schema.ts
@@ -371,6 +384,8 @@ npm install
       - auth.ts
       - permissions.test.ts
       - permissions.ts
+      - **profile**
+        - utils.ts
       - roles.ts
       - validate-user.ts
     - **i18n**
@@ -403,6 +418,15 @@ npm install
     - **ar**
       - index.astro
     - **en**
+      - **auth**
+        - forgot-password.astro
+        - invitations.astro
+        - legal.astro
+        - profile.astro
+        - reset-password.astro
+        - sign-in.astro
+        - sign-up.astro
+        - verify-email.astro
       - **blog**
         - index.astro
       - **docs**
@@ -443,6 +467,7 @@ npm install
           - header.astro
           - table-of-contents.astro
       - index.astro
+      - profile.astro
     - **es**
       - **blog**
         - **auteur**
@@ -509,6 +534,7 @@ npm install
           - header.astro
           - table-of-contents.astro
       - index.astro
+      - profil.astro
   - **styles**
     - base.css
     - **components**
@@ -522,6 +548,7 @@ npm install
       - components.css
       - spacing.css
       - typography.css
+- **test-results**
 - **tests**
   - **a11y**
     - a11y-performance.test.ts
@@ -532,6 +559,24 @@ npm install
     - test-env.ts
   - **e2e**
     - critical-flows.test.ts
+    - **ui**
+      - alert.test.ts
+      - badge.test.ts
+      - button.test.ts
+      - card.test.ts
+      - code.test.ts
+      - dialog.test.ts
+      - dropdown.test.ts
+      - form.test.ts
+      - kbd.test.ts
+      - link.test.ts
+      - menudropdown.test.ts
+      - sheet.test.ts
+      - switch.test.ts
+      - table.test.ts
+      - tabs.test.ts
+      - tooltip.test.ts
+      - video.test.ts
   - **fixtures**
     - auth-fixtures.ts
     - security-payloads.ts
@@ -565,7 +610,6 @@ npm install
     - BannerPage.astro.test.ts
     - BannerPage.video.test.ts
     - Breadcrumb.astro.test.ts
-    - Button.astro.test.ts
     - Card.astro.test.ts
     - Dialog.astro.test.ts
     - Dropdown.astro.test.ts
@@ -581,6 +625,7 @@ npm install
     - Pagination.astro.test.ts
     - PlaceCard.astro.test.ts
     - ProductCard.astro.test.ts
+    - ProfileTemplates.astro.test.ts
     - ProgressBar.astro.test.ts
     - ServiceCard.astro.test.ts
     - Sheet.astro.test.ts
@@ -599,8 +644,191 @@ npm install
     - api-helpers.ts
     - auth-test-utils.ts
     - cleanup.ts
+- **tests-results**
 - tsconfig.json
 - vitest.config.ts
+- **wireframes**
+  - **administration_globale_du_blog**
+    - code.html
+    - screen.png
+  - **blog_concordia**
+    - code.html
+    - screen.png
+  - **blog_de_l'organisation**
+    - code.html
+    - screen.png
+  - **catégorie_blog_de_l'organisation**
+    - code.html
+    - screen.png
+  - **catégorie_de_services_-_liste_filtrée**
+    - code.html
+    - screen.png
+  - **catégorie_du_blog_principal**
+    - code.html
+    - screen.png
+  - **centre_de_notifications_complet**
+    - code.html
+    - screen.png
+  - **concordia___charte_de_la_cité-état_numérique**
+    - code.html
+    - screen.png
+  - **configuration_des_commissions_-_super_admin_1**
+    - code.html
+    - screen.png
+  - **configuration_des_commissions_-_super_admin_2**
+    - code.html
+    - screen.png
+  - **configuration_profil_organisation_1**
+    - code.html
+    - screen.png
+  - **configuration_profil_organisation_2**
+    - code.html
+    - screen.png
+  - **configuration_profil_organisation_3**
+    - code.html
+    - screen.png
+  - **configuration_profil_organisation_4**
+    - code.html
+    - screen.png
+  - **configuration_profil_organisation_5**
+    - code.html
+    - screen.png
+  - **configuration_profil_organisation_6**
+    - code.html
+    - screen.png
+  - **création_**
+    - **_édition_de_service_-_formulaire**
+      - code.html
+      - screen.png
+  - **détail_article_de_blog_concordia**
+    - code.html
+    - screen.png
+  - **détail_de_l'article_de_blog**
+    - code.html
+    - screen.png
+  - **gestion_blog_de_l'organisation**
+    - code.html
+    - screen.png
+  - **gestion_des_litiges_-_super_admin_1**
+    - code.html
+    - screen.png
+  - **gestion_des_litiges_-_super_admin_2**
+    - code.html
+    - screen.png
+  - **gestion_des_réservations_organisation**
+    - code.html
+    - screen.png
+  - **gestion_des_rôles_&_permissions_-_organisation**
+    - code.html
+    - screen.png
+  - **gestion_des_tickets_support_-_admin**
+    - code.html
+    - screen.png
+  - **gestion_de_l'organisation_-_concordia**
+    - code.html
+    - screen.png
+  - **historique_des_versions_du_devis**
+    - code.html
+    - screen.png
+  - **interface_de_traduction_de_contenu_(i18n)**
+    - code.html
+    - screen.png
+  - **le_blog_de_la_communauté_concordia**
+    - code.html
+    - screen.png
+  - **mentions_légales_&_cgu_concordia_1**
+    - code.html
+    - screen.png
+  - **mentions_légales_&_cgu_concordia_2**
+    - code.html
+    - screen.png
+  - **menu_déroulant_des_notifications**
+    - code.html
+    - screen.png
+  - **messagerie_instantanée_concordia**
+    - code.html
+    - screen.png
+  - **mes_devis_-_espace_citoyen**
+    - code.html
+    - screen.png
+  - **modération_des_commentaires_-_organisation**
+    - code.html
+    - screen.png
+  - **modération_globale_des_commentaires**
+    - code.html
+    - screen.png
+  - **onboarding_organisation_-_création_d'espace**
+    - code.html
+    - screen.png
+  - **page_organisation**
+    - code.html
+    - screen.png
+  - **page_publique_organisation_-_réparateurs_de_belleville**
+    - code.html
+    - screen.png
+  - **page_à_propos_-_vision_concordia**
+    - code.html
+    - screen.png
+  - **paramètres_d'accessibilité_concordia**
+    - code.html
+    - screen.png
+  - **profil_artisan_du_lien_-_corrigé**
+    - code.html
+    - screen.png
+  - **profil_marc_-_édition_&_personnalisation**
+    - code.html
+    - screen.png
+  - **profil_public_du_citoyen**
+    - code.html
+    - screen.png
+  - **recensement_de_la_cité_-_concordia**
+    - code.html
+    - screen.png
+  - **recherche_globale_concordia**
+    - code.html
+    - screen.png
+  - **rédaction_d'article_-_cms_organisation_1**
+    - code.html
+    - screen.png
+  - **rédaction_d'article_-_cms_organisation_2**
+    - code.html
+    - screen.png
+  - **services_locaux_-_concordia_1**
+    - code.html
+    - screen.png
+  - **services_locaux_-_concordia_2**
+    - code.html
+    - screen.png
+  - **services_locaux_-_concordia_3**
+    - code.html
+    - screen.png
+  - **services_locaux_-_concordia_4**
+    - code.html
+    - screen.png
+  - **signature_électronique_du_devis_1**
+    - code.html
+    - screen.png
+  - **signature_électronique_du_devis_2**
+    - code.html
+    - screen.png
+  - **tableau_de_bord_gestion_services**
+    - code.html
+    - screen.png
+  - **user_profile_page_1**
+    - code.html
+    - screen.png
+  - **user_profile_page_2**
+    - code.html
+    - screen.png
+  - **user_profile_page_3**
+    - code.html
+    - screen.png
+  - **user_profile_page_4**
+    - code.html
+    - screen.png
+  - **à_propos_de_concordia**
+    - code.html
+    - screen.png
 ```
 
 ### Alias TypeScript (tsconfig.json)
@@ -975,6 +1203,24 @@ _جميع ملفات المخطط تم تصديرها._
   - test-env.ts
 - **e2e**
   - critical-flows.test.ts
+  - **ui**
+    - alert.test.ts
+    - badge.test.ts
+    - button.test.ts
+    - card.test.ts
+    - code.test.ts
+    - dialog.test.ts
+    - dropdown.test.ts
+    - form.test.ts
+    - kbd.test.ts
+    - link.test.ts
+    - menudropdown.test.ts
+    - sheet.test.ts
+    - switch.test.ts
+    - table.test.ts
+    - tabs.test.ts
+    - tooltip.test.ts
+    - video.test.ts
 - **fixtures**
   - auth-fixtures.ts
   - security-payloads.ts
@@ -1008,7 +1254,6 @@ _جميع ملفات المخطط تم تصديرها._
   - BannerPage.astro.test.ts
   - BannerPage.video.test.ts
   - Breadcrumb.astro.test.ts
-  - Button.astro.test.ts
   - Card.astro.test.ts
   - Dialog.astro.test.ts
   - Dropdown.astro.test.ts
@@ -1024,6 +1269,7 @@ _جميع ملفات المخطط تم تصديرها._
   - Pagination.astro.test.ts
   - PlaceCard.astro.test.ts
   - ProductCard.astro.test.ts
+  - ProfileTemplates.astro.test.ts
   - ProgressBar.astro.test.ts
   - ServiceCard.astro.test.ts
   - Sheet.astro.test.ts
@@ -1057,6 +1303,8 @@ _جميع ملفات المخطط تم تصديرها._
   - auth.ts
   - permissions.test.ts
   - permissions.ts
+  - **profile**
+    - utils.ts
   - roles.ts
   - validate-user.ts
 - **i18n**
@@ -1088,9 +1336,9 @@ _جميع ملفات المخطط تم تصديرها._
   - blog.ts
   - factory.ts
 - **migrations**
-  - 0001_massive_dust.sql
+  - 0002_narrow_silver_samurai.sql
   - **meta**
-    - 0001_snapshot.json
+    - 0002_snapshot.json
     - _journal.json
 - **schemas**
   - audit-log.schema.ts
@@ -1184,6 +1432,57 @@ _جميع ملفات المخطط تم تصديرها._
   - **Parcours critique - Multi-variant**
   - **Parcours critique - Erreurs serveur**
 
+- `tests\e2e\ui\alert.test.ts`
+  - **AlertComponent – Page de documentation complète**
+
+- `tests\e2e\ui\badge.test.ts`
+  - **BadgeComponent – Page de documentation complète**
+
+- `tests\e2e\ui\button.test.ts`
+  - **ButtonComponent – Page de documentation complète**
+
+- `tests\e2e\ui\card.test.ts`
+  - **CardComponent – documentation page (couverture totale)**
+
+- `tests\e2e\ui\code.test.ts`
+  - **CodeComponent – documentation page**
+
+- `tests\e2e\ui\dialog.test.ts`
+  - **DialogComponent – documentation page (couverture totale)**
+
+- `tests\e2e\ui\dropdown.test.ts`
+  - **DropdownComponent – documentation page (couverture totale)**
+
+- `tests\e2e\ui\form.test.ts`
+  - **FormComponents – documentation page (couverture totale)**
+
+- `tests\e2e\ui\kbd.test.ts`
+  - **KbdComponent – documentation page (couverture totale)**
+
+- `tests\e2e\ui\link.test.ts`
+  - **LinkComponent – documentation page**
+
+- `tests\e2e\ui\menudropdown.test.ts`
+  - **MenuDropdown – documentation page**
+
+- `tests\e2e\ui\sheet.test.ts`
+  - **SheetComponent – documentation page**
+
+- `tests\e2e\ui\switch.test.ts`
+  - **SwitchComponent – documentation page (couverture totale)**
+
+- `tests\e2e\ui\table.test.ts`
+  - **TableComponent – documentation page (couverture totale)**
+
+- `tests\e2e\ui\tabs.test.ts`
+  - **TabsComponent – documentation page**
+
+- `tests\e2e\ui\tooltip.test.ts`
+  - **TooltipComponent – documentation page**
+
+- `tests\e2e\ui\video.test.ts`
+  - **VideoComponent – documentation page**
+
 - `tests\integration\auth-emails.test.ts`
   - **BetterAuth Email Functions**
   - **Email Verification**
@@ -1271,8 +1570,6 @@ _جميع ملفات المخطط تم تصديرها._
     - applies variant and className props
     - renders aria-label for accessibility
 
-- `tests\ui\Button.astro.test.ts`
-
 - `tests\ui\Card.astro.test.ts`
   - **Card.astro**
     - renders slot content and default classes
@@ -1314,6 +1611,8 @@ _جميع ملفات المخطط تم تصديرها._
 - `tests\ui\PlaceCard.astro.test.ts`
 
 - `tests\ui\ProductCard.astro.test.ts`
+
+- `tests\ui\ProfileTemplates.astro.test.ts`
 
 - `tests\ui\ProgressBar.astro.test.ts`
 

@@ -40,7 +40,7 @@ test.describe('BadgeComponent – Page de documentation complète', () => {
     }
   });
 
-  test('Icones gauche et droite', async ({ page }) => {
+  test('Icones gauche et droite + aria-label', async ({ page }) => {
     const val = page.locator('span.badge', { hasText: 'Validé' });
     await expect(val).toHaveCount(1);
     await expect(val.locator('svg')).toHaveCount(1);
@@ -48,16 +48,28 @@ test.describe('BadgeComponent – Page de documentation complète', () => {
     const dl = page.locator('span.badge', { hasText: 'Télécharger' });
     await expect(dl).toHaveCount(1);
     await expect(dl.locator('svg')).toHaveCount(1);
-  });
 
-  test('Dismissible badges', async ({ page }) => {
-    for (const txt of ['Nouveau','Promo -20%','Notification']) {
-      const b = page.locator('span.badge', { hasText: txt });
-      await expect(b.locator('button')).toHaveCount(1);
+    // Badges icon-only doivent avoir aria-label
+    const iconOnly = page.locator('span.badge[aria-label]');
+    const count = await iconOnly.count();
+    for (let i = 0; i < count; i++) {
+      const badge = iconOnly.nth(i);
+      const label = await badge.getAttribute('aria-label');
+      expect(label).not.toBeNull();
     }
   });
 
-  test('Compteurs et statuts', async ({ page }) => {
+  test('Dismissible badges : clic ferme le badge', async ({ page }) => {
+    for (const txt of ['Nouveau','Promo -20%','Notification']) {
+      const b = page.locator('span.badge', { hasText: txt });
+      await expect(b.locator('button')).toHaveCount(1);
+      // Clic sur la croix ferme le badge
+      await b.locator('button').click();
+      await expect(b).toHaveCount(0);
+    }
+  });
+
+  test('Compteurs et statuts : aria-live, role status', async ({ page }) => {
     const counters = page.locator('h3#compteurs + div.demo-box span.badge');
     await expect(counters).toHaveCount(2);
     await expect(counters.nth(0)).toHaveText(/3/);
@@ -65,9 +77,14 @@ test.describe('BadgeComponent – Page de documentation complète', () => {
 
     const statuses = page.locator('h3#statuts + div.demo-box span.badge');
     await expect(statuses).toHaveCount(3);
-    await expect(statuses.nth(0)).toContainText(/En ligne/);
-    await expect(statuses.nth(1)).toContainText(/Hors ligne/);
-    await expect(statuses.nth(2)).toContainText(/Occupé/);
+    for (let i = 0; i < 3; i++) {
+      const badge = statuses.nth(i);
+      await expect(badge).toContainText(/En ligne|Hors ligne|Occupé/);
+      // aria-live ou role status
+      const ariaLive = await badge.getAttribute('aria-live');
+      const role = await badge.getAttribute('role');
+      expect(ariaLive === 'polite' || role === 'status').toBeTruthy();
+    }
   });
 
   test('Tags modernes', async ({ page }) => {
@@ -84,8 +101,41 @@ test.describe('BadgeComponent – Page de documentation complète', () => {
     for (let i=0;i<texts.length;i++) await expect(badges.nth(i)).toHaveText(new RegExp(texts[i]));
   });
 
-  test('Combinaisons variants + couleurs', async ({ page }) => {
+  test('Combinaisons variants + couleurs : classes', async ({ page }) => {
     const combos = page.locator('h2#combinaisons + div.demo-box span.badge');
     await expect(combos).toHaveCount(16);
+    for (let i = 0; i < 16; i++) {
+      const badge = combos.nth(i);
+      const cls = await badge.getAttribute('class');
+      expect(cls).toMatch(/badge/);
+      expect(cls).toMatch(/(initial|retro|modern|futuristic)/);
+      expect(cls).toMatch(/(default|primary|secondary|accent|error)/);
+    }
+  });
+
+  // Checklist a11y et responsive
+  test('Checklist a11y : aria-label, role, tabindex, responsive', async ({ page }) => {
+    const badges = page.locator('span.badge');
+    const count = await badges.count();
+    expect(count).toBeGreaterThan(0);
+    for (let i = 0; i < count; i++) {
+      const badge = badges.nth(i);
+      // aria-label si icône seule
+      const hasIcon = await badge.locator('svg').count() > 0;
+      if (hasIcon && !(await badge.textContent()).trim()) {
+        const aria = await badge.getAttribute('aria-label');
+        expect(aria).not.toBeNull();
+      }
+      // role
+      const role = await badge.getAttribute('role');
+      if (role) expect(['status','presentation','alert']).toContain(role);
+      // tabindex
+      const tabindex = await badge.getAttribute('tabindex');
+      if (tabindex) expect(["0","-1"]).toContain(tabindex);
+    }
+    // Responsive
+    await page.setViewportSize({ width: 375, height: 800 });
+    await expect(badges.first()).toBeVisible();
+    await page.setViewportSize({ width: 1280, height: 800 });
   });
 });

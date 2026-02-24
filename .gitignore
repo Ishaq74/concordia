@@ -32,4 +32,14 @@ skills/
 
 # local test files
 tests-results/*
+.playwright-mcp/
 .playwright-mcp/*
+
+# wieframes
+
+wireframes/
+wireframes/*
+
+# AI
+instructions/
+instructions/*

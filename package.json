@@ -21,7 +21,6 @@
     "smtp:check": "tsx src/lib/smtp/smtp.check.ts",
     "test": "vitest",
     "test:watch": "vitest --watch",
-    "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration --maxWorkers 1 --no-file-parallelism",

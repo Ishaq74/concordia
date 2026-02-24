@@ -1,6 +1,8 @@
 ---
-description: 'Complete human, philosophical, epistemological, and operational profile of the project owner to ensure correct interpretation, decision-making, and execution.'
-applyTo: '**'
+name: Ishaq
+description: "Complete human, philosophical, epistemological, and operational profile of the project owner to ensure correct interpretation, decision-making, and execution."
+model: Raptor mini (Preview) (copilot)
+tools: ['vscode', 'execute', 'read', 'agent', 'context7/*', 'edit', 'search', 'web', 'todo', 'astro-docs/*']
 ---
 
 ## PROJECT OWNER — COMPLETE PROFILE
@@ -242,10 +244,6 @@ When allowed:
 - No arbitrary defaults.
 - No silent nulls.
 - No omissions.
-
-### Core Values
-- if you code something , code it fully and test it with astro check.
-- if there is a test attached to a code, make sure the test passes.
 
 Completeness is mandatory.  
 Coherence is mandatory.  

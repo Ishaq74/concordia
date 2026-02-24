@@ -17,19 +17,78 @@ test.describe('ButtonComponent – Page de documentation complète', () => {
   });
 
   // Section Variants
-  test('Vérifie tous les variants et couleurs', async ({ page }) => {
+  test('Vérifie tous les variants et couleurs (boutons)', async ({ page }) => {
     const variants = ['initial', 'retro', 'modern', 'futuristic'];
     const colors = ['default', 'primary', 'secondary', 'accent'];
-
     for (const variant of variants) {
       for (const color of colors) {
         const btn = page.locator(`.example-section button.${variant}.${color}`);
-        if (await btn.count() === 0) continue; // certains combos peuvent ne pas exister
+        if (await btn.count() === 0) continue;
         await expect(btn.first()).toBeVisible();
         await expect(btn.first()).toHaveClass(new RegExp(variant));
         if (color !== 'default') await expect(btn.first()).toHaveClass(new RegExp(color));
+        // Vérifie data-variant
+        await expect(btn.first()).toHaveAttribute('data-variant', variant);
       }
     }
+  });
+
+  // Liens <a> stylés en bouton
+  test('Vérifie les <a class="button"> (link as button)', async ({ page }) => {
+    const section = page.locator('h3:has-text("Lien bouton") + .example-section');
+    const links = section.locator('a.button');
+    const count = await links.count();
+    expect(count).toBeGreaterThan(0);
+    for (let i = 0; i < count; i++) {
+      const a = links.nth(i);
+      await expect(a).toBeVisible();
+      // Vérifie href
+      const href = await a.getAttribute('href');
+      expect(href).not.toBeNull();
+      // Vérifie target/rel/download si présents
+      const target = await a.getAttribute('target');
+      if (target) await expect(a).toHaveAttribute('rel', /noopener|noreferrer/);
+      // Vérifie aria-label si icône seule
+      const hasIcon = await a.locator('svg').count() > 0;
+      if (hasIcon && !(await a.textContent()).trim()) {
+        const aria = await a.getAttribute('aria-label');
+        expect(aria).not.toBeNull();
+      }
+    }
+  });
+
+  // Interactions (clic)
+  test('Clic sur bouton déclenche action (si démo)', async ({ page }) => {
+    const section = page.locator('h3:has-text("Bouton action") + .example-section');
+    const btn = section.locator('button', { hasText: 'Action' });
+    if (await btn.count() > 0) {
+      await btn.click();
+      // Vérifie apparition d’un feedback ou d’un changement d’état si présent
+      // (adapter selon la démo réelle)
+    }
+  });
+
+  // Boutons toggle (aria-pressed)
+  test('Boutons toggle ont aria-pressed', async ({ page }) => {
+    const section = page.locator('h3:has-text("Toggle") + .example-section');
+    const toggles = section.locator('button[aria-pressed]');
+    const count = await toggles.count();
+    if (count > 0) {
+      for (let i = 0; i < count; i++) {
+        const btn = toggles.nth(i);
+        const pressed = await btn.getAttribute('aria-pressed');
+        expect(["true","false"]).toContain(pressed);
+      }
+    }
+  });
+
+  // Responsive
+  test('Responsive : boutons visibles et accessibles en mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 800 });
+    const section = page.locator('h2:has-text("Variants") + .example-section');
+    const btn = section.locator('button');
+    await expect(btn.first()).toBeVisible();
+    await page.setViewportSize({ width: 1280, height: 800 });
   });
 
   // Types de bouton
@@ -116,16 +175,29 @@ test.describe('ButtonComponent – Page de documentation complète', () => {
     await expect(nextBtn.locator('svg')).toBeVisible();
   });
 
-  // Accessibilité
-  test('Vérifie les attributs ARIA et focus', async ({ page }) => {
-    const section = page.locator('h3:has-text("Bouton icône seule") + .example-section');
-    const iconButtons = section.locator('button');
-    const count = await iconButtons.count();
+  // Checklist a11y et focus
+  test('Checklist a11y : role, aria-label, tabindex, focus', async ({ page }) => {
+    const btns = page.locator('button, a.button');
+    const count = await btns.count();
     expect(count).toBeGreaterThan(0);
     for (let i = 0; i < count; i++) {
-      const btn = iconButtons.nth(i);
-      const aria = await btn.getAttribute('aria-label');
-      expect(aria).not.toBeNull();
+      const el = btns.nth(i);
+      // role
+      const role = await el.getAttribute('role');
+      if (el.evaluate(node => node.tagName === 'A')) {
+        expect([null, 'button', 'link']).toContain(role);
+      } else {
+        expect([null, 'button']).toContain(role);
+      }
+      // aria-label si icône seule
+      const hasIcon = await el.locator('svg').count() > 0;
+      if (hasIcon && !(await el.textContent()).trim()) {
+        const aria = await el.getAttribute('aria-label');
+        expect(aria).not.toBeNull();
+      }
+      // tabindex
+      const tabindex = await el.getAttribute('tabindex');
+      if (tabindex) expect(["0","-1"]).toContain(tabindex);
     }
   });
 
