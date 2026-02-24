@@ -26,6 +26,7 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration --maxWorkers 1 --no-file-parallelism",
     "test:e2e": "vitest run tests/e2e",
+    "test:ui": "pnpm exec playwright test tests/e2e/ui",
     "test:security": "vitest run tests/e2e/security.test.ts",
     "test:api": "vitest run tests/e2e/api-auth.test.ts",
     "test:all": "vitest run",

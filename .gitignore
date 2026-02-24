@@ -14,6 +14,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+playwright-log.*
 .sonda/
 
 # environment variables
@@ -28,3 +29,7 @@ pnpm-debug.log*
 
 # Agent skills (temporaire)
 skills/
+
+# local test files
+tests-results/*
+playwright-mcp/*

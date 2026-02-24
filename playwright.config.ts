@@ -12,12 +12,16 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
   projects: [
-    { name: 'chromium', use: devices['Desktop Chrome'] },
-    { name: 'mobile', use: devices['Pixel 5'] },
+    { name: 'chromium', use: { channel: 'chrome' } },
   ],
   webServer: {
-    command: 'USE_DB_TEST=true npm run dev',
+    // on Windows the inline environment variable syntax fails, so use 'env' property
+    command: 'npm run dev',
     url: 'http://localhost:4321',
     timeout: 120000,
+    reuseExistingServer: true,
+    env: {
+      USE_DB_TEST: 'true',
+    },
   },
 });
