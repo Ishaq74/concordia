@@ -32,4 +32,4 @@ skills/
 
 # local test files
 tests-results/*
-playwright-mcp/*
+.playwright-mcp/*
