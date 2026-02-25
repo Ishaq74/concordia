@@ -29,36 +29,65 @@ async function listFilesForPattern(pattern: string): Promise<string[]> {
 
 async function injectScope(agentPath: string) {
   const content = await readFile(agentPath);
-  const scopeMatch = content.match(/(## DOCUMENTATION AND OPERATIONAL SCOPE[\s\S]*?)(?=\n## |\n---|$)/);
-  if (!scopeMatch) {
-    // Section absente, on ne touche pas au fichier, on sauvegarde l'ancien contenu
-    await fs.writeFile(agentPath + '.bak', content, 'utf8');
-    console.warn(`Section 'DOCUMENTATION AND OPERATIONAL SCOPE' introuvable dans ${agentPath}, sauvegarde en .bak`);
-    return;
-  }
-  const scopeSection = scopeMatch[1];
-  const patterns = extractPatterns(scopeSection);
-  let newScope = '## DOCUMENTATION AND OPERATIONAL SCOPE\n\n';
-  if (!patterns.length) {
-    // Aucun pattern détecté, on ne supprime rien, on garde l'ancien contenu et on sauvegarde
-    await fs.writeFile(agentPath + '.bak', content, 'utf8');
-    console.warn(`Aucun pattern détecté dans ${agentPath}, sauvegarde en .bak, aucun changement.`);
-    return;
-  }
-  for (const { pattern, comment } of patterns) {
-    newScope += `- \`${pattern}\`${comment ? ' — ' + comment : ''}\n`;
-    const files = await listFilesForPattern(pattern);
-    if (files.length) {
-      for (const f of files) {
-        newScope += `    - ${f}\n`;
-      }
-    } else {
-      newScope += `    - _introuvable_\n`;
+  const lines = content.split('\n');
+  let inScope = false;
+  let scopeStart = -1;
+  let scopeEnd = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith('## DOCUMENTATION AND OPERATIONAL SCOPE')) {
+      inScope = true;
+      scopeStart = i;
+      continue;
+    }
+    if (inScope && (lines[i].startsWith('## ') || lines[i].startsWith('---'))) {
+      scopeEnd = i;
+      break;
     }
   }
-  // Replace old scope section
-  const updated = content.replace(/## DOCUMENTATION AND OPERATIONAL SCOPE[\s\S]*?(?=\n## |\n---|$)/, newScope.trim());
-  await fs.writeFile(agentPath, updated, 'utf8');
+  if (!inScope) return;
+  if (scopeEnd === -1) scopeEnd = lines.length;
+  const scopeLines = lines.slice(scopeStart + 1, scopeEnd);
+  // Find patterns and inject under each
+  let newScopeLines = [];
+  let i = 0;
+  const seenPatterns = new Set();
+  while (i < scopeLines.length) {
+    const match = scopeLines[i].match(/^(\s*)-\s*([`'\"]?)([^`'\"]+)\2\s*—?\s*(.*)$/);
+    if (match) {
+      const indent = match[1] || '';
+      const pattern = match[3].trim();
+      // Ignore duplicate or malformed patterns
+      if (seenPatterns.has(pattern) || !pattern) {
+        newScopeLines.push(scopeLines[i]);
+        i++;
+        continue;
+      }
+      seenPatterns.add(pattern);
+      newScopeLines.push(scopeLines[i]);
+      // Skip any existing injected file list
+      let j = i + 1;
+      while (j < scopeLines.length && /^\s{4,}- /.test(scopeLines[j])) j++;
+      // Inject fresh file list
+      let files = await listFilesForPattern(pattern);
+      files = Array.from(new Set(files)).sort();
+      if (files.length) {
+        for (const f of files) newScopeLines.push(`${indent}    - ${f}`);
+      } else {
+        newScopeLines.push(`${indent}    - _introuvable_`);
+      }
+      i = j;
+    } else {
+      newScopeLines.push(scopeLines[i]);
+      i++;
+    }
+  }
+  // Replace only the scope section
+  const newLines = [
+    ...lines.slice(0, scopeStart + 1),
+    ...newScopeLines,
+    ...lines.slice(scopeEnd)
+  ];
+  await fs.writeFile(agentPath, newLines.join('\n'), 'utf8');
   console.log(`Injected scope for ${path.basename(agentPath)}`);
 }
 

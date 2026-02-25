@@ -11,7 +11,6 @@
     "astro": "astro",
     "sonda:report": "node scripts/run-sonda.mjs ./dist ./reports",
     "readme:generate": "tsx scripts/readme-generate.ts",
-    "contextai:generate": "tsx scripts/contextai/generate.ts",
     "contextai:inject-scope": "tsx scripts/contextai/injectScope.ts",
     "db:check": "tsx scripts/db/db.check.ts",
     "db:compare": "tsx scripts/db/db.compare.ts",
