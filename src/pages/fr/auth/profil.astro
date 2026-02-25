@@ -2,19 +2,25 @@
 // src/pages/fr/profil.astro
 export const prerender = false;
 
+
 import BaseLayout from "@layouts/BaseLayout.astro";
 import translations from "@i18n/fr.json";
 import { getAuth } from "@lib/auth/auth";
-
-// Composants auth
-import ProfileHeader from "@components/templates/auth/profile/ProfileHeader.astro";
-import ProfileDetails from "@components/templates/auth/profile/ProfileDetails.astro";
+import Grid from "@components/Tools/Grid.astro";
+import Flex from "@components/Tools/Flex.astro";
+import Tabs from "@components/ui/Tabs/Tabs.astro";
+import Tab from "@components/ui/Tabs/Tab.astro";
+import TabPanel from "@components/ui/Tabs/TabPanel.astro";
+import AvatarCard from "@components/ui/Avatar/AvatarCard.astro";
+import Badge from "@components/ui/Badge.astro";
+import Timeline from "@components/ui/Timeline.astro";
+import Gallery from "@components/ui/Gallery.astro";
+import GroupCard from "@components/ui/GroupCard.astro";
+import Button from "@components/ui/Button.astro";
+import Card from "@components/ui/Card/Card.astro";
 import ProfileForm from "@components/templates/auth/profile/ProfileForm.astro";
 import ProfileOrganization from "@components/templates/auth/profile/ProfileOrganization.astro";
 import ProfileInvitations from "@components/templates/auth/profile/ProfileInvitations.astro";
-
-// UI
-import Alert from "@components/ui/Alert.astro";
 
 // Utils
 import {
@@ -40,40 +46,18 @@ let status: Status | null = null;
 const auth = await getAuth();
 
 // --- Récupération des organisations
-const organizationListing = await auth.organizationApi.list({ headers: request.headers });
-const organizations: OrganizationRecord[] = Array.isArray(organizationListing)
-  ? organizationListing
-  : (organizationListing as any)?.organizations ?? [];
-
-// --- Organisation active
-const activeOrganizationId = (session as any)?.activeOrganizationId ?? null;
-
-// --- Récupération des membres
+// TODO: brancher API organisations si disponible
+const organizations: OrganizationRecord[] = [];
+const activeOrganizationId = null;
 let members: OrganizationMember[] = [];
-try {
-  const memberResult = await auth.organizationApi.listMembers({ headers: request.headers });
-  members = Array.isArray(memberResult)
-    ? memberResult
-    : (memberResult as any)?.members ?? [];
-} catch {
-  members = [];
-}
 
 // --- Rôle utilisateur
 const memberRole = members.find(m => m.userId === user.id)?.role ?? null;
 const canManageOrganization = memberRole === "owner" || memberRole === "admin";
 const isOwner = memberRole === "owner";
 
-// --- Invitations
+// --- Invitations (placeholder)
 let invitations: InvitationRecord[] = [];
-try {
-  const invitationResult = await auth.organizationApi.listUserInvitations({ headers: request.headers });
-  invitations = Array.isArray(invitationResult)
-    ? invitationResult
-    : (invitationResult as any)?.invitations ?? [];
-} catch {
-  invitations = [];
-}
 
 // --- Dernière connexion
 const lastSignIn = session?.updatedAt
@@ -81,39 +65,116 @@ const lastSignIn = session?.updatedAt
   : null;
 ---
 
+
 <BaseLayout lang="fr" title={translations.auth.profile ?? "Profil"}>
-  <!-- ProfileHeader -->
-  <ProfileHeader
-    title={translations.auth.profile ?? "Profil utilisateur"}
-    description={translations.auth.updateProfile ?? "Gérez vos informations personnelles et suivez vos connexions."}
-    status={status}
-  />
+  <Grid tag="section" cols="1" gap="xl">
+    {/* HERO/HEADER */}
+    <Card variant="modern" elevation="md" className="profile-hero">
+      <Grid cols="auto 1fr" gap="lg" align="center">
+        <div style="position:relative;display:flex;justify-content:center;align-items:center;">
+          <AvatarCard
+            variant="modern"
+            src={typeof user.image === 'string' ? user.image : undefined}
+            alt={user.name ?? user.email}
+            name={user.name ?? user.email}
+            size="xl"
+          >
+            <Button
+              variant="modern"
+              color="primary"
+              ariaLabel="Modifier l’avatar"
+              style="position:absolute;bottom:0;right:0;border-radius:50%;padding:0.5rem;"
+              icon={{ name: "mdi:pencil", side: "left" }}
+              onclick="window.location.href='/fr/auth/profil?edit=avatar'"
+            />
+          </AvatarCard>
+        </div>
+        <Flex direction="column" gap="sm">
+          <Flex gap="sm" alignItems="center">
+            <h1 style="font-size:2rem;font-weight:bold;">{user.name ?? user.email}</h1>
+          </Flex>
+          <Flex gap="md">
+            <Button variant="modern" color="secondary" icon={{name:"mdi:share-variant",side:"left"}}>Partager</Button>
+            <Button variant="modern" color="primary" icon={{name:"mdi:email-outline",side:"left"}}>Contacter</Button>
+          </Flex>
+        </Flex>
+      </Grid>
+    </Card>
 
-  <!-- ProfileDetails -->
-  <ProfileDetails
-    user={user}
-    memberRole={memberRole}
-    organizations={organizations}
-    activeOrganizationId={activeOrganizationId}
-    lastSignIn={lastSignIn}
-    invitationCount={invitations.length}
-  />
+    {/* TABS */}
+    <Tabs variant="modern">
+      <Flex gap="md">
+        <Tab name="profil-tabs" checked icon="mdi:history">Activité</Tab>
+        <Tab name="profil-tabs" icon="mdi:heart">Services favoris</Tab>
+        <Tab name="profil-tabs" icon="mdi:blog-outline">Articles</Tab>
+        <Tab name="profil-tabs" icon="mdi:pencil">Éditer mon profil</Tab>
+      </Flex>
 
-  <!-- ProfileForm -->
-  <ProfileForm user={user} />
-
-  <!-- ProfileOrganization -->
-  <ProfileOrganization
-    organizations={organizations}
-    activeOrganizationId={activeOrganizationId}
-    members={members}
-    canManageOrganization={canManageOrganization}
-    isOwner={isOwner}
-    auth={auth}
-    session={session}
-    translations={translations}
-  />
-
-  <!-- ProfileInvitations -->
-  <ProfileInvitations count={invitations.length} translations={translations} />
+      {/* PANELS */}
+      <TabPanel>
+        {/* GRID PRINCIPALE */}
+        <Grid cols="2fr 1fr" gap="xl">
+          {/* Colonne principale : Activité */}
+          <Card variant="modern" elevation="sm">
+            <h2 style="font-size:1.25rem;font-weight:bold;">Activité récente</h2>
+            <Timeline
+              events={[]}
+              variant="modern"
+              orientation="vertical"
+              iconShape="circle"
+            />
+          </Card>
+          {/* Colonne latérale */}
+          <Flex direction="column" gap="lg">
+            <Card variant="modern" elevation="sm">
+              <h3>Statistiques</h3>
+              <Flex direction="column" gap="xs">
+                <span>Services utilisés : <b>0</b></span>
+                <span>Articles lus : <b>0</b></span>
+                <span>Likes donnés : <b>0</b></span>
+              </Flex>
+            </Card>
+            <Card variant="modern" elevation="sm">
+              <h3>Organisations suivies</h3>
+              <Flex direction="column" gap="sm">
+                <span>Aucune organisation suivie</span>
+              </Flex>
+            </Card>
+            <Card variant="modern" elevation="sm">
+              <h3>Photos récentes</h3>
+              <Gallery images={[]} columns={3} gap="0.5rem" aspectRatio="1/1" showCaptions={false} />
+            </Card>
+          </Flex>
+        </Grid>
+      </TabPanel>
+      <TabPanel>
+        {/* Services favoris */}
+        <Grid cols="1" gap="md">
+          <span>Aucun service favori</span>
+        </Grid>
+      </TabPanel>
+      <TabPanel>
+        {/* Articles de blog */}
+        <Grid cols="1" gap="md">
+          <span>Aucun article</span>
+        </Grid>
+      </TabPanel>
+      <TabPanel>
+        {/* Édition du profil */}
+        <Grid cols="1" gap="xl">
+          <ProfileForm user={user} />
+          <ProfileOrganization
+            organizations={organizations}
+            activeOrganizationId={activeOrganizationId}
+            members={members}
+            canManageOrganization={canManageOrganization}
+            isOwner={isOwner}
+            session={session}
+            translations={translations}
+          />
+          <ProfileInvitations count={invitations.length} translations={translations} />
+        </Grid>
+      </TabPanel>
+    </Tabs>
+  </Grid>
 </BaseLayout>

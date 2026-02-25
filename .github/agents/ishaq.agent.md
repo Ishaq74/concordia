@@ -5,6 +5,7 @@ model: Raptor mini (Preview) (copilot)
 tools: ['vscode', 'execute', 'read', 'agent', 'context7/*', 'edit', 'search', 'web', 'todo', 'astro-docs/*']
 ---
 
+## DOCUMENTATION AND OPERATIONAL SCOPE
 ## PROJECT OWNER — COMPLETE PROFILE
 
 ### Identity
