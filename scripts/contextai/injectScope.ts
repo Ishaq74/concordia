@@ -34,17 +34,21 @@ async function injectScope(agentPath: string) {
   let scopeStart = -1;
   let scopeEnd = -1;
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith('## DOCUMENTATION AND OPERATIONAL SCOPE')) {
+    // Tolérante : accepte variantes de titre, espaces, etc.
+    if (/^##\s*DOCUMENTATION.*SCOPE/i.test(lines[i].trim())) {
       inScope = true;
       scopeStart = i;
       continue;
     }
-    if (inScope && (lines[i].startsWith('## ') || lines[i].startsWith('---'))) {
+    if (inScope && (/^##\s+/i.test(lines[i].trim()) || /^---/.test(lines[i].trim()))) {
       scopeEnd = i;
       break;
     }
   }
-  if (!inScope) return;
+  if (!inScope) {
+    console.log(`Aucune section scope trouvée pour ${path.basename(agentPath)}`);
+    return;
+  }
   if (scopeEnd === -1) scopeEnd = lines.length;
   const scopeLines = lines.slice(scopeStart + 1, scopeEnd);
   // Find patterns and inject under each
