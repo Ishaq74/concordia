@@ -3,6 +3,7 @@ import { getAuth } from "@lib/auth/auth";
 import { getDrizzle } from "@database/drizzle";
 import { profile } from "@database/schemas";
 import { eq } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
 
 export const prerender = false;
 
@@ -25,9 +26,23 @@ export const GET: APIRoute = async ({ request }) => {
     .limit(1);
 
   if (rows.length === 0) {
-    return new Response(JSON.stringify({ error: "BIZ_NOT_FOUND" }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" },
+    // Auto-create profile for authenticated users who don't have one yet
+    const newProfile = await db
+      .insert(profile)
+      .values({
+        id: randomUUID(),
+        userId: session.user.id,
+        fullName: session.user.name ?? null,
+        preferredLanguage: "fr",
+      })
+      .returning();
+
+    return new Response(JSON.stringify(newProfile[0]), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff",
+      },
     });
   }
 
@@ -117,9 +132,24 @@ export const PATCH: APIRoute = async ({ request }) => {
     .returning();
 
   if (result.length === 0) {
-    return new Response(JSON.stringify({ error: "BIZ_NOT_FOUND" }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" },
+    // Profile doesn't exist yet — create it with the provided fields
+    const created = await db
+      .insert(profile)
+      .values({
+        id: randomUUID(),
+        userId: session.user.id,
+        fullName: session.user.name ?? null,
+        preferredLanguage: "fr",
+        ...updates,
+      })
+      .returning();
+
+    return new Response(JSON.stringify(created[0]), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "X-Content-Type-Options": "nosniff",
+      },
     });
   }
 

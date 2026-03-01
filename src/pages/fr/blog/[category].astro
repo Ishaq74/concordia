@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import PageBreadcrumb from '@components/ui/Breadcrumb/PageBreadcrumb.astro';
 
 // 1. Réutilisation des composants
 import PostGrid from "@components/modules/blog/lists/PostGrid.astro";
@@ -49,6 +50,12 @@ const posts = allPosts
   lang={LANG}
 >
   <main class="container mx-auto px-4 py-12" transition:name="category">
+    <PageBreadcrumb
+      items={[
+        { label: "Blog", href: "/blog" },
+      ]}
+      current={name}
+    />
     {/* EN-TÊTE CATÉGORIE */}
     <div class="mb-12 space-y-4">
       <div class="space-y-2">

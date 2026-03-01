@@ -1,0 +1,202 @@
+---
+/**
+ * PageBreadcrumb — Composant intelligent de fil d'Ariane
+ *
+ * Utilise les primitives UI (Breadcrumb, BreadcrumbList, BreadcrumbItem,
+ * BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage) du design system.
+ *
+ * Features :
+ * - i18n : traduit automatiquement "Accueil" et l'aria-label
+ * - Accessibilité : aria-label traduit, aria-current="page", rôles ARIA
+ * - Schema.org : JSON-LD BreadcrumbList pour le SEO
+ * - Design System : supporte variant + color des 4 thèmes
+ * - Mode inverted pour fond sombre (bannières)
+ * - Responsive : tronque automatiquement sur mobile (ellipsis)
+ *
+ * @example
+ * <PageBreadcrumb
+ *   items={[
+ *     { label: "Blog", href: "/blog" },
+ *     { label: "Technologie", href: "/blog/technologie" },
+ *   ]}
+ *   current="Mon article"
+ * />
+ */
+
+import Breadcrumb from './Breadcrumb.astro';
+import BreadcrumbList from './BreadcrumbList.astro';
+import BreadcrumbItem from './BreadcrumbItem.astro';
+import BreadcrumbLink from './BreadcrumbLink.astro';
+import BreadcrumbSeparator from './BreadcrumbSeparator.astro';
+import BreadcrumbPage from './BreadcrumbPage.astro';
+import { Icon } from 'astro-icon/components';
+import { getRelativeLocaleUrl } from '@lib/i18n/locale-url';
+
+interface BreadcrumbEntry {
+  /** Label affiché */
+  label: string;
+  /** URL relative (sans le préfixe locale, ex: "/blog") */
+  href: string;
+}
+
+interface Props {
+  /** Éléments de navigation intermédiaires (liens cliquables) */
+  items?: BreadcrumbEntry[];
+  /** Label de la page courante (dernier élément, non cliquable) */
+  current?: string;
+  /** Variante du design system */
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  /** Couleur du design system */
+  color?: 'default' | 'primary' | 'secondary' | 'accent';
+  /** Mode inversé pour fond sombre (bannière, hero) */
+  inverted?: boolean;
+  /** Afficher l'icône maison pour Accueil */
+  showHomeIcon?: boolean;
+  /** Classe CSS additionnelle */
+  className?: string;
+}
+
+const {
+  items = [],
+  current,
+  variant = 'initial',
+  color = 'default',
+  inverted = false,
+  showHomeIcon = true,
+  className = '',
+} = Astro.props;
+
+const currentLocale = Astro.currentLocale || 'fr';
+
+// Load translations
+const translations = import.meta.glob('../../../../i18n/*.json', { eager: true }) as Record<string, { default: any }>;
+const t = translations[`../../../../i18n/${currentLocale}.json`]?.default
+  ?? translations['../../../../i18n/fr.json']?.default;
+
+const bc = t?.breadcrumb ?? {};
+const ariaLabel = bc.ariaLabel || "Fil d'Ariane";
+const homeLabel = bc.home || 'Accueil';
+const homeHref = getRelativeLocaleUrl(currentLocale, '/');
+
+// Build JSON-LD BreadcrumbList (Schema.org)
+const origin = Astro.url.origin;
+const jsonLdItems = [
+  { "@type": "ListItem", "position": 1, "name": homeLabel, "item": `${origin}${homeHref}` },
+  ...items.map((item, i) => ({
+    "@type": "ListItem",
+    "position": i + 2,
+    "name": item.label,
+    "item": `${origin}${getRelativeLocaleUrl(currentLocale, item.href)}`,
+  })),
+  ...(current ? [{
+    "@type": "ListItem",
+    "position": items.length + 2,
+    "name": current,
+  }] : []),
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": jsonLdItems,
+};
+
+const invertedClass = inverted ? 'breadcrumb-inverted' : '';
+const classes = [className, invertedClass].filter(Boolean).join(' ');
+---
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+<Breadcrumb variant={variant} color={color} className={classes}>
+  <BreadcrumbList>
+    <!-- Accueil -->
+    <BreadcrumbItem>
+      <BreadcrumbLink href={homeHref}>
+        {showHomeIcon && <Icon name="mdi:home" class="breadcrumb-home-icon" />}
+        <span class={showHomeIcon ? 'sr-only-mobile' : ''}>{homeLabel}</span>
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+
+    <!-- Items intermédiaires -->
+    {items.map((item) => (
+      <>
+        <BreadcrumbSeparator>
+          <Icon name="mdi:chevron-right" class="breadcrumb-chevron" />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbLink href={getRelativeLocaleUrl(currentLocale, item.href)}>
+            {item.label}
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+      </>
+    ))}
+
+    <!-- Page courante -->
+    {current && (
+      <>
+        <BreadcrumbSeparator>
+          <Icon name="mdi:chevron-right" class="breadcrumb-chevron" />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbPage>{current}</BreadcrumbPage>
+        </BreadcrumbItem>
+      </>
+    )}
+  </BreadcrumbList>
+</Breadcrumb>
+
+<style>
+  /* Home icon sizing */
+  .breadcrumb-home-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  /* Chevron separator icon */
+  .breadcrumb-chevron {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+  }
+
+  /* Inverted mode for dark backgrounds (banners, heroes) */
+  :global(.breadcrumb-inverted .breadcrumb-link) {
+    color: rgba(255, 255, 255, 0.75) !important;
+  }
+  :global(.breadcrumb-inverted .breadcrumb-link:hover) {
+    color: #ffffff !important;
+  }
+  :global(.breadcrumb-inverted .breadcrumb-page) {
+    color: #ffffff !important;
+  }
+  :global(.breadcrumb-inverted .breadcrumb-separator) {
+    color: rgba(255, 255, 255, 0.5) !important;
+  }
+  :global(.breadcrumb-inverted) .breadcrumb-home-icon {
+    color: rgba(255, 255, 255, 0.75);
+  }
+  :global(.breadcrumb-inverted) .breadcrumb-chevron {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Mobile: hide home text, show only icon */
+  .sr-only-mobile {
+    display: inline;
+  }
+
+  @media (max-width: 640px) {
+    .sr-only-mobile {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  }
+</style>

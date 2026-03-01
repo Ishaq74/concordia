@@ -4,6 +4,7 @@ import MarkdownIt from "markdown-it";
 import BlogLayout from "@components/templates/blog/BlogLayout.astro";
 import Grid from "@components/Tools/Grid.astro";
 import Flex from "@components/Tools/Flex.astro";
+import PageBreadcrumb from '@components/ui/Breadcrumb/PageBreadcrumb.astro';
 // Import des composants
 import PostHeader from "@components/modules/blog/single/PostHeader.astro";
 import TableOfContents from "@components/modules/blog/single/TableOfContents.astro";
@@ -41,6 +42,9 @@ const sameCategoryPosts = allPosts
       new Date(a.data.publishedAt || 0).getTime(),
   );
 
+// Nom lisible de la catégorie courante
+const currentCategory = (post.data.categories ?? []).find((c: any) => c.slug === category);
+const categoryName = currentCategory?.name ?? category;
 ---
 
 
@@ -50,6 +54,13 @@ const sameCategoryPosts = allPosts
   variant="initial"
 >
   <main class="page-container">
+    <PageBreadcrumb
+      items={[
+        { label: "Blog", href: "/blog" },
+        { label: categoryName, href: `/blog/${category}` },
+      ]}
+      current={post.data.title}
+    />
     <PostHeader post={post} lang={LANG} />
 
     <article class="content-column">

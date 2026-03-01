@@ -5,11 +5,13 @@ import { blogAuthors } from "./blog_authors.schema";
 import { blogCategories } from "./blog_categories.schema";
 import { blogMedia } from "./blog_media.schema";
 import { blogComments } from "./blog_comments.schema";
+import { blogOrganizations } from "./blog_organization.schema";
 
 export const blogPosts = pgTable("blog_posts", {
   id: text("id").primaryKey(),
   slug: text("slug").notNull().unique(),
   status: text("status").notNull(),
+  organizationId: text("organization_id"),
   publishedAt: timestamp("published_at"),
   displayInHome: boolean("display_in_home").notNull().default(false),
   displayInBlog: boolean("display_in_blog").notNull().default(true),
@@ -44,7 +46,8 @@ export const blogPostMedia = pgTable("blog_post_media", {
   position: text("position"),
 });
 
-export const blogPostsRelations = relations(blogPosts, ({ many }) => ({
+export const blogPostsRelations = relations(blogPosts, ({ one, many }) => ({
+  organization: one(blogOrganizations, { fields: [blogPosts.organizationId], references: [blogOrganizations.id] }),
   authors: many(blogPostAuthors),
   categories: many(blogPostCategories),
   media: many(blogPostMedia),

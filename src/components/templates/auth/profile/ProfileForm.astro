@@ -3,37 +3,252 @@
 import FormGroup from "@components/ui/Form/FormGroup.astro";
 import Label from "@components/ui/Form/Label.astro";
 import Input from "@components/ui/Form/Input.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
+import Select from "@components/ui/Form/Select.astro";
 import Button from "@components/ui/Button.astro";
 import Card from "@components/ui/Card/Card.astro";
+import { Icon } from "astro-icon/components";
+
+interface ProfileData {
+  id?: string;
+  bio?: string | null;
+  location?: string | null;
+  website?: string | null;
+  preferredLanguage?: string | null;
+  avatarUrl?: string | null;
+}
 
 interface Props {
   user: { id: string; name?: string | null; email: string };
+  profile?: ProfileData | null;
 }
 
-const { user } = Astro.props as Props;
+const { user, profile: userProfile = null } = Astro.props as Props;
 ---
 
-<Card variant="modern" elevation="sm" className="max-w-lg">
-  <form method="POST" class="grid gap-4 p-6">
-  <input type="hidden" name="intent" value="update-profile" />
+<Card variant="modern" elevation="sm">
+  <div class="profile-form">
+    <div class="profile-form__header">
+      <div class="profile-form__header-text">
+        <h2 class="profile-form__title">
+          <Icon name="mdi:account-edit-outline" />
+          Informations personnelles
+        </h2>
+        <p class="profile-form__description">
+          Mettez à jour vos informations de profil. Ces informations seront visibles publiquement.
+        </p>
+      </div>
+    </div>
 
-  <FormGroup>
-    <Label htmlFor="profile-edit-name">Nom complet</Label>
-    <Input id="profile-edit-name" name="name" value={user.name ?? ''} />
-  </FormGroup>
+    <div id="profile-form-alert" class="profile-form__alert" hidden></div>
 
-  <FormGroup>
-    <Label htmlFor="profile-edit-email">Adresse e-mail</Label>
-    <Input id="profile-edit-email" name="email" type="email" value={user.email} required />
-  </FormGroup>
+    <form id="profile-edit-form" class="profile-form__grid">
+      {/* Row 1: Name + Email */}
+      <FormGroup>
+        <Label htmlFor="profile-edit-name">Nom complet</Label>
+        <Input
+          id="profile-edit-name"
+          name="fullName"
+          value={user.name ?? ""}
+          placeholder="Votre nom complet"
+        />
+      </FormGroup>
 
-  <FormGroup>
-    <Label htmlFor="profile-edit-password">Nouveau mot de passe</Label>
-    <Input id="profile-edit-password" name="password" type="password" placeholder="Optionnel" />
-  </FormGroup>
+      <FormGroup>
+        <Label htmlFor="profile-edit-email">Adresse e-mail</Label>
+        <Input
+          id="profile-edit-email"
+          name="email"
+          type="email"
+          value={user.email}
+          disabled
+        />
+        <p class="profile-form__field-hint">L'email ne peut pas être modifié ici.</p>
+      </FormGroup>
 
-  <Button type="submit" variant="modern" color="primary">
-    Mettre à jour
-  </Button>
-</form>
+      {/* Row 2: Location + Website */}
+      <FormGroup>
+        <Label htmlFor="profile-edit-location">Localisation</Label>
+        <Input
+          id="profile-edit-location"
+          name="location"
+          value={userProfile?.location ?? ""}
+          placeholder="Ex: Lyon, France"
+        />
+      </FormGroup>
+
+      <FormGroup>
+        <Label htmlFor="profile-edit-website">Site web</Label>
+        <Input
+          id="profile-edit-website"
+          name="website"
+          value={userProfile?.website ?? ""}
+          placeholder="https://monsite.fr"
+        />
+      </FormGroup>
+
+      {/* Row 3: Bio (full width) */}
+      <div class="profile-form__full-width">
+        <FormGroup>
+          <Label htmlFor="profile-edit-bio">Biographie</Label>
+          <Textarea
+            id="profile-edit-bio"
+            name="bio"
+            value={userProfile?.bio ?? ""}
+            placeholder="Présentez-vous en quelques mots..."
+            rows={4}
+          />
+          <p class="profile-form__field-hint">Maximum 500 caractères.</p>
+        </FormGroup>
+      </div>
+
+      {/* Row 4: Language preference */}
+      <FormGroup>
+        <Label htmlFor="profile-edit-lang">Langue préférée</Label>
+        <Select id="profile-edit-lang" name="preferredLanguage">
+          <option value="fr" selected={userProfile?.preferredLanguage === "fr" || !userProfile?.preferredLanguage}>Français</option>
+          <option value="en" selected={userProfile?.preferredLanguage === "en"}>English</option>
+          <option value="es" selected={userProfile?.preferredLanguage === "es"}>Español</option>
+          <option value="ar" selected={userProfile?.preferredLanguage === "ar"}>العربية</option>
+        </Select>
+      </FormGroup>
+
+      <div></div> {/* spacer for grid alignment */}
+
+      {/* Submit row */}
+      <div class="profile-form__actions">
+        <Button type="submit" variant="modern" color="primary" icon={{ name: "mdi:content-save-outline", side: "left" }}>
+          Enregistrer les modifications
+        </Button>
+      </div>
+    </form>
+  </div>
 </Card>
+
+<script>
+  const form = document.getElementById("profile-edit-form") as HTMLFormElement | null;
+  const alertBox = document.getElementById("profile-form-alert");
+
+  function showAlert(type: "success" | "error", message: string) {
+    if (!alertBox) return;
+    alertBox.hidden = false;
+    alertBox.className = `profile-form__alert profile-form__alert--${type}`;
+    alertBox.textContent = message;
+    alertBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = new FormData(form);
+    const payload: Record<string, string> = {};
+
+    for (const [key, value] of data.entries()) {
+      if (typeof value === "string" && value.trim()) {
+        payload[key] = value.trim();
+      }
+    }
+
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        showAlert("success", "Profil mis à jour avec succès !");
+      } else {
+        const body = await res.json().catch(() => ({}));
+        const msg = body.message ?? body.error ?? "Erreur lors de la mise à jour.";
+        showAlert("error", msg);
+      }
+    } catch {
+      showAlert("error", "Impossible de contacter le serveur.");
+    }
+  });
+</script>
+
+<style>
+.profile-form {
+  padding: 1.5rem;
+}
+
+.profile-form__header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.profile-form__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--heading-color, #1e293b);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.profile-form__title :global(svg) {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-primary, #1978e5);
+}
+
+.profile-form__description {
+  font-size: 0.875rem;
+  color: var(--text-muted, #64748b);
+  margin: 0.5rem 0 0;
+}
+
+.profile-form__alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius, 0.5rem);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.profile-form__alert--success {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.profile-form__alert--error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.profile-form__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .profile-form__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.profile-form__full-width {
+  grid-column: 1 / -1;
+}
+
+.profile-form__field-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted, #94a3b8);
+  margin: 0.25rem 0 0;
+}
+
+.profile-form__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+}
+</style>

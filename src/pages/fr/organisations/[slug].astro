@@ -1,0 +1,734 @@
+---
+// src/pages/fr/organisations/[slug].astro
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import BannerPage from "@templates/BannerPage.astro";
+import Grid from "@components/Tools/Grid.astro";
+import Flex from "@components/Tools/Flex.astro";
+import Card from "@components/ui/Card/Card.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import { Icon } from "astro-icon/components";
+
+import { getDrizzle } from "@database/drizzle";
+import { blogOrganizations, blogAuthors, blogPosts, blogPostAuthors, blogTranslations } from "@database/schemas";
+import { eq, and, sql } from "drizzle-orm";
+
+const LANG = "fr";
+const { slug } = Astro.params;
+
+if (!slug) return Astro.redirect(`/${LANG}/organisations`);
+
+const db = await getDrizzle();
+
+// Fetch organization
+const orgRows = await db
+  .select()
+  .from(blogOrganizations)
+  .where(and(eq(blogOrganizations.slug, slug), eq(blogOrganizations.isActive, true)))
+  .limit(1);
+
+if (orgRows.length === 0) return Astro.redirect(`/${LANG}/organisations`);
+
+const org = orgRows[0];
+
+// Helper to extract localized text
+const loc = (val: any, fallback = "") => {
+  if (!val) return fallback;
+  if (typeof val === "string") return val;
+  return val[LANG] ?? val.fr ?? val.en ?? Object.values(val)[0] ?? fallback;
+};
+
+// Fetch authors working for this organization
+const authors = await db
+  .select()
+  .from(blogAuthors)
+  .where(eq(blogAuthors.worksForId, org.id));
+
+// Fetch posts linked to this organization (with translations for titles)
+const posts = await db
+  .select({
+    id: blogPosts.id,
+    slug: blogPosts.slug,
+    status: blogPosts.status,
+    publishedAt: blogPosts.publishedAt,
+    readingTime: blogPosts.readingTime,
+  })
+  .from(blogPosts)
+  .where(and(eq(blogPosts.organizationId, org.id), eq(blogPosts.status, "published")))
+  .orderBy(sql`${blogPosts.publishedAt} DESC NULLS LAST`)
+  .limit(6);
+
+// Fetch translations for post titles
+const postIds = posts.map(p => p.id);
+const translations = postIds.length > 0
+  ? await db
+      .select()
+      .from(blogTranslations)
+      .where(and(
+        sql`${blogTranslations.postId} IN (${sql.join(postIds.map(id => sql`${id}`), sql`, `)})`,
+        eq(blogTranslations.inLanguage, LANG)
+      ))
+  : [];
+
+const translationMap = new Map(translations.map(t => [t.postId, t]));
+
+// --- Derived data ---
+const desc = loc(org.description);
+const slogan = loc(org.slogan);
+const legalName = loc(org.legalName);
+const address = org.address as { streetAddress?: string; addressLocality?: string; addressRegion?: string; postalCode?: string; addressCountry?: string } | null;
+const sameAs = (org.sameAs ?? []) as string[];
+const knowsAbout = (org.knowsAbout ?? []) as string[];
+const knowsLanguage = (org.knowsLanguage ?? []) as string[];
+const areaServed = (org.areaServed ?? []) as string[];
+const contactPoints = (org.contactPoint ?? []) as { contactType: string; telephone?: string; email?: string; hoursAvailable?: string }[];
+const departments = (org.department ?? []) as string[];
+const employees = (org.employee ?? []) as string[];
+const founders = (Array.isArray(org.founder) ? org.founder : org.founder ? [org.founder] : []) as string[];
+const rating = org.aggregateRating as { ratingValue: number; bestRating: number; worstRating: number; ratingCount: number } | null;
+const stats = (org.interactionStatistic ?? []) as { interactionType: string; userInteractionCount: number }[];
+const makesOffer = (org.makesOffer ?? []) as string[];
+---
+
+<BaseLayout title={`${org.name} — Organisation`} lang={LANG}>
+  <BannerPage
+    title={org.name}
+    subtitle={slogan}
+    description={desc ? (desc.length > 200 ? desc.slice(0, 200) + "…" : desc) : undefined}
+    type="hero"
+    color="primary"
+    featuredImg={org.image ?? org.logo ?? undefined}
+    breadcrumbs={[
+      { label: "Organisations", href: "/organisations" },
+    ]}
+  />
+
+  <main class="org-detail">
+
+    {/* ======================================= */}
+    {/* HERO IDENTITY SECTION                   */}
+    {/* ======================================= */}
+    <section class="org-identity" aria-label="Identité de l'organisation">
+      <div class="org-identity__header">
+        <div class="org-identity__logo-col">
+          {org.logo ? (
+            <img src={org.logo} alt={org.name} class="org-identity__logo" />
+          ) : (
+            <div class="org-identity__logo-placeholder">
+              {org.name.charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+
+        <div class="org-identity__info">
+          <div class="org-identity__name-row">
+            <h1 class="org-identity__name">{org.name}</h1>
+            {org.isFeatured && (
+              <Badge variant="modern" color="warning" icon={{ name: "mdi:star", side: "left" }}>
+                En vedette
+              </Badge>
+            )}
+          </div>
+
+          {legalName && legalName !== org.name && (
+            <p class="org-identity__legal">
+              <Icon name="mdi:gavel" /> {legalName}
+            </p>
+          )}
+
+          {slogan && <p class="org-identity__slogan">« {slogan} »</p>}
+
+          <Flex gap="sm" class="org-identity__badges">
+            {org.nonprofitStatus && (
+              <Badge variant="modern" color="success" icon={{ name: "mdi:hand-heart", side: "left" }}>
+                {org.nonprofitStatus}
+              </Badge>
+            )}
+            {org.foundingDate && (
+              <Badge variant="modern" color="secondary" icon={{ name: "mdi:calendar-outline", side: "left" }}>
+                Fondée en {new Date(org.foundingDate).getFullYear()}
+              </Badge>
+            )}
+            {org.numberOfEmployees && (
+              <Badge variant="modern" color="secondary" icon={{ name: "mdi:account-group", side: "left" }}>
+                {org.numberOfEmployees} membres
+              </Badge>
+            )}
+          </Flex>
+
+          {/* Social links */}
+          {sameAs.length > 0 && (
+            <Flex gap="xs" class="org-identity__socials">
+              {sameAs.map((link) => {
+                const icon = link.includes("facebook") ? "mdi:facebook"
+                  : link.includes("instagram") ? "mdi:instagram"
+                  : link.includes("twitter") || link.includes("x.com") ? "mdi:twitter"
+                  : link.includes("linkedin") ? "mdi:linkedin"
+                  : link.includes("youtube") ? "mdi:youtube"
+                  : link.includes("strava") ? "mdi:run"
+                  : "mdi:link-variant";
+                return (
+                  <a href={link} target="_blank" rel="noopener noreferrer" class="org-identity__social-link" aria-label={`Profil social ${org.name}`}>
+                    <Icon name={icon} />
+                  </a>
+                );
+              })}
+            </Flex>
+          )}
+        </div>
+      </div>
+    </section>
+
+    {/* ======================================= */}
+    {/* MAIN GRID — Left content + Right sidebar */}
+    {/* ======================================= */}
+    <div class="org-grid">
+      <div class="org-grid__main">
+
+        {/* --- ABOUT --- */}
+        {desc && (
+          <Card variant="modern" elevation="sm" class="org-section">
+            <h2 class="org-section__title">
+              <Icon name="mdi:information-outline" /> À propos
+            </h2>
+            <p class="org-section__text">{desc}</p>
+
+            {knowsAbout.length > 0 && (
+              <div class="org-section__tags">
+                <h3 class="org-section__subtitle">Domaines d'expertise</h3>
+                <Flex gap="xs" class="org-section__tag-list">
+                  {knowsAbout.map((tag) => (
+                    <Badge variant="modern" color="secondary">{tag}</Badge>
+                  ))}
+                </Flex>
+              </div>
+            )}
+
+            {makesOffer.length > 0 && (
+              <div class="org-section__tags">
+                <h3 class="org-section__subtitle">Services proposés</h3>
+                <Flex gap="xs" class="org-section__tag-list">
+                  {makesOffer.map((offer) => (
+                    <Badge variant="modern" color="primary">{offer}</Badge>
+                  ))}
+                </Flex>
+              </div>
+            )}
+          </Card>
+        )}
+
+        {/* --- AUTHORS / TEAM --- */}
+        {authors.length > 0 && (
+          <Card variant="modern" elevation="sm" class="org-section">
+            <h2 class="org-section__title">
+              <Icon name="mdi:account-group" /> L'équipe
+            </h2>
+            <div class="org-team">
+              {authors.map((author) => {
+                const name = loc(author.displayName);
+                const job = loc(author.jobTitle);
+                return (
+                  <a href={`/${LANG}/blog/auteur/${author.slug}`} class="org-team__member">
+                    {author.avatarUrl ? (
+                      <img src={author.avatarUrl} alt={name} class="org-team__avatar" loading="lazy" />
+                    ) : (
+                      <div class="org-team__avatar-placeholder">
+                        {name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div class="org-team__info">
+                      <span class="org-team__name">{name}</span>
+                      {job && <span class="org-team__role">{job}</span>}
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </Card>
+        )}
+
+        {/* --- RECENT ARTICLES --- */}
+        {posts.length > 0 && (
+          <Card variant="modern" elevation="sm" class="org-section">
+            <h2 class="org-section__title">
+              <Icon name="mdi:newspaper-variant-outline" /> Articles récents
+            </h2>
+            <div class="org-articles">
+              {posts.map((post) => {
+                const t = translationMap.get(post.id);
+                const title = (t?.headline as string) ?? post.slug.replace(/-/g, " ");
+                return (
+                  <a href={`/${LANG}/blog/${post.slug}`} class="org-article">
+                    <div class="org-article__info">
+                      <span class="org-article__title">{title}</span>
+                      <span class="org-article__meta">
+                        {post.publishedAt && (
+                          <time datetime={post.publishedAt.toISOString()}>
+                            {post.publishedAt.toLocaleDateString(LANG, { day: "numeric", month: "short", year: "numeric" })}
+                          </time>
+                        )}
+                        {post.readingTime && <span> · {post.readingTime}</span>}
+                      </span>
+                    </div>
+                    <Icon name="mdi:chevron-right" />
+                  </a>
+                );
+              })}
+            </div>
+            <a href={`/${LANG}/blog`} class="org-section__more">
+              <Button variant="modern" color="secondary" icon={{ name: "mdi:arrow-right", side: "right" }}>
+                Voir tous les articles
+              </Button>
+            </a>
+          </Card>
+        )}
+      </div>
+
+      {/* ======================================= */}
+      {/* SIDEBAR                                 */}
+      {/* ======================================= */}
+      <aside class="org-grid__sidebar">
+
+        {/* --- CONTACT --- */}
+        <Card variant="modern" elevation="sm" class="org-section">
+          <h2 class="org-section__title">
+            <Icon name="mdi:card-account-mail-outline" /> Contact
+          </h2>
+          <div class="org-contact">
+            {org.email && (
+              <a href={`mailto:${org.email}`} class="org-contact__item">
+                <Icon name="mdi:email-outline" />
+                <span>{org.email}</span>
+              </a>
+            )}
+            {org.telephone && (
+              <a href={`tel:${org.telephone}`} class="org-contact__item">
+                <Icon name="mdi:phone-outline" />
+                <span>{org.telephone}</span>
+              </a>
+            )}
+            {org.url && (
+              <a href={org.url} target="_blank" rel="noopener noreferrer" class="org-contact__item">
+                <Icon name="mdi:web" />
+                <span>{org.url.replace(/^https?:\/\//, "")}</span>
+              </a>
+            )}
+            {address && (
+              <div class="org-contact__item">
+                <Icon name="mdi:map-marker-outline" />
+                <span>
+                  {[address.streetAddress, address.postalCode, address.addressLocality, address.addressCountry]
+                    .filter(Boolean)
+                    .join(", ")}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Contact Points */}
+          {contactPoints.length > 0 && (
+            <div class="org-contact__points">
+              {contactPoints.map((cp) => (
+                <div class="org-contact__point">
+                  <span class="org-contact__point-type">{cp.contactType}</span>
+                  {cp.email && <a href={`mailto:${cp.email}`}>{cp.email}</a>}
+                  {cp.telephone && <a href={`tel:${cp.telephone}`}>{cp.telephone}</a>}
+                  {cp.hoursAvailable && <span class="org-contact__point-hours">{cp.hoursAvailable}</span>}
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+
+        {/* --- STATISTICS --- */}
+        {(rating || stats.length > 0) && (
+          <Card variant="modern" elevation="sm" class="org-section">
+            <h2 class="org-section__title">
+              <Icon name="mdi:chart-bar" /> Statistiques
+            </h2>
+            <div class="org-stats">
+              {rating && (
+                <div class="org-stat">
+                  <Icon name="mdi:star" />
+                  <span class="org-stat__value">{Number(rating.ratingValue).toFixed(1)}/5</span>
+                  <span class="org-stat__label">{rating.ratingCount} avis</span>
+                </div>
+              )}
+              {stats.map((s) => {
+                const icon = s.interactionType === "CommentAction" ? "mdi:comment-text-outline"
+                  : s.interactionType === "ShareAction" ? "mdi:share-variant"
+                  : s.interactionType === "LikeAction" ? "mdi:heart"
+                  : "mdi:gesture-tap";
+                const label = s.interactionType === "CommentAction" ? "Commentaires"
+                  : s.interactionType === "ShareAction" ? "Partages"
+                  : s.interactionType === "LikeAction" ? "Likes"
+                  : s.interactionType;
+                return (
+                  <div class="org-stat">
+                    <Icon name={icon} />
+                    <span class="org-stat__value">{s.userInteractionCount.toLocaleString(LANG)}</span>
+                    <span class="org-stat__label">{label}</span>
+                  </div>
+                );
+              })}
+              {posts.length > 0 && (
+                <div class="org-stat">
+                  <Icon name="mdi:newspaper" />
+                  <span class="org-stat__value">{posts.length}</span>
+                  <span class="org-stat__label">Articles récents</span>
+                </div>
+              )}
+              {authors.length > 0 && (
+                <div class="org-stat">
+                  <Icon name="mdi:account-edit" />
+                  <span class="org-stat__value">{authors.length}</span>
+                  <span class="org-stat__label">Auteurs</span>
+                </div>
+              )}
+            </div>
+          </Card>
+        )}
+
+        {/* --- AREA SERVED --- */}
+        {areaServed.length > 0 && (
+          <Card variant="modern" elevation="sm" class="org-section">
+            <h2 class="org-section__title">
+              <Icon name="mdi:earth" /> Zones desservies
+            </h2>
+            <Flex gap="xs" class="org-section__tag-list">
+              {areaServed.map((area) => (
+                <Badge variant="modern" color="accent">{area}</Badge>
+              ))}
+            </Flex>
+          </Card>
+        )}
+
+        {/* --- LANGUAGES --- */}
+        {knowsLanguage.length > 0 && (
+          <Card variant="modern" elevation="sm" class="org-section">
+            <h2 class="org-section__title">
+              <Icon name="mdi:translate" /> Langues
+            </h2>
+            <Flex gap="xs" class="org-section__tag-list">
+              {knowsLanguage.map((lang) => {
+                const label = lang === "fr" ? "Français" : lang === "en" ? "English" : lang === "es" ? "Español" : lang === "ar" ? "العربية" : lang;
+                return <Badge variant="modern" color="secondary">{label}</Badge>;
+              })}
+            </Flex>
+          </Card>
+        )}
+
+        {/* --- FOUNDERS --- */}
+        {founders.length > 0 && (
+          <Card variant="modern" elevation="sm" class="org-section">
+            <h2 class="org-section__title">
+              <Icon name="mdi:account-star" /> Fondateur{founders.length > 1 ? "s" : ""}
+            </h2>
+            <ul class="org-founders">
+              {founders.map((f) => (
+                <li>{f}</li>
+              ))}
+            </ul>
+          </Card>
+        )}
+
+        {/* --- DEPARTMENTS --- */}
+        {departments.length > 0 && (
+          <Card variant="modern" elevation="sm" class="org-section">
+            <h2 class="org-section__title">
+              <Icon name="mdi:office-building-outline" /> Départements
+            </h2>
+            <ul class="org-departments">
+              {departments.map((d) => (
+                <li>{d}</li>
+              ))}
+            </ul>
+          </Card>
+        )}
+
+        {/* --- POLICIES / TRANSPARENCY -- */}
+        {(org.publishingPrinciples || org.ethicsPolicy || org.correctionsPolicy || org.diversityPolicy || org.ownershipFundingInfo) && (
+          <Card variant="modern" elevation="sm" class="org-section">
+            <h2 class="org-section__title">
+              <Icon name="mdi:shield-check-outline" /> Transparence & Politiques
+            </h2>
+            <div class="org-policies">
+              {org.publishingPrinciples && (
+                <a href={org.publishingPrinciples} target="_blank" rel="noopener noreferrer" class="org-policy">
+                  <Icon name="mdi:book-open-page-variant-outline" /> Charte éditoriale
+                </a>
+              )}
+              {org.ethicsPolicy && (
+                <a href={org.ethicsPolicy} target="_blank" rel="noopener noreferrer" class="org-policy">
+                  <Icon name="mdi:scale-balance" /> Politique d'éthique
+                </a>
+              )}
+              {org.correctionsPolicy && (
+                <a href={org.correctionsPolicy} target="_blank" rel="noopener noreferrer" class="org-policy">
+                  <Icon name="mdi:pencil-ruler" /> Politique de corrections
+                </a>
+              )}
+              {org.diversityPolicy && (
+                <a href={org.diversityPolicy} target="_blank" rel="noopener noreferrer" class="org-policy">
+                  <Icon name="mdi:account-multiple" /> Politique de diversité
+                </a>
+              )}
+              {org.ownershipFundingInfo && (
+                <a href={org.ownershipFundingInfo} target="_blank" rel="noopener noreferrer" class="org-policy">
+                  <Icon name="mdi:currency-eur" /> Financement & propriété
+                </a>
+              )}
+            </div>
+          </Card>
+        )}
+      </aside>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+/* ========================================
+   ORGANIZATION DETAIL PAGE
+   ======================================== */
+
+.org-detail {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* --- Identity Section --- */
+.org-identity {
+  background: var(--card-bg, #fff);
+  border-radius: var(--radius-lg, 1rem);
+  border: 1px solid var(--border-color, #e2e8f0);
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.org-identity__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.org-identity__logo {
+  width: 96px; height: 96px;
+  border-radius: var(--radius-md, 0.5rem);
+  object-fit: contain;
+  background: var(--bg-muted, #f8f9fa);
+  padding: 0.5rem;
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.org-identity__logo-placeholder {
+  width: 96px; height: 96px;
+  border-radius: var(--radius-md, 0.5rem);
+  background: linear-gradient(135deg, var(--color-primary, #1978e5), #6366f1);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem; font-weight: 700;
+}
+
+.org-identity__info { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+
+.org-identity__name-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.org-identity__name { margin: 0; font-size: 2rem; font-weight: 800; color: var(--text-foreground); }
+
+.org-identity__legal {
+  display: flex; align-items: center; gap: 0.25rem;
+  font-size: 0.875rem; color: var(--text-muted-foreground);
+}
+.org-identity__legal :global(svg) { width: 1rem; height: 1rem; }
+
+.org-identity__slogan {
+  font-size: 1.125rem; font-style: italic;
+  color: var(--color-primary, #1978e5); margin: 0;
+}
+
+.org-identity__badges { flex-wrap: wrap; }
+
+.org-identity__socials { flex-wrap: wrap; margin-top: 0.5rem; }
+.org-identity__social-link {
+  display: flex; align-items: center; justify-content: center;
+  width: 2.25rem; height: 2.25rem;
+  border-radius: var(--radius-sm, 0.25rem);
+  color: var(--text-muted-foreground);
+  transition: color 150ms, background 150ms;
+}
+.org-identity__social-link:hover {
+  color: var(--color-primary);
+  background: var(--bg-muted, #f1f5f9);
+}
+.org-identity__social-link :global(svg) { width: 1.5rem; height: 1.5rem; }
+
+/* --- Main Grid --- */
+.org-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .org-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.org-grid__main { display: flex; flex-direction: column; gap: 1.5rem; }
+.org-grid__sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+
+/* --- Section Card --- */
+.org-section { display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem; }
+
+.org-section__title {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 1.25rem; font-weight: 700; margin: 0;
+  color: var(--text-foreground);
+}
+.org-section__title :global(svg) { width: 1.5rem; height: 1.5rem; color: var(--color-primary); }
+
+.org-section__subtitle {
+  font-size: 0.875rem; font-weight: 600;
+  color: var(--text-muted-foreground); margin: 0.75rem 0 0.25rem;
+}
+
+.org-section__text {
+  font-size: 0.9375rem; line-height: 1.7;
+  color: var(--text-muted-foreground); margin: 0;
+}
+
+.org-section__tags { display: flex; flex-direction: column; gap: 0.5rem; }
+.org-section__tag-list { flex-wrap: wrap; }
+
+.org-section__more { text-decoration: none; align-self: flex-start; margin-top: 0.5rem; }
+
+/* --- Team --- */
+.org-team {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.org-team__member {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-md, 0.5rem);
+  text-decoration: none;
+  transition: background 150ms;
+}
+.org-team__member:hover { background: var(--bg-muted, #f1f5f9); }
+
+.org-team__avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.org-team__avatar-placeholder {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), #6366f1);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+}
+
+.org-team__info { display: flex; flex-direction: column; }
+.org-team__name { font-weight: 600; color: var(--text-foreground); font-size: 0.9375rem; }
+.org-team__role { font-size: 0.8125rem; color: var(--text-muted-foreground); }
+
+/* --- Articles --- */
+.org-articles { display: flex; flex-direction: column; }
+
+.org-article {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 0; gap: 0.5rem;
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  transition: background 150ms;
+}
+.org-article:last-child { border-bottom: none; }
+.org-article:hover { background: var(--bg-muted, #f8f9fa); }
+
+.org-article__info { display: flex; flex-direction: column; gap: 0.125rem; }
+.org-article__title { font-weight: 600; color: var(--text-foreground); font-size: 0.9375rem; }
+.org-article__meta { font-size: 0.8125rem; color: var(--text-muted-foreground); }
+
+.org-article :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--text-muted-foreground); flex-shrink: 0; }
+
+/* --- Contact --- */
+.org-contact { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.org-contact__item {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.875rem; color: var(--text-foreground);
+  text-decoration: none;
+}
+.org-contact__item:hover { color: var(--color-primary); }
+.org-contact__item :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary); flex-shrink: 0; }
+
+.org-contact__points { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color, #e2e8f0); }
+
+.org-contact__point { display: flex; flex-direction: column; gap: 0.125rem; }
+.org-contact__point-type { font-size: 0.8125rem; font-weight: 600; color: var(--text-foreground); }
+.org-contact__point a { font-size: 0.8125rem; color: var(--color-primary); text-decoration: none; }
+.org-contact__point a:hover { text-decoration: underline; }
+.org-contact__point-hours { font-size: 0.75rem; color: var(--text-muted-foreground); }
+
+/* --- Stats --- */
+.org-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.org-stat {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.25rem;
+  text-align: center;
+  padding: 0.75rem 0.5rem;
+  border-radius: var(--radius-md, 0.5rem);
+  background: var(--bg-muted, #f8f9fa);
+}
+.org-stat :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary); }
+.org-stat__value { font-size: 1.25rem; font-weight: 800; color: var(--text-foreground); }
+.org-stat__label { font-size: 0.75rem; color: var(--text-muted-foreground); }
+
+/* --- Policies --- */
+.org-policies { display: flex; flex-direction: column; gap: 0.5rem; }
+.org-policy {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.875rem; color: var(--text-foreground);
+  text-decoration: none;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm, 0.25rem);
+  transition: background 150ms;
+}
+.org-policy:hover { background: var(--bg-muted, #f1f5f9); color: var(--color-primary); }
+.org-policy :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary); flex-shrink: 0; }
+
+/* --- Founders & Departments --- */
+.org-founders, .org-departments {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 0.25rem;
+}
+.org-founders li, .org-departments li {
+  font-size: 0.9rem; color: var(--text-foreground);
+  padding: 0.25rem 0;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .org-identity__header { flex-direction: column; align-items: center; text-align: center; }
+  .org-identity__name { font-size: 1.5rem; }
+  .org-identity__badges { justify-content: center; }
+  .org-identity__socials { justify-content: center; }
+  .org-team { grid-template-columns: 1fr; }
+  .org-stats { grid-template-columns: repeat(2, 1fr); }
+}
+</style>

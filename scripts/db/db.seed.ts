@@ -157,16 +157,13 @@ async function seed() {
       }
 
       if (baseName === 'blog_organizations' || baseName === 'blog_organization') {
+        // Schema now matches seed data — no field stripping needed.
+        // Only normalize legalName → name if data still uses old format
         rows = rows.map(r => {
-          // schema has `name` (string); data provides `legalName` (localized object)
           if (!r.name && r.legalName) {
-            r.name = r.legalName.fr || r.legalName.en || Object.values(r.legalName)[0] || r.slug || r.id;
+            const ln = r.legalName;
+            r.name = (typeof ln === 'string') ? ln : (ln.fr || ln.en || Object.values(ln)[0] || r.slug || r.id);
           }
-          // drop large/unused localized fields that schema doesn't expect
-          if (r.legalName) delete r.legalName;
-          if (r.address) delete r.address;
-          if (r.sameAs) delete r.sameAs;
-          if (r.foundingDate) delete r.foundingDate;
           return r;
         });
       }

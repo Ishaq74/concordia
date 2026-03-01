@@ -95,8 +95,7 @@ const link = propHref ?? (primaryCat ? `/${lang}/blog/${primaryCat}/${post.data.
       className="post-meta"
     />
     {
-        (Astro.locals.user?.role === "admin" ||
-          Astro.locals.user?.id === post.ownerId) && (
+        Astro.locals.user?.role === "admin" && (
       <Flex 
         alignItems="center" 
         justifyContent="flex-end"
@@ -144,5 +143,5 @@ const link = propHref ?? (primaryCat ? `/${lang}/blog/${primaryCat}/${post.data.
 .post-excerpt { color: var(--text-muted-foreground); margin: 0; }
 .post-title-link { text-decoration: none; display: inline-block; width:100%; }
 .post-title-link:hover .post-title { text-decoration: underline; }
-.post-edit { background-color: red; margin-top:40px; }
+.post-edit { margin-top: var(--space-2); gap: var(--space-2); }
 </style>

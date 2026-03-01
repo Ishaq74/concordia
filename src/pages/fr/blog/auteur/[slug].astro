@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Grid from "@components/Tools/Grid.astro";
+import PageBreadcrumb from '@components/ui/Breadcrumb/PageBreadcrumb.astro';
 
 // 1. On réutilise tes composants "briques"
 import PostGrid from "@components/modules/blog/lists/PostGrid.astro";
@@ -53,6 +54,12 @@ const posts = allPosts
   description={`Découvrez les articles écrits par ${author.name}`}
   lang={LANG}
 >
+ <PageBreadcrumb
+      items={[
+        { label: "Blog", href: "/blog" },
+      ]}
+      current={author.name}
+    />
  <AuthorBannerPage
       name={author.name}
       bio={author.bio}

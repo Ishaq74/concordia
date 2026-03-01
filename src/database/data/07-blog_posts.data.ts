@@ -1,15 +1,15 @@
-// 06 - Blog Posts (27 articles réalistes sur Annecy — 3 par catégorie)
+// 06 - Blog Posts (27 articles rÃ©alistes sur Annecy â€” 3 par catÃ©gorie)
 // Cas de figure :
 //   - isFeatured true / false (pour tester FeaturedGrid)
-//   - status "draft" (ne doit PAS apparaître côté public)
-//   - displayInBlog false (masqué de la grille blog)
+//   - status "draft" (ne doit PAS apparaÃ®tre cÃ´tÃ© public)
+//   - displayInBlog false (masquÃ© de la grille blog)
 //   - allowComments false (pas de section commentaires)
-//   - Dates variées (tri chronologique)
-//   - Auteurs variés (3 auteurs répartis)
+//   - Dates variÃ©es (tri chronologique)
+//   - Auteurs variÃ©s (3 auteurs rÃ©partis)
 export const blogPostsSeed = [
-    // ═══════════════════════════════════════════════
-    // INTERVIEWS (cat-interviews) — 3 articles
-    // ═══════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // INTERVIEWS (cat-interviews) â€” 3 articles
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     {
         id: "post-interview-chef-bilboquet",
         slug: "interview-chef-bilboquet",
@@ -25,6 +25,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-camille-dupont",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-interviews",
         createdAt: new Date("2025-12-15T10:00:00Z"),
         updatedAt: new Date("2025-12-15T10:00:00Z"),
@@ -44,6 +45,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-sarah-leroy",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-interviews",
         createdAt: new Date("2026-01-20T09:00:00Z"),
         updatedAt: new Date("2026-01-20T09:00:00Z"),
@@ -63,14 +65,15 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-lucas-martin",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-interviews",
         createdAt: new Date("2026-02-05T14:00:00Z"),
         updatedAt: new Date("2026-02-05T14:00:00Z"),
     },
 
-    // ═══════════════════════════════════════════════
-    // EXPÉRIENCES (cat-experiences) — 3 articles
-    // ═══════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // EXPÃ‰RIENCES (cat-experiences) â€” 3 articles
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     {
         id: "post-experience-plage-imperial",
         slug: "experience-plage-imperial",
@@ -86,6 +89,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-lucas-martin",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-experiences",
         createdAt: new Date("2025-12-14T14:00:00Z"),
         updatedAt: new Date("2025-12-14T14:00:00Z"),
@@ -105,6 +109,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-camille-dupont",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-experiences",
         createdAt: new Date("2026-01-10T08:00:00Z"),
         updatedAt: new Date("2026-01-10T08:00:00Z"),
@@ -124,14 +129,15 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-sarah-leroy",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-experiences",
         createdAt: new Date("2026-02-18T16:00:00Z"),
         updatedAt: new Date("2026-02-18T16:00:00Z"),
     },
 
-    // ═══════════════════════════════════════════════
-    // ENQUÊTES (cat-enquetes) — 3 articles
-    // ═══════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // ENQUÃŠTES (cat-enquetes) â€” 3 articles
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     {
         id: "post-enquete-logement-annecy",
         slug: "enquete-logement-annecy",
@@ -147,6 +153,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-sarah-leroy",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-enquetes",
         createdAt: new Date("2025-12-13T09:00:00Z"),
         updatedAt: new Date("2025-12-13T09:00:00Z"),
@@ -166,6 +173,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-sarah-leroy",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-enquetes",
         createdAt: new Date("2026-01-28T10:00:00Z"),
         updatedAt: new Date("2026-01-28T10:00:00Z"),
@@ -185,14 +193,15 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-lucas-martin",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-enquetes",
         createdAt: new Date("2026-02-15T09:00:00Z"),
         updatedAt: new Date("2026-02-15T09:00:00Z"),
     },
 
-    // ═══════════════════════════════════════════════
-    // ÉVÉNEMENTS (cat-evenements) — 3 articles
-    // ═══════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // Ã‰VÃ‰NEMENTS (cat-evenements) â€” 3 articles
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     {
         id: "post-fete-du-lac-2025",
         slug: "fete-du-lac-2025-preparation",
@@ -208,6 +217,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-camille-dupont",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-evenements",
         createdAt: new Date("2025-12-12T11:00:00Z"),
         updatedAt: new Date("2025-12-12T11:00:00Z"),
@@ -227,6 +237,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-camille-dupont",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-evenements",
         createdAt: new Date("2026-02-01T11:00:00Z"),
         updatedAt: new Date("2026-02-01T11:00:00Z"),
@@ -246,14 +257,15 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-sarah-leroy",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-evenements",
         createdAt: new Date("2025-11-25T09:00:00Z"),
         updatedAt: new Date("2025-11-25T09:00:00Z"),
     },
 
-    // ═══════════════════════════════════════════════
-    // GUIDES PRATIQUES (cat-guides) — 3 articles
-    // ═══════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // GUIDES PRATIQUES (cat-guides) â€” 3 articles
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     {
         id: "post-guide-transports-annecy",
         slug: "guide-transports-annecy",
@@ -269,6 +281,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-lucas-martin",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-guides",
         createdAt: new Date("2025-12-11T08:00:00Z"),
         updatedAt: new Date("2025-12-11T08:00:00Z"),
@@ -288,6 +301,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-lucas-martin",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-guides",
         createdAt: new Date("2026-01-15T08:00:00Z"),
         updatedAt: new Date("2026-01-15T08:00:00Z"),
@@ -307,14 +321,15 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-camille-dupont",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-guides",
         createdAt: new Date("2026-02-10T12:00:00Z"),
         updatedAt: new Date("2026-02-10T12:00:00Z"),
     },
 
-    // ═══════════════════════════════════════════════
-    // HISTOIRE & PATRIMOINE (cat-patrimoine) — 3 articles
-    // ═══════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // HISTOIRE & PATRIMOINE (cat-patrimoine) â€” 3 articles
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     {
         id: "post-palais-isle-histoire",
         slug: "palais-isle-histoire-secrets",
@@ -330,6 +345,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-sarah-leroy",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-patrimoine",
         createdAt: new Date("2025-12-10T15:00:00Z"),
         updatedAt: new Date("2025-12-10T15:00:00Z"),
@@ -349,6 +365,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-sarah-leroy",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-patrimoine",
         createdAt: new Date("2026-01-05T10:00:00Z"),
         updatedAt: new Date("2026-01-05T10:00:00Z"),
@@ -368,14 +385,15 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-camille-dupont",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-patrimoine",
         createdAt: new Date("2026-02-14T08:00:00Z"),
         updatedAt: new Date("2026-02-14T08:00:00Z"),
     },
 
-    // ═══════════════════════════════════════════════
-    // GASTRONOMIE (cat-gastronomie) — 3 articles
-    // ═══════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // GASTRONOMIE (cat-gastronomie) â€” 3 articles
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     {
         id: "post-tartiflette-recette-authentique",
         slug: "tartiflette-recette-authentique",
@@ -391,6 +409,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-camille-dupont",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-gastronomie",
         createdAt: new Date("2025-12-09T12:00:00Z"),
         updatedAt: new Date("2025-12-09T12:00:00Z"),
@@ -410,6 +429,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-lucas-martin",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-gastronomie",
         createdAt: new Date("2026-01-08T11:00:00Z"),
         updatedAt: new Date("2026-01-08T11:00:00Z"),
@@ -429,14 +449,15 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-camille-dupont",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-gastronomie",
         createdAt: new Date("2026-02-22T09:00:00Z"),
         updatedAt: new Date("2026-02-22T09:00:00Z"),
     },
 
-    // ═══════════════════════════════════════════════
-    // NATURE & SPORTS (cat-nature-sports) — 3 articles
-    // ═══════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // NATURE & SPORTS (cat-nature-sports) â€” 3 articles
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     {
         id: "post-tour-lac-velo",
         slug: "tour-lac-velo-itineraire",
@@ -452,6 +473,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-lucas-martin",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-nature-sports",
         createdAt: new Date("2025-12-08T07:00:00Z"),
         updatedAt: new Date("2025-12-08T07:00:00Z"),
@@ -471,6 +493,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-lucas-martin",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-nature-sports",
         createdAt: new Date("2026-01-25T07:00:00Z"),
         updatedAt: new Date("2026-01-25T07:00:00Z"),
@@ -490,14 +513,15 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-sarah-leroy",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-nature-sports",
         createdAt: new Date("2026-02-08T08:00:00Z"),
         updatedAt: new Date("2026-02-08T08:00:00Z"),
     },
 
-    // ═══════════════════════════════════════════════
-    // VIE PRATIQUE (cat-vie-pratique) — 3 articles
-    // ═══════════════════════════════════════════════
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // VIE PRATIQUE (cat-vie-pratique) â€” 3 articles
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
     {
         id: "post-ecoles-annecy-guide",
         slug: "ecoles-annecy-guide-parents",
@@ -513,6 +537,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-sarah-leroy",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-vie-pratique",
         createdAt: new Date("2025-12-07T13:00:00Z"),
         updatedAt: new Date("2025-12-07T13:00:00Z"),
@@ -532,6 +557,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-sarah-leroy",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-vie-pratique",
         createdAt: new Date("2026-01-18T14:00:00Z"),
         updatedAt: new Date("2026-01-18T14:00:00Z"),
@@ -551,6 +577,7 @@ export const blogPostsSeed = [
         inLanguage: "fr",
         license: "CC-BY",
         authorId: "author-lucas-martin",
+        organizationId: "org-salut-annecy",
         categoryId: "cat-vie-pratique",
         createdAt: new Date("2026-02-25T10:00:00Z"),
         updatedAt: new Date("2026-02-25T10:00:00Z"),
