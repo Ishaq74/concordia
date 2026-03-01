@@ -1,0 +1,80 @@
+---
+/**
+ * CategoryGrid — Grille de catégories du blog.
+ * Affiche les catégories extraites des posts sous forme de cartes cliquables.
+ * Zéro JS — pure CSS.
+ */
+import Link from "@components/ui/Link.astro";
+import Badge from "@components/ui/Badge.astro";
+
+interface Category {
+  name: string;
+  slug: string;
+  count: number;
+}
+
+interface Props {
+  categories: Category[];
+  lang: string;
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+}
+
+const { categories, lang, variant = "retro" } = Astro.props;
+---
+
+<section class="category-grid-section" aria-label="Catégories du blog">
+  <h2 class="section-heading">Catégories</h2>
+  <div class="category-grid">
+    {categories.map((cat) => (
+      <Link href={`/${lang}/blog/${cat.slug}`} className="category-card" style="link" ariaLabel={`Catégorie : ${cat.name}`}>
+        <span class="category-name">{cat.name}</span>
+        <Badge variant={variant} color="secondary" text={`${cat.count}`}>
+          {cat.count} {cat.count > 1 ? "articles" : "article"}
+        </Badge>
+      </Link>
+    ))}
+  </div>
+</section>
+
+<style>
+  .category-grid-section {
+    margin-bottom: var(--space-8, 2rem);
+  }
+
+  .section-heading {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: var(--space-4, 1rem);
+    color: var(--text-foreground);
+  }
+
+  .category-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3, 0.75rem);
+  }
+
+  .category-card {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: var(--card-border-radius, 0.5rem);
+    background: var(--card-bg, #fff);
+    text-decoration: none;
+    color: var(--text-foreground);
+    transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  }
+
+  .category-card:hover {
+    background: var(--accent-bg, #f0f0ff);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .category-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+</style>

@@ -2,6 +2,7 @@
 import Avatar from "../../ui/Avatar/Avatar.astro";
 import Dropdown from "../../ui/Dropdown.astro";
 import Link from "../../ui/Link.astro";
+import { isAdminUser } from "@lib/admin/permissions";
 
 interface Props {
   variant?: "initial" | "retro" | "modern" | "futuristic";
@@ -38,20 +39,29 @@ const profileRoute =
   detectedLang === "ar" ? "/ar/auth/profile" :
   "/fr/auth/profil";
 
+const adminRoute =
+  detectedLang === "fr" ? "/fr/admin" :
+  detectedLang === "en" ? "/en/admin" :
+  detectedLang === "es" ? "/es/admin" :
+  detectedLang === "ar" ? "/ar/admin" :
+  "/fr/admin";
+
 // Traductions locales avec fallback robustes
 const dictionaries: Record<string, any> = {
   fr: {
     login: "Se connecter",
     profile: "Mon profil",
     logout: "Se déconnecter",
+    admin: "Administration",
   },
-  en: { login: "Sign in", profile: "My profile", logout: "Sign out" },
+  en: { login: "Sign in", profile: "My profile", logout: "Sign out", admin: "Administration" },
   es: {
     login: "Iniciar sesión",
     profile: "Mi perfil",
     logout: "Cerrar sesión",
+    admin: "Administración",
   },
-  ar: { login: "تسجيل الدخول", profile: "ملفي الشخصي", logout: "تسجيل الخروج" },
+  ar: { login: "تسجيل الدخول", profile: "ملفي الشخصي", logout: "تسجيل الخروج", admin: "الإدارة" },
 };
 
 let t = dictionaries[detectedLang] || dictionaries.en;
@@ -67,6 +77,7 @@ try {
       login: loaded.auth.signIn || t.login,
       profile: loaded.auth.profile || t.profile,
       logout: loaded.auth.signOut || t.logout,
+      admin: loaded.adminPanel?.title || loaded.nav?.admin || t.admin,
     };
   }
 } catch (e) {
@@ -74,9 +85,11 @@ try {
 }
 
 const user = Astro.locals.user;
+const userIsAdmin = isAdminUser(user);
 
 // Icons
 const icons = {
+  admin: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
   profile: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
   logout: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>`,
 };
@@ -91,6 +104,11 @@ const icons = {
       ismenu={isMenu}
       class="user-dropdown"
       items={[
+        ...(userIsAdmin ? [{
+          label: t.admin,
+          href: adminRoute,
+          icon: icons.admin,
+        }] : []),
         {
           label: t.profile,
           href: profileRoute,

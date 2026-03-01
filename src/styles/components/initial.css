@@ -15,29 +15,7 @@
   justify-content: center; 
 }
 
-/* BUTTON */
-button { 
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: center; 
-  font-family: inherit; 
-  font-size: var(--button-font-size); 
-  padding: var(--button-padding-y) var(--button-padding-x); 
-  border-width: var(--button-border-width); 
-  border-style: solid;
-  border-radius: var(--button-border-radius); 
-  cursor: pointer; 
-  background-color: var(--button-default-bg);
-  color: var(--button-default-color);
-  border-color: var(--button-default-border-color);
-  line-height: 1.5;
-  font-weight: 500;
-}
-button:hover:not(:disabled) { background-color: var(--button-default-bg-hover); }
-button:disabled, button[disabled] { opacity: 0.5; cursor: not-allowed; }
-button.primary { background-color: var(--button-primary-bg); color: var(--button-primary-color); border-color: transparent; }
-button.secondary { background-color: var(--button-secondary-bg); color: var(--button-secondary-color); border-color: transparent; }
-button.accent { background-color: var(--button-accent-bg); color: var(--button-accent-color); border-color: transparent; }
+
 
 /* INPUT & FORMS */
 label { display: block; margin-bottom: 0.375rem; font-size: 0.875rem; font-weight: 500; }
@@ -286,75 +264,8 @@ input[type="range"]::-webkit-slider-thumb {
   box-shadow: var(--card-shadow);
 }
 
-/* BADGE */
-.badge { 
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: center; 
-  padding: var(--badge-padding-y) var(--badge-padding-x); 
-  border-radius: var(--badge-border-radius); 
-  font-size: var(--badge-font-size); 
-  border: 1px solid transparent; 
-  font-weight: 600; 
-  line-height: 1; 
-  white-space: nowrap; 
-}
-.badge.primary { background: var(--badge-primary-bg); color: var(--badge-primary-color); }
-.badge.secondary { background: var(--badge-secondary-bg); color: var(--badge-secondary-color); }
-.badge.accent { background: var(--badge-accent-bg); color: var(--badge-accent-color); }
 
-/* ALERT */
-.alert { 
-  padding: var(--alert-padding-y) var(--alert-padding-x); 
-  border-radius: var(--alert-border-radius); 
-  display: flex; 
-  align-items: center; 
-  border: var(--alert-border-width) solid transparent; 
-  width: 100%; 
-  margin-bottom: 0.5rem; 
-  position: relative;
-  overflow: hidden;
-}
-.alert[data-status="info"], .alert.info { background: var(--alert-info-bg); color: var(--alert-info-color); border-color: var(--alert-info-border); }
-.alert[data-status="success"], .alert.success { background: var(--alert-success-bg); color: var(--alert-success-color); border-color: var(--alert-success-border); }
-.alert[data-status="warning"], .alert.warning { background: var(--alert-warning-bg); color: var(--alert-warning-color); border-color: var(--alert-warning-border); }
-.alert[data-status="danger"], .alert[data-status="error"], .alert.danger, .alert.error { background: var(--alert-error-bg); color: var(--alert-error-color); border-color: var(--alert-error-border); }
 
-.alert-close {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  margin-left: 0.75rem;
-  display: inline-flex;
-  align-items: center;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-
-.alert-close:hover {
-  opacity: 1;
-}
-
-.alert-progress {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 3px;
-  width: 100%;
-  background: currentColor;
-  opacity: 0.3;
-  transform-origin: left;
-}
-
-@keyframes alert-progress {
-  from {
-    transform: scaleX(1);
-  }
-  to {
-    transform: scaleX(0);
-  }
-}
 
 
 /* TABLE */
@@ -459,201 +370,151 @@ input[type="range"]::-webkit-slider-thumb {
   }
 }
 
-/* LINK */
-.link, a.link {
-  color: var(--link-color); 
-  font-size: var(--link-font-size);
-  font-weight: var(--link-font-weight);
-  text-decoration: var(--link-text-decoration); 
-  text-decoration-thickness: var(--link-text-decoration-thickness);
-  text-decoration-style: var(--link-text-decoration-style);
-  text-decoration-color: var(--link-text-decoration-color); 
-  text-underline-offset: var(--link-text-underline-offset);
-  transition: var(--link-transition); 
-}
-.link:hover { color: var(--link-hover-color); text-decoration-color: currentColor; }
-.link:active { color: var(--link-color-active); }
-.link:visited { color: var(--link-color-visited); }
 
-/* LINK AS BUTTON */
-a.button {
-  display: inline-flex; 
-  align-items: center; 
-  justify-content: center; 
-  font-family: inherit; 
-  font-size: var(--link-button-font-size); 
-  padding: var(--link-button-padding-y) var(--link-button-padding-x); 
-  border-width: var(--link-button-border-width); 
-  border-style: solid;
-  border-radius: var(--link-button-border-radius); 
-  cursor: pointer; 
-  background-color: var(--link-button-default-bg);
-  color: var(--link-button-default-color);
-  border-color: var(--link-button-default-border-color);
-  line-height: 1.5;
-  font-weight: 500;
-  text-decoration: none;
-}
-a.button:hover { background-color: var(--link-button-default-bg-hover); text-decoration: none; }
-a.button.primary { background-color: var(--button-primary-bg); color: var(--button-primary-color); border-color: transparent; }
-a.button.secondary { background-color: var(--button-secondary-bg); color: var(--button-secondary-color); border-color: transparent; }
-a.button.accent { background-color: var(--button-accent-bg); color: var(--button-accent-color); border-color: transparent; }
 
-/* KBD - Keyboard Key */
-.kbd {
-  display: inline-block;
-  padding: 0.125rem 0.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.875em;
-  line-height: 1.5;
-  color: var(--text-default);
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-default);
-  border-radius: 0.375rem;
-  box-shadow: 0 2px 0 0 var(--border-default), 
-              0 3px 0 0 color-mix(in srgb, var(--border-default) 50%, transparent);
-  font-weight: 600;
-  white-space: nowrap;
-  vertical-align: middle;
-  transition: all 0.1s ease;
-}
 
-.kbd:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 0 var(--border-default);
-}
 
-/* Sizes */
-.kbd-sm {
-  padding: 0.0625rem 0.375rem;
-  font-size: 0.75em;
-  border-radius: 0.25rem;
-}
+/* ============================================================ */
+/* TABS — Radio input CSS-only (zéro JavaScript)                */
+/* <input.tab-radio> + <label.tab> + <div.tab-panel>            */
+/* :checked + .tab + .tab-panel affiche le bon panneau          */
+/* ============================================================ */
 
-.kbd-lg {
-  padding: 0.25rem 0.75rem;
-  font-size: 1em;
-  border-radius: 0.5rem;
-}
-
-/* Combinations de touches */
-.kbd + .kbd {
-  margin-left: 0.25rem;
-}
-
-/* Colors */
-.kbd.primary {
-  background: var(--button-primary-bg);
-  color: var(--button-primary-color);
-  border-color: var(--button-primary-bg);
-  box-shadow: 0 2px 0 0 color-mix(in srgb, var(--button-primary-bg) 80%, #000),
-              0 3px 0 0 color-mix(in srgb, var(--button-primary-bg) 40%, transparent);
-}
-
-.kbd.secondary {
-  background: var(--button-secondary-bg);
-  color: var(--button-secondary-color);
-  border-color: var(--button-secondary-bg);
-  box-shadow: 0 2px 0 0 color-mix(in srgb, var(--button-secondary-bg) 80%, #000),
-              0 3px 0 0 color-mix(in srgb, var(--button-secondary-bg) 40%, transparent);
-}
-
-.kbd.accent {
-  background: var(--button-accent-bg);
-  color: var(--button-accent-color);
-  border-color: var(--button-accent-bg);
-  box-shadow: 0 2px 0 0 color-mix(in srgb, var(--button-accent-bg) 80%, #000),
-              0 3px 0 0 color-mix(in srgb, var(--button-accent-bg) 40%, transparent);
-}
-
-/* TABS - CSS ONLY (ZERO SCRIPT) */
-/* Masquer les radios */
-.tab-radio {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Container des tabs */
+/* ── Layout de base (toutes variants) ────────────────────────── */
 .tabs-container {
   display: flex;
-  flex-direction: column;
-  width: 100%;
+  flex-wrap: wrap;
+  position: relative;
 }
 
-/* Liste des tabs */
-.tabs { 
-  display: flex; 
-  gap: 2px; 
-  border-bottom: 1px solid var(--border-default);
-  margin: 0;
-  padding: 0;
+/* Radio inputs masqués mais accessibles au clavier */
+.tabs-container .tab-radio {
+  position: absolute;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-/* Style de chaque tab */
-.tab { 
-  padding: var(--tab-padding-y) var(--tab-padding-x); 
-  font-size: var(--tab-font-size); 
-  background: transparent; 
-  border: none; 
-  cursor: pointer; 
-  color: var(--tab-inactive-color); 
-  transition: all 0.2s; 
-  border-bottom: 2px solid transparent;
+/* Labels = onglets visuels, forcés en haut via order */
+.tabs-container .tab {
+  order: -1;
+  flex: 0 1 auto;
+  min-height: 44px; /* WCAG 2.5.5 Target Size */
+  padding: var(--tab-padding-y) var(--tab-padding-x);
+  cursor: pointer;
+  font-size: var(--tab-font-size);
+  font-weight: 500;
+  font-family: inherit;
+  line-height: 1.5;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
+  position: relative;
+  transition: all 150ms ease;
   user-select: none;
 }
 
-.tab:hover {
-  background: var(--bg-subtle);
+/* Icône dans l'onglet */
+.tabs-container .tab .tab-icon {
+  width: 1.25em;
+  height: 1.25em;
+  flex-shrink: 0;
 }
 
-/* Tab actif quand le radio est checked */
-.tab-radio:checked + .tab {
-  color: var(--tab-active-color); 
-  border-bottom-color: var(--tab-active-border-color); 
-  font-weight: 500; 
-}
-
-/* Container des panels */
-.tabs-panels {
+/* Panneau masqué par défaut, pleine largeur sous les onglets */
+.tabs-container .tab-panel {
+  display: none;
+  order: 99;
   width: 100%;
 }
 
-/* Masquer tous les panels par défaut */
-.tab-panel {
-  display: none;
-  padding: var(--space-6) 0;
-  animation: fadeIn 0.2s ease-in;
-}
-
-/* Approche générique : matcher position du radio avec position du panel */
-/* Supporte jusqu'à 15 tabs - extensible si besoin */
-.tab-radio:nth-of-type(1):checked ~ .tabs-panels > .tab-panel:nth-of-type(1),
-.tab-radio:nth-of-type(2):checked ~ .tabs-panels > .tab-panel:nth-of-type(2),
-.tab-radio:nth-of-type(3):checked ~ .tabs-panels > .tab-panel:nth-of-type(3),
-.tab-radio:nth-of-type(4):checked ~ .tabs-panels > .tab-panel:nth-of-type(4),
-.tab-radio:nth-of-type(5):checked ~ .tabs-panels > .tab-panel:nth-of-type(5),
-.tab-radio:nth-of-type(6):checked ~ .tabs-panels > .tab-panel:nth-of-type(6),
-.tab-radio:nth-of-type(7):checked ~ .tabs-panels > .tab-panel:nth-of-type(7),
-.tab-radio:nth-of-type(8):checked ~ .tabs-panels > .tab-panel:nth-of-type(8),
-.tab-radio:nth-of-type(9):checked ~ .tabs-panels > .tab-panel:nth-of-type(9),
-.tab-radio:nth-of-type(10):checked ~ .tabs-panels > .tab-panel:nth-of-type(10),
-.tab-radio:nth-of-type(11):checked ~ .tabs-panels > .tab-panel:nth-of-type(11),
-.tab-radio:nth-of-type(12):checked ~ .tabs-panels > .tab-panel:nth-of-type(12),
-.tab-radio:nth-of-type(13):checked ~ .tabs-panels > .tab-panel:nth-of-type(13),
-.tab-radio:nth-of-type(14):checked ~ .tabs-panels > .tab-panel:nth-of-type(14),
-.tab-radio:nth-of-type(15):checked ~ .tabs-panels > .tab-panel:nth-of-type(15) {
+/* Panneau actif quand le radio est coché */
+.tabs-container .tab-radio:checked + .tab + .tab-panel {
   display: block;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Focus visible pour navigation clavier */
+.tabs-container .tab-radio:focus-visible + .tab {
+  outline: 3px solid var(--tab-active-border-color);
+  outline-offset: 2px;
+  border-radius: var(--border-radius-sm);
+}
+
+/* Réduction des animations si demandé */
+@media (prefers-reduced-motion: reduce) {
+  .tabs-container .tab,
+  .tabs-container .tab-panel {
+    transition: none !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ── Variant : Initial (underline animée) ────────────────────── */
+.tabs-container.initial {
+  border-bottom: 2px solid var(--border-strong);
+}
+
+.tabs-container.initial .tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--tab-inactive-color);
+  margin-bottom: -2px;
+}
+
+.tabs-container.initial .tab::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--tab-active-border-color);
+  transform: scaleX(0);
+  transition: transform 250ms ease;
+}
+
+.tabs-container.initial .tab:hover {
+  color: var(--text-default);
+  background: var(--tab-hover-bg);
+}
+
+.tabs-container.initial .tab:hover::after {
+  transform: scaleX(0.5);
+}
+
+.tabs-container.initial .tab-radio:checked + .tab {
+  color: var(--tab-active-color);
+  font-weight: 600;
+}
+
+.tabs-container.initial .tab-radio:checked + .tab::after {
+  transform: scaleX(1);
+}
+
+.tabs-container.initial .tab-panel {
+  padding: var(--space-8);
+  background: var(--bg-default);
+  animation: tabsFadeIn 250ms ease;
+}
+
+@keyframes tabsFadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Initial */
+@media (max-width: 640px) {
+  .tabs-container.initial .tab {
+    flex: 1 1 auto;
+    text-align: center;
+    justify-content: center;
+    font-size: 0.8125rem;
+    padding: var(--space-2) var(--space-3);
+  }
 }
 
 /* ACCORDION */

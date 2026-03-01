@@ -45,9 +45,6 @@ const maxDepth = 5;
 ---
 
 <div class="comment-thread">
-  <div style="background: #ffeeba; color: #7c4700; padding: 0.25rem 0.5rem; font-size: 0.85rem; margin-bottom: 0.5rem;">
-    [DEBUG] CommentItem rendu — id: {comment.id}, auteur: {comment.authorName}, contenu: {getContent(comment.content)}
-  </div>
   <Card
     class={`comment-card ${depth > 0 ? "is-reply" : ""}`}
   >
@@ -107,7 +104,7 @@ const maxDepth = 5;
           )
         }
       </div>
-    </div>
+    </Grid>
 
     {/* Formulaire de réponse (toujours présent mais caché par défaut) */}
     <div
@@ -118,6 +115,7 @@ const maxDepth = 5;
         <input type="hidden" name="postId" value={postId} />
         <input type="hidden" name="postType" value={postType} />
         <input type="hidden" name="parentId" value={comment.id} />
+        <input type="hidden" name="rating" value="0" />
         <Avatar variant="retro" size="lg" src={user?.avatar_url} fallback={user?.name} />
         <div class="reply-input-wrap">
           <Textarea
@@ -133,7 +131,7 @@ const maxDepth = 5;
               size="sm"
               variant="retro"
               type="button"
-              class="cancel-reply"
+              className="cancel-reply"
               data-target={comment.id}>Annuler</Button
             >
             <Button size="sm" type="submit">Répondre</Button>
@@ -146,22 +144,20 @@ const maxDepth = 5;
   {
     /* RÉCURSIVITÉ : Si le commentaire a des enfants, on rappelle ce même composant */
   }
-  {
-    children.length > 0 && (
-      <div class="comment-children">
-        {children.map((child) => (
-          <Astro.self
-            comment={child}
-            allComments={allComments}
-            postId={postId}
-            postType={postType}
-            user={user}
-            lang={lang}
-            depth={depth + 1}
-          />
-        ))}
-      </div>
-    )
+  {children.length > 0 &&
+    <div class="comment-children">
+      {children.map((child) => (
+        <Astro.self
+          comment={child}
+          allComments={allComments}
+          postId={postId}
+          postType={postType}
+          user={user}
+          lang={lang}
+          depth={depth + 1}
+        />
+      ))}
+    </div>
   }
 </div>
 
@@ -171,6 +167,7 @@ const maxDepth = 5;
 .comment-row{align-items:flex-start}
 .comment-body{width:100%}
 .reply-btn{background:none;border:none;color:var(--color-primary);cursor:pointer;padding:0;font-weight:600}
+.reply-btn.is-hidden{display:none}
 .reply-slot.is-hidden{display:none}
 .comment-actions{display:flex;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-2)}
 .comment-children{margin-left:1rem;border-left:2px solid var(--border-muted);padding-left:1rem;margin-top:var(--space-4)}

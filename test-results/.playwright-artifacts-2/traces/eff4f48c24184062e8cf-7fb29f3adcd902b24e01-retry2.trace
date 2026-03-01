@@ -1,0 +1,22 @@
+{"version":8,"type":"context-options","origin":"library","browserName":"","playwrightVersion":"1.58.2","options":{},"platform":"win32","wallTime":1772301092245,"monotonicTime":23953.83,"sdkLanguage":"javascript","contextId":"request-context@907ad0e68d51f21cab75fa6015eb4d37","title":"ui\\newtab.test.ts:13 › NewTabComponent – documentation page › page loads and demo is present"}
+{"type":"before","callId":"call@14","startTime":24715.291,"class":"APIRequestContext","method":"fetch","params":{"url":"http://localhost:4321/test/newtab","method":"GET","timeout":0},"stepId":"pw:api@42"}
+{"type":"log","callId":"call@14","time":24737.04,"message":"→ GET http://localhost:4321/test/newtab"}
+{"type":"log","callId":"call@14","time":24737.125,"message":"  user-agent: Playwright/1.58.2 (x64; windows 10.0) node/20.19"}
+{"type":"log","callId":"call@14","time":24737.161,"message":"  accept: */*"}
+{"type":"log","callId":"call@14","time":24737.214,"message":"  accept-encoding: gzip,deflate,br"}
+{"type":"log","callId":"call@14","time":24802.679,"message":"← 404 Not Found"}
+{"type":"log","callId":"call@14","time":24802.754,"message":"  vary: Origin"}
+{"type":"log","callId":"call@14","time":24802.79,"message":"  content-security-policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"}
+{"type":"log","callId":"call@14","time":24802.823,"message":"  content-type: text/html"}
+{"type":"log","callId":"call@14","time":24802.855,"message":"  cross-origin-opener-policy: same-origin"}
+{"type":"log","callId":"call@14","time":24802.919,"message":"  cross-origin-resource-policy: same-origin"}
+{"type":"log","callId":"call@14","time":24802.989,"message":"  permissions-policy: camera=(), microphone=(), geolocation=(self)"}
+{"type":"log","callId":"call@14","time":24803.02,"message":"  referrer-policy: strict-origin-when-cross-origin"}
+{"type":"log","callId":"call@14","time":24803.107,"message":"  strict-transport-security: max-age=63072000; includeSubDomains; preload"}
+{"type":"log","callId":"call@14","time":24803.133,"message":"  x-content-type-options: nosniff"}
+{"type":"log","callId":"call@14","time":24803.153,"message":"  x-xss-protection: 0"}
+{"type":"log","callId":"call@14","time":24803.174,"message":"  date: Sat, 28 Feb 2026 17:51:33 GMT"}
+{"type":"log","callId":"call@14","time":24803.194,"message":"  connection: keep-alive"}
+{"type":"log","callId":"call@14","time":24803.214,"message":"  keep-alive: timeout=5"}
+{"type":"log","callId":"call@14","time":24803.234,"message":"  transfer-encoding: chunked"}
+{"type":"after","callId":"call@14","endTime":24803.766,"result":{"response":{"url":"http://localhost:4321/test/newtab","status":404,"statusText":"Not Found","headers":[{"name":"Vary","value":"Origin"},{"name":"content-security-policy","value":"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"},{"name":"content-type","value":"text/html"},{"name":"cross-origin-opener-policy","value":"same-origin"},{"name":"cross-origin-resource-policy","value":"same-origin"},{"name":"permissions-policy","value":"camera=(), microphone=(), geolocation=(self)"},{"name":"referrer-policy","value":"strict-origin-when-cross-origin"},{"name":"strict-transport-security","value":"max-age=63072000; includeSubDomains; preload"},{"name":"x-content-type-options","value":"nosniff"},{"name":"x-xss-protection","value":"0"},{"name":"Date","value":"Sat, 28 Feb 2026 17:51:33 GMT"},{"name":"Connection","value":"keep-alive"},{"name":"Keep-Alive","value":"timeout=5"},{"name":"Transfer-Encoding","value":"chunked"}],"fetchUid":"76a2477bcc172242aa59157687ffa4e7"}}}

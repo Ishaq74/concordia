@@ -1,39 +1,56 @@
 ---
-import { Icon } from 'astro-icon/components';
-
 /**
- * Tab - Label pour tabs CSS-only (ZERO SCRIPT)
- * 
- * Position détermine le matching avec TabPanel (pas d'ID en dur)
- * 
- * @param {string} name - Nom du groupe radio (pour regrouper les tabs)
- * @param {boolean} checked - Tab actif par défaut
- * @param {string} icon - Nom de l'icône (optionnel)
- * @param {string} className - Classes CSS additionnelles
+ * Tab — Onglet individuel (CSS-only, zéro JavaScript)
+ *
+ * Rend 3 éléments frères (siblings) dans le flux :
+ *   1. <input type="radio"> — masqué visuellement, gère l'état :checked
+ *   2. <label class="tab">  — le bouton onglet visible et cliquable
+ *   3. <div class="tab-panel"> — le contenu associé
+ *
+ * Le sélecteur CSS .tab-radio:checked + .tab + .tab-panel
+ * affiche le bon panneau sans aucun JavaScript.
+ * Les flèches clavier fonctionnent nativement (radio group).
+ *
+ * @param {string}  label  - Texte du bouton onglet (requis)
+ * @param {boolean} open   - Onglet actif par défaut
+ * @param {string}  icon   - Nom d'icône astro-icon (optionnel)
+ * @param {string}  name   - Nom du groupe radio (requis, identique pour tous les Tab du groupe)
+ * @param {string}  class  - Classes CSS additionnelles sur le panel
  */
 
+import { Icon } from 'astro-icon/components';
+
 interface Props {
-  name: string;
-  checked?: boolean;
+  label: string;
+  open?: boolean;
   icon?: string;
-  className?: string;
+  name?: string;
+  class?: string;
 }
 
 const {
-  name,
-  checked = false,
+  label,
+  open = false,
   icon,
-  className = '',
+  name = 'tabs',
+  class: className = '',
 } = Astro.props;
 
-const classes = [
-  'tab',
-  className,
-].filter(Boolean).join(' ');
+const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const tabId = `${name}-${slug}`;
 ---
 
-<input type="radio" name={name} checked={checked} class="tab-radio" />
-<label class={classes}>
-  {icon && <Icon name={icon} />}
-  <slot />
+<input
+  type="radio"
+  name={name}
+  id={tabId}
+  checked={open || undefined}
+  class="tab-radio"
+/>
+<label for={tabId} class:list={['tab', className]}>
+  {icon && <Icon name={icon} class="tab-icon" aria-hidden="true" />}
+  <span>{label}</span>
 </label>
+<div class="tab-panel">
+  <slot />
+</div>

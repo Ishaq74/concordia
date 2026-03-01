@@ -1,5 +1,5 @@
 ---
-import { getEntry } from "astro:content";
+import { getEntry, getCollection } from "astro:content";
 import MarkdownIt from "markdown-it";
 import BlogLayout from "@components/templates/blog/BlogLayout.astro";
 import Grid from "@components/Tools/Grid.astro";
@@ -10,8 +10,9 @@ import TableOfContents from "@components/modules/blog/single/TableOfContents.ast
 import AuthorCard from "@components/modules/blog/cards/AuthorCard.astro";
 import ShareButtons from "@components/modules/blog/ui/ShareButtons.astro";
 import PostFooter from "@components/modules/blog/single/PostFooter.astro";
+import RelatedPosts from "@components/modules/blog/lists/RelatedPosts.astro";
 
-const { slug } = Astro.params;
+const { slug, category } = Astro.params;
 const LANG = "fr";
 
 const post = await getEntry("blog", `${slug}-${LANG}`);
@@ -28,6 +29,17 @@ const md = new MarkdownIt({
   typographer: true,
 });
 const renderedHtml = md.render(String(post.data.content ?? ""));
+
+// --- Articles liés (même catégorie, hors article courant) ---
+const allPosts = await getCollection("blog");
+const sameCategoryPosts = allPosts
+  .filter((p) => p.data.lang === LANG)
+  .filter((p) => (p.data.categories ?? []).some((c: any) => c.slug === category))
+  .sort(
+    (a, b) =>
+      new Date(b.data.publishedAt || 0).getTime() -
+      new Date(a.data.publishedAt || 0).getTime(),
+  );
 
 ---
 
@@ -59,6 +71,14 @@ const renderedHtml = md.render(String(post.data.content ?? ""));
 
       <PostFooter postId={post.data.id} postType="blog" />
     </article>
+
+    <RelatedPosts
+      posts={sameCategoryPosts}
+      lang={LANG}
+      currentPostId={post.data.id}
+      variant="retro"
+      limit={3}
+    />
   </main>
 
   <style>

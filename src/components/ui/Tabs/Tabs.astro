@@ -1,32 +1,36 @@
 ---
 /**
- * Tabs - Composant conteneur pour système de tabs CSS-only (ZERO SCRIPT)
- * 
- * Utilise :nth-of-type() pour matcher radios et panels par position
- * AUCUN ID en dur dans le CSS - design system réutilisable
- * 
- * @param {string} variant - Style variant (initial|retro|modern|futuristic)
- * @param {string} className - Classes CSS additionnelles
+ * Tabs — conteneur d'onglets (CSS-only, zéro JavaScript)
+ *
+ * Flex container avec flex-wrap. Les <Tab> enfants rendent des
+ * radio + label + panel en siblings. Le CSS :checked + ~ gère
+ * l'affichage du bon panneau sans aucun JS.
+ *
+ * @param {string}  variant  - Style (initial | retro | modern | futuristic)
+ * @param {string}  label    - aria-label sur le conteneur
+ * @param {string}  name     - Identifiant du groupe (à passer aussi à chaque <Tab>)
+ * @param {string}  class    - Classes CSS additionnelles
  */
 
 interface Props {
   variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
-  className?: string;
+  label?: string;
+  name?: string;
+  class?: string;
 }
 
 const {
   variant = 'initial',
-  className = '',
+  label,
+  name,
+  class: className = '',
 } = Astro.props;
 
-const variantClass = variant !== 'initial' ? variant : '';
-const containerClasses = [
-  'tabs-container',
-  variantClass,
-  className,
-].filter(Boolean).join(' ');
+const containerClasses = ['tabs-container', variant, className]
+  .filter(Boolean)
+  .join(' ');
 ---
 
-<div class={containerClasses}>
+<div class={containerClasses} aria-label={label || undefined}>
   <slot />
 </div>

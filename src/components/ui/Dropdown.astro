@@ -417,112 +417,116 @@ const getLevel2RadioName = (parentId: string) =>
 </style>
 
 <script is:inline type="module" define:vars={{ dropdownId, openOnHover }}>
-  // dropdownId is provided by Astro via `define:vars` — silence TS/IDE parsing
-  // @ts-ignore
-  const dropdown = document
-    .querySelector(`#${dropdownId}`)
-    ?.closest(".dropdown");
-  if (!dropdown) return;
+  // IIFE wrapper — top-level `return` is illegal in module scripts,
+  // so we wrap the whole block in a function to allow early exit.
+  (function initDropdownCollision() {
+    // dropdownId is provided by Astro via `define:vars` — silence TS/IDE parsing
+    // @ts-ignore
+    const dropdown = document
+      .querySelector(`#${dropdownId}`)
+      ?.closest(".dropdown");
+    if (!dropdown) return;
 
-  const menu = dropdown.querySelector(".dropdown-menu");
-  const submenus = dropdown.querySelectorAll(".submenu-content");
+    const menu = dropdown.querySelector(".dropdown-menu");
+    const submenus = dropdown.querySelectorAll(".submenu-content");
 
-  function checkCollision(element) {
-    if (!element) return;
+    function checkCollision(element) {
+      if (!element) return;
 
-    const rect = element.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+      const rect = element.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
 
-    // Check si le submenu sort à droite
-    if (rect.right > viewportWidth - 20) {
-      element.style.left = "auto";
-      element.style.right = "100%";
-      element.style.marginLeft = "0";
-      element.style.marginRight = "0.25rem";
+      // Check si le submenu sort à droite
+      if (rect.right > viewportWidth - 20) {
+        element.style.left = "auto";
+        element.style.right = "100%";
+        element.style.marginLeft = "0";
+        element.style.marginRight = "0.25rem";
+      }
+
+      // Check si le submenu sort en bas
+      if (rect.bottom > viewportHeight - 20) {
+        element.style.top = "auto";
+        element.style.bottom = "0";
+      }
     }
 
-    // Check si le submenu sort en bas
-    if (rect.bottom > viewportHeight - 20) {
-      element.style.top = "auto";
-      element.style.bottom = "0";
-    }
-  }
-
-  // Observer pour détecter quand les menus s'ouvrent
-  const observer = new MutationObserver(() => {
-    if (
-      (menu && menu.style.visibility === "visible") ||
-      getComputedStyle(menu).visibility === "visible"
-    ) {
-      checkCollision(menu);
-
-      // Check tous les submenus visibles
-      submenus.forEach((submenu) => {
-        if (
-          submenu.style.visibility === "visible" ||
-          getComputedStyle(submenu).visibility === "visible"
-        ) {
-          checkCollision(submenu);
-        }
-      });
-    }
-  });
-
-  observer.observe(dropdown, {
-    attributes: true,
-    subtree: true,
-    attributeFilter: ["style", "class"],
-  });
-
-  // Check initial au hover pour les dropdowns hover
-  if (openOnHover) {
-    dropdown.addEventListener("mouseenter", () => {
-      setTimeout(() => {
+    // Observer pour détecter quand les menus s'ouvrent
+    const observer = new MutationObserver(() => {
+      if (
+        (menu && menu.style.visibility === "visible") ||
+        getComputedStyle(menu).visibility === "visible"
+      ) {
         checkCollision(menu);
+
+        // Check tous les submenus visibles
         submenus.forEach((submenu) => {
-          if (getComputedStyle(submenu).visibility === "visible") {
+          if (
+            submenu.style.visibility === "visible" ||
+            getComputedStyle(submenu).visibility === "visible"
+          ) {
             checkCollision(submenu);
           }
         });
-      }, 50);
+      }
     });
 
-    // Re-check sur submenu hover
-    const submenuTriggers = dropdown.querySelectorAll(".dropdown-submenu");
-    submenuTriggers.forEach((trigger) => {
-      trigger.addEventListener("mouseenter", () => {
+    observer.observe(dropdown, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ["style", "class"],
+    });
+
+    // Check initial au hover pour les dropdowns hover
+    if (openOnHover) {
+      dropdown.addEventListener("mouseenter", () => {
         setTimeout(() => {
-          const submenu = trigger.querySelector(".submenu-content");
-          checkCollision(submenu);
+          checkCollision(menu);
+          submenus.forEach((submenu) => {
+            if (getComputedStyle(submenu).visibility === "visible") {
+              checkCollision(submenu);
+            }
+          });
         }, 50);
       });
-    });
-  } else {
-    // Pour le mode click, check après l'ouverture
-    const checkbox = dropdown.querySelector(".dropdown-state");
-    if (checkbox) {
-      checkbox.addEventListener("change", () => {
-        if (checkbox.checked) {
-          setTimeout(() => {
-            checkCollision(menu);
-          }, 50);
-        }
-      });
-    }
 
-    // Check sur radio change pour submenus
-    const radioButtons = dropdown.querySelectorAll(".submenu-state");
-    radioButtons.forEach((radio) => {
-      radio.addEventListener("change", () => {
-        if (radio.checked) {
+      // Re-check sur submenu hover
+      const submenuTriggers = dropdown.querySelectorAll(".dropdown-submenu");
+      submenuTriggers.forEach((trigger) => {
+        trigger.addEventListener("mouseenter", () => {
           setTimeout(() => {
-            const parent = radio.closest(".dropdown-submenu");
-            const submenu = parent?.querySelector(".submenu-content");
+            const submenu = trigger.querySelector(".submenu-content");
             checkCollision(submenu);
           }, 50);
-        }
+        });
       });
-    });
-  }
+    } else {
+      // Pour le mode click, check après l'ouverture
+      const checkbox = dropdown.querySelector(".dropdown-state");
+      if (checkbox) {
+        checkbox.addEventListener("change", () => {
+          if (checkbox.checked) {
+            setTimeout(() => {
+              checkCollision(menu);
+            }, 50);
+          }
+        });
+      }
+
+      // Check sur radio change pour submenus
+      const radioButtons = dropdown.querySelectorAll(".submenu-state");
+      radioButtons.forEach((radio) => {
+        radio.addEventListener("change", () => {
+          if (radio.checked) {
+            setTimeout(() => {
+              const parent = radio.closest(".dropdown-submenu");
+              const submenu = parent?.querySelector(".submenu-content");
+              checkCollision(submenu);
+            }, 50);
+          }
+        });
+      });
+    }
+  })();
 </script>

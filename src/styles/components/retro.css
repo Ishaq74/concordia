@@ -210,19 +210,72 @@ a.button.retro.secondary { background-color: var(--button-secondary-bg); color: 
 a.button.retro.accent { background-color: var(--button-accent-bg); color: var(--button-accent-color); border-color: var(--retro-link-button-border-color); }
 
 /* TABS RETRO */
-.tabs.retro { 
-  gap: 4px; 
-  border-bottom: none; 
+.tabs-container.retro {
+  background: var(--bg-default);
+  padding: var(--space-8);
+  border: var(--retro-border-width) solid var(--retro-shadow-color);
+  box-shadow: var(--retro-shadow-offset) var(--retro-shadow-offset) 0 var(--retro-shadow-color);
+  gap: var(--space-4);
 }
-.tabs.retro .tab { 
-  border: var(--retro-border-width) solid transparent; 
-  border-bottom: none; 
-  background: var(--bg-default); 
+
+.tabs-container.retro .tab {
+  background: var(--bg-default);
+  border: var(--retro-border-width) solid var(--retro-shadow-color);
+  box-shadow: var(--retro-shadow-offset) var(--retro-shadow-offset) 0 var(--retro-shadow-color);
+  color: var(--text-default);
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transform: translate(0, 0);
 }
-.tabs.retro .tab[aria-selected="true"], .tabs.retro .tab.active { 
-  background: var(--retro-tab-active-bg); 
-  border-color: currentColor; 
-  color: var(--bg-default); 
+
+/* Couleurs alternées avec contraste WCAG */
+.tabs-container.retro .tab:nth-of-type(3n+1) {
+  background: var(--retro-tab-active-bg, #fbbf24);
+  color: #1f2937;
+}
+
+.tabs-container.retro .tab:nth-of-type(3n+3) {
+  background: var(--color-secondary);
+  color: #ffffff;
+}
+
+.tabs-container.retro .tab:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: calc(var(--retro-shadow-offset) + 2px) calc(var(--retro-shadow-offset) + 2px) 0 var(--retro-shadow-color);
+}
+
+.tabs-container.retro .tab:active,
+.tabs-container.retro .tab-radio:checked + .tab {
+  transform: translate(var(--retro-shadow-offset), var(--retro-shadow-offset));
+  box-shadow: 0 0 0 var(--retro-shadow-color);
+}
+
+.tabs-container.retro .tab-panel {
+  background: var(--bg-default);
+  border: var(--retro-border-width) solid var(--retro-shadow-color);
+  padding: var(--space-8);
+  box-shadow: var(--retro-shadow-offset) var(--retro-shadow-offset) 0 var(--retro-shadow-color);
+  animation: retroPop 250ms ease;
+}
+
+@keyframes retroPop {
+  0%   { transform: scale(0.98); opacity: 0.9; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Responsive Retro */
+@media (max-width: 640px) {
+  .tabs-container.retro {
+    padding: var(--space-6);
+  }
+
+  .tabs-container.retro .tab {
+    flex: 1 0 100%;
+    text-align: center;
+    justify-content: center;
+  }
 }
 
 /* ACCORDION RETRO */

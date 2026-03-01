@@ -1,26 +1,13 @@
 ---
 /**
- * TabPanel - Panneau de contenu CSS-only (ZERO SCRIPT)
- * 
- * Position détermine le matching avec Tab (pas d'ID en dur)
- * 
- * @param {string} className - Classes CSS additionnelles
+ * TabPanel — DÉPRÉCIÉ
+ *
+ * Le contenu des onglets est désormais directement dans <Tab> via le slot.
+ * Ce composant est conservé pour compatibilité ascendante uniquement.
+ * Migrez vers : <Tab name="..." label="...">contenu ici</Tab>
+ *
+ * @deprecated Utiliser le slot de <Tab> à la place.
  */
-
-interface Props {
-  className?: string;
-}
-
-const {
-  className = '',
-} = Astro.props;
-
-const classes = [
-  'tab-panel',
-  className,
-].filter(Boolean).join(' ');
 ---
-
-<div class={classes}>
-  <slot />
-</div>
+<!-- TabPanel déprécié : contenu rendu sans wrapper -->
+<slot />

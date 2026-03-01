@@ -12,7 +12,7 @@ export const commentActions = {
             postType: z.enum(["blog", "place", "event", "hike", "classified"]),
             parentId: z.string().optional(),
             content: z.string().min(3),
-            rating: z.string().optional().transform(v => v ? parseInt(v) : 0),
+            rating: z.string().nullish().transform(v => v ? parseInt(v) : 0),
         }),
         handler: async (input, context) => {
             const user = context.locals.user;

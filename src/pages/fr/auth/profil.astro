@@ -10,7 +10,6 @@ import Grid from "@components/Tools/Grid.astro";
 import Flex from "@components/Tools/Flex.astro";
 import Tabs from "@components/ui/Tabs/Tabs.astro";
 import Tab from "@components/ui/Tabs/Tab.astro";
-import TabPanel from "@components/ui/Tabs/TabPanel.astro";
 import AvatarCard from "@components/ui/Avatar/AvatarCard.astro";
 import Badge from "@components/ui/Badge.astro";
 import Timeline from "@components/ui/Timeline.astro";
@@ -102,16 +101,9 @@ const lastSignIn = session?.updatedAt
     </Card>
 
     {/* TABS */}
-    <Tabs variant="modern">
-      <Flex gap="md">
-        <Tab name="profil-tabs" checked icon="mdi:history">Activité</Tab>
-        <Tab name="profil-tabs" icon="mdi:heart">Services favoris</Tab>
-        <Tab name="profil-tabs" icon="mdi:blog-outline">Articles</Tab>
-        <Tab name="profil-tabs" icon="mdi:pencil">Éditer mon profil</Tab>
-      </Flex>
+    <Tabs name="profil-tabs" variant="modern">
 
-      {/* PANELS */}
-      <TabPanel>
+      <Tab name="profil-tabs" label="Activité" icon="mdi:history" open>
         {/* GRID PRINCIPALE */}
         <Grid cols="2fr 1fr" gap="xl">
           {/* Colonne principale : Activité */}
@@ -146,20 +138,23 @@ const lastSignIn = session?.updatedAt
             </Card>
           </Flex>
         </Grid>
-      </TabPanel>
-      <TabPanel>
+      </Tab>
+
+      <Tab name="profil-tabs" label="Services favoris" icon="mdi:heart">
         {/* Services favoris */}
         <Grid cols="1" gap="md">
           <span>Aucun service favori</span>
         </Grid>
-      </TabPanel>
-      <TabPanel>
+      </Tab>
+
+      <Tab name="profil-tabs" label="Articles" icon="mdi:blog-outline">
         {/* Articles de blog */}
         <Grid cols="1" gap="md">
           <span>Aucun article</span>
         </Grid>
-      </TabPanel>
-      <TabPanel>
+      </Tab>
+
+      <Tab name="profil-tabs" label="Éditer mon profil" icon="mdi:pencil">
         {/* Édition du profil */}
         <Grid cols="1" gap="xl">
           <ProfileForm user={user} />
@@ -174,7 +169,8 @@ const lastSignIn = session?.updatedAt
           />
           <ProfileInvitations count={invitations.length} translations={translations} />
         </Grid>
-      </TabPanel>
+      </Tab>
+
     </Tabs>
   </Grid>
 </BaseLayout>

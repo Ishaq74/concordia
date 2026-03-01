@@ -8,6 +8,8 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import BannerPage from "@templates/BannerPage.astro";
 import PostGrid from "@components/modules/blog/lists/PostGrid.astro";
 import PostCard from "@components/modules/blog/cards/PostCard.astro";
+import CategoryGrid from "@components/modules/blog/lists/CategoryGrid.astro";
+import FeaturedGrid from "@components/modules/blog/lists/FeaturedGrid.astro";
 
 const LANG = Astro.currentLocale || "fr";
 const t = await import(`../../../i18n/${LANG}.json`);
@@ -35,10 +37,22 @@ const posts = allPosts
       new Date(a.data.publishedAt || 0).getTime(),
   );
 
-// DEBUG — afficher les catégories des posts pour investiguer l'absence de CategoryBadge
-console.log('[blog/index] posts count=', posts.length);
-posts.forEach(p => console.log(`[blog/index] slug=${p.data.slug} categories=`, p.data.categories ?? null));
+// --- Extraire les catégories uniques avec nombre d'articles ---
+const catMap = new Map<string, { name: string; slug: string; count: number }>();
+posts.forEach((post) => {
+  (post.data.categories ?? []).forEach((cat: any) => {
+    const existing = catMap.get(cat.slug);
+    if (existing) {
+      existing.count++;
+    } else {
+      catMap.set(cat.slug, { name: cat.name, slug: cat.slug, count: 1 });
+    }
+  });
+});
+const categories = Array.from(catMap.values()).sort((a, b) => b.count - a.count);
 
+// --- Articles mis en avant ---
+const featuredPosts = posts.filter((p) => p.data.isFeatured);
 ---
 
 <BaseLayout title="Blog" lang={LANG}>
@@ -49,6 +63,16 @@ posts.forEach(p => console.log(`[blog/index] slug=${p.data.slug} categories=`, p
     color="accent"
   />
   <main class="container py-12">
+    {/* Section Catégories */}
+    {categories.length > 0 && (
+      <CategoryGrid categories={categories} lang={LANG} />
+    )}
+
+    {/* Section Articles à la une */}
+    <FeaturedGrid posts={featuredPosts} lang={LANG} statsMap={statsMap} variant="retro" limit={6} />
+
+    {/* Tous les articles */}
+    <h2 class="all-posts-heading">Tous les articles</h2>
     <PostGrid>
       {
         posts.map((post) => {
@@ -68,3 +92,12 @@ posts.forEach(p => console.log(`[blog/index] slug=${p.data.slug} categories=`, p
     </PostGrid>
   </main>
 </BaseLayout>
+
+<style>
+  .all-posts-heading {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-foreground);
+    margin: 0 0 var(--space-4, 1rem) 0;
+  }
+</style>

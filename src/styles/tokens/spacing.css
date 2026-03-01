@@ -9,6 +9,8 @@
   --space-6: 1.5rem;
   --space-8: 2rem;
   --space-10: 2.5rem;
+  --space-12: 3rem; /* additional sizes used by components */
+  --touch-target: 2.75rem; /* 44px recommended minimum touch size */
 
   /* Rayons de bordure */
   --border-radius-sm: 0.25rem;

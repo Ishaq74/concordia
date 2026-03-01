@@ -59,3 +59,57 @@ const displayIcon = icon || defaultIcons[status];
     </button>
   )}
 </div>
+
+<style>
+.alert { 
+  padding: var(--alert-padding-y) var(--alert-padding-x); 
+  border-radius: var(--alert-border-radius); 
+  display: flex; 
+  align-items: center; 
+  border: var(--alert-border-width) solid transparent; 
+  width: 100%; 
+  margin-bottom: 0.5rem; 
+  position: relative;
+  overflow: hidden;
+}
+.alert[data-status="info"], .alert.info { background: var(--alert-info-bg); color: var(--alert-info-color); border-color: var(--alert-info-border); }
+.alert[data-status="success"], .alert.success { background: var(--alert-success-bg); color: var(--alert-success-color); border-color: var(--alert-success-border); }
+.alert[data-status="warning"], .alert.warning { background: var(--alert-warning-bg); color: var(--alert-warning-color); border-color: var(--alert-warning-border); }
+.alert[data-status="danger"], .alert[data-status="error"], .alert.danger, .alert.error { background: var(--alert-error-bg); color: var(--alert-error-color); border-color: var(--alert-error-border); }
+
+.alert-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.alert-close:hover {
+  opacity: 1;
+}
+
+.alert-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: currentColor;
+  opacity: 0.3;
+  transform-origin: left;
+}
+
+@keyframes alert-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+</style>

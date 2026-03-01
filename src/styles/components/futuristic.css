@@ -308,20 +308,142 @@ a.button.futuristic.accent {
 }
 
 /* TABS FUTURISTIC */
-.tabs.futuristic { 
-  background: var(--futuristic-tab-bg); 
-  padding: 4px; 
-  border: 1px solid var(--color-primary); 
-  border-bottom: none; 
+.tabs-container.futuristic {
+  --fut-bg: var(--futuristic-bg, #050508);
+  --fut-primary: var(--futuristic-primary, #00f0ff);
+  --fut-secondary: var(--futuristic-secondary, #ff00a0);
+  --fut-tertiary: var(--futuristic-tertiary, #00ff88);
+  --fut-grid: var(--futuristic-grid, rgba(0, 240, 255, 0.08));
+
+  background: var(--fut-bg);
+  padding: var(--space-8);
+  border-radius: var(--border-radius-lg);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  gap: var(--space-4);
 }
-.tabs.futuristic .tab { 
-  color: var(--text-muted); 
+
+.tabs-container.futuristic::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(var(--fut-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--fut-grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  opacity: 0.6;
+  z-index: 0;
 }
-.tabs.futuristic .tab[aria-selected="true"], .tabs.futuristic .tab.active { 
-  background: color-mix(in srgb, var(--color-primary) 20%, transparent); 
-  box-shadow: 0 0 10px var(--color-primary); 
-  color: var(--color-primary); 
-  text-shadow: 0 0 5px currentColor; 
+
+.tabs-container.futuristic .tab {
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  overflow: hidden;
+  z-index: 1;
+  transition: all 250ms ease;
+}
+
+/* Scanline effect */
+.tabs-container.futuristic .tab::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(0, 240, 255, 0.1),
+    transparent
+  );
+  transform: rotate(45deg) translateY(-100%);
+  transition: transform 0.6s;
+}
+
+.tabs-container.futuristic .tab:hover {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: var(--fut-primary);
+  color: var(--fut-primary);
+  text-shadow: 0 0 8px var(--fut-primary);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+}
+
+.tabs-container.futuristic .tab:hover::after {
+  transform: rotate(45deg) translateY(100%);
+}
+
+.tabs-container.futuristic .tab-radio:checked + .tab {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: var(--fut-primary);
+  color: var(--fut-primary);
+  text-shadow: 0 0 12px var(--fut-primary);
+  box-shadow:
+    0 0 30px rgba(0, 240, 255, 0.3),
+    inset 0 0 20px rgba(0, 240, 255, 0.1);
+}
+
+.tabs-container.futuristic .tab-panel {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  padding: var(--space-8);
+  z-index: 1;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  animation: futurGlitch 0.5s ease;
+}
+
+.tabs-container.futuristic .tab-panel h3 {
+  color: var(--fut-primary);
+  font-size: 1.25rem;
+  margin-bottom: var(--space-4);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 15px var(--fut-primary);
+  font-family: 'Courier New', monospace;
+}
+
+.tabs-container.futuristic .tab-panel p {
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.7;
+  font-size: 0.9375rem;
+}
+
+@keyframes futurGlitch {
+  0% {
+    opacity: 0;
+    clip-path: polygon(0 0, 0 0, 0 0, 0 0, 0 0, 0 0);
+  }
+  20% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 100%, 0 0);
+  }
+  100% {
+    opacity: 1;
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  }
+}
+
+/* Responsive Futuristic */
+@media (max-width: 640px) {
+  .tabs-container.futuristic .tab {
+    flex: 1 0 100%;
+    text-align: center;
+    justify-content: center;
+    clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+  }
 }
 
 /* ACCORDION FUTURISTIC */

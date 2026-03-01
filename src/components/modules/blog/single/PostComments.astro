@@ -10,7 +10,6 @@ import Button from "@components/ui/Button.astro";
 
 import Tabs from '@components/ui/Tabs/Tabs.astro';
 import Tab from '@components/ui/Tabs/Tab.astro';
-import TabPanel from '@components/ui/Tabs/TabPanel.astro';
 import CommentItem from "./CommentItem.astro";
 
 interface Props {
@@ -21,8 +20,6 @@ interface Props {
 const { postId, postType } = Astro.props;
 const user = Astro.locals.user;
 const lang = Astro.currentLocale ?? "fr";
-
-console.log('[PostComments] props', { postId, postType });
 
 let allComments: any[] = [];
 let rootComments: any[] = [];
@@ -36,9 +33,7 @@ try {
     ),
     orderBy: [desc(blogComments.createdAt)],
   });
-  console.log('[PostComments] allComments', allComments);
   rootComments = allComments.filter((c) => !c.parentId);
-  console.log('[PostComments] rootComments', rootComments);
 } catch (err) {
   dbError = (err instanceof Error && err.message) ? err.message : String(err);
   console.error('PostComments: DB read error', dbError);
@@ -47,16 +42,9 @@ const loginUrl = `/${lang}/connexion?callbackURL=${Astro.url.pathname}`;
 ---
 
 <section id="comments-section" class="comments-section">
-  <div style="background: #ff0; color: #000; font-weight: bold; padding: 8px; border: 2px solid #f00; margin-bottom: 16px; font-size: 1.2em;">
-    [DEBUG] PostComments.astro rendu — rootComments: {rootComments.length} — postId: {postId}
-  </div>
 
-
-<Tabs variant="modern">
-  <Tab name="comments-tabs" checked>
-    Commentaires ({allComments.length})
-  </Tab>
-  <TabPanel>
+<Tabs name="comments-tabs" variant="retro" label="Commentaires et avis">
+  <Tab name="comments-tabs" label={`Commentaires (${allComments.length})`} open>
     {rootComments.length === 0 ? (
       <div>Aucun commentaire pour le moment.</div>
     ) : (
@@ -71,12 +59,9 @@ const loginUrl = `/${lang}/connexion?callbackURL=${Astro.url.pathname}`;
         />
       ))
     )}
-  </TabPanel>
-
-  <Tab name="comments-tabs" icon="mdi:pencil">
-    Laisser un avis
   </Tab>
-  <TabPanel>
+
+  <Tab name="comments-tabs" label="Laisser un avis" icon="mdi:pencil">
     <Card>
       <form method="POST" action={actions.createComment}>
         <input type="hidden" name="postId" value={postId} />
@@ -96,8 +81,8 @@ const loginUrl = `/${lang}/connexion?callbackURL=${Astro.url.pathname}`;
           </div>
         )}
 
-        <div>
-          <span>Note :</span>
+        <fieldset class="rating-fieldset">
+          <legend class="rating-legend">Note</legend>
           <div class="rating-selector">
             {[5, 4, 3, 2, 1].map((n) => (
               <>
@@ -107,17 +92,17 @@ const loginUrl = `/${lang}/connexion?callbackURL=${Astro.url.pathname}`;
                   name="rating"
                   value={n}
                   required
-                  checked={n === 5}
+                  class="rating-radio"
                 />
-                <label for={`r-${n}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <label for={`r-${n}`} class="rating-star" title={`${n} étoile${n > 1 ? 's' : ''}`}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                   </svg>
                 </label>
               </>
             ))}
           </div>
-        </div>
+        </fieldset>
 
         <div>
           <label>Message</label>
@@ -127,44 +112,94 @@ const loginUrl = `/${lang}/connexion?callbackURL=${Astro.url.pathname}`;
         <Button type="submit">Publier le commentaire</Button>
       </form>
     </Card>
-  </TabPanel>
+  </Tab>
 </Tabs>
 </section>
 
-<script>
-  function initCommentInteractions() {
-    const section = document.getElementById("comments-section");
+<script is:inline>
+  (function initCommentInteractions() {
+    var section = document.getElementById("comments-section");
     if (!section) return;
 
-    section.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement;
-      const replyBtn = target.closest(".reply-btn");
-      const cancelBtn = target.closest(".cancel-reply");
+    section.addEventListener("click", function (e) {
+      var target = /** @type {HTMLElement} */ (e.target);
+      var replyBtn = target.closest(".reply-btn");
+      var cancelBtn = target.closest(".cancel-reply");
 
       if (replyBtn) {
-        const id = replyBtn.getAttribute("data-reply-to");
-        document.getElementById(`reply-slot-${id}`)?.classList.remove("hidden");
-        replyBtn.classList.add("hidden");
+        var id = replyBtn.getAttribute("data-reply-to");
+        var slot = document.getElementById("reply-slot-" + id);
+        if (slot) slot.classList.remove("is-hidden");
+        replyBtn.classList.add("is-hidden");
       }
 
       if (cancelBtn) {
-        const id = cancelBtn.getAttribute("data-target");
-        document.getElementById(`reply-slot-${id}`)?.classList.add("hidden");
-        section
-          .querySelector(`[data-reply-to="${id}"]`)
-          ?.classList.remove("hidden");
+        var cid = cancelBtn.getAttribute("data-target");
+        var cslot = document.getElementById("reply-slot-" + cid);
+        if (cslot) cslot.classList.add("is-hidden");
+        var btn = section.querySelector('[data-reply-to="' + cid + '"]');
+        if (btn) btn.classList.remove("is-hidden");
       }
     });
-  }
-
-  initCommentInteractions();
-  document.addEventListener("astro:page-load", initCommentInteractions);
+  })();
 </script>
 
 <style>
-  .rating-selector input:checked ~ label,
-  .rating-selector label:hover ~ label {
-    color: #fbce03;
+  .comments-section {
+    margin-top: var(--space-6);
   }
-  .comments-section{margin-top:var(--space-6)}
+
+  /* ── Rating stars selector ── */
+  .rating-fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+  .rating-legend {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: var(--space-2);
+    color: var(--text-default);
+  }
+  .rating-selector {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: var(--space-1);
+    align-items: center;
+  }
+  /* Hide native radio, keep accessible */
+  .rating-radio {
+    position: absolute;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .rating-star {
+    cursor: pointer;
+    color: var(--border-default, #d1d5db);
+    transition: color 150ms ease, transform 150ms ease;
+    line-height: 1;
+    display: inline-flex;
+  }
+  .rating-star:hover,
+  .rating-star:hover ~ .rating-star {
+    color: #facc15;
+    transform: scale(1.15);
+  }
+  .rating-radio:checked ~ .rating-star {
+    color: #facc15;
+  }
+  .rating-radio:focus-visible ~ .rating-star {
+    /* just the first star after focus gets outline */
+  }
+  .rating-radio:focus-visible + .rating-star {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--border-radius-sm);
+  }
+
 </style>

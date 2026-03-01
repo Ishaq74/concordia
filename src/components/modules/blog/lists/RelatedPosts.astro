@@ -1,0 +1,56 @@
+---
+/**
+ * RelatedPosts — Articles de la même catégorie.
+ * Exclut l'article courant. Affiche une grille de PostCard.
+ */
+import PostGrid from "@components/modules/blog/lists/PostGrid.astro";
+import PostCard from "@components/modules/blog/cards/PostCard.astro";
+
+interface Props {
+  posts: any[];
+  lang: string;
+  currentPostId: string;
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  /** Max articles liés à afficher (défaut : 3) */
+  limit?: number;
+}
+
+const {
+  posts,
+  lang,
+  currentPostId,
+  variant = "retro",
+  limit = 3,
+} = Astro.props;
+
+// Exclure l'article courant et limiter
+const related = posts
+  .filter((p) => p.data.id !== currentPostId)
+  .slice(0, limit);
+---
+
+{related.length > 0 && (
+  <section class="related-section" aria-label="Articles similaires">
+    <h2 class="section-heading">Articles similaires</h2>
+    <PostGrid>
+      {related.map((post) => (
+        <PostCard post={post} lang={lang} variant={variant} />
+      ))}
+    </PostGrid>
+  </section>
+)}
+
+<style>
+  .related-section {
+    margin-top: var(--space-8, 2rem);
+    padding-top: var(--space-6, 1.5rem);
+    border-top: 1px solid var(--border-color, #e5e7eb);
+  }
+
+  .section-heading {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-foreground);
+    margin: 0 0 var(--space-4, 1rem) 0;
+  }
+</style>

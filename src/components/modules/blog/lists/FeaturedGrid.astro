@@ -1,0 +1,77 @@
+---
+/**
+ * FeaturedGrid — Grille d'articles mis en avant.
+ * Affiche les posts "featured" avec une présentation visuelle premium.
+ * Réutilise PostGrid + PostCard pour la cohérence.
+ */
+import PostGrid from "@components/modules/blog/lists/PostGrid.astro";
+import PostCard from "@components/modules/blog/cards/PostCard.astro";
+
+interface Props {
+  posts: any[];
+  lang: string;
+  statsMap?: Map<string, { avgRating: number; count: number }>;
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+  /** Max articles à afficher (défaut : 6) */
+  limit?: number;
+}
+
+const {
+  posts,
+  lang,
+  statsMap = new Map(),
+  variant = "retro",
+  limit = 6,
+} = Astro.props;
+
+const featured = posts.slice(0, limit);
+---
+
+{featured.length > 0 && (
+  <section class="featured-section" aria-label="Articles mis en avant">
+    <div class="featured-header">
+      <h2 class="section-heading">⭐ À la une</h2>
+      <p class="section-subtitle">Nos articles incontournables, sélectionnés pour vous.</p>
+    </div>
+
+    <PostGrid>
+      {featured.map((post) => {
+        const stats = statsMap.get(post.data.id);
+        return (
+          <PostCard
+            post={post}
+            lang={lang}
+            rating={stats?.avgRating}
+            count={stats?.count}
+            variant={variant}
+          />
+        );
+      })}
+    </PostGrid>
+  </section>
+)}
+
+<style>
+  .featured-section {
+    margin-bottom: var(--space-8, 2rem);
+    padding: var(--space-6, 1.5rem) 0;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+  }
+
+  .featured-header {
+    margin-bottom: var(--space-4, 1rem);
+  }
+
+  .section-heading {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-foreground);
+    margin: 0 0 var(--space-2, 0.5rem) 0;
+  }
+
+  .section-subtitle {
+    color: var(--text-muted-foreground);
+    margin: 0;
+    font-size: 1rem;
+  }
+</style>

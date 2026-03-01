@@ -1,0 +1,410 @@
+---
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Pagination from "@components/ui/Pagination.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import { blogAuthors, blogPostAuthors } from "@database/schemas";
+import { count, desc, ilike, eq, inArray, and } from "drizzle-orm";
+
+import tData from "@i18n/fr.json";
+const currentLocale = Astro.currentLocale || "fr";
+const t = tData;
+
+const url = new URL(Astro.request.url);
+const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));
+const perPage = 20;
+const search = url.searchParams.get("q")?.trim() ?? "";
+const featuredFilter = url.searchParams.get("featured")?.trim() ?? "";
+const homeFilter = url.searchParams.get("home")?.trim() ?? "";
+const blogFilter = url.searchParams.get("blog")?.trim() ?? "";
+
+const db = await getDrizzle();
+
+// Build filter conditions
+const conditions: any[] = [];
+if (search) conditions.push(ilike(blogAuthors.slug, `%${search}%`));
+if (featuredFilter === "true") conditions.push(eq(blogAuthors.isFeatured, true));
+if (featuredFilter === "false") conditions.push(eq(blogAuthors.isFeatured, false));
+if (homeFilter === "true") conditions.push(eq(blogAuthors.displayInHome, true));
+if (homeFilter === "false") conditions.push(eq(blogAuthors.displayInHome, false));
+if (blogFilter === "true") conditions.push(eq(blogAuthors.displayInBlog, true));
+if (blogFilter === "false") conditions.push(eq(blogAuthors.displayInBlog, false));
+
+const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+const [totalResult] = whereClause
+  ? await db.select({ value: count() }).from(blogAuthors).where(whereClause)
+  : await db.select({ value: count() }).from(blogAuthors);
+const totalAuthors = totalResult.value;
+const totalPages = Math.max(1, Math.ceil(totalAuthors / perPage));
+
+const authors = whereClause
+  ? await db.select().from(blogAuthors).where(whereClause).orderBy(desc(blogAuthors.createdAt)).limit(perPage).offset((page - 1) * perPage)
+  : await db.select().from(blogAuthors).orderBy(desc(blogAuthors.createdAt)).limit(perPage).offset((page - 1) * perPage);
+
+// Article counts
+const authorIds = authors.map((a) => a.id);
+const articleCountMap = new Map<string, number>();
+if (authorIds.length > 0) {
+  const counts = await db.select({ authorId: blogPostAuthors.authorId, count: count() }).from(blogPostAuthors).where(inArray(blogPostAuthors.authorId, authorIds)).groupBy(blogPostAuthors.authorId);
+  counts.forEach((c) => articleCountMap.set(c.authorId, c.count));
+}
+
+// Stats
+const [allCount] = await db.select({ value: count() }).from(blogAuthors);
+const [featuredCount] = await db.select({ value: count() }).from(blogAuthors).where(eq(blogAuthors.isFeatured, true));
+const [homeCount] = await db.select({ value: count() }).from(blogAuthors).where(eq(blogAuthors.displayInHome, true));
+const [blogCount] = await db.select({ value: count() }).from(blogAuthors).where(eq(blogAuthors.displayInBlog, true));
+
+const extractLocalized = (value: unknown): string => {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    const obj = value as Record<string, string>;
+    return obj[currentLocale] || Object.values(obj)[0] || "—";
+  }
+  return "—";
+};
+
+const adminBase = `/${currentLocale}/admin/blog/authors`;
+const hasFilters = search || featuredFilter || homeFilter || blogFilter;
+
+const filterParams = new URLSearchParams();
+if (search) filterParams.set("q", search);
+if (featuredFilter) filterParams.set("featured", featuredFilter);
+if (homeFilter) filterParams.set("home", homeFilter);
+if (blogFilter) filterParams.set("blog", blogFilter);
+const paginationBase = `${adminBase}?${filterParams.toString()}${filterParams.toString() ? "&" : ""}page=`;
+---
+
+<AdminLayout title="Auteurs" activeSection="blog-authors">
+  <header class="admin-page-header">
+    <div class="admin-page-title-row">
+      <div class="admin-page-title-group">
+        <h1>Auteurs</h1>
+        <Badge color="primary" text={`${totalAuthors} résultat${totalAuthors > 1 ? "s" : ""}`} />
+      </div>
+      <a href={`${adminBase}/new`} class="btn-create">
+        <Icon name="mdi:plus-circle-outline" />
+        Nouvel auteur
+      </a>
+    </div>
+    <p class="admin-page-subtitle">Gérer les auteurs du blog — profils, visibilité et contenu multilingue.</p>
+  </header>
+
+  <!-- Stats cards -->
+  <div class="stats-grid">
+    <a href={adminBase} class:list={["stat-card", { active: !hasFilters }]}>
+      <div class="stat-icon stat-icon--primary"><Icon name="mdi:account-group-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{allCount.value}</span>
+        <span class="stat-label">Total</span>
+      </div>
+    </a>
+    <a href={`${adminBase}?featured=true`} class:list={["stat-card", { active: featuredFilter === "true" }]}>
+      <div class="stat-icon stat-icon--accent"><Icon name="mdi:star-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{featuredCount.value}</span>
+        <span class="stat-label">Featured</span>
+      </div>
+    </a>
+    <a href={`${adminBase}?home=true`} class:list={["stat-card", { active: homeFilter === "true" }]}>
+      <div class="stat-icon stat-icon--success"><Icon name="mdi:home-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{homeCount.value}</span>
+        <span class="stat-label">Accueil</span>
+      </div>
+    </a>
+    <a href={`${adminBase}?blog=true`} class:list={["stat-card", { active: blogFilter === "true" }]}>
+      <div class="stat-icon stat-icon--warning"><Icon name="mdi:post-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{blogCount.value}</span>
+        <span class="stat-label">Blog</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <Card elevation="sm" className="admin-filters-card">
+    <CardContent>
+      <form method="get" action={adminBase} class="admin-filters-form">
+        <div class="admin-filters-row">
+          <div class="admin-filter-field filter-search">
+            <Label htmlFor="q">Rechercher</Label>
+            <Input id="q" name="q" type="search" placeholder="Slug, nom…" value={search} />
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="featured">Featured</Label>
+            <Select id="featured" name="featured">
+              <option value="">Tous</option>
+              <option value="true" selected={featuredFilter === "true"}>Oui</option>
+              <option value="false" selected={featuredFilter === "false"}>Non</option>
+            </Select>
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="home">Accueil</Label>
+            <Select id="home" name="home">
+              <option value="">Tous</option>
+              <option value="true" selected={homeFilter === "true"}>Visible</option>
+              <option value="false" selected={homeFilter === "false"}>Masqué</option>
+            </Select>
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="blog">Blog</Label>
+            <Select id="blog" name="blog">
+              <option value="">Tous</option>
+              <option value="true" selected={blogFilter === "true"}>Visible</option>
+              <option value="false" selected={blogFilter === "false"}>Masqué</option>
+            </Select>
+          </div>
+        </div>
+        <div class="admin-filter-actions">
+          <Button type="submit" color="primary" icon={{ name: "mdi:magnify", side: "left" }}>
+            Filtrer
+          </Button>
+          {hasFilters && (
+            <a href={adminBase} class="admin-filter-reset">Réinitialiser</a>
+          )}
+        </div>
+      </form>
+    </CardContent>
+  </Card>
+
+  <!-- Table -->
+  <Card>
+    <CardContent>
+      {authors.length === 0 ? (
+        <div class="empty-state">
+          <Icon name="mdi:account-edit" class="empty-state-icon" />
+          <p>Aucun auteur trouvé.</p>
+          <a href={`${adminBase}/new`} class="btn-create-empty">
+            <Icon name="mdi:plus" /> Créer un auteur
+          </a>
+        </div>
+      ) : (
+        <div class="table-responsive">
+        <Table striped>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Auteur</TableHead>
+              <TableHead>Slug</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Articles</TableHead>
+              <TableHead>Visibilité</TableHead>
+              <TableHead>Créé le</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {authors.map((author) => {
+              const displayName = extractLocalized(author.displayName);
+              const bio = extractLocalized(author.bio);
+              const articleCount = articleCountMap.get(author.id) ?? 0;
+              return (
+                <TableRow>
+                  <TableCell>
+                    <div class="author-cell">
+                      {author.avatarUrl ? (
+                        <img src={author.avatarUrl} alt={displayName} class="author-avatar" width="36" height="36" loading="lazy" />
+                      ) : (
+                        <div class="author-avatar-fallback">
+                          <Icon name="mdi:account" />
+                        </div>
+                      )}
+                      <div>
+                        <span class="author-name">{displayName}</span>
+                        {author.isFeatured && <Badge color="accent" text="Featured" />}
+                        {bio && bio !== "—" && <span class="author-bio">{bio.slice(0, 60)}{bio.length > 60 ? "…" : ""}</span>}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <code class="slug-code">{author.slug}</code>
+                  </TableCell>
+                  <TableCell>
+                    {author.email ? (
+                      <span class="author-email">{author.email}</span>
+                    ) : (
+                      <span class="text-muted">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Badge color={articleCount > 0 ? "primary" : "default"} text={String(articleCount)} />
+                  </TableCell>
+                  <TableCell>
+                    <div class="visibility-badges">
+                      {author.displayInHome && <Badge color="primary" text="Home" />}
+                      {author.displayInBlog && <Badge color="success" text="Blog" />}
+                      {!author.displayInHome && !author.displayInBlog && <span class="text-muted">Masqué</span>}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <time datetime={author.createdAt.toISOString()}>
+                      {author.createdAt.toLocaleDateString(currentLocale, { day: "2-digit", month: "2-digit", year: "2-digit" })}
+                    </time>
+                  </TableCell>
+                  <TableCell>
+                    <div class="action-buttons">
+                      <a href={`${adminBase}/${author.id}/edit`} class="btn-action btn-action--edit" title="Modifier">
+                        <Icon name="mdi:pencil-outline" />
+                      </a>
+                      <button type="button" class="btn-action btn-action--delete" title="Supprimer"
+                        data-delete-author={author.id}
+                        data-author-name={displayName}>
+                        <Icon name="mdi:delete-outline" />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+        </div>
+      )}
+    </CardContent>
+  </Card>
+
+  {totalPages > 1 && (
+    <div class="admin-pagination">
+      <Pagination currentPage={page} totalPages={totalPages} baseUrl={paginationBase} showPrevNext color="primary" />
+    </div>
+  )}
+</AdminLayout>
+
+<script>
+  import { showToast } from "@lib/admin/toast";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll<HTMLButtonElement>("[data-delete-author]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.deleteAuthor!;
+        const name = btn.dataset.authorName ?? "cet auteur";
+        if (!confirm(`Supprimer l'auteur "${name}" ? Les associations articles-auteurs seront supprimées.`)) return;
+        btn.disabled = true;
+        try {
+          const res = await fetch("/api/admin/blog/authors", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "delete", id }),
+          });
+          if (res.ok) {
+            showToast("Auteur supprimé.", "success");
+            setTimeout(() => window.location.reload(), 1000);
+          } else {
+            const data = await res.json();
+            showToast("Erreur : " + (data.error || "inconnue"), "error");
+            btn.disabled = false;
+          }
+        } catch {
+          showToast("Erreur réseau.", "error");
+          btn.disabled = false;
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .admin-page-header { margin-bottom: var(--space-6, 1.5rem); }
+  .admin-page-title-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3, 0.75rem); }
+  .admin-page-title-group { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .admin-page-header h1 { font-family: var(--font-family-display, "Space Grotesk", sans-serif); font-size: var(--h2-font-size, 2rem); font-weight: 800; color: var(--heading-color, #0f172a); margin: 0; }
+  .admin-page-subtitle { color: var(--text-muted, #64748b); font-size: 0.9375rem; margin: var(--space-1, 0.25rem) 0 0; }
+
+  .btn-create {
+    display: inline-flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+    background: var(--color-primary, #eab308); color: #000; font-weight: 600; font-size: 0.875rem;
+    border-radius: var(--border-radius-md, 0.375rem); text-decoration: none; transition: opacity 0.15s;
+  }
+  .btn-create:hover { opacity: 0.85; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-3, 0.75rem); margin-bottom: var(--space-4, 1rem); }
+  .stat-card {
+    display: flex; align-items: center; gap: var(--space-3, 0.75rem);
+    padding: var(--space-4, 1rem); border-radius: var(--border-radius-lg, 0.5rem);
+    background: var(--bg-surface, white); border: 1px solid var(--border-default, #e2e8f0);
+    text-decoration: none; color: inherit; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .stat-card:hover { border-color: var(--color-primary, #eab308); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .stat-card.active { border-color: var(--color-primary, #eab308); background: var(--bg-inset, #f1f5f9); }
+  .stat-icon { width: 2rem; height: 2rem; flex-shrink: 0; }
+  .stat-icon--primary { color: var(--color-primary, #eab308); }
+  .stat-icon--success { color: var(--color-success, #16a34a); }
+  .stat-icon--warning { color: var(--color-warning, #f97316); }
+  .stat-icon--accent { color: var(--color-accent, #8b5cf6); }
+  .stat-info { display: flex; flex-direction: column; }
+  .stat-value { font-size: 1.5rem; font-weight: 800; line-height: 1; color: var(--heading-color, #0f172a); }
+  .stat-label { font-size: 0.75rem; color: var(--text-muted, #64748b); margin-top: 0.125rem; }
+
+  .admin-filters-card { margin-bottom: var(--space-4, 1rem); }
+  .admin-filters-form { display: flex; flex-direction: column; gap: var(--space-3, 0.75rem); }
+  .admin-filters-row { display: flex; flex-wrap: wrap; gap: var(--space-3, 0.75rem); }
+  .admin-filter-field { display: flex; flex-direction: column; gap: var(--space-1, 0.25rem); min-width: 140px; flex: 1; }
+  .filter-search { flex: 2; min-width: 200px; }
+  .admin-filter-actions { display: flex; align-items: center; gap: var(--space-2, 0.5rem); }
+  .admin-filter-reset { color: var(--text-muted, #64748b); font-size: 0.8125rem; text-decoration: underline; }
+
+  .author-cell { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .author-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  .author-avatar-fallback { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-inset, #f1f5f9); display: flex; align-items: center; justify-content: center; color: var(--text-muted, #64748b); font-size: 1.25rem; flex-shrink: 0; }
+  .author-name { font-weight: 600; font-size: 0.875rem; color: var(--text-default, #0f172a); display: block; }
+  .author-bio { font-size: 0.75rem; color: var(--text-muted, #64748b); display: block; margin-top: 0.125rem; }
+  .author-email { font-size: 0.8125rem; color: var(--text-default, #1e293b); }
+  .slug-code { font-family: var(--font-family-mono, monospace); font-size: 0.75rem; background: var(--bg-inset, #f1f5f9); padding: 0.125rem 0.375rem; border-radius: var(--border-radius-sm, 0.25rem); }
+  .visibility-badges { display: flex; flex-wrap: wrap; gap: var(--space-1, 0.25rem); }
+  .text-muted { color: var(--text-muted, #64748b); font-size: 0.8125rem; }
+
+  .action-buttons { display: flex; gap: var(--space-1, 0.25rem); }
+  .btn-action {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border-radius: var(--border-radius-sm, 0.25rem);
+    border: 1px solid var(--border-default, #e2e8f0); background: var(--bg-surface, white);
+    color: var(--text-muted, #64748b); cursor: pointer; transition: all 0.15s; text-decoration: none;
+  }
+  .btn-action:hover { border-color: var(--color-primary, #eab308); color: var(--text-default, #0f172a); }
+  .btn-action--edit:hover { color: var(--color-primary, #eab308); }
+  .btn-action--delete:hover { color: var(--color-danger, #dc2626); border-color: var(--color-danger, #dc2626); }
+  .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .empty-state { text-align: center; padding: var(--space-8, 2rem); color: var(--text-muted, #64748b); }
+  .empty-state-icon { width: 3rem; height: 3rem; margin-bottom: var(--space-2, 0.5rem); opacity: 0.5; }
+  .btn-create-empty {
+    display: inline-flex; align-items: center; gap: var(--space-1, 0.25rem);
+    margin-top: var(--space-3, 0.75rem); color: var(--color-primary, #eab308);
+    font-weight: 600; font-size: 0.875rem; text-decoration: none;
+  }
+
+  .admin-pagination { margin-top: var(--space-4, 1rem); display: flex; justify-content: center; }
+
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .admin-filters-row { flex-direction: column; }
+    .admin-page-title-row { flex-direction: column; align-items: flex-start; }
+    .author-cell { gap: var(--space-2, 0.5rem); }
+    .author-avatar, .author-avatar-fallback { width: 28px; height: 28px; }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .admin-page-header h1 { font-size: 1.5rem; }
+    .btn-create { width: 100%; justify-content: center; }
+  }
+</style>

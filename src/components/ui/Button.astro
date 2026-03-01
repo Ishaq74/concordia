@@ -60,3 +60,40 @@ const classes = [
   <slot />
   {icon?.side === 'right' && <Icon name={icon.name} />}
 </button>
+
+<style>
+
+:root {
+
+}
+
+button { 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-family: inherit; 
+  font-size: var(--button-font-size); 
+  padding: var(--button-padding-y) var(--button-padding-x); 
+  border-width: var(--button-border-width); 
+  border-style: solid;
+  border-radius: var(--button-border-radius); 
+  cursor: pointer; 
+  background-color: var(--button-default-bg);
+  color: var(--button-default-color);
+  border-color: var(--button-default-border-color);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+button + button { margin-block-end: 0.6rem; margin-inline-end: 0.6rem; }
+
+
+button:hover:not(:disabled) { background-color: var(--button-default-bg-hover); }
+button:disabled, button[disabled] { opacity: 0.5; cursor: not-allowed; }
+button.primary { background-color: var(--button-primary-bg); color: var(--button-primary-color); border-color: transparent; }
+button.secondary { background-color: var(--button-secondary-bg); color: var(--button-secondary-color); border-color: transparent; }
+button.accent { background-color: var(--button-accent-bg); color: var(--button-accent-color); border-color: transparent; }
+button.primary:hover:not(:disabled) { background-color: var(--button-primary-bg-hover); }
+button.secondary:hover:not(:disabled) { background-color: var(--button-secondary-bg-hover); }
+button.accent:hover:not(:disabled) { background-color: var(--button-accent-bg-hover); }
+</style>

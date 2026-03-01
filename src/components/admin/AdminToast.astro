@@ -1,0 +1,150 @@
+---
+/**
+ * AdminToast — Global toast notification container for admin pages.
+ * Duplicates Alert component styles as global CSS so dynamically-created
+ * toasts (via toast.ts) get proper design-system styling.
+ *
+ * Include once per layout. Use from JS:
+ *
+ *   import { showToast } from "@lib/admin/toast";
+ *   showToast("Article enregistré !", "success");
+ *   showToast("Erreur de réseau", "error");
+ */
+---
+
+<div id="admin-toast-container" class="admin-toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<style is:global>
+  /* ── Toast container — fixed overlay ── */
+  .admin-toast-container {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+    max-width: 420px;
+    width: 100%;
+  }
+
+  /* ── Alert base styles (mirrored from Alert.astro for dynamic creation) ── */
+  .admin-toast-container .alert {
+    padding: var(--alert-padding-y, 1rem) var(--alert-padding-x, 1rem);
+    border-radius: var(--alert-border-radius, 0.375rem);
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    border: var(--alert-border-width, 1px) solid transparent;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    pointer-events: auto;
+    animation: toast-slide-in 0.3s ease-out;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 0;
+  }
+
+  .admin-toast-container .alert svg {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .admin-toast-container .alert > div {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  .admin-toast-container .alert > div strong {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.125rem;
+  }
+
+  /* ── Status variants ── */
+  .admin-toast-container .alert.info {
+    background: var(--alert-info-bg, #eff6ff);
+    color: var(--alert-info-color, #1e40af);
+    border-color: var(--alert-info-border, #3b82f6);
+  }
+  .admin-toast-container .alert.success {
+    background: var(--alert-success-bg, #f0fdf4);
+    color: var(--alert-success-color, #166534);
+    border-color: var(--alert-success-border, #16a34a);
+  }
+  .admin-toast-container .alert.warning {
+    background: var(--alert-warning-bg, #fff7ed);
+    color: var(--alert-warning-color, #9a3412);
+    border-color: var(--alert-warning-border, #f97316);
+  }
+  .admin-toast-container .alert.error {
+    background: var(--alert-error-bg, #fef2f2);
+    color: var(--alert-error-color, #991b1b);
+    border-color: var(--alert-error-border, #dc2626);
+  }
+
+  /* ── Close button ── */
+  .admin-toast-container .alert-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.125rem;
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    color: inherit;
+  }
+  .admin-toast-container .alert-close:hover { opacity: 1; }
+  .admin-toast-container .alert-close svg { width: 1rem; height: 1rem; }
+
+  /* ── Auto-dismiss progress bar ── */
+  .admin-toast-container .alert-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: currentColor;
+    opacity: 0.3;
+    transform-origin: left;
+    animation: toast-progress linear forwards;
+  }
+
+  /* ── Exit animation ── */
+  .admin-toast-container .alert.toast-exiting {
+    animation: toast-slide-out 0.25s ease-in forwards;
+  }
+
+  @keyframes toast-slide-in {
+    from { transform: translateX(110%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes toast-slide-out {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(110%); opacity: 0; }
+  }
+
+  @keyframes toast-progress {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+  }
+
+  @media (max-width: 640px) {
+    .admin-toast-container {
+      top: auto;
+      bottom: 1rem;
+      right: 0.75rem;
+      left: 0.75rem;
+      max-width: none;
+    }
+  }
+</style>

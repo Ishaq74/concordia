@@ -98,6 +98,13 @@
   --futuristic-button-border-color: var(--color-primary);
   --futuristic-button-hover-bg: rgba(79, 70, 229, 0.2);
   --futuristic-button-hover-glow: var(--color-primary);
+
+  /* additional tokens used by the NewTab futuristic variant */
+  --futuristic-bg: #050508;
+  --futuristic-primary: #00f0ff;
+  --futuristic-secondary: #ff00a0;
+  --futuristic-tertiary: #00ff88;
+  --futuristic-grid: rgba(0, 240, 255, 0.08);
   --futuristic-input-bg: rgba(0,0,0,0.1);
   --futuristic-input-color: var(--color-primary);
   --futuristic-input-text-color: var(--color-primary);
