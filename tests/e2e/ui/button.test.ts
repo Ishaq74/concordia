@@ -50,7 +50,7 @@ test.describe('ButtonComponent – Page de documentation complète', () => {
       if (target) await expect(a).toHaveAttribute('rel', /noopener|noreferrer/);
       // Vérifie aria-label si icône seule
       const hasIcon = await a.locator('svg').count() > 0;
-      if (hasIcon && !(await a.textContent()).trim()) {
+      if (hasIcon && !(await a.textContent() ?? '').trim()) {
         const aria = await a.getAttribute('aria-label');
         expect(aria).not.toBeNull();
       }
@@ -184,14 +184,14 @@ test.describe('ButtonComponent – Page de documentation complète', () => {
       const el = btns.nth(i);
       // role
       const role = await el.getAttribute('role');
-      if (el.evaluate(node => node.tagName === 'A')) {
+      if (await el.evaluate(node => node.tagName === 'A')) {
         expect([null, 'button', 'link']).toContain(role);
       } else {
         expect([null, 'button']).toContain(role);
       }
       // aria-label si icône seule
       const hasIcon = await el.locator('svg').count() > 0;
-      if (hasIcon && !(await el.textContent()).trim()) {
+      if (hasIcon && !(await el.textContent() ?? '').trim()) {
         const aria = await el.getAttribute('aria-label');
         expect(aria).not.toBeNull();
       }

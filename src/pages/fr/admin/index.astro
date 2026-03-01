@@ -10,7 +10,7 @@ import Link from "@components/ui/Link.astro";
 import { Icon } from "astro-icon/components";
 import { getDrizzle } from "@database/drizzle";
 import { user, blogPosts, blogComments, auditLog } from "@database/schemas";
-import { count, eq, desc, sql } from "drizzle-orm";
+import { count, eq, desc } from "drizzle-orm";
 
 import tData from "@i18n/fr.json";
 const currentLocale = Astro.currentLocale || "fr";
@@ -21,11 +21,9 @@ const adminUser = Astro.locals.user;
 const db = await getDrizzle();
 
 const [usersCount] = await db.select({ value: count() }).from(user);
-const [postsCount] = await db.select({ value: count() }).from(blogPosts);
 const [publishedCount] = await db.select({ value: count() }).from(blogPosts).where(eq(blogPosts.status, "published"));
 const [draftCount] = await db.select({ value: count() }).from(blogPosts).where(eq(blogPosts.status, "draft"));
 const [pendingCommentsCount] = await db.select({ value: count() }).from(blogComments).where(eq(blogComments.status, "pending"));
-const [totalCommentsCount] = await db.select({ value: count() }).from(blogComments);
 
 // Derniers logs d'audit
 const recentLogs = await db

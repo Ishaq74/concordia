@@ -1,5 +1,3 @@
-import { notification } from '../schemas/notification.schema';
-
 export const notificationData = [
   {
     id: 'notif-1',

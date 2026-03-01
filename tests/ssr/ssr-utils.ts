@@ -1,4 +1,18 @@
-import { startServer, stopServer, fetchPage } from '@tests/utils/api-helpers';
+const API_BASE = process.env.TEST_BASE_URL || 'http://localhost:4321';
+
+// Lightweight SSR test helpers. A real server process is expected to be started
+// externally (e.g. via a globalSetup script). These wrappers simply fetch pages.
+async function startServer(_opts?: { throwError?: boolean }) {
+  // no-op — server is managed externally
+}
+async function stopServer() {
+  // no-op
+}
+async function fetchPage(pagePath: string) {
+  const res = await fetch(`${API_BASE}${pagePath}`);
+  const html = await res.text();
+  return { html, status: res.status, clientJsSize: 0, hydratedIslands: 0 };
+}
 
 export async function renderSSR(path: string) {
   await startServer();

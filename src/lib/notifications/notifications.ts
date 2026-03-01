@@ -74,6 +74,7 @@ export async function createNotification(
 
   await db.insert(notification).values({
     id,
+    createdAt: new Date(),
     userId: input.userId,
     type: input.type,
     title: input.title,

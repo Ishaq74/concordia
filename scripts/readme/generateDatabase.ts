@@ -1,6 +1,6 @@
 import { listFiles, readFile, PATHS } from './utils';
 import path from 'path';
-import { i18n, LANGS, type Lang } from './i18n';
+import { i18n, type Lang } from './i18n';
 
 /**
  * Generates the Database section for the README.
@@ -50,7 +50,7 @@ export async function generateDatabaseSection(lang: Lang = 'en') {
 
   // Files exported in barrel and present in directory (by normalized name)
   const realExportedFiles = [];
-  for (const [norm, file] of exportedMap.entries()) {
+  for (const [norm] of exportedMap.entries()) {
     if (schemaMap.has(norm)) realExportedFiles.push(schemaMap.get(norm)!);
   }
 
@@ -67,9 +67,7 @@ export async function generateDatabaseSection(lang: Lang = 'en') {
     // Matches: export const blogPostsRelations = relations(blogPosts, ({ many }) => ({ ... }));
     const relExportRegex = /export\s+const\s+(\w+)Relations\s*=\s*relations\(\s*(\w+)\s*,[^=]*=>\s*\((\{[\s\S]*?\})\)\s*\);/gm;
     let relMatch;
-    let foundAny = false;
     while ((relMatch = relExportRegex.exec(content)) !== null) {
-      foundAny = true;
       // (debug output removed)
       const relBody = relMatch[3];
       const relFieldRegex = /([a-zA-Z0-9_]+)\s*:\s*(one|many)\s*\(/g;

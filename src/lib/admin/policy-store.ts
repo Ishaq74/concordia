@@ -1,8 +1,25 @@
 import { eq } from "drizzle-orm";
 import { getDrizzle } from "@database/drizzle";
-import { adminRoleDefinition } from "@database/schemas";
+import { pgTable, text, jsonb, timestamp } from "drizzle-orm/pg-core";
 
 export type RolePolicyStatement = Record<string, string[]>;
+
+/**
+ * Inline table definition for admin role policies.
+ * This is a custom RBAC extension — not part of Better Auth's core schemas.
+ * Defined here to keep the policy store self-contained.
+ */
+const adminRoleDefinition = pgTable("admin_role_definition", {
+  roleKey: text("role_key").primaryKey(),
+  label: text("label"),
+  description: text("description"),
+  tone: text("tone").$type<"neutral" | "info" | "warning" | "danger">(),
+  highlights: jsonb("highlights").$type<string[] | null>(),
+  statement: jsonb("statement").$type<RolePolicyStatement>().notNull(),
+  updatedBy: text("updated_by"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export type RolePolicyRecord = typeof adminRoleDefinition.$inferSelect;
 
 export type UpsertRolePolicyInput = {

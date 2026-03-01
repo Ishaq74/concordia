@@ -31,17 +31,11 @@ const {
 // On trouve les enfants de ce commentaire
 const children = allComments.filter((c) => c.parentId === comment.id);
 
-function getInitials(name: string) {
-  return name ? name.substring(0, 2).toUpperCase() : "?";
-}
-
 function getContent(content: any) {
   if (typeof content === "string") return content;
   return content?.[lang] || content?.["fr"] || Object.values(content)[0] || "";
 }
 
-// On limite l'indentation visuelle pour ne pas sortir de l'écran sur mobile
-const maxDepth = 5;
 ---
 
 <div class="comment-thread">

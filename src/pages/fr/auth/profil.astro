@@ -5,16 +5,13 @@ export const prerender = false;
 
 import BaseLayout from "@layouts/BaseLayout.astro";
 import translations from "@i18n/fr.json";
-import { getAuth } from "@lib/auth/auth";
 import Grid from "@components/Tools/Grid.astro";
 import Flex from "@components/Tools/Flex.astro";
 import Tabs from "@components/ui/Tabs/Tabs.astro";
 import Tab from "@components/ui/Tabs/Tab.astro";
 import AvatarCard from "@components/ui/Avatar/AvatarCard.astro";
-import Badge from "@components/ui/Badge.astro";
 import Timeline from "@components/ui/Timeline.astro";
 import Gallery from "@components/ui/Gallery.astro";
-import GroupCard from "@components/ui/GroupCard.astro";
 import Button from "@components/ui/Button.astro";
 import Card from "@components/ui/Card/Card.astro";
 import ProfileForm from "@components/templates/auth/profile/ProfileForm.astro";
@@ -23,26 +20,14 @@ import ProfileInvitations from "@components/templates/auth/profile/ProfileInvita
 
 // Utils
 import {
-  slugify,
-  resolveErrorMessage,
-  forwardSetCookies,
-  type Status,
   type OrganizationRecord,
   type OrganizationMember,
   type InvitationRecord,
 } from "@lib/auth/profile/utils";
 
 const { user, session } = Astro.locals;
-const request = Astro.request;
-const response = Astro.response;
-const url = new URL(request.url);
 
 if (!user) return Astro.redirect("/fr/connexion");
-
-let status: Status | null = null;
-
-// --- Auth instance
-const auth = await getAuth();
 
 // --- Récupération des organisations
 // TODO: brancher API organisations si disponible
@@ -57,11 +42,6 @@ const isOwner = memberRole === "owner";
 
 // --- Invitations (placeholder)
 let invitations: InvitationRecord[] = [];
-
-// --- Dernière connexion
-const lastSignIn = session?.updatedAt
-  ? new Date(session.updatedAt).toLocaleString("fr-FR")
-  : null;
 ---
 
 

@@ -9,7 +9,7 @@ import { validateUserInput } from "./validate-user";
 import { smtp } from "@lib/smtp/smtp";
 import { auditLog } from "@database/schemas";
 import { randomUUID } from "crypto";
-import { eq, gte, and, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 // ==================== HELPERS ====================
 
@@ -62,7 +62,7 @@ const sharedConfig = {
     }) {
       validateUserInput({ email, password, username, name });
     },
-    async sendResetPassword({ user, url, token }: any) {
+    async sendResetPassword({ user, url }: any) {
       try {
         await smtp.send({
           to: user.email,
@@ -76,7 +76,7 @@ const sharedConfig = {
     },
   },
   emailVerification: {
-    async sendVerificationEmail({ user, url, token }: any) {
+    async sendVerificationEmail({ user, url }: any) {
       try {
         await smtp.send({
           to: user.email,

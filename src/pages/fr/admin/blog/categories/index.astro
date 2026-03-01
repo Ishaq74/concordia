@@ -21,9 +21,7 @@ import { getDrizzle } from "@database/drizzle";
 import { blogCategories, blogPostCategories } from "@database/schemas";
 import { count, eq, desc, ilike, inArray, and, isNull } from "drizzle-orm";
 
-import tData from "@i18n/fr.json";
 const currentLocale = Astro.currentLocale || "fr";
-const t = tData;
 
 const url = new URL(Astro.request.url);
 const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));
@@ -116,12 +114,6 @@ if (blogFilter) filterParams.set("blog", blogFilter);
 if (menuFilter) filterParams.set("menu", menuFilter);
 if (parentFilter) filterParams.set("parent", parentFilter);
 const paginationBase = `${adminBase}?${filterParams.toString()}${filterParams.toString() ? "&" : ""}page=`;
-
-// Parent categories for filter
-const parentCategories = allCategories.filter((c) => {
-  // show categories that have children
-  return allCategories.some((child) => child.parentId === c.id);
-});
 ---
 
 <AdminLayout title="Catégories" activeSection="blog-categories">

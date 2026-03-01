@@ -1,16 +1,15 @@
 import type { APIRoute } from "astro";
 import { getAuth } from "@lib/auth/auth";
 import { getDrizzle } from "@database/drizzle";
-import { userRole } from "@database/schemas";
-import { eq, and } from "drizzle-orm";
-import { randomUUID } from "crypto";
+import { user as userTable } from "@database/schemas";
+import { eq } from "drizzle-orm";
 import { getUserRoles } from "@lib/auth/roles";
 import { hasPermission } from "@lib/auth/permissions";
 import { createNotification } from "@lib/notifications/notifications";
 
 export const prerender = false;
 
-/** Assign or revoke a role. */
+/** Assign or revoke a role via Better Auth's user.role field. */
 export const POST: APIRoute = async ({ request }) => {
   const auth = await getAuth();
   const session = await auth.api.getSession({ headers: request.headers });
@@ -77,25 +76,24 @@ export const POST: APIRoute = async ({ request }) => {
   const db = await getDrizzle();
 
   if (action === "assign") {
-    // Check not already assigned
-    const existing = await db
-      .select({ id: userRole.id })
-      .from(userRole)
-      .where(and(eq(userRole.userId, userId), eq(userRole.role, role as any)))
+    // Check current role
+    const [existing] = await db
+      .select({ role: userTable.role })
+      .from(userTable)
+      .where(eq(userTable.id, userId))
       .limit(1);
 
-    if (existing.length > 0) {
+    if (existing?.role === role) {
       return new Response(
         JSON.stringify({ error: "BIZ_ROLE_ALREADY_ASSIGNED" }),
         { status: 409, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    await db.insert(userRole).values({
-      id: randomUUID(),
-      userId,
-      role: role as any,
-    });
+    await db
+      .update(userTable)
+      .set({ role })
+      .where(eq(userTable.id, userId));
 
     await createNotification({
       userId,
@@ -120,9 +118,19 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  await db
-    .delete(userRole)
-    .where(and(eq(userRole.userId, userId), eq(userRole.role, role as any)));
+  // Only clear the role if it matches
+  const [current] = await db
+    .select({ role: userTable.role })
+    .from(userTable)
+    .where(eq(userTable.id, userId))
+    .limit(1);
+
+  if (current?.role === role) {
+    await db
+      .update(userTable)
+      .set({ role: null })
+      .where(eq(userTable.id, userId));
+  }
 
   await createNotification({
     userId,

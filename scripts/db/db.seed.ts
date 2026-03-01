@@ -196,7 +196,7 @@ async function seed() {
       // separate blog_post_categories.data.ts file.
       if (baseName === 'blog_posts') {
         try {
-          const rawDataset = (dataModule && Object.values(dataModule).find((d: any[]) => Array.isArray(d))) as any[];
+          const rawDataset = (dataModule && Object.values(dataModule).find((d: unknown) => Array.isArray(d))) as any[];
           if (rawDataset && rawDataset.length) {
             const mapping = rawDataset
               .map(r => ({ postId: r.id, categoryId: r.categoryId }))
@@ -210,8 +210,8 @@ async function seed() {
           console.warn('[WARN] Failed to derive blog_post_categories from blog_posts:', err);
         }
       }
-    } catch (err) {
-      if (err && err.message) {
+    } catch (err: unknown) {
+      if (err instanceof Error) {
         console.error(`[ERR] ${baseName}: ${err.message}`);
       } else {
         console.error(`[ERR] ${baseName}:`, err);

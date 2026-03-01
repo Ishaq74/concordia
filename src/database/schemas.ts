@@ -1,6 +1,7 @@
 // Auth & Core
 export * from './schemas/auth-schema';
 export * from './schemas/audit-log.schema';
+export * from './schemas/profile.schema';
 
 // Blog
 export * from "./schemas/blog_posts.schema";
@@ -10,5 +11,6 @@ export * from "./schemas/blog_comments.schema";
 export * from "./schemas/blog_media.schema";
 export * from "./schemas/blog_organization.schema";
 export * from "./schemas/blog_translations.schema";
+
 // Notifications
 export * from "./schemas/notification.schema";

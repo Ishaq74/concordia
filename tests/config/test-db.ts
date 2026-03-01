@@ -17,11 +17,11 @@ export async function getTestDb() {
       const mem = newDb()
       // register minimal pg functions used by migrations (if any)
       const adapter = mem.adapters.createPg()
-      dbClient = new adapter.Client()
-      await dbClient.connect()
+      dbClient = new adapter.Client() as unknown as Client;
+      await dbClient!.connect()
 
       // Wrap query to strip unsupported options (pg-mem doesn't support rowMode)
-      const origQuery = (dbClient as any).query.bind(dbClient)
+      const origQuery = (dbClient as any).query.bind(dbClient!)
       ;(dbClient as any).query = (...args: any[]) => {
         // Strip rowMode from any object-style arg (defensive)
         for (let i = 0; i < args.length; i++) {
@@ -51,7 +51,7 @@ export async function getTestDb() {
         }
       }
 
-      db = drizzle(dbClient, { schema })
+      db = drizzle(dbClient!, { schema })
 
       // Apply SQL migrations from src/database/migrations for parity
       const migrationsDir = path.resolve(process.cwd(), 'src', 'database', 'migrations')
@@ -61,14 +61,14 @@ export async function getTestDb() {
           const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8')
           if (sql.trim()) {
             // pg-mem supports multiple statements
-            await dbClient.query(sql)
+            await dbClient!.query(sql)
           }
         }
       }
     } else {
       dbClient = new Client({ connectionString })
       await dbClient.connect()
-      db = drizzle(dbClient, { schema })
+      db = drizzle(dbClient!, { schema })
     }
   }
   return db

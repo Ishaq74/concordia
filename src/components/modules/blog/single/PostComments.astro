@@ -4,7 +4,6 @@ import { getDrizzle } from "@database/drizzle";
 import { blogComments } from "@database/schemas";
 import { eq, and, desc } from "drizzle-orm";
 
-import Avatar from "@components/ui/Avatar/Avatar.astro";
 import Card from "@components/ui/Card/Card.astro";
 import Button from "@components/ui/Button.astro";
 
@@ -38,7 +37,6 @@ try {
   dbError = (err instanceof Error && err.message) ? err.message : String(err);
   console.error('PostComments: DB read error', dbError);
 }
-const loginUrl = `/${lang}/connexion?callbackURL=${Astro.url.pathname}`;
 ---
 
 <section id="comments-section" class="comments-section">

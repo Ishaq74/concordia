@@ -1,6 +1,30 @@
-import { auth } from "@lib/auth/auth";
+import { getAuth } from "@lib/auth/auth";
 
 type AdminRoleValue = string | string[];
+
+/**
+ * Type-safe wrapper for the Better Auth admin API.
+ * The admin() plugin is loaded conditionally, so TypeScript cannot infer
+ * these methods statically. We define the shape we rely on and cast once.
+ */
+interface AdminApi {
+  listUsers(opts: { headers: Headers; query?: Record<string, string | number | undefined> }): Promise<unknown>;
+  createUser(opts: { headers: Headers; body: Record<string, unknown> }): Promise<unknown>;
+  setRole(opts: { headers: Headers; body: Record<string, unknown> }): Promise<unknown>;
+  banUser(opts: { headers: Headers; body: Record<string, unknown> }): Promise<unknown>;
+  unbanUser(opts: { headers: Headers; body: Record<string, unknown> }): Promise<unknown>;
+  listSessions(opts: { headers: Headers; body?: Record<string, unknown> }): Promise<unknown>;
+  revokeSessions(opts: { headers: Headers; body?: Record<string, unknown> }): Promise<unknown>;
+  setPassword(opts: { headers: Headers; body: Record<string, unknown> }): Promise<unknown>;
+  removeUser(opts: { headers: Headers; body: Record<string, unknown> }): Promise<unknown>;
+  impersonateUser(opts: { headers: Headers; body: Record<string, unknown> }): Promise<unknown>;
+  stopImpersonating(opts: { headers: Headers; body?: Record<string, unknown> }): Promise<unknown>;
+}
+
+async function getAdminApi(): Promise<AdminApi> {
+  const auth = await getAuth();
+  return auth.api as unknown as AdminApi;
+}
 
 const resolveBanExpiresIn = (expires?: Date | string | null): number | undefined => {
   if (!expires) return undefined;
@@ -12,7 +36,8 @@ const resolveBanExpiresIn = (expires?: Date | string | null): number | undefined
 };
 
 export async function listUsers(headers: Headers, query: Record<string, string | number | undefined> = {}) {
-  return auth.api.listUsers({
+  const api = await getAdminApi();
+  return api.listUsers({
     headers,
     query,
   });
@@ -27,7 +52,8 @@ export async function createUser(
     role?: AdminRoleValue;
   },
 ) {
-  return auth.api.createUser({
+  const api = await getAdminApi();
+  return api.createUser({
     headers,
     body: {
       email: params.email,
@@ -49,7 +75,8 @@ export async function setUserRole(
     role: string;
   },
 ) {
-  return auth.api.setRole({
+  const api = await getAdminApi();
+  return api.setRole({
     headers,
     body: {
       userId: params.userId,
@@ -68,7 +95,8 @@ export async function banUser(
   },
 ) {
   const banExpiresIn = resolveBanExpiresIn(params.banExpires);
-  return auth.api.banUser({
+  const api = await getAdminApi();
+  return api.banUser({
     headers,
     body: {
       userId: params.userId,
@@ -79,7 +107,8 @@ export async function banUser(
 }
 
 export async function unbanUser(headers: Headers, params: { userId: string }) {
-  return auth.api.unbanUser({
+  const api = await getAdminApi();
+  return api.unbanUser({
     headers,
     body: {
       userId: params.userId,
@@ -88,7 +117,8 @@ export async function unbanUser(headers: Headers, params: { userId: string }) {
 }
 
 export async function listUserSessions(headers: Headers, params: { userId: string }) {
-  return auth.api.listUserSessions({
+  const api = await getAdminApi();
+  return api.listSessions({
     headers,
     body: {
       userId: params.userId,
@@ -97,7 +127,8 @@ export async function listUserSessions(headers: Headers, params: { userId: strin
 }
 
 export async function revokeUserSessions(headers: Headers, params: { userId: string }) {
-  return auth.api.revokeUserSessions({
+  const api = await getAdminApi();
+  return api.revokeSessions({
     headers,
     body: {
       userId: params.userId,
@@ -112,7 +143,8 @@ export async function setUserPassword(
     password: string;
   },
 ) {
-  return auth.api.setUserPassword({
+  const api = await getAdminApi();
+  return api.setPassword({
     headers,
     body: {
       userId: params.userId,
@@ -122,7 +154,8 @@ export async function setUserPassword(
 }
 
 export async function removeUser(headers: Headers, params: { userId: string }) {
-  return auth.api.removeUser({
+  const api = await getAdminApi();
+  return api.removeUser({
     headers,
     body: {
       userId: params.userId,
@@ -131,7 +164,8 @@ export async function removeUser(headers: Headers, params: { userId: string }) {
 }
 
 export async function impersonateUser(headers: Headers, params: { userId: string }) {
-  return auth.api.impersonateUser({
+  const api = await getAdminApi();
+  return api.impersonateUser({
     headers,
     body: {
       userId: params.userId,
@@ -140,7 +174,8 @@ export async function impersonateUser(headers: Headers, params: { userId: string
 }
 
 export async function stopImpersonating(headers: Headers) {
-  return auth.api.stopImpersonating({
+  const api = await getAdminApi();
+  return api.stopImpersonating({
     headers,
     body: {},
   });

@@ -82,7 +82,7 @@ test.describe('LinkComponent – documentation page', () => {
       const a = links.nth(i);
       // aria-label si icône seule
       const hasIcon = await a.locator('svg').count() > 0;
-      if (hasIcon && !(await a.textContent()).trim()) {
+      if (hasIcon && !(await a.textContent() ?? '').trim()) {
         const aria = await a.getAttribute('aria-label');
         expect(aria).not.toBeNull();
       }

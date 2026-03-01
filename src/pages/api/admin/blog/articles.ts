@@ -9,12 +9,10 @@ import {
   blogPostAuthors,
   blogPostCategories,
   blogPostMedia,
-  blogCategories,
   blogAuthors,
-  blogMedia,
   auditLog,
 } from "@database/schemas";
-import { eq, desc, ilike, count, inArray, and, sql } from "drizzle-orm";
+import { eq, desc, ilike, count, inArray, and } from "drizzle-orm";
 
 const json = (status: number, payload: unknown) =>
   new Response(JSON.stringify(payload), {

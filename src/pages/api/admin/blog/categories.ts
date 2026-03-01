@@ -6,7 +6,6 @@ import { getDrizzle } from "@database/drizzle";
 import {
   blogCategories,
   blogPostCategories,
-  blogMedia,
   auditLog,
 } from "@database/schemas";
 import { eq, desc, ilike, count, inArray, and } from "drizzle-orm";

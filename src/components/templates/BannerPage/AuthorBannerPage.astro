@@ -1,6 +1,5 @@
 ---
 import Grid from '@components/Tools/Grid.astro';
-import Flex from '@components/Tools/Flex.astro';
 import Avatar from '@components/ui/Avatar/Avatar.astro';
 import Badge from '@components/ui/Badge.astro';
 
@@ -25,13 +24,6 @@ const {
   className = '',
   ...rest
 } = Astro.props as Props;
-
-const currentLocale = Astro.currentLocale;
-// use import.meta.glob with eager option (supported by Astro/Vite)
-const translations = import.meta.glob('../../../i18n/*.json', { eager: true }) as Record<string, { default: any }>;
-const t = translations[`../../../i18n/${currentLocale}.json`]?.default || translations['../../../i18n/fr.json']?.default;
-
-const backgroundImage = avatar || '/images/placeholder.jpg';
 ---
 
 <Grid

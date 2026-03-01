@@ -122,7 +122,7 @@ test.describe('BadgeComponent – Page de documentation complète', () => {
       const badge = badges.nth(i);
       // aria-label si icône seule
       const hasIcon = await badge.locator('svg').count() > 0;
-      if (hasIcon && !(await badge.textContent()).trim()) {
+      if (hasIcon && !(await badge.textContent() ?? '').trim()) {
         const aria = await badge.getAttribute('aria-label');
         expect(aria).not.toBeNull();
       }

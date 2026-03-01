@@ -43,7 +43,7 @@ test.describe('TableComponent – documentation page (couverture totale)', () =>
     if (await section.count() > 0) {
       const table = section.locator('table.striped');
       await expect(table).toBeVisible();
-      await expect(table.locator('tbody tr')).toHaveCountGreaterThan(1);
+      expect(await table.locator('tbody tr').count()).toBeGreaterThan(1);
     }
   });
 

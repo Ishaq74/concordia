@@ -3,7 +3,6 @@ export const prerender = false;
 
 import AdminLayout from "@layouts/AdminLayout.astro";
 import Card from "@components/ui/Card/Card.astro";
-import CardHeader from "@components/ui/Card/CardHeader.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
 import Table from "@components/ui/Table/Table.astro";
 import TableHeader from "@components/ui/Table/TableHeader.astro";
@@ -12,7 +11,6 @@ import TableRow from "@components/ui/Table/TableRow.astro";
 import TableHead from "@components/ui/Table/TableHead.astro";
 import TableCell from "@components/ui/Table/TableCell.astro";
 import Badge from "@components/ui/Badge.astro";
-import Input from "@components/ui/Form/Input.astro";
 import Select from "@components/ui/Form/Select.astro";
 import Label from "@components/ui/Form/Label.astro";
 import Button from "@components/ui/Button.astro";
@@ -20,7 +18,7 @@ import Pagination from "@components/ui/Pagination.astro";
 import { Icon } from "astro-icon/components";
 import { getDrizzle } from "@database/drizzle";
 import { auditLog, user } from "@database/schemas";
-import { count, eq, desc, ilike, inArray, and } from "drizzle-orm";
+import { count, eq, desc, inArray } from "drizzle-orm";
 
 import tData from "@i18n/fr.json";
 const currentLocale = Astro.currentLocale || "fr";

@@ -5,18 +5,6 @@ import glob from 'fast-glob';
 
 const AGENTS_DIR = path.resolve(PATHS.root, '.github/agents');
 
-function extractPatterns(scopeSection: string): { pattern: string, comment: string }[] {
-  const lines = scopeSection.split('\n');
-  const patterns: { pattern: string, comment: string }[] = [];
-  for (const line of lines) {
-    const match = line.match(/^\s*-\s*([`'"]?)([^`'"]+)\1\s*—?\s*(.*)$/);
-    if (match) {
-      patterns.push({ pattern: match[2].trim(), comment: match[3].trim() });
-    }
-  }
-  return patterns;
-}
-
 async function listFilesForPattern(pattern: string): Promise<string[]> {
   // Convert pattern to glob (remove leading ./ if present)
   let g = pattern.replace(/^\.?\//, '');

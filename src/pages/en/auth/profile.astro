@@ -17,6 +17,7 @@ import Label from "@components/ui/Form/Label.astro";
 import Input from "@components/ui/Form/Input.astro";
 import Select from "@components/ui/Form/Select.astro";
 import Checkbox from "@components/ui/Form/Checkbox.astro";
+import ProfileHeader from "@components/templates/auth/profile/ProfileHeader.astro";
 
 const { user, session } = Astro.locals;
 const request = Astro.request;
@@ -391,15 +392,12 @@ try {
 
 <BaseLayout lang="en" title={pageTitle}>
   <ProfileHeader
-    user={user}
-    memberRole={memberRole}
-    lastSignIn={lastSignIn}
-    translations={translations}
+    title={pageTitle}
   />
 
   <header>
     <a href="#maincontent" class="sr-only focus:not-sr-only">
-      {translations.common.skipToMain ?? "Skip to main"}
+      Skip to main
     </a>
   </header>
   <main

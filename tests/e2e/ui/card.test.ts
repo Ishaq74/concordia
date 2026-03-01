@@ -122,7 +122,7 @@ test.describe('CardComponent – documentation page (couverture totale)', () => 
     for (let i = 0; i < count; i++) {
       const desc = descs.nth(i);
       await expect(desc).toBeVisible();
-      const cls = await desc.getAttribute('class');
+      const cls = await desc.getAttribute('class') ?? '';
       if (cls.includes('truncate')) {
         expect(cls).toMatch(/truncate-\d+/);
       }

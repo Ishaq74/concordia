@@ -154,7 +154,7 @@ function parseRoleInput(value?: string | string[] | null): string[] {
 
 function extractRoleListFromCarrier(user: unknown): string[] {
   if (!user || typeof user !== "object") return [];
-  const carrier = user as MaybeRoleCarrier;
+  const carrier = user as NonNullable<MaybeRoleCarrier>;
   const candidate = carrier.role ?? carrier.roles;
   return parseRoleInput(candidate);
 }
@@ -398,6 +398,9 @@ export async function checkPermissionAccess(headers: Headers, payload: Permissio
     throw new Error("PERMISSIONS_MISSING");
   }
 
+  if (!auth) {
+    throw new Error("AUTH_NOT_INITIALIZED");
+  }
   const userHasPermissionApi = auth.api as Record<string, unknown>;
   const userHasPermissionFn = userHasPermissionApi?.userHasPermission as
     | ((args: { headers: Headers; body: PermissionCheckInput }) => Promise<unknown>)

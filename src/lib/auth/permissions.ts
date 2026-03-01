@@ -385,23 +385,6 @@ export async function checkPermission(
     return false;
   }
 
-  // Determine whether this permission requires ABAC/context
-  const requiresContext = () => {
-    if (permission.endsWith('_own')) return true;
-    if ([
-      'update_resource',
-      'read_project',
-      'admin_access',
-      'remove_member',
-      'change_role',
-      'read_resource',
-      'manage_organization',
-      'delete_organization',
-      'invite_member'
-    ].includes(permission)) return true;
-    return false;
-  };
-
   // ABAC rules
   // Ownership checks for _own permissions
   if (permission.endsWith('_own') || permission.includes('_own_')) {

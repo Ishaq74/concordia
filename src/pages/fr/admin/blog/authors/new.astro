@@ -16,9 +16,7 @@ import { Icon } from "astro-icon/components";
 import { getDrizzle } from "@database/drizzle";
 import { blogOrganizations } from "@database/schemas";
 
-import tData from "@i18n/fr.json";
 const currentLocale = Astro.currentLocale || "fr";
-const t = tData;
 const adminBase = `/${currentLocale}/admin/blog/authors`;
 
 const db = await getDrizzle();

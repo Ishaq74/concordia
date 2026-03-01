@@ -45,7 +45,7 @@ async function generateReadmeForLang(lang: Lang) {
   mainContent += `## ${t.sections.auth[lang]}\n\n`;
   mainContent += t.auth[lang] + '\n\n';
 
-  mainContent += await generateDatabase(lang, t);
+  mainContent += await generateDatabase(lang);
 
   mainContent += `\n## ${t.sections.env[lang]}\n\n`;
   mainContent += await generateEnv() + '\n';

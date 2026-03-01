@@ -96,7 +96,7 @@ const filteredSegments = breadcrumbSegments.filter(
 // If customCrumbs are provided, use them instead of automatic generation
 const finalCrumbs =
     customCrumbs ||
-    filteredSegments.map((segment, index) => {
+    filteredSegments.map((segment, _index) => {
         const segmentIdxInOriginal = breadcrumbSegments.indexOf(segment);
         return {
             label: getLabel(segment),

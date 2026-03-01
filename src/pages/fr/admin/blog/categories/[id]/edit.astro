@@ -19,9 +19,7 @@ import { getDrizzle } from "@database/drizzle";
 import { blogCategories, blogPostCategories, blogMedia } from "@database/schemas";
 import { eq, count } from "drizzle-orm";
 
-import tData from "@i18n/fr.json";
 const currentLocale = Astro.currentLocale || "fr";
-const t = tData;
 const adminBase = `/${currentLocale}/admin/blog/categories`;
 
 const categoryId = Astro.params.id;

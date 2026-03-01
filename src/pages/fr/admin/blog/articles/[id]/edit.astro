@@ -6,7 +6,6 @@ import Card from "@components/ui/Card/Card.astro";
 import CardHeader from "@components/ui/Card/CardHeader.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
 import Badge from "@components/ui/Badge.astro";
-import Button from "@components/ui/Button.astro";
 import Input from "@components/ui/Form/Input.astro";
 import Select from "@components/ui/Form/Select.astro";
 import Label from "@components/ui/Form/Label.astro";
@@ -26,11 +25,9 @@ import {
   blogCategories,
   blogAuthors,
 } from "@database/schemas";
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
-import tData from "@i18n/fr.json";
 const currentLocale = Astro.currentLocale || "fr";
-const t = tData;
 const adminBase = `/${currentLocale}/admin/blog/articles`;
 
 const articleId = Astro.params.id;

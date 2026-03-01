@@ -107,14 +107,14 @@ export async function createTestUser(options: {
       }
     }
 
-    const body: Record<string, any> = {
+    const body = {
       email,
       password,
       name: finalName,
       username: finalUsername,
     }
 
-    const result = await auth.api.signUpEmail({ body })
+    const result = await auth.api.signUpEmail({ body } as Parameters<typeof auth.api.signUpEmail>[0])
 
     if (!result.user?.id) throw new Error('User creation failed')
 

@@ -35,9 +35,6 @@ const {
   endDate,
   variant = 'initial'
 } = Astro.props as Props;
-
-const volunteerPercent = volunteerGoal ? Math.min(100, Math.round((volunteerCount / volunteerGoal) * 100)) : 0;
-const fundingPercent = fundingGoal ? Math.min(100, Math.round((Number(fundingRaised || 0) / Number(fundingGoal)) * 100)) : 0;
 ---
 
 <Link href={href} variant={variant}>

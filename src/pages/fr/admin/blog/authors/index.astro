@@ -21,9 +21,7 @@ import { getDrizzle } from "@database/drizzle";
 import { blogAuthors, blogPostAuthors } from "@database/schemas";
 import { count, desc, ilike, eq, inArray, and } from "drizzle-orm";
 
-import tData from "@i18n/fr.json";
 const currentLocale = Astro.currentLocale || "fr";
-const t = tData;
 
 const url = new URL(Astro.request.url);
 const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));

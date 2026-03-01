@@ -1,7 +1,7 @@
 import { defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { getDrizzle } from "@database/drizzle";
-import { blogPosts, blogTranslations, blogPostCategories, blogComments } from "@database/schemas";
+import { blogPosts, blogTranslations } from "@database/schemas";
 import { eq, and } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import fs from "node:fs/promises";
@@ -22,13 +22,11 @@ export const blogActions = {
       
       // GESTION IMAGE (Upload local dans public/uploads)
       const imageFile = formData.get("coverImage") as File;
-      let imagePath = formData.get("existingCover") as string;
       
       if (imageFile && imageFile.size > 0) {
         const buffer = Buffer.from(await imageFile.arrayBuffer());
         const fileName = `${id}-${imageFile.name}`;
         await fs.writeFile(path.join(process.cwd(), "public/uploads", fileName), buffer);
-        imagePath = `/uploads/${fileName}`;
       }
 
       return await db.transaction(async (tx) => {

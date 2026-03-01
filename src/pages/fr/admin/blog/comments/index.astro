@@ -3,7 +3,6 @@ export const prerender = false;
 
 import AdminLayout from "@layouts/AdminLayout.astro";
 import Card from "@components/ui/Card/Card.astro";
-import CardHeader from "@components/ui/Card/CardHeader.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
 import Table from "@components/ui/Table/Table.astro";
 import TableHeader from "@components/ui/Table/TableHeader.astro";
@@ -21,9 +20,7 @@ import { getDrizzle } from "@database/drizzle";
 import { blogComments, blogPosts } from "@database/schemas";
 import { count, eq, desc, inArray } from "drizzle-orm";
 
-import tData from "@i18n/fr.json";
 const currentLocale = Astro.currentLocale || "fr";
-const t = tData;
 
 const url = new URL(Astro.request.url);
 const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));

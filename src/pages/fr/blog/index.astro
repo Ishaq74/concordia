@@ -3,7 +3,7 @@
 import { getCollection } from "astro:content";
 import { getDrizzle } from "@database/drizzle";
 import { blogComments } from "@database/schemas";
-import { sql, and, eq } from "drizzle-orm";
+import { sql, eq } from "drizzle-orm";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import BannerPage from "@templates/BannerPage.astro";
 import PostGrid from "@components/modules/blog/lists/PostGrid.astro";

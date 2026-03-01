@@ -33,7 +33,7 @@ test.describe('DropdownComponent – documentation page (couverture totale)', ()
     await trigger.click();
     const menu = page.locator('.dropdown-menu');
     await expect(menu).toBeVisible();
-    await expect(menu.locator('.dropdown-item')).toHaveCountGreaterThan(10);
+    expect(await menu.locator('.dropdown-item').count()).toBeGreaterThan(10);
     await menu.locator('.dropdown-item', { hasText: 'Analytics' }).click();
     await expect(menu).not.toBeVisible();
   });
@@ -97,7 +97,7 @@ test.describe('DropdownComponent – documentation page (couverture totale)', ()
       await trigger.click();
       const menu = page.locator(`.dropdown.${variant} .dropdown-menu`);
       await expect(menu).toBeVisible();
-      await expect(menu.locator('.dropdown-item')).toHaveCountGreaterThan(0);
+      expect(await menu.locator('.dropdown-item').count()).toBeGreaterThan(0);
       await menu.locator('.dropdown-item').first().click();
       await expect(menu).not.toBeVisible();
     }

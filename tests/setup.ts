@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, afterAll, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, afterAll, vi } from 'vitest'
 import { cleanupTestData } from './utils/cleanup'
 
 
