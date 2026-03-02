@@ -4,7 +4,6 @@ export const prerender = false;
 
 import BaseLayout from "@layouts/BaseLayout.astro";
 import BannerPage from "@templates/BannerPage.astro";
-import Grid from "@components/Tools/Grid.astro";
 import Flex from "@components/Tools/Flex.astro";
 import Card from "@components/ui/Card/Card.astro";
 import Badge from "@components/ui/Badge.astro";
@@ -12,7 +11,7 @@ import Button from "@components/ui/Button.astro";
 import { Icon } from "astro-icon/components";
 
 import { getDrizzle } from "@database/drizzle";
-import { blogOrganizations, blogAuthors, blogPosts, blogPostAuthors, blogTranslations } from "@database/schemas";
+import { blogOrganizations, blogAuthors, blogPosts, blogTranslations } from "@database/schemas";
 import { eq, and, sql } from "drizzle-orm";
 
 const LANG = "fr";
@@ -85,7 +84,6 @@ const knowsLanguage = (org.knowsLanguage ?? []) as string[];
 const areaServed = (org.areaServed ?? []) as string[];
 const contactPoints = (org.contactPoint ?? []) as { contactType: string; telephone?: string; email?: string; hoursAvailable?: string }[];
 const departments = (org.department ?? []) as string[];
-const employees = (org.employee ?? []) as string[];
 const founders = (Array.isArray(org.founder) ? org.founder : org.founder ? [org.founder] : []) as string[];
 const rating = org.aggregateRating as { ratingValue: number; bestRating: number; worstRating: number; ratingCount: number } | null;
 const stats = (org.interactionStatistic ?? []) as { interactionType: string; userInteractionCount: number }[];

@@ -74,7 +74,6 @@ const t = translations[`../../../../i18n/${currentLocale}.json`]?.default
   ?? translations['../../../../i18n/fr.json']?.default;
 
 const bc = t?.breadcrumb ?? {};
-const ariaLabel = bc.ariaLabel || "Fil d'Ariane";
 const homeLabel = bc.home || 'Accueil';
 const homeHref = getRelativeLocaleUrl(currentLocale, '/');
 
@@ -106,7 +105,7 @@ const classes = [className, invertedClass].filter(Boolean).join(' ');
 ---
 
 <!-- Schema.org JSON-LD -->
-<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
 <Breadcrumb variant={variant} color={color} className={classes}>
   <BreadcrumbList>
