@@ -1,15 +1,333 @@
 ---
-import BannerPage from '@templates/BannerPage.astro';
+// src/pages/fr/a-propos.astro
+import BaseLayout from "@layouts/BaseLayout.astro";
+import BannerPage from "@templates/BannerPage.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import { Icon } from "astro-icon/components";
+
+const LANG = "fr";
+
+const values = [
+  { icon: "mdi:map-marker-radius-outline", title: "Proximité", desc: "Nous rapprochons les citoyens de leur territoire et de leurs voisins pour créer un tissu social solide." },
+  { icon: "mdi:handshake-outline", title: "Solidarité", desc: "Chaque action sur Concordia renforce les liens d'entraide au sein de la communauté locale." },
+  { icon: "mdi:hand-heart-outline", title: "Engagement", desc: "Nous vous proposons des moyens concrets de vous impliquer et de participer à la vie de votre quartier." },
+  { icon: "mdi:leaf", title: "Durabilité", desc: "Notre approche favorise des solutions pérennes, respectueuses de l'environnement et de l'humain." },
+];
+
+const pillars = [
+  { icon: "mdi:map-outline", title: "Cartographie Locale", desc: "Découvrez les acteurs, initiatives et services autour de vous grâce à une cartographie vivante." },
+  { icon: "mdi:account-voice", title: "Médiation", desc: "Des outils pour résoudre les conflits et favoriser le dialogue entre les membres de la communauté." },
+  { icon: "mdi:tools", title: "Compétences", desc: "Partagez et développez vos savoir-faire à travers des ateliers et des échanges collaboratifs." },
+  { icon: "mdi:school-outline", title: "Éducation & Santé", desc: "Accédez à des ressources éducatives et de bien-être pour renforcer la résilience communautaire." },
+];
+
+const coreValues = [
+  { icon: "mdi:eye-outline", title: "Transparence Totale", desc: "Toutes les décisions sont documentées et accessibles. Chaque euro est tracé. Chaque vote est public." },
+  { icon: "mdi:sprout", title: "Écologie Numérique", desc: "Infrastructure minimaliste, hébergement vert, sobriété algorithmique. Moins de code, plus de sens." },
+  { icon: "mdi:account-group-outline", title: "Inclusion pour tous", desc: "Accessibilité WCAG, multilinguisme, design universel. Concordia est construite pour être utilisée par tous." },
+];
+
+const stats = [
+  { value: "12k+", label: "Médiations réalisées" },
+  { value: "850", label: "Projets lancés" },
+  { value: "45k", label: "Heures bénévoles" },
+  { value: "94%", label: "Taux de confiance" },
+];
 ---
 
-<BannerPage
-  title="À propos"
-  description="Qui nous sommes et ce que nous faisons."
-  type="flex"
-  color="primary"
-  breadcrumbs={[]}
-/>
+<BaseLayout title="À propos — Concordia" lang={LANG}>
+  {/* ===== HERO ===== */}
+  <section class="about-hero">
+    <div class="about-hero__bg" aria-hidden="true">
+      <img src="/images/placeholder.jpg" alt="" class="about-hero__bg-img" loading="eager" />
+      <div class="about-hero__overlay" />
+    </div>
+    <div class="about-hero__content">
+      <Badge variant="retro" color="accent">Notre Mission</Badge>
+      <h1 class="about-hero__title">Renforcer le lien social, localement.</h1>
+      <p class="about-hero__subtitle">Concordia est une plateforme citoyenne, conçue pour rapprocher les habitants, les associations et les acteurs locaux au sein d'un même espace de confiance.</p>
+      <a href="#mission">
+        <Button variant="retro" color="primary" icon={{ name: "mdi:arrow-down", side: "right" }}>
+          Rejoindre le mouvement
+        </Button>
+      </a>
+    </div>
+  </section>
 
-<section class="about-content">
-  <!-- contenu libre de la page "À propos" -->
-</section>
+  <main class="about-page">
+
+    {/* ===== MISSION + VALUES CARDS ===== */}
+    <section class="about-mission" id="mission" aria-label="Notre mission">
+      <div class="about-mission__grid">
+        <div class="about-mission__text">
+          <span class="about-label">Pourquoi Concordia ?</span>
+          <h2 class="about-h2">
+            Une technologie au service du lien humain
+          </h2>
+          <p class="about-body">
+            Dans un monde de plus en plus fragmenté, Concordia crée des espaces
+            numériques qui renforcent la vie de quartier. Notre plateforme relie
+            les habitants aux initiatives locales, aux services de proximité et
+            aux personnes qui font vivre leur communauté.
+          </p>
+          <p class="about-body">
+            Nous croyons que la technologie doit être invisible : un outil
+            simple, accessible, qui amplifie les liens plutôt que de les
+            remplacer.
+          </p>
+        </div>
+        <div class="about-mission__cards">
+          {values.map((v, i) => (
+            <Card variant="retro" elevation="sm" class:list={["about-value-card", i % 2 === 1 && "about-value-card--offset"]}>
+              <CardContent>
+                <div class="about-value-card__icon">
+                  <Icon name={v.icon} />
+                </div>
+                <h3 class="about-value-card__title">{v.title}</h3>
+                <p class="about-value-card__desc">{v.desc}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ===== PILLARS ===== */}
+    <section class="about-pillars" aria-label="Nos piliers">
+      <span class="about-label">Nos 4 Piliers</span>
+      <h2 class="about-h2">Les fondations de Concordia</h2>
+      <div class="about-pillars__grid">
+        {pillars.map((p) => (
+          <Card variant="retro" elevation="sm" class="about-pillar-card">
+            <CardContent>
+              <div class="about-pillar-card__icon">
+                <Icon name={p.icon} />
+              </div>
+              <h3 class="about-pillar-card__title">{p.title}</h3>
+              <p class="about-pillar-card__desc">{p.desc}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </section>
+
+    {/* ===== CORE VALUES ===== */}
+    <section class="about-core" aria-label="Nos valeurs fondamentales">
+      <span class="about-label">Nos Valeurs Fondamentales</span>
+      <h2 class="about-h2">Ce en quoi nous croyons</h2>
+      <div class="about-core__grid">
+        {coreValues.map((v) => (
+          <Card variant="retro" elevation="sm" class="about-core-card">
+            <CardContent>
+              <div class="about-core-card__icon">
+                <Icon name={v.icon} />
+              </div>
+              <h3 class="about-core-card__title">{v.title}</h3>
+              <p class="about-core-card__desc">{v.desc}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </section>
+
+    {/* ===== IMPACT DASHBOARD ===== */}
+    <section class="about-impact" aria-label="Notre impact">
+      <span class="about-label">Notre Impact</span>
+      <h2 class="about-h2">Des chiffres qui parlent</h2>
+      <div class="about-impact__grid">
+        {stats.map((s) => (
+          <div class="about-impact__stat">
+            <span class="about-impact__value">{s.value}</span>
+            <span class="about-impact__label">{s.label}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* ===== CTA ===== */}
+    <section class="about-cta" aria-label="Appel à l'action">
+      <div class="about-cta__inner">
+        <h2 class="about-cta__title">Prêt à faire bouger votre quartier ?</h2>
+        <p class="about-cta__desc">Rejoignez Concordia et participez à une aventure citoyenne qui a du sens.</p>
+        <div class="about-cta__buttons">
+          <Button variant="retro" color="primary" icon={{ name: "mdi:account-plus-outline", side: "left" }}>
+            S'inscrire
+          </Button>
+          <a href={`/${LANG}/blog`}>
+            <Button variant="retro" color="secondary" icon={{ name: "mdi:newspaper-variant-outline", side: "left" }}>
+              Lire le blog
+            </Button>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+/* ========================================
+   À PROPOS PAGE
+   ======================================== */
+
+/* --- Hero --- */
+.about-hero {
+  position: relative; min-height: 480px;
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+.about-hero__bg { position: absolute; inset: 0; }
+.about-hero__bg-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.about-hero__overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.25) 50%, transparent 100%);
+}
+.about-hero__content {
+  position: relative; z-index: 1;
+  max-width: 1280px; width: 100%; margin: 0 auto;
+  padding: 4rem 1.5rem;
+  display: flex; flex-direction: column; gap: 1rem;
+  color: #fff;
+}
+.about-hero__title { margin: 0; font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; line-height: 1.1; }
+.about-hero__subtitle { margin: 0; font-size: 1.125rem; max-width: 55ch; opacity: 0.9; line-height: 1.6; }
+
+/* --- Shared --- */
+.about-page {
+  max-width: 1280px; margin: 0 auto;
+  padding: 3rem 1rem;
+  display: flex; flex-direction: column; gap: 4rem;
+}
+
+.about-label {
+  display: inline-block; font-size: 0.75rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--color-primary); margin-bottom: 0.25rem;
+}
+
+.about-h2 {
+  margin: 0 0 1.5rem; font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 800; color: var(--heading-color, var(--text-default));
+  line-height: 1.2;
+}
+
+.about-body {
+  font-size: 1rem; color: var(--text-muted); line-height: 1.7;
+  margin: 0 0 1rem;
+}
+
+/* --- Mission --- */
+.about-mission__grid {
+  display: grid; grid-template-columns: 1fr; gap: 2.5rem;
+}
+@media (min-width: 1024px) { .about-mission__grid { grid-template-columns: 1fr 1fr; } }
+
+.about-mission__text { display: flex; flex-direction: column; justify-content: center; }
+
+.about-mission__cards {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+}
+
+.about-value-card--offset { margin-top: 2rem; }
+@media (max-width: 640px) { .about-value-card--offset { margin-top: 0; } }
+
+.about-value-card__icon {
+  width: 2.5rem; height: 2.5rem; border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 0.75rem;
+}
+.about-value-card__icon :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary); }
+.about-value-card__title { margin: 0 0 0.375rem; font-size: 1rem; font-weight: 700; color: var(--text-default); }
+.about-value-card__desc { margin: 0; font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; }
+
+/* --- Pillars --- */
+.about-pillars {
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--bg-default));
+  border-radius: var(--border-radius-lg, 1rem);
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.about-pillars__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem; text-align: left;
+}
+
+.about-pillar-card { transition: transform 200ms, border-color 200ms; }
+.about-pillar-card:hover { transform: translateY(-2px); }
+
+.about-pillar-card__icon {
+  width: 2.5rem; height: 2.5rem; border-radius: var(--border-radius-sm);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 0.75rem;
+  transition: background 200ms;
+}
+.about-pillar-card:hover .about-pillar-card__icon {
+  background: var(--color-primary);
+}
+.about-pillar-card__icon :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary); }
+.about-pillar-card:hover .about-pillar-card__icon :global(svg) { color: #fff; }
+.about-pillar-card__title { margin: 0 0 0.375rem; font-weight: 700; color: var(--text-default); }
+.about-pillar-card__desc { margin: 0; font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; }
+
+/* --- Core Values --- */
+.about-core { text-align: center; }
+.about-core__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem; text-align: left;
+}
+
+.about-core-card__icon {
+  width: 3rem; height: 3rem; border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 0.75rem;
+}
+.about-core-card__icon :global(svg) { width: 1.5rem; height: 1.5rem; color: var(--color-primary); }
+.about-core-card__title { margin: 0 0 0.375rem; font-size: 1.125rem; font-weight: 700; color: var(--text-default); }
+.about-core-card__desc { margin: 0; font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; }
+
+/* --- Impact --- */
+.about-impact { text-align: center; }
+
+.about-impact__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.about-impact__stat {
+  display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  padding: 1.5rem 1rem;
+  border-radius: var(--border-radius-lg, 1rem);
+  background: var(--bg-subtle);
+}
+.about-impact__value { font-size: 2.25rem; font-weight: 800; color: var(--color-primary); }
+.about-impact__label { font-size: 0.875rem; color: var(--text-muted); }
+
+/* --- CTA --- */
+.about-cta__inner {
+  background: var(--color-primary);
+  color: #fff; text-align: center;
+  padding: 3.5rem 2rem;
+  border-radius: var(--border-radius-lg, 1rem);
+  position: relative; overflow: hidden;
+}
+.about-cta__title { margin: 0 0 0.5rem; font-size: 1.75rem; font-weight: 800; }
+.about-cta__desc { margin: 0 0 1.5rem; font-size: 1rem; opacity: 0.9; }
+.about-cta__buttons { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+  .about-hero { min-height: 360px; }
+  .about-hero__content { padding: 2.5rem 1rem; }
+  .about-mission__cards { grid-template-columns: 1fr; }
+  .about-pillars { padding: 2rem 1rem; }
+}
+</style>
