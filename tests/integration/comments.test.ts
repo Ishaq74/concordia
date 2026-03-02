@@ -7,11 +7,10 @@ vi.mock('astro:schema', () => {
   const z = {
     string: () => {
       let minLen: number | undefined = undefined;
-      let isOptional = false;
       let transformer: ((v: any) => any) | undefined = undefined;
       return {
         min(n: number) { minLen = n; return this; },
-        optional() { isOptional = true; return this; },
+        optional() { return this; },
         transform(fn: any) { transformer = fn; return this; },
         parse(v: any) {
           if (typeof v !== 'string') throw new Error('Not a string');

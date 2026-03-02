@@ -1,0 +1,335 @@
+---
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import Link from "@components/ui/Link.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import { user, blogPosts, blogComments, auditLog } from "@database/schemas";
+import { count, eq, desc } from "drizzle-orm";
+
+import tData from "@i18n/en.json";
+const currentLocale = Astro.currentLocale || "en";
+const t = tData;
+const adminUser = Astro.locals.user;
+
+// DB queries
+const db = await getDrizzle();
+
+const [usersCount] = await db.select({ value: count() }).from(user);
+const [publishedCount] = await db.select({ value: count() }).from(blogPosts).where(eq(blogPosts.status, "published"));
+const [draftCount] = await db.select({ value: count() }).from(blogPosts).where(eq(blogPosts.status, "draft"));
+const [pendingCommentsCount] = await db.select({ value: count() }).from(blogComments).where(eq(blogComments.status, "pending"));
+
+// Recent audit logs
+const recentLogs = await db
+  .select()
+  .from(auditLog)
+  .orderBy(desc(auditLog.createdAt))
+  .limit(8);
+
+// Latest articles
+const recentPosts = await db
+  .select()
+  .from(blogPosts)
+  .orderBy(desc(blogPosts.createdAt))
+  .limit(5);
+
+const stats = [
+  {
+    label: t.adminPanel?.users ?? "Users",
+    value: usersCount.value,
+    icon: "mdi:account-group",
+    color: "primary" as const,
+    href: `/${currentLocale}/admin/users`,
+  },
+  {
+    label: "Published articles",
+    value: publishedCount.value,
+    icon: "mdi:newspaper-variant-outline",
+    color: "success" as const,
+    href: `/${currentLocale}/admin/blog/articles`,
+  },
+  {
+    label: "Drafts",
+    value: draftCount.value,
+    icon: "mdi:file-edit-outline",
+    color: "warning" as const,
+    href: `/${currentLocale}/admin/blog/articles`,
+  },
+  {
+    label: "Pending comments",
+    value: pendingCommentsCount.value,
+    icon: "mdi:comment-alert-outline",
+    color: "error" as const,
+    href: `/${currentLocale}/admin/blog/comments`,
+  },
+];
+---
+
+<AdminLayout title={t.adminPanel?.dashboard ?? "Dashboard"} activeSection="dashboard">
+  <header class="admin-page-header">
+    <h1>{t.adminPanel?.dashboard ?? "Dashboard"}</h1>
+    <p class="admin-page-subtitle">
+      Welcome, <strong>{adminUser?.name ?? "Administrator"}</strong>
+    </p>
+  </header>
+
+  <!-- Stats -->
+  <section class="admin-stats" aria-label="Statistics">
+    {stats.map((stat) => (
+      <a href={stat.href} class="admin-stat-link">
+        <Card elevation="sm" interactive>
+          <CardContent>
+            <div class="stat-row">
+              <div class="stat-icon-wrap">
+                <Icon name={stat.icon} class={`stat-icon stat-icon--${stat.color}`} />
+              </div>
+              <div class="stat-data">
+                <span class="stat-value">{stat.value}</span>
+                <span class="stat-label">{stat.label}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </a>
+    ))}
+  </section>
+
+  <div class="admin-grid-2">
+    <!-- Latest articles -->
+    <Card>
+      <CardHeader>
+        <div class="card-title-row">
+          <h2 class="card-section-title">Latest articles</h2>
+          <Link href={`/${currentLocale}/admin/blog/articles`} style="link">
+            View all
+          </Link>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {recentPosts.length === 0 ? (
+          <p class="empty-text">No articles yet.</p>
+        ) : (
+          <ul class="admin-list" role="list">
+            {recentPosts.map((post) => (
+              <li class="admin-list-item">
+                <div class="admin-list-item-main">
+                  <span class="admin-list-item-title">{post.slug}</span>
+                  <span class="admin-list-item-meta">
+                    {post.createdAt ? new Date(post.createdAt).toLocaleDateString(currentLocale) : "—"}
+                  </span>
+                </div>
+                <Badge
+                  color={post.status === "published" ? "success" : post.status === "draft" ? "warning" : "default"}
+                  text={post.status}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
+
+    <!-- Recent logs -->
+    <Card>
+      <CardHeader>
+        <div class="card-title-row">
+          <h2 class="card-section-title">{t.adminPanel?.audit ?? "Audit log"}</h2>
+          <Link href={`/${currentLocale}/admin/audit`} style="link">
+            View all
+          </Link>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {recentLogs.length === 0 ? (
+          <p class="empty-text">No recent activity.</p>
+        ) : (
+          <ul class="admin-list" role="list">
+            {recentLogs.map((log) => (
+              <li class="admin-list-item">
+                <div class="admin-list-item-main">
+                  <span class="admin-list-item-title">{log.action}</span>
+                  <span class="admin-list-item-meta">
+                    {log.createdAt ? new Date(log.createdAt).toLocaleDateString(currentLocale, { hour: "2-digit", minute: "2-digit" }) : "—"}
+                    {log.ip ? ` · ${log.ip}` : ""}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+</AdminLayout>
+
+<style>
+  .admin-page-header {
+    margin-bottom: var(--space-6, 1.5rem);
+  }
+
+  .admin-page-header h1 {
+    font-family: var(--font-family-display, "Space Grotesk", sans-serif);
+    font-size: var(--h2-font-size, 2rem);
+    font-weight: 800;
+    color: var(--heading-color, #0f172a);
+    margin: 0 0 var(--space-1, 0.25rem);
+  }
+
+  .admin-page-subtitle {
+    color: var(--text-muted, #64748b);
+    font-size: 0.9375rem;
+    margin: 0;
+  }
+
+  /* Stat cards */
+  .admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+    gap: var(--space-4, 1rem);
+    margin-bottom: var(--space-8, 2rem);
+  }
+
+  .admin-stat-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .stat-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4, 1rem);
+  }
+
+  .stat-icon-wrap {
+    flex-shrink: 0;
+  }
+
+  .stat-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .stat-icon--primary { color: var(--color-primary, #eab308); }
+  .stat-icon--success { color: var(--color-success, #16a34a); }
+  .stat-icon--warning { color: var(--color-warning, #f97316); }
+  .stat-icon--error { color: var(--color-danger, #dc2626); }
+
+  .stat-data {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--heading-color, #0f172a);
+  }
+
+  .stat-label {
+    font-size: 0.8125rem;
+    color: var(--text-muted, #64748b);
+    margin-top: var(--space-1, 0.25rem);
+  }
+
+  /* Grid 2 cols */
+  .admin-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
+    gap: var(--space-4, 1rem);
+  }
+
+  .card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .card-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--heading-color, #0f172a);
+    margin: 0;
+  }
+
+  .empty-text {
+    color: var(--text-muted, #64748b);
+    font-size: 0.875rem;
+    font-style: italic;
+  }
+
+  /* Reusable admin list */
+  .admin-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .admin-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2, 0.5rem) 0;
+    border-bottom: 1px solid var(--border-default, #e2e8f0);
+  }
+
+  .admin-list-item:last-child {
+    border-bottom: none;
+  }
+
+  .admin-list-item-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .admin-list-item-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-default, #0f172a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .admin-list-item-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted, #64748b);
+  }
+
+  @media (max-width: 768px) {
+    .admin-stats {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .admin-grid-2 {
+      grid-template-columns: 1fr;
+    }
+
+    .admin-list-item-title {
+      white-space: normal;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .admin-stats {
+      grid-template-columns: 1fr;
+    }
+
+    .admin-page-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .stat-value {
+      font-size: 1.25rem;
+    }
+  }
+</style>

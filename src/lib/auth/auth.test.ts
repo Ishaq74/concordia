@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { account, verification } from '../../database/schemas/auth-schema';
+import { account } from '../../database/schemas/auth-schema';
 import { 
   createTestUser, 
   loginTestUser, 

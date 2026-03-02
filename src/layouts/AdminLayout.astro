@@ -23,15 +23,8 @@ const user = Astro.locals.user;
 
 // Double protection : session + rôle admin
 if (!user) {
-  const signInSlugs: Record<string, string> = {
-    fr: "connexion",
-    en: "sign-in",
-    ar: "sign-in",
-    es: "sign-in",
-  };
-  const returnUrl = encodeURIComponent(Astro.url.pathname);
   return Astro.redirect(
-    `/${currentLocale}/auth/${signInSlugs[currentLocale] ?? "sign-in"}?redirect=${returnUrl}`,
+    `/${currentLocale}/auth/${({ fr: "connexion", en: "sign-in", ar: "sign-in", es: "sign-in" } as Record<string, string>)[currentLocale] ?? "sign-in"}?redirect=${encodeURIComponent(Astro.url.pathname)}`,
     302,
   );
 }

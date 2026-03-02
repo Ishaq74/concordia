@@ -10,7 +10,7 @@ describe('createTranslationLoader (unit)', () => {
       }
     ])
 
-    const transformer = (entity: any, translation: any) => ({
+    const transformer = (_entity: any, translation: any) => ({
       title: translation.headline,
       content: translation.articleBody,
     })
@@ -71,7 +71,7 @@ describe('createTranslationLoader (unit)', () => {
         ]
       }
     ])
-    const transformer = (entity: any, translation: any) => ({ title: translation.headline })
+    const transformer = (_entity: any, translation: any) => ({ title: translation.headline })
     const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
@@ -87,7 +87,7 @@ describe('createTranslationLoader (unit)', () => {
     const fetcher = vi.fn(async () => [
       { slug: 'badlang', translations: [ { headline: 'NoLang', articleBody: '...' } ] }
     ])
-    const transformer = (entity: any, translation: any) => ({ title: translation.headline })
+    const transformer = (_entity: any, translation: any) => ({ title: translation.headline })
     const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
@@ -107,7 +107,7 @@ describe('createTranslationLoader (unit)', () => {
         ]
       }
     ])
-    const transformer = (entity: any, translation: any) => ({ title: translation.headline })
+    const transformer = (_entity: any, translation: any) => ({ title: translation.headline })
     const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }

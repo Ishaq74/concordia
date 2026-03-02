@@ -1,0 +1,338 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import MenuDropdown from "@components/ui/MenuDropdown.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import { Code } from "astro:components";
+---
+
+<DocLayout
+  title="MenuDropdown"
+  description="Accessible, multi-level dropdown menu component, design system compliant"
+  variant="initial"
+>
+  <h1 id="menu-dropdown">MenuDropdown</h1>
+
+  <p>
+    The <code class="inline-code">MenuDropdown</code> component is a powerful dropdown
+    system that works <strong>WITHOUT any JavaScript</strong>. It supports hover
+    opening (desktop), click (mobile), mutual exclusion, closing on
+    click-outside, and a mobile-optimized accordion view.
+  </p>
+
+  <h2 id="installation">Installation</h2>
+
+  <p>
+    The component is available in <code class="inline-code"
+      >src/components/ui/MenuDropdown.astro</code
+    >
+  </p>
+
+  <Code
+    lang="typescript"
+    code={`import MenuDropdown from '@components/ui/MenuDropdown.astro';`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Default</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">items</code></TableCell>
+          <TableCell>MenuDropdownItem[]</TableCell>
+          <TableCell>—</TableCell>
+          <TableCell
+            >Menu structure (required). Up to 3 nested levels supported.</TableCell
+          >
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">variant</code></TableCell>
+          <TableCell>initial | retro | modern | futuristic</TableCell>
+          <TableCell>initial</TableCell>
+          <TableCell>Visual style variant</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">position</code></TableCell>
+          <TableCell
+            >bottom-left | bottom-right | top-left | top-right</TableCell
+          >
+          <TableCell>bottom-left</TableCell>
+          <TableCell>Absolute placement relative to the trigger</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">openOnHover</code></TableCell>
+          <TableCell>boolean</TableCell>
+          <TableCell>false</TableCell>
+          <TableCell>Open on hover (desktop only)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">isMenuMobile</code></TableCell>
+          <TableCell>boolean</TableCell>
+          <TableCell>false</TableCell>
+          <TableCell
+            >Integrated "Accordion" mode for mobile navigation (borderless,
+            seamless)</TableCell
+          >
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">groupName</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>"default-dropdown-group"</TableCell>
+          <TableCell
+            >Group name for mutual exclusion (only one menu open at a time in
+            the same group)</TableCell
+          >
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">triggerLabel</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>"Menu"</TableCell>
+          <TableCell>Trigger button text</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">triggerIcon</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>—</TableCell>
+          <TableCell>Optional icon (SVG string)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">class</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>—</TableCell>
+          <TableCell>Custom CSS classes</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h2 id="features">"Master" Features (Zero-JS)</h2>
+  <ul>
+    <li>
+      <strong>Mutual Exclusion</strong> : Opening one menu automatically closes others
+      (via Radio Hack).
+    </li>
+    <li>
+      <strong>Outside Click</strong> : Closes if you click anywhere else (via CSS
+      Backdrop).
+    </li>
+    <li>
+      <strong>Mobile Mode</strong> : Automatically switches to a vertical accordion
+      view on small screens.
+    </li>
+    <li>
+      <strong>Zero JavaScript</strong> : Guaranteed, even for complex mutual exclusion
+      behaviors.
+    </li>
+  </ul>
+
+  <h2 id="variants">Variants</h2>
+
+  <h3>Initial (default)</h3>
+  <div class="example-section">
+    <MenuDropdown
+      items={[
+        { label: "One", href: "#" },
+        { label: "Two", href: "#" },
+      ]}
+      variant="initial"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<MenuDropdown items={[{ label: 'One', href: '#' }, { label: 'Two', href: '#' }]} variant="initial" />`}
+  />
+
+  <h3>Retro</h3>
+  <div class="example-section">
+    <MenuDropdown
+      items={[{ label: "One" }, { label: "Two" }]}
+      variant="retro"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<MenuDropdown items={[{ label: 'One' }, { label: 'Two' }]} variant="retro" />`}
+  />
+
+  <h3>Modern</h3>
+  <div class="example-section">
+    <MenuDropdown
+      items={[{ label: "One" }, { label: "Two" }]}
+      variant="modern"
+    />
+  </div>
+
+  <h3>Futuristic</h3>
+  <div class="example-section">
+    <MenuDropdown
+      items={[{ label: "One" }, { label: "Two" }]}
+      variant="futuristic"
+    />
+  </div>
+
+  <h2 id="usage">Usage</h2>
+
+  <p>
+    Nested menus are supported by providing a <code>children</code> array on an item.
+  </p>
+
+  <h3>Example with submenus</h3>
+  <div class="example-section">
+    <MenuDropdown
+      items={[
+        { label: "Home", href: "/" },
+        {
+          label: "Products",
+          children: [
+            { label: "Category 1", href: "/cat1" },
+            { label: "Category 2", href: "/cat2" },
+            { label: "Category 3", href: "/cat3" },
+          ],
+        },
+        {
+          label: "Services",
+          children: [
+            { label: "Consulting", href: "/consulting" },
+            { label: "Development", href: "/dev" },
+          ],
+        },
+        { label: "Contact", href: "/contact" },
+      ]}
+      triggerLabel="Navigation Menu"
+      variant="initial"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<MenuDropdown
+  items={[
+    { label: 'Home', href: '/' },
+    { label: 'Products', children: [
+      { label: 'Category 1', href: '/cat1' },
+      { label: 'Category 2', href: '/cat2' },
+    ]},
+    { label: 'Contact', href: '/contact' },
+  ]}
+  triggerLabel="Menu"
+/>`}
+  />
+
+  <h3>Hover mode (openOnHover)</h3>
+  <p>The menu can open automatically on hover:</p>
+  <div class="example-section">
+    <MenuDropdown
+      items={[
+        {
+          label: "File",
+          children: [
+            { label: "New", href: "#" },
+            { label: "Open", href: "#" },
+            { label: "Save", href: "#" },
+          ],
+        },
+        {
+          label: "Edit",
+          children: [
+            { label: "Copy", href: "#" },
+            { label: "Paste", href: "#" },
+          ],
+        },
+      ]}
+      triggerLabel="Hover to Open"
+      openOnHover={true}
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<MenuDropdown
+  items={[...]}
+  openOnHover={true}
+/>`}
+  />
+
+  <h3>All positions</h3>
+  <div
+    class="example-section"
+    style="display: flex; gap: 1rem; flex-wrap: wrap;"
+  >
+    <MenuDropdown
+      items={[
+        { label: "Option 1", href: "#" },
+        { label: "Option 2", href: "#" },
+        { label: "Option 3", href: "#" },
+      ]}
+      triggerLabel="Bottom Left"
+      position="bottom-left"
+    />
+    <MenuDropdown
+      items={[
+        { label: "Option 1", href: "#" },
+        { label: "Option 2", href: "#" },
+        { label: "Option 3", href: "#" },
+      ]}
+      triggerLabel="Bottom Right"
+      position="bottom-right"
+    />
+    <MenuDropdown
+      items={[
+        { label: "Option 1", href: "#" },
+        { label: "Option 2", href: "#" },
+        { label: "Option 3", href: "#" },
+      ]}
+      triggerLabel="Top Left"
+      position="top-left"
+    />
+    <MenuDropdown
+      items={[
+        { label: "Option 1", href: "#" },
+        { label: "Option 2", href: "#" },
+        { label: "Option 3", href: "#" },
+      ]}
+      triggerLabel="Top Right"
+      position="top-right"
+    />
+  </div>
+
+  <h2 id="accessibility">Accessibility</h2>
+  <ul>
+    <li>
+      Native keyboard interaction via <code>details</code>/<code>summary</code>.
+    </li>
+    <li>
+      Use of ARIA roles (<code>role="menu"</code>, <code>role="menuitem"</code
+      >).
+    </li>
+    <li>Focusable items and visible focus styles.</li>
+    <li>Touch-optimized support (min-height 44px).</li>
+    <li>Responsive: stacks submenus vertically on mobile.</li>
+  </ul>
+
+  <h2 id="notes">Technical notes</h2>
+  <ul>
+    <li>
+      <strong>Pure CSS</strong>: No JavaScript required for basic functionality.
+    </li>
+    <li>
+      <strong>Animations</strong>: Smooth transitions with <code>slideIn</code> keyframe.
+    </li>
+    <li><strong>Dark mode</strong>: Automatic dark theme support.</li>
+    <li><strong>Touch-friendly</strong>: Minimum 44px touch targets.</li>
+  </ul>
+</DocLayout>

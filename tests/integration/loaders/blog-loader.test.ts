@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { loadBlogPosts } from '@/database/loaders/blog'
-import * as drizz from '@database/drizzle'
 import * as schema from '@database/schemas'
 
 describe('loadBlogPosts (integration via mocked DB)', () => {

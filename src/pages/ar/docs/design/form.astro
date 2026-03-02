@@ -1,0 +1,897 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import FormCard from "@components/ui/Form/FormCard.astro";
+import FormGroup from "@components/ui/Form/FormGroup.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Input from "@components/ui/Form/Input.astro";
+import PasswordInput from "@components/ui/Form/PasswordInput.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Checkbox from "@components/ui/Form/Checkbox.astro";
+import Radio from "@components/ui/Form/Radio.astro";
+import Switch from "@components/ui/Form/Switch.astro";
+import DatePicker from "@components/ui/Form/DatePicker.astro";
+import ButtonComponent from "@components/ui/Button.astro";
+import AlertComponent from "@components/ui/Alert.astro";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+---
+
+<DocLayout 
+  title="Form Components" 
+  description="Comprehensive documentation of the form system with all components and variants"
+  variant="initial"
+>
+  <h1 id="form-components">Form Components</h1>
+  
+  <p>
+    Complete form component system with support for 4 variants (initial, retro, modern, futuristic), full accessibility (ARIA), error handling, and reusable components.
+  </p>
+
+  <TableOfContents
+    items={[
+      { label: "FormCard", href: "#formcard" },
+      { label: "Alert (Validation Messages)", href: "#alert" },
+      { label: "Input", href: "#input" },
+      { label: "PasswordInput", href: "#password" },
+      { label: "Textarea", href: "#textarea" },
+      { label: "Select", href: "#select" },
+      { label: "Checkbox", href: "#checkbox" },
+      { label: "Radio", href: "#radio" },
+      { label: "Switch", href: "#switch" },
+      { label: "DatePicker", href: "#datepicker" },
+      { label: "Accessibility", href: "#accessibility" },
+    ]}
+    title="Table of Contents"
+  />
+
+  <h2 id="formcard">FormCard</h2>
+  
+  <p>
+    The <code class="inline-code">FormCard</code> component reuses the Card system to create styled forms. Supports all 4 variants and wraps FormGroup, Label, and fields.
+  </p>
+
+  <h3>Props</h3>
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Default</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">variant</code></TableCell>
+          <TableCell>initial | retro | modern | futuristic</TableCell>
+          <TableCell>initial</TableCell>
+          <TableCell>Visual style of the form</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">title</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Form title</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">description</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Form description</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3>Examples - All variants</h3>
+
+  <div class="example-grid">
+    <div>
+      <h4>Initial</h4>
+      <FormCard variant="initial" title="Login" description="Enter your credentials">
+        <FormGroup>
+          <Label htmlFor="email-initial" required>Email</Label>
+          <Input 
+            id="email-initial" 
+            type="email" 
+            placeholder="you@example.com"
+            icon="mdi:email"
+            variant="initial"
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label htmlFor="password-initial" required>Password</Label>
+          <PasswordInput 
+            id="password-initial"
+            variant="initial"
+          />
+        </FormGroup>
+        <ButtonComponent variant="initial" type="submit">Log in</ButtonComponent>
+      </FormCard>
+    </div>
+
+    <div>
+      <h4>Retro</h4>
+      <FormCard variant="retro" title="Sign Up" description="Create your retro account">
+        <FormGroup>
+          <Label htmlFor="username-retro" required>Username</Label>
+          <Input 
+            id="username-retro" 
+            type="text" 
+            placeholder="johndoe"
+            icon="mdi:account"
+            variant="retro"
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label htmlFor="email-retro" required>Email</Label>
+          <Input 
+            id="email-retro" 
+            type="email" 
+            placeholder="you@example.com"
+            variant="retro"
+          />
+        </FormGroup>
+        <ButtonComponent variant="retro" type="submit">Sign up</ButtonComponent>
+      </FormCard>
+    </div>
+
+    <div>
+      <h4>Modern</h4>
+      <FormCard variant="modern" title="Contact" description="Send us a message">
+        <FormGroup>
+          <Label htmlFor="name-modern" required>Full name</Label>
+          <Input 
+            id="name-modern" 
+            type="text" 
+            placeholder="John Doe"
+            icon="mdi:account"
+            variant="modern"
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label htmlFor="message-modern" required>Message</Label>
+          <Textarea 
+            id="message-modern"
+            placeholder="Your message..."
+            rows={4}
+            variant="modern"
+          />
+        </FormGroup>
+        <ButtonComponent variant="modern" type="submit">Send</ButtonComponent>
+      </FormCard>
+    </div>
+
+    <div>
+      <h4>Futuristic</h4>
+      <FormCard variant="futuristic" title="Settings" description="Configure your profile">
+        <FormGroup>
+          <Label htmlFor="display-name-futuristic" required>Display name</Label>
+          <Input 
+            id="display-name-futuristic" 
+            type="text" 
+            placeholder="CyberUser_2026"
+            icon="mdi:account-circle"
+            variant="futuristic"
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label htmlFor="bio-futuristic">Bio</Label>
+          <Textarea 
+            id="bio-futuristic"
+            placeholder="Tell us about yourself..."
+            rows={3}
+            variant="futuristic"
+          />
+        </FormGroup>
+        <ButtonComponent variant="futuristic" type="submit">Save</ButtonComponent>
+      </FormCard>
+    </div>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<FormCard variant="initial" title="Login" description="Enter your credentials">
+  <FormGroup>
+    <Label htmlFor="email" required>Email</Label>
+    <Input 
+      id="email" 
+      type="email" 
+      placeholder="you@example.com"
+      icon="mdi:email"
+      variant="initial"
+    />
+  </FormGroup>
+  <ButtonComponent type="submit">Log in</ButtonComponent>
+</FormCard>`}
+  />
+
+  <h2 id="alert">Alert - Validation Messages</h2>
+  
+  <p>
+    The <code class="inline-code">Alert</code> component is essential in forms to display success, error, warning, or info messages after submission.
+  </p>
+
+  <h3>Usage in forms</h3>
+
+  <div class="example-section">
+    <h4>Validation messages - Initial</h4>
+    <FormCard variant="initial" title="Login">
+      <AlertComponent status="error" variant="initial" dismissible>
+        <strong>Error:</strong> Incorrect email or password. Please try again.
+      </AlertComponent>
+      
+      <FormGroup>
+        <Label htmlFor="email-alert-initial" required>Email</Label>
+        <Input 
+          id="email-alert-initial" 
+          type="email" 
+          icon="mdi:email"
+          variant="initial"
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label htmlFor="pwd-alert-initial" required>Password</Label>
+        <PasswordInput 
+          id="pwd-alert-initial"
+          variant="initial"
+        />
+      </FormGroup>
+      <ButtonComponent variant="initial" type="submit">Log in</ButtonComponent>
+    </FormCard>
+
+    <h4>Success - Retro</h4>
+    <FormCard variant="retro" title="Sign up successful">
+      <AlertComponent status="success" variant="retro" icon="mdi:check-circle">
+        <strong>Success!</strong> Your account has been created. A confirmation email has been sent to you.
+      </AlertComponent>
+      
+      <FormGroup>
+        <Label htmlFor="username-success">Username</Label>
+        <Input 
+          id="username-success" 
+          type="text" 
+          value="johndoe"
+          variant="retro"
+          disabled
+        />
+      </FormGroup>
+      <ButtonComponent variant="retro">Go to dashboard</ButtonComponent>
+    </FormCard>
+
+    <h4>Warning - Modern</h4>
+    <FormCard variant="modern" title="Edit profile">
+      <AlertComponent status="warning" variant="modern" icon="mdi:alert">
+        <strong>Warning:</strong> Some changes require email verification.
+      </AlertComponent>
+      
+      <FormGroup>
+        <Label htmlFor="email-warning">New email address</Label>
+        <Input 
+          id="email-warning" 
+          type="email" 
+          icon="mdi:email"
+          variant="modern"
+        />
+      </FormGroup>
+      <ButtonComponent variant="modern" type="submit">Update</ButtonComponent>
+    </FormCard>
+
+    <h4>Information - Futuristic</h4>
+    <FormCard variant="futuristic" title="Configuration">
+      <AlertComponent status="info" variant="futuristic" icon="mdi:information">
+        <strong>Info:</strong> Settings will be applied immediately to all your connected devices.
+      </AlertComponent>
+      
+      <Switch id="sync-devices" name="sync" variant="futuristic" checked>
+        Sync across all devices
+      </Switch>
+      <ButtonComponent variant="futuristic" type="submit">Save</ButtonComponent>
+    </FormCard>
+  </div>
+
+  <h3>Alert types in forms</h3>
+  <ul>
+    <li><strong>error</strong>: Validation errors, submission failure</li>
+    <li><strong>success</strong>: Successful submission confirmation, account creation</li>
+    <li><strong>warning</strong>: Warnings before important actions, missing optional fields</li>
+    <li><strong>info</strong>: Contextual information, filling tips</li>
+  </ul>
+
+  <Code
+    lang="astro"
+    code={`<FormCard variant="initial" title="Login">
+  <AlertComponent status="error" variant="initial" dismissible>
+    <strong>Error:</strong> Incorrect credentials.
+  </AlertComponent>
+  
+  <FormGroup>
+    <Label htmlFor="email" required>Email</Label>
+    <Input id="email" type="email" variant="initial" />
+  </FormGroup>
+  <ButtonComponent type="submit">Log in</ButtonComponent>
+</FormCard>`}
+  />
+
+  <h2 id="input">Input</h2>
+  
+  <p>
+    Text input component with icon support (left/right), all HTML5 types, error handling, and variants.
+  </p>
+
+  <h3>Main props</h3>
+  <ul>
+    <li><code class="inline-code">type</code>: text | email | password | number | tel | url | search | date | time</li>
+    <li><code class="inline-code">icon</code>: MDI icon name</li>
+    <li><code class="inline-code">iconPosition</code>: left | right (default: left)</li>
+    <li><code class="inline-code">variant</code>: initial | retro | modern | futuristic</li>
+    <li><code class="inline-code">error</code>: Error message</li>
+    <li><code class="inline-code">required</code>, <code class="inline-code">disabled</code>, <code class="inline-code">readonly</code></li>
+  </ul>
+
+  <h3>Examples with icons</h3>
+
+  <div class="example-section">
+    <FormGroup>
+      <Label htmlFor="email-icon-left">Email with left icon (initial)</Label>
+      <Input 
+        id="email-icon-left" 
+        type="email" 
+        icon="mdi:email" 
+        iconPosition="left"
+        placeholder="you@example.com"
+        variant="initial"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="search-icon-right">Search with right icon (retro)</Label>
+      <Input 
+        id="search-icon-right" 
+        type="search" 
+        icon="mdi:magnify" 
+        iconPosition="right"
+        placeholder="Search..."
+        variant="retro"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="phone-icon">Phone (modern)</Label>
+      <Input 
+        id="phone-icon" 
+        type="tel" 
+        icon="mdi:phone" 
+        placeholder="+1 555 123 4567"
+        variant="modern"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="url-icon">URL (futuristic)</Label>
+      <Input 
+        id="url-icon" 
+        type="url" 
+        icon="mdi:link" 
+        placeholder="https://example.com"
+        variant="futuristic"
+      />
+    </FormGroup>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Input 
+  id="email" 
+  type="email" 
+  icon="mdi:email" 
+  iconPosition="left"
+  placeholder="vous@exemple.com"
+  variant="initial"
+/>`}
+  />
+
+  <h3>Error states</h3>
+
+  <div class="example-section">
+    <FormGroup>
+      <Label htmlFor="input-error-initial">Email (initial - error)</Label>
+      <Input 
+        id="input-error-initial" 
+        type="email" 
+        icon="mdi:email"
+        variant="initial"
+        error="Invalid email format"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="input-error-retro">Username (retro - error)</Label>
+      <Input 
+        id="input-error-retro" 
+        type="text" 
+        icon="mdi:account"
+        variant="retro"
+        error="This username is already taken"
+      />
+    </FormGroup>
+  </div>
+
+  <h2 id="password">PasswordInput</h2>
+  
+  <p>
+    Specialized password component with visibility toggle (eye) and all variants.
+  </p>
+
+  <div class="example-section">
+    <FormGroup>
+      <Label htmlFor="pwd-initial">Password (initial)</Label>
+      <PasswordInput 
+        id="pwd-initial"
+        variant="initial"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="pwd-retro">Password (retro)</Label>
+      <PasswordInput 
+        id="pwd-retro"
+        variant="retro"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="pwd-modern">Password (modern)</Label>
+      <PasswordInput 
+        id="pwd-modern"
+        variant="modern"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="pwd-futuristic">Password (futuristic)</Label>
+      <PasswordInput 
+        id="pwd-futuristic"
+        variant="futuristic"
+      />
+    </FormGroup>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<PasswordInput 
+  id="password"
+  variant="initial"
+  required
+/>`}
+  />
+
+  <h2 id="textarea">Textarea</h2>
+  
+  <p>
+    Multi-line text area with variant support and error handling.
+  </p>
+
+  <div class="example-section">
+    <FormGroup>
+      <Label htmlFor="textarea-initial">Message (initial)</Label>
+      <Textarea 
+        id="textarea-initial"
+        placeholder="Your message..."
+        rows={4}
+        variant="initial"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="textarea-retro">Description (retro)</Label>
+      <Textarea 
+        id="textarea-retro"
+        placeholder="Describe your project..."
+        rows={3}
+        variant="retro"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="textarea-modern">Comment (modern)</Label>
+      <Textarea 
+        id="textarea-modern"
+        placeholder="Leave a comment..."
+        rows={3}
+        variant="modern"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="textarea-futuristic">Notes (futuristic)</Label>
+      <Textarea 
+        id="textarea-futuristic"
+        placeholder="Your notes..."
+        rows={4}
+        variant="futuristic"
+      />
+    </FormGroup>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Textarea 
+  id="message"
+  placeholder="Your message..."
+  rows={4}
+  variant="initial"
+/>`}
+  />
+
+  <h2 id="select">Select</h2>
+  
+  <p>
+    Dropdown menu with variant support and custom options via slot.
+  </p>
+
+  <div class="example-section">
+    <FormGroup>
+      <Label htmlFor="select-initial">Country (initial)</Label>
+      <Select id="select-initial" variant="initial">
+        <option value="">Select a country</option>
+        <option value="fr">France</option>
+        <option value="be">Belgium</option>
+        <option value="ca">Canada</option>
+        <option value="ch">Switzerland</option>
+      </Select>
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="select-retro">Category (retro)</Label>
+      <Select id="select-retro" variant="retro">
+        <option value="">Choose...</option>
+        <option value="tech">Technology</option>
+        <option value="design">Design</option>
+        <option value="business">Business</option>
+      </Select>
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="select-modern">Priority (modern)</Label>
+      <Select id="select-modern" variant="modern">
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </Select>
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="select-futuristic">Level (futuristic)</Label>
+      <Select id="select-futuristic" variant="futuristic">
+        <option value="1">Level 1</option>
+        <option value="2">Level 2</option>
+        <option value="3">Level 3</option>
+      </Select>
+    </FormGroup>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Select id="country" variant="initial">
+  <option value="">Select a country</option>
+  <option value="fr">France</option>
+  <option value="be">Belgium</option>
+</Select>`}
+  />
+
+  <h2 id="checkbox">Checkbox</h2>
+  
+  <p>
+    Checkboxes with variant support, error states, and accessibility.
+  </p>
+
+  <div class="example-section">
+    <Checkbox id="checkbox-initial" name="terms" variant="initial">
+      I accept the terms (initial)
+    </Checkbox>
+
+    <Checkbox id="checkbox-retro" name="newsletter" variant="retro" checked>
+      Receive the newsletter (retro)
+    </Checkbox>
+
+    <Checkbox id="checkbox-modern" name="notifications" variant="modern">
+      Enable notifications (modern)
+    </Checkbox>
+
+    <Checkbox id="checkbox-futuristic" name="beta" variant="futuristic">
+      Join the beta program (futuristic)
+    </Checkbox>
+
+    <Checkbox 
+      id="checkbox-error" 
+      name="required" 
+      variant="initial"
+      error="You must accept to continue"
+    >
+      Required field with error
+    </Checkbox>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Checkbox id="terms" name="terms" variant="initial" required>
+  I accept the terms of use
+</Checkbox>`}
+  />
+
+  <h2 id="radio">Radio</h2>
+  
+  <p>
+    Radio buttons for single selection with variant support.
+  </p>
+
+  <div class="example-section">
+    <fieldset>
+      <legend>Choose a plan (initial)</legend>
+      <Radio id="plan-free" name="plan-initial" value="free" variant="initial" checked>
+        Free
+      </Radio>
+      <Radio id="plan-pro" name="plan-initial" value="pro" variant="initial">
+        Pro - €9/month
+      </Radio>
+      <Radio id="plan-enterprise" name="plan-initial" value="enterprise" variant="initial">
+        Enterprise - €99/month
+      </Radio>
+    </fieldset>
+
+    <fieldset>
+      <legend>Delivery mode (retro)</legend>
+      <Radio id="delivery-standard" name="delivery" value="standard" variant="retro" checked>
+        Standard (3-5 days)
+      </Radio>
+      <Radio id="delivery-express" name="delivery" value="express" variant="retro">
+        Express (24h)
+      </Radio>
+    </fieldset>
+
+    <fieldset>
+      <legend>Theme (modern)</legend>
+      <Radio id="theme-light" name="theme" value="light" variant="modern" checked>
+        Light
+      </Radio>
+      <Radio id="theme-dark" name="theme" value="dark" variant="modern">
+        Dark
+      </Radio>
+      <Radio id="theme-auto" name="theme" value="auto" variant="modern">
+        Automatic
+      </Radio>
+    </fieldset>
+
+    <fieldset>
+      <legend>Difficulty (futuristic)</legend>
+      <Radio id="difficulty-easy" name="difficulty" value="easy" variant="futuristic" checked>
+        Easy
+      </Radio>
+      <Radio id="difficulty-medium" name="difficulty" value="medium" variant="futuristic">
+        Medium
+      </Radio>
+      <Radio id="difficulty-hard" name="difficulty" value="hard" variant="futuristic">
+        Hard
+      </Radio>
+    </fieldset>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Radio id="plan-free" name="plan" value="free" variant="initial" checked>
+  Free
+</Radio>
+<Radio id="plan-pro" name="plan" value="pro" variant="initial">
+  Pro - €9/month
+</Radio>`}
+  />
+
+  <h2 id="switch">Switch</h2>
+  
+  <p>
+    Toggle switch with variant support for ON/OFF options.
+  </p>
+
+  <div class="example-section">
+    <Switch id="switch-initial" name="notifications-initial" variant="initial" checked>
+      Notifications enabled (initial)
+    </Switch>
+
+    <Switch id="switch-retro" name="dark-mode" variant="retro">
+      Dark mode (retro)
+    </Switch>
+
+    <Switch id="switch-modern" name="auto-save" variant="modern" checked>
+      Auto-save (modern)
+    </Switch>
+
+    <Switch id="switch-futuristic" name="ai-assist" variant="futuristic">
+      AI assistance (futuristic)
+    </Switch>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Switch id="notifications" name="notifications" variant="initial" checked>
+  Enable notifications
+</Switch>`}
+  />
+
+  <h2 id="datepicker">DatePicker</h2>
+  
+  <p>
+    Native HTML5 date picker with variant support, min/max.
+  </p>
+
+  <div class="example-section">
+    <FormGroup>
+      <Label htmlFor="date-initial">Birthdate (initial)</Label>
+      <DatePicker 
+        id="date-initial"
+        name="birthdate"
+        variant="initial"
+        max="2026-01-03"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="date-retro">Departure date (retro)</Label>
+      <DatePicker 
+        id="date-retro"
+        name="departure"
+        variant="retro"
+        min="2026-01-03"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="date-modern">Delivery date (modern)</Label>
+      <DatePicker 
+        id="date-modern"
+        name="delivery-date"
+        variant="modern"
+        min="2026-01-04"
+        max="2026-12-31"
+      />
+    </FormGroup>
+
+    <FormGroup>
+      <Label htmlFor="date-futuristic">Mission date (futuristic)</Label>
+      <DatePicker 
+        id="date-futuristic"
+        name="mission-date"
+        variant="futuristic"
+        min="2026-01-01"
+      />
+    </FormGroup>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<DatePicker 
+  id="date"
+  name="birthdate"
+  variant="initial"
+  max="2026-01-03"
+/>`}
+  />
+
+  <h2 id="accessibility">FULL Accessibility</h2>
+  
+  <p>
+    All form components follow accessibility best practices:
+  </p>
+
+  <ul>
+    <li><strong>ARIA</strong>: <code class="inline-code">aria-invalid</code>, <code class="inline-code">aria-describedby</code>, <code class="inline-code">role="alert"</code> attributes</li>
+    <li><strong>Linked labels</strong>: All fields have a label associated via <code class="inline-code">htmlFor</code> and <code class="inline-code">id</code></li>
+    <li><strong>Required indicators</strong>: Red asterisk (*) for required fields</li>
+    <li><strong>Error messages</strong>: Announced to screen readers with <code class="inline-code">role="alert"</code></li>
+    <li><strong>Visible focus</strong>: Clear focus states on all interactive elements</li>
+    <li><strong>Keyboard navigation</strong>: All components are keyboard accessible</li>
+    <li><strong>Contrast</strong>: Meets WCAG AA ratios</li>
+  </ul>
+
+  <h3>Complete accessible example</h3>
+
+  <div class="example-section">
+    <FormCard variant="initial" title="Accessible form" description="Example with all best practices">
+      <FormGroup>
+        <Label htmlFor="fullname-accessible" required>Full name</Label>
+        <Input 
+          id="fullname-accessible" 
+          type="text"
+          icon="mdi:account"
+          placeholder="John Doe"
+          required
+          aria-label="Enter your full name"
+        />
+      </FormGroup>
+
+      <FormGroup>
+        <Label htmlFor="email-accessible" required>Email address</Label>
+        <Input 
+          id="email-accessible" 
+          type="email"
+          icon="mdi:email"
+          placeholder="john.doe@example.com"
+          required
+          error="Invalid email format"
+        />
+      </FormGroup>
+
+      <FormGroup>
+        <Label htmlFor="country-accessible" required>Country</Label>
+        <Select id="country-accessible" required>
+          <option value="">Select your country</option>
+          <option value="fr">France</option>
+          <option value="be">Belgium</option>
+          <option value="ca">Canada</option>
+        </Select>
+      </FormGroup>
+
+      <Checkbox id="terms-accessible" name="terms" required>
+        I accept the terms of use (required)
+      </Checkbox>
+
+      <Switch id="newsletter-accessible" name="newsletter">
+        Receive the weekly newsletter
+      </Switch>
+
+      <ButtonComponent type="submit" variant="initial">Submit form</ButtonComponent>
+    </FormCard>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<FormGroup>
+  <Label htmlFor="email" required>Email</Label>
+  <Input 
+    id="email" 
+    type="email"
+    icon="mdi:email"
+    required
+    error="Invalid format"
+    aria-label="Enter your email"
+  />
+</FormGroup>`}
+  />
+
+  <h2 id="best-practices">Best practices</h2>
+
+  <ul>
+    <li><strong>Always use FormGroup</strong>: Wraps label + input for consistent spacing</li>
+    <li><strong>Indicate required fields</strong>: Use <code class="inline-code">required</code> prop on Label and Input</li>
+    <li><strong>Clear error messages</strong>: Explain why the error and how to fix it</li>
+    <li><strong>Informative placeholders</strong>: Show examples of expected format</li>
+    <li><strong>Relevant icons</strong>: Help visually identify the field type</li>
+    <li><strong>Consistent variants</strong>: Use the same variant throughout the form</li>
+    <li><strong>Group radios</strong>: Use <code class="inline-code">&lt;fieldset&gt;</code> and <code class="inline-code">&lt;legend&gt;</code></li>
+    <li><strong>Progressive validation</strong>: Validate in real time or on submit depending on context</li>
+  </ul>
+
+  <h2>Available components</h2>
+  
+  <ul>
+    <li><code class="inline-code">FormCard</code>: Form wrapper with Card</li>
+    <li><code class="inline-code">FormGroup</code>: Label + field group</li>
+    <li><code class="inline-code">Label</code>: Label with required indicator</li>
+    <li><code class="inline-code">Input</code>: Text field with icons</li>
+    <li><code class="inline-code">PasswordInput</code>: Password with visibility toggle</li>
+    <li><code class="inline-code">Textarea</code>: Multi-line text area</li>
+    <li><code class="inline-code">Select</code>: Dropdown menu</li>
+    <li><code class="inline-code">Checkbox</code>: Checkbox</li>
+    <li><code class="inline-code">Radio</code>: Radio button</li>
+    <li><code class="inline-code">Switch</code>: Toggle switch</li>
+    <li><code class="inline-code">DatePicker</code>: Date picker</li>
+  </ul>
+</DocLayout>

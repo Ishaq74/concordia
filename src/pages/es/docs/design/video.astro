@@ -1,0 +1,412 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import VideoComponent from "@components/ui/Video.astro";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+---
+
+<DocLayout 
+  title="Video Component" 
+  description="Video player with variants and custom controls" 
+  variant="initial"
+>
+
+  <h1 id="video-component">Video Component</h1>
+
+  <p>
+    The <code class="inline-code">Video</code> component is a styled video player
+    that adapts to different design variants. It supports all standard HTML5 video attributes
+    and provides styles consistent with your design system.
+  </p>
+
+  <TableOfContents
+    items={[
+      { label: "Installation", href: "#installation" },
+      { label: "Props", href: "#props" },
+      { label: "Basic usage", href: "#basic" },
+      { label: "Variants", href: "#variants" },
+      { label: "Sizes", href: "#sizes" },
+      { label: "Playback options", href: "#options" },
+      { label: "Multiple sources", href: "#multiple-sources" },
+      { label: "Subtitles", href: "#subtitles" },
+      { label: "Accessibility", href: "#accessibility" },
+    ]}
+    title="Table of contents"
+  />
+
+  <h2 id="installation">Installation</h2>
+
+  <Code
+    lang="astro"
+    code={`import Video from '@components/ui/Video.astro';`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <Table variant="initial">
+    <TableHeader>
+      <TableRow>
+        <TableHead>Prop</TableHead>
+        <TableHead>Type</TableHead>
+        <TableHead>Default</TableHead>
+        <TableHead>Description</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow>
+        <TableCell><code class="inline-code">variant</code></TableCell>
+        <TableCell><code class="inline-code">"initial" | "retro" | "modern" | "futuristic"</code></TableCell>
+        <TableCell><code class="inline-code">"initial"</code></TableCell>
+        <TableCell>The visual style of the video player</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">src</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><em>Required</em></TableCell>
+        <TableCell>Video URL</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">poster</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><code class="inline-code">undefined</code></TableCell>
+        <TableCell>Preview image before playback</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">width</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><code class="inline-code">"100%"</code></TableCell>
+        <TableCell>Player width</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">height</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><code class="inline-code">"auto"</code></TableCell>
+        <TableCell>Player height</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">controls</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">true</code></TableCell>
+        <TableCell>Show native controls</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">autoplay</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">false</code></TableCell>
+        <TableCell>Autoplay</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">loop</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">false</code></TableCell>
+        <TableCell>Loop playback</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">muted</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">false</code></TableCell>
+        <TableCell>Muted video</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">preload</code></TableCell>
+        <TableCell><code class="inline-code">"none" | "metadata" | "auto"</code></TableCell>
+        <TableCell><code class="inline-code">"metadata"</code></TableCell>
+        <TableCell>Preload strategy</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">className</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><code class="inline-code">""</code></TableCell>
+        <TableCell>Additional CSS classes</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">ariaLabel</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><code class="inline-code">undefined</code></TableCell>
+        <TableCell>Accessibility label</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <h2 id="basic">Basic usage</h2>
+
+  <div class="demo-section">
+    <VideoComponent 
+      src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      poster="https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<VideoComponent 
+  src="video.mp4"
+  poster="thumbnail.jpg"
+/>`}
+  />
+
+  <h2 id="variants">Variants</h2>
+  <h3>Initial</h3>
+  <div class="demo-section">
+    <VideoComponent 
+      variant="initial"
+      src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      poster="https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217"
+      width="600px"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<VideoComponent 
+  variant="initial"
+  src="video.mp4"
+  poster="thumbnail.jpg"
+  width="600px"
+/>`}
+  />
+
+  <h3>Retro</h3>
+  <div class="demo-section">
+    <VideoComponent 
+      variant="retro"
+      src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      poster="https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217"
+      width="600px"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<VideoComponent 
+  variant="retro"
+  src="video.mp4"
+  poster="thumbnail.jpg"
+  width="600px"
+/>`}
+  />
+
+  <h3>Modern</h3>
+  <div class="demo-section">
+    <VideoComponent 
+      variant="modern"
+      src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      poster="https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217"
+      width="600px"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<VideoComponent 
+  variant="modern"
+  src="video.mp4"
+  poster="thumbnail.jpg"
+  width="600px"
+/>`}
+  />
+
+  <h3>Futuristic</h3>
+  <div class="demo-section">
+    <VideoComponent 
+      variant="futuristic"
+      src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      poster="https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217"
+      width="600px"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<VideoComponent 
+  variant="futuristic"
+  src="video.mp4"
+  poster="thumbnail.jpg"
+  width="600px"
+/>`}
+  />
+
+  <h2 id="sizes">Sizes</h2>
+  <h3>Full width</h3>
+  <div class="demo-section">
+    <VideoComponent 
+      src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+      poster="https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217"
+      width="100%"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<VideoComponent 
+  src="video.mp4"
+  width="100%"
+/>`}
+  />
+
+  <h3>Custom sizes</h3>
+  <div class="demo-section">
+    <VideoComponent 
+      src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+      poster="https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217"
+      width="400px"
+      height="300px"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<VideoComponent 
+  src="video.mp4"
+  width="400px"
+  height="300px"
+/>`}
+  />
+  <h2 id="options">Playback options</h2>
+
+  <h3>Autoplay and loop</h3>
+  <div class="demo-section">
+    <VideoComponent 
+      src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+      autoplay
+      loop
+      muted
+      width="500px"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<VideoComponent 
+  src="video.mp4"
+  autoplay
+  loop
+  muted
+  width="500px"
+/>`}
+  />
+  <h3>Without controls</h3>
+  <div class="demo-section">
+    <VideoComponent 
+      src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+      controls={false}
+      width="500px"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<VideoComponent 
+  src="video.mp4"
+  controls={false}
+  width="500px"
+/>`}
+  />
+
+  <h2 id="multiple-sources">Multiple sources</h2>
+  <p>
+    Use the <code class="inline-code">source</code> slot to provide multiple video formats for better browser compatibility.
+  </p>
+
+  <div class="demo-section">
+    <VideoComponent variant="modern" width="600px" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4">
+      <source slot="source" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
+      <source slot="source" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/webm" />
+    </VideoComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<VideoComponent variant="modern" width="600px">
+  <source slot="source" src="video.mp4" type="video/mp4" />
+  <source slot="source" src="video.webm" type="video/webm" />
+  <source slot="source" src="video.ogv" type="video/ogg" />
+</VideoComponent>`}
+  />
+
+  <h2 id="subtitles">Subtitles</h2>
+  <p>
+    Use the <code class="inline-code">track</code> slot to add subtitles or descriptions.
+  </p>
+
+  <Code
+    lang="astro"
+    code={`<VideoComponent src="video.mp4" width="600px">
+  <track 
+    slot="track"
+    kind="subtitles"
+    src="subtitles-fr.vtt"
+    srclang="fr"
+    label="Français"
+    default
+  />
+  <track 
+    slot="track"
+    kind="subtitles"
+    src="subtitles-en.vtt"
+    srclang="en"
+    label="English"
+  />
+</VideoComponent>`}
+  />
+
+  <h2 id="accessibility">Accessibility</h2>
+  <p>
+    The <code class="inline-code">Video</code> component follows accessibility best practices:
+  </p>
+
+  <ul>
+    <li>
+      <strong>aria-label attribute:</strong> Allows you to describe the video content
+    </li>
+    <li>
+      <strong>Native controls:</strong> Keyboard and screen reader accessible
+    </li>
+    <li>
+      <strong>Subtitle support:</strong> Via <code class="inline-code">&lt;track&gt;</code> elements
+    </li>
+    <li>
+      <strong>Poster frame:</strong> Provides a visual preview before playback
+    </li>
+    <li>
+      <strong>Fallback message:</strong> For browsers that do not support video
+    </li>
+  </ul>
+
+  <h3>Full accessible example</h3>
+
+  <Code
+    lang="astro"
+    code={`<VideoComponent 
+  src="presentation.mp4"
+  poster="presentation-thumbnail.jpg"
+  ariaLabel="Presentation of our new product, duration 5 minutes"
+  width="100%"
+>
+  <source slot="source" src="presentation.mp4" type="video/mp4" />
+  <source slot="source" src="presentation.webm" type="video/webm" />
+  
+  <track 
+    slot="track"
+    kind="subtitles"
+    src="subtitles-fr.vtt"
+    srclang="fr"
+    label="French"
+    default
+  />
+  <track 
+    slot="track"
+    kind="descriptions"
+    src="audio-description-fr.vtt"
+    srclang="fr"
+    label="Audio description"
+  />
+</VideoComponent>`}
+  />
+</DocLayout>

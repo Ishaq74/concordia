@@ -1,0 +1,212 @@
+---
+// src/pages/en/about.astro
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import { Icon } from "astro-icon/components";
+
+const LANG = "en";
+
+const values = [
+  { icon: "mdi:map-marker-radius-outline", title: "Proximity", desc: "We bring citizens closer to their territory and neighbors to create a strong social fabric." },
+  { icon: "mdi:handshake-outline", title: "Solidarity", desc: "Every action on Concordia strengthens mutual aid within the local community." },
+  { icon: "mdi:hand-heart-outline", title: "Commitment", desc: "We offer concrete ways to get involved and participate in your neighborhood life." },
+  { icon: "mdi:leaf", title: "Sustainability", desc: "Our approach promotes lasting solutions, respectful of the environment and people." },
+];
+
+const pillars = [
+  { icon: "mdi:map-outline", title: "Local Mapping", desc: "Discover the actors, initiatives and services around you with a living map." },
+  { icon: "mdi:account-voice", title: "Mediation", desc: "Tools to resolve conflicts and foster dialogue between community members." },
+  { icon: "mdi:tools", title: "Skills", desc: "Share and develop your know-how through workshops and collaborative exchanges." },
+  { icon: "mdi:school-outline", title: "Education & Health", desc: "Access educational and wellness resources to strengthen community resilience." },
+];
+
+const coreValues = [
+  { icon: "mdi:eye-outline", title: "Total Transparency", desc: "All decisions are documented and accessible. Every euro is tracked. Every vote is public." },
+  { icon: "mdi:sprout", title: "Digital Ecology", desc: "Minimalist infrastructure, green hosting, algorithmic sobriety. Less code, more meaning." },
+  { icon: "mdi:account-group-outline", title: "Inclusion for All", desc: "WCAG accessibility, multilingualism, universal design. Concordia is built to be used by everyone." },
+];
+
+const stats = [
+  { value: "12k+", label: "Mediations completed" },
+  { value: "850", label: "Projects launched" },
+  { value: "45k", label: "Volunteer hours" },
+  { value: "94%", label: "Trust rate" },
+];
+---
+
+<BaseLayout title="About — Concordia" lang={LANG}>
+  {/* ===== HERO ===== */}
+  <section class="about-hero">
+    <div class="about-hero__bg" aria-hidden="true">
+      <img src="/images/placeholder.jpg" alt="" class="about-hero__bg-img" loading="eager" />
+      <div class="about-hero__overlay" />
+    </div>
+    <div class="about-hero__content">
+      <Badge variant="retro" color="accent">Our Mission</Badge>
+      <h1 class="about-hero__title">Strengthening social bonds, locally.</h1>
+      <p class="about-hero__subtitle">Concordia is a civic platform, designed to bring together residents, associations and local actors within a single trusted space.</p>
+      <a href="#mission">
+        <Button variant="retro" color="primary" icon={{ name: "mdi:arrow-down", side: "right" }}>
+          Join the movement
+        </Button>
+      </a>
+    </div>
+  </section>
+
+  <main class="about-page">
+    {/* ===== MISSION + VALUES CARDS ===== */}
+    <section class="about-mission" id="mission" aria-label="Our mission">
+      <div class="about-mission__grid">
+        <div class="about-mission__text">
+          <span class="about-label">Why Concordia?</span>
+          <h2 class="about-h2">Technology serving human connection</h2>
+          <p class="about-body">
+            In an increasingly fragmented world, Concordia creates digital spaces
+            that strengthen neighborhood life. Our platform connects residents
+            to local initiatives, nearby services and the people who bring their
+            community to life.
+          </p>
+          <p class="about-body">
+            We believe technology should be invisible: a simple, accessible tool
+            that amplifies bonds rather than replacing them.
+          </p>
+        </div>
+        <div class="about-mission__cards">
+          {values.map((v, i) => (
+            <Card variant="retro" elevation="sm" class:list={["about-value-card", i % 2 === 1 && "about-value-card--offset"]}>
+              <CardContent>
+                <div class="about-value-card__icon"><Icon name={v.icon} /></div>
+                <h3 class="about-value-card__title">{v.title}</h3>
+                <p class="about-value-card__desc">{v.desc}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ===== PILLARS ===== */}
+    <section class="about-pillars" aria-label="Our pillars">
+      <span class="about-label">Our 4 Pillars</span>
+      <h2 class="about-h2">The foundations of Concordia</h2>
+      <div class="about-pillars__grid">
+        {pillars.map((p) => (
+          <Card variant="retro" elevation="sm" class="about-pillar-card">
+            <CardContent>
+              <div class="about-pillar-card__icon"><Icon name={p.icon} /></div>
+              <h3 class="about-pillar-card__title">{p.title}</h3>
+              <p class="about-pillar-card__desc">{p.desc}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </section>
+
+    {/* ===== CORE VALUES ===== */}
+    <section class="about-core" aria-label="Core values">
+      <span class="about-label">Our Core Values</span>
+      <h2 class="about-h2">What we believe in</h2>
+      <div class="about-core__grid">
+        {coreValues.map((v) => (
+          <Card variant="retro" elevation="sm" class="about-core-card">
+            <CardContent>
+              <div class="about-core-card__icon"><Icon name={v.icon} /></div>
+              <h3 class="about-core-card__title">{v.title}</h3>
+              <p class="about-core-card__desc">{v.desc}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </section>
+
+    {/* ===== IMPACT DASHBOARD ===== */}
+    <section class="about-impact" aria-label="Our impact">
+      <span class="about-label">Our Impact</span>
+      <h2 class="about-h2">Numbers that speak</h2>
+      <div class="about-impact__grid">
+        {stats.map((s) => (
+          <div class="about-impact__stat">
+            <span class="about-impact__value">{s.value}</span>
+            <span class="about-impact__label">{s.label}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* ===== CTA ===== */}
+    <section class="about-cta" aria-label="Call to action">
+      <div class="about-cta__inner">
+        <h2 class="about-cta__title">Ready to make a difference in your neighborhood?</h2>
+        <p class="about-cta__desc">Join Concordia and take part in a civic adventure that matters.</p>
+        <div class="about-cta__buttons">
+          <Button variant="retro" color="primary" icon={{ name: "mdi:account-plus-outline", side: "left" }}>
+            Sign up
+          </Button>
+          <a href={`/${LANG}/blog`}>
+            <Button variant="retro" color="secondary" icon={{ name: "mdi:newspaper-variant-outline", side: "left" }}>
+              Read the blog
+            </Button>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+.about-hero { position: relative; min-height: 480px; display: flex; align-items: center; overflow: hidden; }
+.about-hero__bg { position: absolute; inset: 0; }
+.about-hero__bg-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.about-hero__overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.25) 50%, transparent 100%); }
+.about-hero__content { position: relative; z-index: 1; max-width: 1280px; width: 100%; margin: 0 auto; padding: 4rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; color: #fff; }
+.about-hero__title { margin: 0; font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; line-height: 1.1; }
+.about-hero__subtitle { margin: 0; font-size: 1.125rem; max-width: 55ch; opacity: 0.9; line-height: 1.6; }
+.about-page { max-width: 1280px; margin: 0 auto; padding: 3rem 1rem; display: flex; flex-direction: column; gap: 4rem; }
+.about-label { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-primary); margin-bottom: 0.25rem; }
+.about-h2 { margin: 0 0 1.5rem; font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 800; color: var(--heading-color, var(--text-default)); line-height: 1.2; }
+.about-body { font-size: 1rem; color: var(--text-muted); line-height: 1.7; margin: 0 0 1rem; }
+.about-mission__grid { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
+@media (min-width: 1024px) { .about-mission__grid { grid-template-columns: 1fr 1fr; } }
+.about-mission__text { display: flex; flex-direction: column; justify-content: center; }
+.about-mission__cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.about-value-card--offset { margin-top: 2rem; }
+@media (max-width: 640px) { .about-value-card--offset { margin-top: 0; } }
+.about-value-card__icon { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: color-mix(in srgb, var(--color-primary) 10%, transparent); display: flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; }
+.about-value-card__icon :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary); }
+.about-value-card__title { margin: 0 0 0.375rem; font-size: 1rem; font-weight: 700; color: var(--text-default); }
+.about-value-card__desc { margin: 0; font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; }
+.about-pillars { background: color-mix(in srgb, var(--color-primary) 5%, var(--bg-default)); border-radius: var(--border-radius-lg, 1rem); padding: 3rem 2rem; text-align: center; }
+.about-pillars__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; text-align: left; }
+.about-pillar-card { transition: transform 200ms, border-color 200ms; }
+.about-pillar-card:hover { transform: translateY(-2px); }
+.about-pillar-card__icon { width: 2.5rem; height: 2.5rem; border-radius: var(--border-radius-sm); background: color-mix(in srgb, var(--color-primary) 10%, transparent); display: flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; transition: background 200ms; }
+.about-pillar-card:hover .about-pillar-card__icon { background: var(--color-primary); }
+.about-pillar-card__icon :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary); }
+.about-pillar-card:hover .about-pillar-card__icon :global(svg) { color: #fff; }
+.about-pillar-card__title { margin: 0 0 0.375rem; font-weight: 700; color: var(--text-default); }
+.about-pillar-card__desc { margin: 0; font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; }
+.about-core { text-align: center; }
+.about-core__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; text-align: left; }
+.about-core-card__icon { width: 3rem; height: 3rem; border-radius: 50%; background: color-mix(in srgb, var(--color-primary) 8%, transparent); display: flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; }
+.about-core-card__icon :global(svg) { width: 1.5rem; height: 1.5rem; color: var(--color-primary); }
+.about-core-card__title { margin: 0 0 0.375rem; font-size: 1.125rem; font-weight: 700; color: var(--text-default); }
+.about-core-card__desc { margin: 0; font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; }
+.about-impact { text-align: center; }
+.about-impact__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+.about-impact__stat { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 1.5rem 1rem; border-radius: var(--border-radius-lg, 1rem); background: var(--bg-subtle); }
+.about-impact__value { font-size: 2.25rem; font-weight: 800; color: var(--color-primary); }
+.about-impact__label { font-size: 0.875rem; color: var(--text-muted); }
+.about-cta__inner { background: var(--color-primary); color: #fff; text-align: center; padding: 3.5rem 2rem; border-radius: var(--border-radius-lg, 1rem); position: relative; overflow: hidden; }
+.about-cta__title { margin: 0 0 0.5rem; font-size: 1.75rem; font-weight: 800; }
+.about-cta__desc { margin: 0 0 1.5rem; font-size: 1rem; opacity: 0.9; }
+.about-cta__buttons { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+@media (max-width: 640px) {
+  .about-hero { min-height: 360px; }
+  .about-hero__content { padding: 2.5rem 1rem; }
+  .about-mission__cards { grid-template-columns: 1fr; }
+  .about-pillars { padding: 2rem 1rem; }
+}
+</style>

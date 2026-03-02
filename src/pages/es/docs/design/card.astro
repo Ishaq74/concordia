@@ -1,0 +1,668 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import CardComponent from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardImage from "@components/ui/Card/CardImage.astro";
+import CardMeta from "@components/ui/Card/CardMeta.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import CardDescription from "@components/ui/Card/CardDescription.astro";
+import CardFooter from "@components/ui/Card/CardFooter.astro";
+import LinkComponent from "@components/ui/Link.astro";
+import { Code } from "astro:components";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+---
+
+<DocLayout 
+  title="Card Component" 
+  description="Complete documentation for the Card component with all its subcomponents and variants"
+  variant="initial"
+>
+  <h1 id="card-component">Card Component</h1>
+  
+  <p>
+    The <code>Card</code> component is a flexible and modular container that supports multiple subcomponents (Header, Image, Meta, Content, Description, Footer) and visual variants.
+  </p>
+
+  <h2 id="installation">Installation</h2>
+  
+  <p>The components are available in <code class="inline-code">src/components/ui/Card/</code></p>
+  
+  <Code
+    lang="typescript"
+    code={`import Card from '@components/ui/Card/Card.astro';
+import CardHeader from '@components/ui/Card/CardHeader.astro';
+import CardImage from '@components/ui/Card/CardImage.astro';
+import CardMeta from '@components/ui/Card/CardMeta.astro';
+import CardContent from '@components/ui/Card/CardContent.astro';
+import CardDescription from '@components/ui/Card/CardDescription.astro';
+import CardFooter from '@components/ui/Card/CardFooter.astro';`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <h3 id="card-props">Card</h3>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <h2 id="basic-examples">Basic examples</h2>
+
+          <h3 id="simple-card">Simple card</h3>
+
+          <div class="example">
+            <CardComponent>
+              <CardContent>
+                <h3>Card title</h3>
+                <CardDescription>
+                  A simple description to present the content of this card.
+                </CardDescription>
+              </CardContent>
+            </CardComponent>
+          </div>
+
+          <Code
+            lang="astro"
+            code={`<Card>
+          <CardContent>
+            <h3>Card title</h3>
+            <CardDescription>
+              A simple description to present the content of this card.
+            </CardDescription>
+          </CardContent>
+        </Card>`}
+          />
+
+          <h3 id="card-with-image">Card with image</h3>
+
+          <div class="example">
+            <CardComponent elevation="lg">
+              <CardImage 
+                src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=450&fit=crop"
+                alt="Developer workspace"
+              />
+              <CardContent>
+                <h3>Modern workspace</h3>
+                <CardDescription>
+                  A stylish workspace for creative developers.
+                </CardDescription>
+              </CardContent>
+            </CardComponent>
+          </div>
+
+          <Code
+            lang="astro"
+            code={`<Card elevation="lg">
+          <CardImage 
+            src="https://images.unsplash.com/photo-1498050108023-c5249f4df085"
+            alt="Developer workspace"
+          />
+          <CardContent>
+            <h3>Modern workspace</h3>
+            <CardDescription>
+              A stylish workspace for creative developers.
+            </CardDescription>
+          </CardContent>
+        </Card>`}
+          />
+
+          <h3 id="full-card">Full card</h3>
+
+          <div class="example">
+            <CardComponent variant="initial" elevation="md" interactive>
+              <CardImage 
+                src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop"
+                alt="Business analytics"
+                aspectRatio="16/9"
+              />
+              <CardContent>
+                <CardHeader>
+                  <h3>Analytics Dashboard</h3>
+                </CardHeader>
+                <CardMeta 
+                  items={[
+                    { icon: 'mdi:calendar', text: '15 Jan 2026' },
+                    { icon: 'mdi:account', text: 'John Doe' },
+                    { icon: 'mdi:tag', text: 'Analytics' }
+                  ]}
+                />
+                <CardDescription truncate lines={2}>
+                  Discover insights from your data with our complete analytics dashboard. Real-time visualizations, custom reports, and much more.
+                </CardDescription>
+              </CardContent>
+              <CardFooter>
+                <LinkComponent text="Learn more" style="link" color="primary" />
+                <LinkComponent text="Get started" style="button" color="primary" />
+              </CardFooter>
+            </CardComponent>
+          </div>
+
+          <Code
+            lang="astro"
+            code={`<Card variant="initial" elevation="md" interactive>
+          <CardImage 
+            src="https://images.unsplash.com/photo-1460925895917-afdab827c52f"
+            alt="Business analytics"
+            aspectRatio="16/9"
+          />
+          <CardContent>
+            <CardHeader>
+              <h3>Analytics Dashboard</h3>
+            </CardHeader>
+            <CardMeta 
+              items={[
+                { icon: 'mdi:calendar', text: '15 Jan 2026' },
+                { icon: 'mdi:account', text: 'John Doe' },
+                { icon: 'mdi:tag', text: 'Analytics' }
+              ]}
+            />
+            <CardDescription truncate lines={2}>
+              Discover insights from your data with our complete analytics dashboard.
+            </CardDescription>
+          </CardContent>
+          <CardFooter>
+            <Link text="Learn more" style="link" color="primary" />
+            <Link text="Get started" style="button" color="primary" />
+          </CardFooter>
+        </Card>`}
+          />
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Default</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code>text</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Description text</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>truncate</code></TableCell>
+          <TableCell>boolean</TableCell>
+          <TableCell>false</TableCell>
+          <TableCell>Truncate text</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>lines</code></TableCell>
+          <TableCell>number</TableCell>
+          <TableCell>3</TableCell>
+          <TableCell>Maximum number of lines</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Custom CSS classes</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h3 id="cardfooter-props">CardFooter</h3>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Default</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code>align</code></TableCell>
+          <TableCell>left | center | right | between</TableCell>
+          <TableCell>between</TableCell>
+          <TableCell>Content alignment</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Custom CSS classes</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h2 id="exemples-basiques">Exemples basiques</h2>
+
+  <h3 id="carte-simple">Carte simple</h3>
+
+  <div class="example">
+    <CardComponent>
+      <CardContent>
+        <h3>Titre de la carte</h3>
+        <CardDescription>
+          Une description simple pour présenter le contenu de cette carte.
+        </CardDescription>
+      </CardContent>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Card>
+  <CardContent>
+    <h3>Titre de la carte</h3>
+    <CardDescription>
+      Une description simple pour présenter le contenu de cette carte.
+    </CardDescription>
+  </CardContent>
+</Card>`}
+  />
+
+  <h3 id="carte-avec-image">Carte avec image</h3>
+
+  <div class="example">
+    <CardComponent elevation="lg">
+      <CardImage 
+        src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=450&fit=crop"
+        alt="Developer workspace"
+      />
+      <CardContent>
+        <h3>Workspace moderne</h3>
+        <CardDescription>
+          Un espace de travail élégant pour développeurs créatifs.
+        </CardDescription>
+      </CardContent>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Card elevation="lg">
+  <CardImage 
+    src="https://images.unsplash.com/photo-1498050108023-c5249f4df085"
+    alt="Developer workspace"
+  />
+  <CardContent>
+    <h3>Workspace moderne</h3>
+    <CardDescription>
+      Un espace de travail élégant pour développeurs créatifs.
+    </CardDescription>
+  </CardContent>
+</Card>`}
+  />
+
+  <h3 id="carte-complete">Carte complète</h3>
+
+  <div class="example">
+    <CardComponent variant="initial" elevation="md" interactive>
+      <CardImage 
+        src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop"
+        alt="Business analytics"
+        aspectRatio="16/9"
+      />
+      <CardContent>
+        <CardHeader>
+          <h3>Analytics Dashboard</h3>
+        </CardHeader>
+        <CardMeta 
+          items={[
+            { icon: 'mdi:calendar', text: '15 Jan 2026' },
+            { icon: 'mdi:account', text: 'John Doe' },
+            { icon: 'mdi:tag', text: 'Analytics' }
+          ]}
+        />
+        <CardDescription truncate lines={2}>
+          Découvrez les insights de vos données avec notre dashboard analytics complet. 
+          Visualisations en temps réel, rapports personnalisés et bien plus encore.
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <LinkComponent text="En savoir plus" style="link" color="primary" />
+        <LinkComponent text="Démarrer" style="button" color="primary" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Card variant="initial" elevation="md" interactive>
+  <CardImage 
+    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f"
+    alt="Business analytics"
+    aspectRatio="16/9"
+  />
+  <CardContent>
+    <CardHeader>
+      <h3>Analytics Dashboard</h3>
+    </CardHeader>
+    <CardMeta 
+      items={[
+        { icon: 'mdi:calendar', text: '15 Jan 2026' },
+        { icon: 'mdi:account', text: 'John Doe' },
+        { icon: 'mdi:tag', text: 'Analytics' }
+      ]}
+    />
+    <CardDescription truncate lines={2}>
+      Découvrez les insights de vos données avec notre dashboard analytics complet.
+    </CardDescription>
+  </CardContent>
+  <CardFooter>
+    <Link text="En savoir plus" style="link" color="primary" />
+    <Link text="Démarrer" style="button" color="primary" />
+  </CardFooter>
+</Card>`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <p>The Card component supports 4 different visual variants.</p>
+
+  <h3 id="variant-initial">Initial (Default)</h3>
+
+  <div class="example">
+    <CardComponent variant="initial" elevation="md">
+      <CardContent>
+        <h3>Initial Variant</h3>
+        <CardDescription>
+          Clean and modern design with sharp lines.
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <LinkComponent text="Action" style="button" variant="initial" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <h3 id="variant-retro">Retro</h3>
+
+  <div class="example">
+    <CardComponent variant="retro" elevation="md">
+      <CardContent>
+        <h3>Retro Variant</h3>
+        <CardDescription>
+          Vintage inspiration with nostalgic colors.
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <LinkComponent text="Action" style="button" variant="retro" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <h3 id="variant-modern">Modern</h3>
+
+  <div class="example">
+    <CardComponent variant="modern" elevation="md">
+      <CardContent>
+        <h3>Modern Variant</h3>
+        <CardDescription>
+          Contemporary design with elegant gradients.
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <LinkComponent text="Action" style="button" variant="modern" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <h3 id="variant-futuristic">Futuristic</h3>
+
+  <div class="example">
+    <CardComponent variant="futuristic" elevation="md">
+      <CardContent>
+        <h3>Futuristic Variant</h3>
+        <CardDescription>
+          Futuristic style with neon and cyber effects.
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <LinkComponent text="Action" style="button" variant="futuristic" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <h2 id="elevations">Elevations</h2>
+
+  <p>Control visual depth with different elevation levels.</p>
+
+  <div class="example-grid">
+    <CardComponent elevation="none">
+      <CardContent>
+        <h4>None</h4>
+        <p>No shadow</p>
+      </CardContent>
+    </Card>
+    <CardComponent elevation="sm">
+      <CardContent>
+        <h4>Small</h4>
+        <p>Light shadow</p>
+      </CardContent>
+    </Card>
+    <CardComponent elevation="md">
+      <CardContent>
+        <h4>Medium</h4>
+        <p>Medium shadow</p>
+      </CardContent>
+    </Card>
+    <CardComponent elevation="lg">
+      <CardContent>
+        <h4>Large</h4>
+        <p>Strong shadow</p>
+      </CardContent>
+    </Card>
+    <CardComponent elevation="xl">
+      <CardContent>
+        <h4>Extra Large</h4>
+        <p>Very strong shadow</p>
+      </CardContent>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Card elevation="none">...</Card>
+<Card elevation="sm">...</Card>
+<Card elevation="md">...</Card>
+<Card elevation="lg">...</Card>
+<Card elevation="xl">...</Card>`}
+  />
+
+  <h2 id="carte-interactive">Carte interactive</h2>
+
+  <p>Activez le mode interactif pour des effets hover/focus.</p>
+
+  <div class="example">
+    <CardComponent interactive elevation="md">
+      <CardImage 
+        src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=450&fit=crop"
+        alt="Code editor"
+      />
+      <CardContent>
+        <h3>Interactive card</h3>
+        <CardDescription>
+          Hover over this card to see the interactive effect.
+        </CardDescription>
+      </CardContent>
+      <CardFooter>
+        <LinkComponent text="Discover" style="button" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Card interactive elevation="md">
+  <CardImage src="..." alt="..." />
+  <CardContent>
+    <h3>Interactive card</h3>
+    <CardDescription>
+      Hover over this card to see the interactive effect.
+    </CardDescription>
+  </CardContent>
+  <CardFooter>
+    <Link text="Discover" style="button" />
+  </CardFooter>
+</Card>`}
+  />
+
+  <h2 id="aspect-ratios">Aspect Ratios</h2>
+
+  <p>Different image ratios to fit your needs.</p>
+
+  <div class="example-grid">
+    <CardComponent>
+      <CardImage 
+        src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=225&fit=crop"
+        alt="16:9 ratio"
+        aspectRatio="16/9"
+      />
+      <CardContent>
+        <h4>16:9</h4>
+        <CardDescription>Panoramic format</CardDescription>
+      </CardContent>
+    </Card>
+    <CardComponent>
+      <CardImage 
+        src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=300&fit=crop"
+        alt="4:3 ratio"
+        aspectRatio="4/3"
+      />
+      <CardContent>
+        <h4>4:3</h4>
+        <CardDescription>Standard format</CardDescription>
+      </CardContent>
+    </Card>
+    <CardComponent>
+      <CardImage 
+        src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=400&fit=crop"
+        alt="1:1 ratio"
+        aspectRatio="1/1"
+      />
+      <CardContent>
+        <h4>1:1</h4>
+        <CardDescription>Square format</CardDescription>
+      </CardContent>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<CardImage aspectRatio="16/9" src="..." alt="..." />
+<CardImage aspectRatio="4/3" src="..." alt="..." />
+<CardImage aspectRatio="1/1" src="..." alt="..." />`}
+  />
+
+  <h2 id="custom-meta">Custom meta</h2>
+
+  <p>Use the slot for custom metadata.</p>
+
+  <div class="example">
+    <CardComponent>
+      <CardContent>
+        <h3>Blog post</h3>
+        <CardMeta>
+          <span>⏰ 5 min read</span>
+          <span>👤 Jane Smith</span>
+          <span>💬 12 comments</span>
+        </CardMeta>
+        <CardDescription>
+          Discover the latest trends in web development.
+        </CardDescription>
+      </CardContent>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Card>
+  <CardContent>
+    <h3>Blog post</h3>
+    <CardMeta>
+      <span>⏰ 5 min read</span>
+      <span>👤 Jane Smith</span>
+      <span>💬 12 comments</span>
+    </CardMeta>
+    <CardDescription>
+      Discover the latest trends in web development.
+    </CardDescription>
+  </CardContent>
+</Card>`}
+  />
+
+  <h2 id="footer-alignment">Footer alignment</h2>
+
+  <p>Control the alignment of the footer content.</p>
+
+  <div class="example-grid">
+    <CardComponent>
+      <CardContent>
+        <h4>Left</h4>
+      </CardContent>
+      <CardFooter align="left">
+        <LinkComponent text="Action" style="button" />
+      </CardFooter>
+    </Card>
+    <CardComponent>
+      <CardContent>
+        <h4>Center</h4>
+      </CardContent>
+      <CardFooter align="center">
+        <LinkComponent text="Action" style="button" />
+      </CardFooter>
+    </Card>
+    <CardComponent>
+      <CardContent>
+        <h4>Right</h4>
+      </CardContent>
+      <CardFooter align="right">
+        <LinkComponent text="Action" style="button" />
+      </CardFooter>
+    </Card>
+    <CardComponent>
+      <CardContent>
+        <h4>Between</h4>
+      </CardContent>
+      <CardFooter align="between">
+        <LinkComponent text="Cancel" style="link" />
+        <LinkComponent text="Confirm" style="button" />
+      </CardFooter>
+    </Card>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<CardFooter align="left">...</CardFooter>
+<CardFooter align="center">...</CardFooter>
+<CardFooter align="right">...</CardFooter>
+<CardFooter align="between">...</CardFooter>`}
+  />
+
+  <h2 id="best-practices">Best practices</h2>
+
+  <ul>
+    <li>Use <code>CardImage</code> with a descriptive <code>alt</code> for accessibility</li>
+    <li>Limit <code>CardDescription</code> content with <code>truncate</code> to keep a consistent design</li>
+    <li>Use <code>elevation</code> to create visual hierarchy between cards</li>
+    <li>Enable <code>interactive</code> only for clickable cards</li>
+    <li>Group metadata with <code>CardMeta</code> for better readability</li>
+    <li>Use <code>CardFooter</code> for main actions related to the card</li>
+  </ul>
+
+  <h2 id="accessibility">Accessibility</h2>
+
+  <ul>
+    <li>The component uses the semantic <code>&lt;article&gt;</code> tag</li>
+    <li>Images require an <code>alt</code> attribute</li>
+    <li>Headers use <code>&lt;header&gt;</code> and footers use <code>&lt;footer&gt;</code></li>
+    <li>Interactive mode adds visible focus states</li>
+    <li>Metadata is structured in a <code>&lt;ul&gt;</code> list</li>
+  </ul>
+  </ul>
+
+</DocLayout>

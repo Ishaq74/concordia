@@ -1,0 +1,692 @@
+---
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
+import Switch from "@components/ui/Form/Switch.astro";
+import Checkbox from "@components/ui/Form/Checkbox.astro";
+import MarkdownEditor from "@components/admin/MarkdownEditor.astro";
+import MediaPickerModal from "@components/admin/MediaPickerModal.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import { blogCategories, blogAuthors } from "@database/schemas";
+
+const currentLocale = Astro.currentLocale || "en";
+const adminBase = `/${currentLocale}/admin/blog/articles`;
+
+const db = await getDrizzle();
+
+// Load categories for selector
+const allCategories = await db
+  .select({ id: blogCategories.id, slug: blogCategories.slug, name: blogCategories.name })
+  .from(blogCategories)
+  .orderBy(blogCategories.slug);
+
+// Load authors for selector
+const allAuthors = await db
+  .select({ id: blogAuthors.id, displayName: blogAuthors.displayName, slug: blogAuthors.slug })
+  .from(blogAuthors)
+  .orderBy(blogAuthors.slug);
+
+const extractLocalized = (value: unknown, locale: string = currentLocale): string => {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    const obj = value as Record<string, string>;
+    return obj[locale] || Object.values(obj)[0] || "";
+  }
+  return "";
+};
+
+const supportedLocales = [
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "ar", label: "العربية", flag: "🇸🇦" },
+];
+---
+
+<AdminLayout title="New article" activeSection="blog-articles">
+  <header class="admin-page-header">
+    <div class="admin-page-title-row">
+      <div class="admin-page-title-group">
+        <a href={adminBase} class="back-link"><Icon name="mdi:arrow-left" /></a>
+        <h1>New article</h1>
+      </div>
+    </div>
+    <p class="admin-page-subtitle">Create an article with its translations, categories, authors and media.</p>
+  </header>
+
+  <form id="article-form" class="article-form">
+    <div class="form-layout">
+      <!-- Main content column -->
+      <div class="form-main">
+
+        <!-- Translation tabs -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:translate" class="card-title-icon" />
+              <span>Multilingual content</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="locale-tabs" role="tablist">
+              {supportedLocales.map((loc, i) => (
+                <button
+                  type="button"
+                  role="tab"
+                  class:list={["locale-tab", { active: i === 0 }]}
+                  data-locale={loc.code}
+                  aria-selected={i === 0 ? "true" : "false"}
+                >
+                  <span class="locale-flag">{loc.flag}</span>
+                  {loc.label}
+                </button>
+              ))}
+            </div>
+
+            {supportedLocales.map((loc, i) => (
+              <div class:list={["locale-panel", { active: i === 0 }]} data-locale-panel={loc.code}>
+                <div class="form-field">
+                  <Label htmlFor={`headline-${loc.code}`}>Title *</Label>
+                  <Input id={`headline-${loc.code}`} name={`headline-${loc.code}`} placeholder={`Title in ${loc.label}…`} />
+                </div>
+                <div class="form-field">
+                  <Label htmlFor={`alt-headline-${loc.code}`}>Subtitle</Label>
+                  <Input id={`alt-headline-${loc.code}`} name={`alt-headline-${loc.code}`} placeholder="Optional subtitle…" />
+                </div>
+                <div class="form-field">
+                  <Label htmlFor={`excerpt-${loc.code}`}>Excerpt *</Label>
+                  <Textarea id={`excerpt-${loc.code}`} name={`excerpt-${loc.code}`} rows={3} placeholder={`Short summary in ${loc.label}…`} />
+                </div>
+                <div class="form-field">
+                  <Label htmlFor={`body-${loc.code}`}>Content (Markdown) *</Label>
+                  <MarkdownEditor id={`body-${loc.code}`} name={`body-${loc.code}`} rows={16} placeholder={`Write your article in Markdown…`} />
+                </div>
+
+                <!-- SEO section -->
+                <details class="seo-section">
+                  <summary class="seo-summary">
+                    <Icon name="mdi:search-web" class="seo-icon" />
+                    SEO — {loc.label}
+                  </summary>
+                  <div class="seo-fields">
+                    <div class="form-field">
+                      <Label htmlFor={`seo-title-${loc.code}`}>SEO Title</Label>
+                      <Input id={`seo-title-${loc.code}`} name={`seo-title-${loc.code}`} placeholder="Title for search engines…" />
+                    </div>
+                    <div class="form-field">
+                      <Label htmlFor={`seo-desc-${loc.code}`}>SEO Description</Label>
+                      <Textarea id={`seo-desc-${loc.code}`} name={`seo-desc-${loc.code}`} rows={2} placeholder="160 characters max…" />
+                    </div>
+                    <div class="form-field">
+                      <Label htmlFor={`seo-keywords-${loc.code}`}>SEO Keywords</Label>
+                      <Input id={`seo-keywords-${loc.code}`} name={`seo-keywords-${loc.code}`} placeholder="keyword1, keyword2, keyword3…" />
+                    </div>
+                  </div>
+                </details>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <!-- Media upload -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:image-multiple-outline" class="card-title-icon" />
+              <span>Cover image</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="upload-zone" id="upload-zone">
+              <div class="upload-actions-row">
+                <button type="button" id="btn-pick-media" class="btn-pick-media">
+                  <Icon name="mdi:image-search-outline" class="pick-icon" />
+                  Library
+                </button>
+                <span class="upload-separator">or</span>
+                <label for="cover-upload" class="btn-upload-file">
+                  <Icon name="mdi:cloud-upload-outline" class="pick-icon" />
+                  Upload
+                </label>
+              </div>
+              <input type="file" id="cover-upload" accept="image/*" class="upload-input" />
+              <div id="upload-preview" class="upload-preview hidden"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="form-sidebar">
+
+        <!-- Publish settings -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:cog-outline" class="card-title-icon" />
+              <span>Publishing</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="form-field">
+              <Label htmlFor="slug">Slug *</Label>
+              <Input id="slug" name="slug" placeholder="my-article" />
+              <span class="field-hint">Auto-generated from title if empty</span>
+            </div>
+            <div class="form-field">
+              <Label htmlFor="status">Status</Label>
+              <Select id="status" name="status">
+                <option value="draft" selected>Draft</option>
+                <option value="published">Published</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="archived">Archived</option>
+              </Select>
+            </div>
+            <div class="form-field">
+              <Label htmlFor="in-language">Main language</Label>
+              <Select id="in-language" name="in-language">
+                {supportedLocales.map((loc) => (
+                  <option value={loc.code} selected={loc.code === "fr"}>{loc.flag} {loc.label}</option>
+                ))}
+              </Select>
+            </div>
+
+            <div class="toggle-group">
+              <div class="toggle-row">
+                <Switch id="is-featured" name="is-featured" />
+                <Label htmlFor="is-featured">Featured</Label>
+              </div>
+              <div class="toggle-row">
+                <Switch id="display-home" name="display-home" />
+                <Label htmlFor="display-home">Display on homepage</Label>
+              </div>
+              <div class="toggle-row">
+                <Switch id="display-blog" name="display-blog" checked />
+                <Label htmlFor="display-blog">Visible on blog</Label>
+              </div>
+              <div class="toggle-row">
+                <Switch id="allow-comments" name="allow-comments" checked />
+                <Label htmlFor="allow-comments">Allow comments</Label>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <!-- Categories -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:tag-multiple-outline" class="card-title-icon" />
+              <span>Categories</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {allCategories.length === 0 ? (
+              <p class="text-muted">No category available.</p>
+            ) : (
+              <div class="checkbox-list">
+                {allCategories.map((cat) => (
+                  <div class="checkbox-item">
+                    <Checkbox id={`cat-${cat.id}`} name="categories" value={cat.id} />
+                    <Label htmlFor={`cat-${cat.id}`}>{extractLocalized(cat.name)}</Label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <!-- Authors -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:account-multiple-outline" class="card-title-icon" />
+              <span>Authors</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {allAuthors.length === 0 ? (
+              <p class="text-muted">No author available.</p>
+            ) : (
+              <div class="checkbox-list">
+                {allAuthors.map((author) => (
+                  <div class="checkbox-item">
+                    <Checkbox id={`author-${author.id}`} name="authors" value={author.id} />
+                    <Label htmlFor={`author-${author.id}`}>{extractLocalized(author.displayName)}</Label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <!-- Extra fields -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:information-outline" class="card-title-icon" />
+              <span>Metadata</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="form-field">
+              <Label htmlFor="reading-time">Reading time</Label>
+              <Input id="reading-time" name="reading-time" placeholder="5 min" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="license">License</Label>
+              <Input id="license" name="license" placeholder="CC-BY-4.0" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="form-actions">
+      <a href={adminBase} class="btn-cancel">Cancel</a>
+      <div class="form-actions-right">
+        <button type="button" id="btn-save-draft" class="btn-secondary">
+          <Icon name="mdi:content-save-outline" /> Save draft
+        </button>
+        <button type="button" id="btn-publish" class="btn-primary">
+          <Icon name="mdi:publish" /> Publish
+        </button>
+      </div>
+    </div>
+  </form>
+  <MediaPickerModal />
+</AdminLayout>
+
+<script>
+  import { initMarkdownEditors, getEditorValue } from "@lib/admin/markdown-editor";
+  import { openMediaPicker } from "@lib/admin/media-picker";
+  import { showToast } from "@lib/admin/toast";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // Initialize WYSIWYG editors
+    const editors = initMarkdownEditors();
+
+    // Locale tabs
+    const tabs = document.querySelectorAll<HTMLElement>(".locale-tab");
+    const panels = document.querySelectorAll<HTMLElement>(".locale-panel");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const locale = tab.dataset.locale!;
+        tabs.forEach((t) => { t.classList.remove("active"); t.setAttribute("aria-selected", "false"); });
+        panels.forEach((p) => p.classList.remove("active"));
+        tab.classList.add("active");
+        tab.setAttribute("aria-selected", "true");
+        document.querySelector(`[data-locale-panel="${locale}"]`)?.classList.add("active");
+      });
+    });
+
+    // Auto-slug from title
+    const slugField = document.getElementById("slug") as HTMLInputElement;
+    const headlineFr = document.getElementById("headline-fr") as HTMLInputElement;
+    let slugManual = false;
+    slugField?.addEventListener("input", () => { slugManual = !!slugField.value; });
+    headlineFr?.addEventListener("input", () => {
+      if (!slugManual) {
+        slugField.value = headlineFr.value
+          .toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      }
+    });
+
+    // Image upload preview
+    const coverInput = document.getElementById("cover-upload") as HTMLInputElement;
+    const preview = document.getElementById("upload-preview") as HTMLElement;
+    let coverId: string | null = null;
+
+    function setCoverPreview(id: string, url: string) {
+      coverId = id;
+      preview.innerHTML = `<img src="${url}" alt="Preview" /><button type="button" class="remove-preview" title="Remove">&times;</button>`;
+      preview.classList.remove("hidden");
+      preview.querySelector(".remove-preview")?.addEventListener("click", () => {
+        coverId = null;
+        preview.innerHTML = "";
+        preview.classList.add("hidden");
+        coverInput.value = "";
+      });
+    }
+
+    // Media library picker
+    document.getElementById("btn-pick-media")?.addEventListener("click", async () => {
+      const result = await openMediaPicker();
+      if (result) setCoverPreview(result.id, result.url);
+    });
+
+    // Upload via modal (with metadata form)
+    coverInput?.addEventListener("change", async () => {
+      const file = coverInput.files?.[0];
+      if (file) {
+        const result = await openMediaPicker({ file });
+        if (result) setCoverPreview(result.id, result.url);
+      }
+      coverInput.value = "";
+    });
+
+    // Collect form data
+    const locales = ["fr", "en", "es", "ar"];
+
+    function collectData(status: string) {
+      const slug = (document.getElementById("slug") as HTMLInputElement).value.trim();
+      const inLanguage = (document.getElementById("in-language") as HTMLSelectElement).value;
+      const isFeatured = (document.getElementById("is-featured") as HTMLInputElement).checked;
+      const displayInHome = (document.getElementById("display-home") as HTMLInputElement).checked;
+      const displayInBlog = (document.getElementById("display-blog") as HTMLInputElement).checked;
+      const allowComments = (document.getElementById("allow-comments") as HTMLInputElement).checked;
+      const readingTime = (document.getElementById("reading-time") as HTMLInputElement).value.trim();
+      const license = (document.getElementById("license") as HTMLInputElement).value.trim();
+
+      // Categories
+      const categoryIds = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="categories"]:checked'))
+        .map((cb) => cb.value);
+
+      // Authors
+      const authorIds = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="authors"]:checked'))
+        .map((cb) => cb.value);
+
+      // Translations (only filled locales)
+      const translations: any[] = [];
+      for (const loc of locales) {
+        const headline = (document.getElementById(`headline-${loc}`) as HTMLInputElement)?.value.trim();
+        const body = getEditorValue(editors, `body-${loc}`).trim();
+        const excerpt = (document.getElementById(`excerpt-${loc}`) as HTMLTextAreaElement)?.value.trim();
+        if (headline || body || excerpt) {
+          translations.push({
+            inLanguage: loc,
+            headline: headline || "",
+            alternativeHeadline: (document.getElementById(`alt-headline-${loc}`) as HTMLInputElement)?.value.trim() || "",
+            articleBody: body || "",
+            excerpt: excerpt || "",
+            seoTitle: (document.getElementById(`seo-title-${loc}`) as HTMLInputElement)?.value.trim() || "",
+            seoDescription: (document.getElementById(`seo-desc-${loc}`) as HTMLTextAreaElement)?.value.trim() || "",
+            seoKeywords: (document.getElementById(`seo-keywords-${loc}`) as HTMLInputElement)?.value.trim() || "",
+          });
+        }
+      }
+
+      // Media
+      const media: any[] = [];
+      if (coverId) {
+        media.push({ mediaId: coverId, type: "cover", position: "0" });
+      }
+
+      return {
+        action: "create",
+        slug: slug || undefined,
+        title: (document.getElementById("headline-fr") as HTMLInputElement)?.value.trim(),
+        status,
+        inLanguage,
+        isFeatured,
+        displayInHome,
+        displayInBlog,
+        allowComments,
+        readingTime: readingTime || undefined,
+        license: license || undefined,
+        translations,
+        categoryIds,
+        authorIds,
+        media,
+      };
+    }
+
+    // Validation
+    function validate() {
+      const headline = (document.getElementById("headline-fr") as HTMLInputElement)?.value.trim();
+      if (!headline) {
+        showToast("The French title is required.", "warning");
+        document.querySelector<HTMLElement>('[data-locale="fr"]')?.click();
+        document.getElementById("headline-fr")?.focus();
+        return false;
+      }
+      return true;
+    }
+
+    // Save draft
+    document.getElementById("btn-save-draft")?.addEventListener("click", async () => {
+      if (!validate()) return;
+      const data = collectData("draft");
+      await submitArticle(data);
+    });
+
+    // Publish
+    document.getElementById("btn-publish")?.addEventListener("click", async () => {
+      if (!validate()) return;
+      const data = collectData("published");
+      await submitArticle(data);
+    });
+
+    async function submitArticle(data: any) {
+      const btns = document.querySelectorAll<HTMLButtonElement>(".form-actions button");
+      btns.forEach((b) => { b.disabled = true; });
+      try {
+        const res = await fetch("/api/admin/blog/articles", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await res.json();
+        if (result.ok || result.id) {
+          showToast("Article created successfully! Redirecting…", "success");
+          setTimeout(() => {
+            window.location.href = document.querySelector<HTMLAnchorElement>(".back-link")?.href || window.location.pathname.replace("/new", "");
+          }, 800);
+        } else {
+          showToast(result.error || "Unknown error during creation.", "error");
+        }
+      } catch {
+        showToast("Network error — check your connection.", "error");
+      } finally {
+        btns.forEach((b) => { b.disabled = false; });
+      }
+    }
+  });
+</script>
+
+<style>
+  .admin-page-header { margin-bottom: var(--space-6, 1.5rem); }
+  .admin-page-title-row { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .admin-page-title-group { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .admin-page-header h1 {
+    font-family: var(--font-family-display, "Space Grotesk", sans-serif);
+    font-size: var(--h2-font-size, 2rem); font-weight: 800;
+    color: var(--heading-color, #0f172a); margin: 0;
+  }
+  .admin-page-subtitle { color: var(--text-muted, #64748b); font-size: 0.9375rem; margin: var(--space-1, 0.25rem) 0 0; }
+
+  .back-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2.25rem; height: 2.25rem; border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem); color: var(--text-muted, #64748b);
+    text-decoration: none; transition: all 0.15s;
+  }
+  .back-link:hover { border-color: var(--color-primary, #eab308); color: var(--text-default, #0f172a); }
+  .back-link [data-icon] { width: 1.25rem; height: 1.25rem; }
+
+  /* Two-column layout */
+  .form-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: var(--space-5, 1.25rem);
+    align-items: start;
+  }
+  .form-main { display: flex; flex-direction: column; gap: var(--space-4, 1rem); }
+  .form-sidebar { display: flex; flex-direction: column; gap: var(--space-4, 1rem); }
+
+  /* Card titles */
+  .card-title-row { display: flex; align-items: center; gap: var(--space-2, 0.5rem); font-weight: 600; font-size: 0.9375rem; }
+  .card-title-icon { width: 1.125rem; height: 1.125rem; color: var(--text-muted, #64748b); }
+
+  /* Form fields */
+  .form-field { margin-bottom: var(--space-3, 0.75rem); }
+  .form-field:last-child { margin-bottom: 0; }
+  .field-hint { font-size: 0.75rem; color: var(--text-muted, #64748b); margin-top: 0.125rem; }
+
+  /* Locale tabs */
+  .locale-tabs {
+    display: flex; gap: var(--space-1, 0.25rem); border-bottom: 2px solid var(--border-default, #e2e8f0);
+    margin-bottom: var(--space-4, 1rem); padding-bottom: 0;
+  }
+  .locale-tab {
+    display: inline-flex; align-items: center; gap: var(--space-1, 0.25rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    border: none; background: none; cursor: pointer;
+    font-size: 0.875rem; font-weight: 500; color: var(--text-muted, #64748b);
+    border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.15s;
+  }
+  .locale-tab:hover { color: var(--text-default, #0f172a); }
+  .locale-tab.active {
+    color: var(--color-primary, #eab308);
+    border-bottom-color: var(--color-primary, #eab308);
+  }
+  .locale-flag { font-size: 1rem; }
+  .locale-panel { display: none; }
+  .locale-panel.active { display: block; }
+
+  /* Markdown editor */
+  :global(.editor-textarea textarea) {
+    font-family: var(--font-family-mono, "JetBrains Mono", monospace) !important;
+    font-size: 0.875rem !important;
+    line-height: 1.7 !important;
+    tab-size: 2;
+  }
+  .markdown-hint {
+    display: flex; align-items: center; gap: var(--space-1, 0.25rem);
+    font-size: 0.75rem; color: var(--text-muted, #64748b); margin-top: var(--space-1, 0.25rem);
+  }
+  .hint-icon { width: 0.875rem; height: 0.875rem; }
+
+  /* SEO section */
+  .seo-section {
+    margin-top: var(--space-3, 0.75rem); border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem); overflow: hidden;
+  }
+  .seo-summary {
+    display: flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    cursor: pointer; font-size: 0.8125rem; font-weight: 500;
+    color: var(--text-muted, #64748b); background: var(--bg-subtle, #f8fafc);
+    user-select: none;
+  }
+  .seo-summary:hover { color: var(--text-default, #0f172a); }
+  .seo-icon { width: 1rem; height: 1rem; }
+  .seo-fields { padding: var(--space-3, 0.75rem); }
+
+  /* Upload zone */
+  .upload-zone { position: relative; }
+  .upload-input {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    width: 100%; height: 100%; display: none;
+  }
+  .upload-actions-row {
+    display: flex; align-items: center; gap: var(--space-3, 0.75rem);
+    justify-content: center; padding: var(--space-4, 1rem);
+    border: 2px dashed var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem);
+  }
+  .btn-pick-media, .btn-upload-file {
+    display: inline-flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem);
+    background: var(--bg-default, #fff); color: var(--text-default, #1e293b);
+    font-size: 0.8125rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-pick-media:hover, .btn-upload-file:hover {
+    border-color: var(--color-primary, #eab308); color: var(--color-primary, #eab308);
+  }
+  .pick-icon { width: 1rem; height: 1rem; }
+  .upload-separator { color: var(--text-muted, #64748b); font-size: 0.8125rem; }
+  .upload-label {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: var(--space-6, 1.5rem); border: 2px dashed var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem); text-align: center;
+    cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  }
+  .upload-zone:hover .upload-label { border-color: var(--color-primary, #eab308); background: var(--bg-subtle, #f8fafc); }
+  .upload-icon { width: 2.5rem; height: 2.5rem; color: var(--text-muted, #64748b); margin-bottom: var(--space-2, 0.5rem); }
+  .upload-text { font-size: 0.875rem; color: var(--text-default, #1e293b); }
+  .upload-hint { font-size: 0.75rem; color: var(--text-muted, #64748b); margin-top: var(--space-1, 0.25rem); }
+  .upload-preview { margin-top: var(--space-3, 0.75rem); position: relative; display: inline-block; }
+  .upload-preview.hidden { display: none; }
+  .upload-preview :global(img) {
+    max-width: 100%; max-height: 200px; border-radius: var(--border-radius-md, 0.375rem);
+    border: 1px solid var(--border-default, #e2e8f0);
+  }
+  :global(.remove-preview) {
+    position: absolute; top: -0.5rem; right: -0.5rem;
+    width: 1.5rem; height: 1.5rem; border-radius: 50%;
+    background: #dc2626; color: white; border: none; cursor: pointer;
+    font-size: 1rem; line-height: 1; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Toggle group */
+  .toggle-group {
+    display: flex; flex-direction: column; gap: var(--space-3, 0.75rem);
+    margin-top: var(--space-4, 1rem); padding-top: var(--space-4, 1rem);
+    border-top: 1px solid var(--border-default, #e2e8f0);
+  }
+  .toggle-row { display: flex; align-items: center; gap: var(--space-2, 0.5rem); }
+
+  /* Checkbox list */
+  .checkbox-list { display: flex; flex-direction: column; gap: var(--space-2, 0.5rem); max-height: 200px; overflow-y: auto; }
+  .checkbox-item { display: flex; align-items: center; gap: var(--space-2, 0.5rem); }
+
+  .text-muted { color: var(--text-muted, #64748b); font-size: 0.8125rem; }
+
+  /* Actions bar */
+  .form-actions {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: var(--space-6, 1.5rem); padding-top: var(--space-4, 1rem);
+    border-top: 1px solid var(--border-default, #e2e8f0); flex-wrap: wrap; gap: var(--space-3, 0.75rem);
+  }
+  .form-actions-right { display: flex; gap: var(--space-2, 0.5rem); }
+  .btn-cancel {
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+    color: var(--text-muted, #64748b); text-decoration: none; font-size: 0.875rem;
+    border: 1px solid var(--border-default, #e2e8f0); border-radius: var(--border-radius-md, 0.375rem);
+    transition: all 0.15s;
+  }
+  .btn-cancel:hover { border-color: var(--text-default, #0f172a); color: var(--text-default, #0f172a); }
+  .btn-secondary, .btn-primary {
+    display: inline-flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+    border: none; border-radius: var(--border-radius-md, 0.375rem);
+    font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-secondary [data-icon], .btn-primary [data-icon] { width: 1.125rem; height: 1.125rem; }
+  .btn-secondary {
+    background: var(--bg-inset, #f1f5f9); color: var(--text-default, #1e293b);
+    border: 1px solid var(--border-default, #e2e8f0);
+  }
+  .btn-secondary:hover { background: var(--bg-subtle, #f8fafc); border-color: var(--text-muted, #64748b); }
+  .btn-primary {
+    background: var(--color-primary, #eab308); color: var(--color-primary-contrast, #0f172a);
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:disabled, .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .form-layout { grid-template-columns: 1fr; }
+    .form-sidebar { order: -1; }
+    .form-row--2 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .locale-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .form-actions { flex-direction: column; }
+    .form-actions-right { width: 100%; justify-content: flex-end; }
+    .admin-page-header h1 { font-size: 1.5rem; }
+  }
+</style>

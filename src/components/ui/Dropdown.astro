@@ -417,14 +417,11 @@ const getLevel2RadioName = (parentId: string) =>
 </style>
 
 <script is:inline type="module" define:vars={{ dropdownId, openOnHover }}>
+  // @ts-nocheck — dropdownId & openOnHover are injected by Astro define:vars
   // IIFE wrapper — top-level `return` is illegal in module scripts,
   // so we wrap the whole block in a function to allow early exit.
   (function initDropdownCollision() {
-    // dropdownId is provided by Astro via `define:vars` — silence TS/IDE parsing
-    // @ts-ignore
-    const dropdown = document
-      .querySelector(`#${dropdownId}`)
-      ?.closest(".dropdown");
+    const dropdown = document.querySelector(`#${dropdownId}`)?.closest(".dropdown");
     if (!dropdown) return;
 
     const menu = dropdown.querySelector(".dropdown-menu");

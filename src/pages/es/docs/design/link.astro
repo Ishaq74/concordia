@@ -1,0 +1,425 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import LinkComponent from "@components/ui/Link.astro";
+import { Code } from "astro:components";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+---
+
+<DocLayout
+  title="Link Component"
+  description="Comprehensive documentation of the Link component with all variants and examples"
+  variant="initial"
+>
+  <h1 id="link-component">Link Component</h1>
+
+  <p>
+    The <code>Link</code> component is a smart wrapper that supports multiple visual
+    variants, icons, and can be rendered as a classic link or as a button.
+  </p>
+
+  <h2 id="installation">Installation</h2>
+
+  <p>
+    The component is available in <code class="inline-code"
+      >src/components/ui/Link.astro</code
+    >
+  </p>
+
+  <Code
+    lang="typescript"
+    code="import Link from '@components/ui/Link.astro';"
+  />
+
+  <h2 id="props">Props</h2>
+
+  <div class="props-table">
+    <Table variant="modern" striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Default</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code>tag</code></TableCell>
+          <TableCell>a | button</TableCell>
+          <TableCell>a</TableCell>
+          <TableCell>HTML element to render</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>href</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Destination URL</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>type</code></TableCell>
+          <TableCell>button | submit | reset</TableCell>
+          <TableCell>button</TableCell>
+          <TableCell>Button type (if tag="button")</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>variant</code></TableCell>
+          <TableCell>initial | retro | modern | futuristic</TableCell>
+          <TableCell>initial</TableCell>
+          <TableCell>Visual style</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>style</code></TableCell>
+          <TableCell>link | button</TableCell>
+          <TableCell>link</TableCell>
+          <TableCell>Appearance (link or button)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>color</code></TableCell>
+          <TableCell>default | primary | secondary | accent</TableCell>
+          <TableCell>default</TableCell>
+          <TableCell>Component color</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>external</code></TableCell>
+          <TableCell>boolean</TableCell>
+          <TableCell>false</TableCell>
+          <TableCell>Opens in new tab</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>text</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Link text</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>icon</code></TableCell>
+          <TableCell>object</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Icon (name and side: left | right)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>ariaLabel</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Accessibility label</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code>className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Additional CSS classes</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h2 id="basic-examples">Basic Examples</h2>
+
+  <h3 id="simple-link">Simple Link</h3>
+
+  <div class="demo-box">
+    <LinkComponent href="#" text="Simple link" />
+    <LinkComponent href="#" text="External link" external />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Link href="/about" text="About" />
+  <Link href="https://example.com" text="External site" external />`}
+  />
+
+  <h3 id="with-icon">With Icon</h3>
+
+  <div class="demo-box">
+    <LinkComponent
+      href="#"
+      text="Back"
+      icon={{ name: "mdi:arrow-left", side: "left" }}
+    />
+    <LinkComponent
+      href="#"
+      text="Next"
+      icon={{ name: "mdi:arrow-right", side: "right" }}
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Link 
+  href="/back" 
+  text="Back" 
+  icon={{ name: "mdi:arrow-left", side: "left" }}
+/>`}
+  />
+
+  <h2 id="variants-link">Variants - Link Style</h2>
+
+  <div class="demo-box">
+    <LinkComponent href="#" text="Initial" variant="initial" />
+    <LinkComponent href="#" text="Retro" variant="retro" />
+    <LinkComponent href="#" text="Modern" variant="modern" />
+    <LinkComponent href="#" text="Futuristic" variant="futuristic" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Link href="/about" text="About" variant="modern" />`}
+  />
+
+  <h2 id="variants-button">Variants - Button Style</h2>
+
+  <h3 id="button-initial">Initial Button</h3>
+
+  <div class="demo-box">
+    <LinkComponent href="#" text="Default" style="button" />
+    <LinkComponent href="#" text="Primary" style="button" color="primary" />
+    <LinkComponent href="#" text="Secondary" style="button" color="secondary" />
+    <LinkComponent href="#" text="Accent" style="button" color="accent" />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Link href="/signup" text="Sign up" style="button" color="primary" />`}
+  />
+
+  <h3 id="button-retro">Retro Button</h3>
+
+  <div class="demo-box">
+    <LinkComponent href="#" text="Default" style="button" variant="retro" />
+    <LinkComponent
+      href="#"
+      text="Primary"
+      style="button"
+      variant="retro"
+      color="primary"
+    />
+    <LinkComponent
+      href="#"
+      text="Secondary"
+      style="button"
+      variant="retro"
+      color="secondary"
+    />
+    <LinkComponent
+      href="#"
+      text="Accent"
+      style="button"
+      variant="retro"
+      color="accent"
+    />
+  </div>
+
+  <h3 id="button-modern">Modern Button</h3>
+
+  <div class="demo-box">
+    <LinkComponent href="#" text="Default" style="button" variant="modern" />
+    <LinkComponent
+      href="#"
+      text="Primary"
+      style="button"
+      variant="modern"
+      color="primary"
+    />
+    <LinkComponent
+      href="#"
+      text="Secondary"
+      style="button"
+      variant="modern"
+      color="secondary"
+    />
+    <LinkComponent
+      href="#"
+      text="Accent"
+      style="button"
+      variant="modern"
+      color="accent"
+    />
+  </div>
+
+  <h3 id="button-futuristic">Futuristic Button</h3>
+
+  <div class="demo-box">
+    <LinkComponent
+      href="#"
+      text="Default"
+      style="button"
+      variant="futuristic"
+    />
+    <LinkComponent
+      href="#"
+      text="Primary"
+      style="button"
+      variant="futuristic"
+      color="primary"
+    />
+    <LinkComponent
+      href="#"
+      text="Secondary"
+      style="button"
+      variant="futuristic"
+      color="secondary"
+    />
+    <LinkComponent
+      href="#"
+      text="Accent"
+      style="button"
+      variant="futuristic"
+      color="accent"
+    />
+  </div>
+
+  <h2 id="buttons-with-icons">Buttons with Icons</h2>
+
+  <div class="demo-box">
+    <LinkComponent
+      href="#"
+      text="Download"
+      style="button"
+      color="primary"
+      icon={{ name: "mdi:download", side: "left" }}
+    />
+    <LinkComponent
+      href="#"
+      text="Delete"
+      style="button"
+      variant="retro"
+      color="secondary"
+      icon={{ name: "mdi:delete", side: "right" }}
+    />
+    <LinkComponent
+      href="#"
+      text="Validate"
+      style="button"
+      variant="modern"
+      color="accent"
+      icon={{ name: "mdi:check", side: "left" }}
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Link 
+  href="/download" 
+  text="Download" 
+  style="button"
+  color="primary"
+  icon={{ name: "mdi:download", side: "left" }}
+/>`}
+  />
+
+  <h2 id="external-links">External Links</h2>
+
+  <p>Use the <code>external</code> prop for links that open in a new tab.</p>
+
+  <div class="demo-box">
+    <LinkComponent
+      href="https://astro.build"
+      text="Astro Documentation"
+      external
+      icon={{ name: "mdi:open-in-new", side: "right" }}
+    />
+    <LinkComponent
+      href="https://github.com"
+      text="GitHub"
+      variant="modern"
+      external
+      icon={{ name: "mdi:github", side: "left" }}
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Link 
+  href="https://example.com" 
+  text="External site" 
+  external
+  icon={{ name: "mdi:open-in-new", side: "right" }}
+/>`}
+  />
+
+  <h2 id="html-button">HTML Button</h2>
+
+  <p>
+    Use <code>tag="button"</code> to render a real button element (for forms).
+  </p>
+
+  <div class="demo-box">
+    <LinkComponent
+      tag="button"
+      type="submit"
+      text="Submit"
+      style="button"
+      color="primary"
+    />
+    <LinkComponent
+      tag="button"
+      type="reset"
+      text="Reset"
+      style="button"
+      variant="retro"
+    />
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<Link 
+  tag="button" 
+  type="submit"
+  text="Submit" 
+  style="button"
+  color="primary"
+/>`}
+  />
+
+  <h2 id="navigation">In a Navigation</h2>
+
+  <div class="demo-box">
+    <nav style="display: flex; gap: 1rem; align-items: center;">
+      <LinkComponent href="/" text="Home" />
+      <LinkComponent href="/about" text="About" />
+      <LinkComponent href="/contact" text="Contact" />
+      <LinkComponent
+        href="/login"
+        text="Login"
+        style="button"
+        color="primary"
+        icon={{ name: "openmoji:door", side: "right" }}
+      />
+    </nav>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<nav>
+  <Link href="/" text="Home" />
+  <Link href="/about" text="About" />
+  <Link href="/contact" text="Contact" />
+  <Link 
+    href="/login" 
+    text="Login" 
+    style="button" 
+    color="primary"
+    icon={{ name: "mdi:login", side: "right" }}
+  />
+</nav>`}
+  />
+
+  <h2 id="accessibility">Accessibility</h2>
+
+  <p>The Link component follows accessibility best practices:</p>
+
+  <ul>
+    <li>
+      External links automatically include <code>rel="noopener noreferrer"</code
+      >
+    </li>
+    <li>Color contrast meets WCAG standards</li>
+    <li>Hover and focus states are clearly visible</li>
+    <li>Use <code>ariaLabel</code> for links without visible text</li>
+  </ul>
+</DocLayout>

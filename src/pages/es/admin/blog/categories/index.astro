@@ -1,0 +1,522 @@
+﻿---
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Pagination from "@components/ui/Pagination.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import { blogCategories, blogPostCategories } from "@database/schemas";
+import { count, eq, desc, ilike, inArray, and, isNull } from "drizzle-orm";
+
+const currentLocale = Astro.currentLocale || "es";
+
+const url = new URL(Astro.request.url);
+const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));
+const perPage = 20;
+const search = url.searchParams.get("q")?.trim() ?? "";
+const featuredFilter = url.searchParams.get("featured")?.trim() ?? "";
+const homeFilter = url.searchParams.get("home")?.trim() ?? "";
+const blogFilter = url.searchParams.get("blog")?.trim() ?? "";
+const menuFilter = url.searchParams.get("menu")?.trim() ?? "";
+const parentFilter = url.searchParams.get("parent")?.trim() ?? "";
+
+const db = await getDrizzle();
+
+// Build filter conditions
+const conditions: any[] = [];
+if (search) conditions.push(ilike(blogCategories.slug, `%${search}%`));
+if (featuredFilter === "true") conditions.push(eq(blogCategories.isFeatured, true));
+if (featuredFilter === "false") conditions.push(eq(blogCategories.isFeatured, false));
+if (homeFilter === "true") conditions.push(eq(blogCategories.displayInHome, true));
+if (homeFilter === "false") conditions.push(eq(blogCategories.displayInHome, false));
+if (blogFilter === "true") conditions.push(eq(blogCategories.displayInBlog, true));
+if (blogFilter === "false") conditions.push(eq(blogCategories.displayInBlog, false));
+if (menuFilter === "true") conditions.push(eq(blogCategories.displayInMenu, true));
+if (menuFilter === "false") conditions.push(eq(blogCategories.displayInMenu, false));
+if (parentFilter === "root") conditions.push(isNull(blogCategories.parentId));
+else if (parentFilter) conditions.push(eq(blogCategories.parentId, parentFilter));
+
+const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+// Counts
+const [totalResult] = whereClause
+  ? await db.select({ value: count() }).from(blogCategories).where(whereClause)
+  : await db.select({ value: count() }).from(blogCategories);
+const totalCategories = totalResult.value;
+const totalPages = Math.max(1, Math.ceil(totalCategories / perPage));
+
+// Fetch categories
+const categories = whereClause
+  ? await db.select().from(blogCategories).where(whereClause).orderBy(desc(blogCategories.createdAt)).limit(perPage).offset((page - 1) * perPage)
+  : await db.select().from(blogCategories).orderBy(desc(blogCategories.createdAt)).limit(perPage).offset((page - 1) * perPage);
+
+// Article count per category
+const categoryIds = categories.map((c) => c.id);
+const articleCountMap = new Map<string, number>();
+if (categoryIds.length > 0) {
+  const counts = await db
+    .select({ categoryId: blogPostCategories.categoryId, count: count() })
+    .from(blogPostCategories)
+    .where(inArray(blogPostCategories.categoryId, categoryIds))
+    .groupBy(blogPostCategories.categoryId);
+  counts.forEach((c) => articleCountMap.set(c.categoryId, c.count));
+}
+
+// All categories (for parent filter dropdown & parent name resolution)
+const allCategories = await db
+  .select({ id: blogCategories.id, slug: blogCategories.slug, name: blogCategories.name, parentId: blogCategories.parentId })
+  .from(blogCategories)
+  .orderBy(blogCategories.slug);
+
+const categoryNameMap = new Map<string, string>();
+allCategories.forEach((c) => {
+  const n = c.name;
+  categoryNameMap.set(c.id, typeof n === "string" ? n : (n as Record<string, string>)?.[currentLocale] || Object.values(n as Record<string, string>)[0] || c.slug);
+});
+
+// Stats
+const [totalAll] = await db.select({ value: count() }).from(blogCategories);
+const [featuredCount] = await db.select({ value: count() }).from(blogCategories).where(eq(blogCategories.isFeatured, true));
+const [homeCount] = await db.select({ value: count() }).from(blogCategories).where(eq(blogCategories.displayInHome, true));
+const [menuCount] = await db.select({ value: count() }).from(blogCategories).where(eq(blogCategories.displayInMenu, true));
+const [rootCount] = await db.select({ value: count() }).from(blogCategories).where(isNull(blogCategories.parentId));
+
+const extractLocalized = (value: unknown): string => {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    const obj = value as Record<string, string>;
+    return obj[currentLocale] || Object.values(obj)[0] || "—";
+  }
+  return "—";
+};
+
+const adminBase = `/${currentLocale}/admin/blog/categories`;
+const hasFilters = search || featuredFilter || homeFilter || blogFilter || menuFilter || parentFilter;
+
+const filterParams = new URLSearchParams();
+if (search) filterParams.set("q", search);
+if (featuredFilter) filterParams.set("featured", featuredFilter);
+if (homeFilter) filterParams.set("home", homeFilter);
+if (blogFilter) filterParams.set("blog", blogFilter);
+if (menuFilter) filterParams.set("menu", menuFilter);
+if (parentFilter) filterParams.set("parent", parentFilter);
+const paginationBase = `${adminBase}?${filterParams.toString()}${filterParams.toString() ? "&" : ""}page=`;
+---
+
+<AdminLayout title="Categorías" activeSection="blog-categories">
+  <header class="admin-page-header">
+    <div class="admin-page-title-row">
+      <div class="admin-page-title-group">
+        <h1>Categorías</h1>
+        <Badge color="primary" text={`${totalCategories} resultado${totalCategories > 1 ? "s" : ""}`} />
+      </div>
+      <a href={`${adminBase}/new`} class="btn-create">
+        <Icon name="mdi:plus-circle-outline" />
+        Nueva categoría
+      </a>
+    </div>
+    <p class="admin-page-subtitle">Organice los artículos por categorías temáticas. Gestione la jerarquía, la visibilidad y el SEO.</p>
+  </header>
+
+  <!-- Quick stats -->
+  <div class="stats-grid">
+    <a href={adminBase} class:list={["stat-card", { active: !hasFilters }]}>
+      <div class="stat-icon stat-icon--primary"><Icon name="mdi:folder-multiple-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{totalAll.value}</span>
+        <span class="stat-label">Total</span>
+      </div>
+    </a>
+    <a href={`${adminBase}?featured=true`} class:list={["stat-card", { active: featuredFilter === "true" }]}>
+      <div class="stat-icon stat-icon--accent"><Icon name="mdi:star-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{featuredCount.value}</span>
+        <span class="stat-label">Featured</span>
+      </div>
+    </a>
+    <a href={`${adminBase}?home=true`} class:list={["stat-card", { active: homeFilter === "true" }]}>
+      <div class="stat-icon stat-icon--success"><Icon name="mdi:home-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{homeCount.value}</span>
+        <span class="stat-label">Inicio</span>
+      </div>
+    </a>
+    <a href={`${adminBase}?menu=true`} class:list={["stat-card", { active: menuFilter === "true" }]}>
+      <div class="stat-icon stat-icon--warning"><Icon name="mdi:menu" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{menuCount.value}</span>
+        <span class="stat-label">Menu</span>
+      </div>
+    </a>
+    <a href={`${adminBase}?parent=root`} class:list={["stat-card", { active: parentFilter === "root" }]}>
+      <div class="stat-icon stat-icon--info"><Icon name="mdi:file-tree-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{rootCount.value}</span>
+        <span class="stat-label">Raíz</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <Card elevation="sm" className="admin-filters-card">
+    <CardContent>
+      <form method="get" action={adminBase} class="admin-filters-form">
+        <div class="admin-filters-row">
+          <div class="admin-filter-field filter-search">
+            <Label htmlFor="q">Buscar</Label>
+            <Input id="q" name="q" type="search" placeholder="Slug, nombre…" value={search} />
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="featured">Featured</Label>
+            <Select id="featured" name="featured">
+              <option value="">Todas</option>
+              <option value="true" selected={featuredFilter === "true"}>Sí</option>
+              <option value="false" selected={featuredFilter === "false"}>No</option>
+            </Select>
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="home">Inicio</Label>
+            <Select id="home" name="home">
+              <option value="">Todas</option>
+              <option value="true" selected={homeFilter === "true"}>Sí</option>
+              <option value="false" selected={homeFilter === "false"}>No</option>
+            </Select>
+          </div>
+        </div>
+        <div class="admin-filters-row">
+          <div class="admin-filter-field">
+            <Label htmlFor="blog">Visible blog</Label>
+            <Select id="blog" name="blog">
+              <option value="">Todas</option>
+              <option value="true" selected={blogFilter === "true"}>Sí</option>
+              <option value="false" selected={blogFilter === "false"}>No</option>
+            </Select>
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="menu">Menu</Label>
+            <Select id="menu" name="menu">
+              <option value="">Todas</option>
+              <option value="true" selected={menuFilter === "true"}>Sí</option>
+              <option value="false" selected={menuFilter === "false"}>No</option>
+            </Select>
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="parent">Parent</Label>
+            <Select id="parent" name="parent">
+              <option value="">Todos</option>
+              <option value="root" selected={parentFilter === "root"}>Raíz (sin padre)</option>
+              {allCategories.map((cat) => (
+                <option value={cat.id} selected={parentFilter === cat.id}>
+                  {categoryNameMap.get(cat.id)}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <div class="admin-filter-actions">
+            <Button type="submit" color="primary" icon={{ name: "mdi:magnify", side: "left" }}>
+              Filtrar
+            </Button>
+            {hasFilters && (
+              <a href={adminBase} class="admin-filter-reset">Restablecer</a>
+            )}
+          </div>
+        </div>
+      </form>
+    </CardContent>
+  </Card>
+
+  <!-- Categories table -->
+  <Card>
+    <CardContent>
+      {categories.length === 0 ? (
+        <div class="empty-state">
+          <Icon name="mdi:folder-outline" class="empty-state-icon" />
+          <p>Ninguna categoría encontrada.</p>
+          <a href={`${adminBase}/new`} class="btn-create-sm">
+            <Icon name="mdi:plus" /> Crear una categoría
+          </a>
+        </div>
+      ) : (
+        <div class="table-responsive">
+          <Table striped>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Categoría</TableHead>
+                <TableHead>Artículos</TableHead>
+                <TableHead>Visibilidad</TableHead>
+                <TableHead>Padre</TableHead>
+                <TableHead>Imagen</TableHead>
+                <TableHead>Fecha</TableHead>
+                <TableHead>Acciones</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {categories.map((cat) => {
+                const name = extractLocalized(cat.name);
+                const description = extractLocalized(cat.description);
+                const articleCount = articleCountMap.get(cat.id) ?? 0;
+                const parentName = cat.parentId ? categoryNameMap.get(cat.parentId) : null;
+                return (
+                  <TableRow>
+                    <TableCell>
+                      <a href={`${adminBase}/${cat.id}/edit`} class="category-title-link">
+                        <span class="category-name">{name}</span>
+                      </a>
+                      <code class="category-slug">{cat.slug}</code>
+                      {description !== "—" && (
+                        <span class="category-desc">{description.slice(0, 60)}{description.length > 60 ? "…" : ""}</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        color={articleCount > 0 ? "primary" : "default"}
+                        text={`${articleCount} artículo${articleCount > 1 ? "s" : ""}`}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div class="visibility-badges">
+                        {cat.isFeatured && <Badge color="accent" text="★ Featured" />}
+                        {cat.displayInHome && <Badge color="primary" text="Home" />}
+                        {cat.displayInBlog && <Badge color="success" text="Blog" />}
+                        {cat.displayInMenu && <Badge color="default" text="Menu" />}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {parentName ? (
+                        <a href={`${adminBase}?parent=${cat.parentId}`} class="parent-link">
+                          <Icon name="mdi:folder-outline" class="parent-icon" />
+                          {parentName}
+                        </a>
+                      ) : (
+                        <span class="text-muted">Raíz</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {cat.featuredImageId ? (
+                        <span class="has-image"><Icon name="mdi:image-outline" /> Sí</span>
+                      ) : (
+                        <span class="text-muted">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div class="date-cell">
+                        <time datetime={cat.createdAt.toISOString()} class="date-main">
+                          {cat.createdAt.toLocaleDateString(currentLocale, { day: "2-digit", month: "short", year: "numeric" })}
+                        </time>
+                        <time datetime={cat.updatedAt.toISOString()} class="date-sub">
+                          Modificado {cat.updatedAt.toLocaleDateString(currentLocale, { day: "2-digit", month: "short" })}
+                        </time>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div class="action-buttons">
+                        <a href={`${adminBase}/${cat.id}/edit`} class="action-btn" title="Editar">
+                          <Icon name="mdi:pencil-outline" />
+                        </a>
+                        <button type="button" class="action-btn action-btn--delete" title="Eliminar" data-action="delete" data-id={cat.id} data-name={name}>
+                          <Icon name="mdi:delete-outline" />
+                        </button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </CardContent>
+  </Card>
+
+  {totalPages > 1 && (
+    <div class="admin-pagination">
+      <Pagination currentPage={page} totalPages={totalPages} baseUrl={paginationBase} showPrevNext color="primary" />
+    </div>
+  )}
+</AdminLayout>
+
+<script>
+  import { showToast } from "@lib/admin/toast";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll<HTMLElement>("[data-action]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const action = btn.dataset.action!;
+        const id = btn.dataset.id!;
+        const name = btn.dataset.name || "";
+
+        if (action === "delete") {
+          if (!confirm(`¿Eliminar la categoría « ${name} »?\nLos artículos asociados no serán eliminados, pero perderán la asociación a esta categoría.`)) return;
+        }
+
+        try {
+          const res = await fetch("/api/admin/blog/categories", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action, id }),
+          });
+          const data = await res.json();
+          if (data.ok) {
+            showToast("Categoría eliminada.", "success");
+            setTimeout(() => window.location.reload(), 1000);
+          } else {
+            showToast(`Error: ${data.error || "Desconocido"}`, "error");
+          }
+        } catch {
+          showToast("Error de red.", "error");
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .admin-page-header { margin-bottom: var(--space-6, 1.5rem); }
+  .admin-page-title-row {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: var(--space-3, 0.75rem);
+  }
+  .admin-page-title-group { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .admin-page-header h1 {
+    font-family: var(--font-family-display, "Space Grotesk", sans-serif);
+    font-size: var(--h2-font-size, 2rem); font-weight: 800;
+    color: var(--heading-color, #0f172a); margin: 0;
+  }
+  .admin-page-subtitle { color: var(--text-muted, #64748b); font-size: 0.9375rem; margin: var(--space-1, 0.25rem) 0 0; }
+
+  .btn-create {
+    display: inline-flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+    background: var(--color-primary, #eab308); color: var(--color-primary-contrast, #0f172a);
+    border-radius: var(--border-radius-md, 0.375rem); font-weight: 600; font-size: 0.875rem;
+    text-decoration: none; transition: opacity 0.15s, transform 0.1s; white-space: nowrap;
+  }
+  .btn-create:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-create [data-icon] { width: 1.25rem; height: 1.25rem; }
+
+  .btn-create-sm {
+    display: inline-flex; align-items: center; gap: var(--space-1, 0.25rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    background: var(--color-primary, #eab308); color: var(--color-primary-contrast, #0f172a);
+    border-radius: var(--border-radius-md, 0.375rem); font-weight: 600; font-size: 0.8125rem;
+    text-decoration: none; margin-top: var(--space-3, 0.75rem);
+  }
+  .btn-create-sm [data-icon] { width: 1rem; height: 1rem; }
+
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-3, 0.75rem); margin-bottom: var(--space-4, 1rem);
+  }
+  .stat-card {
+    display: flex; align-items: center; gap: var(--space-3, 0.75rem);
+    padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+    background: var(--bg-surface, white); border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-lg, 0.5rem); text-decoration: none; color: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .stat-card:hover { border-color: var(--color-primary, #eab308); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .stat-card.active { border-color: var(--color-primary, #eab308); background: var(--bg-subtle, #f8fafc); }
+  .stat-icon {
+    width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;
+    border-radius: var(--border-radius-md, 0.375rem);
+  }
+  .stat-icon [data-icon] { width: 1.25rem; height: 1.25rem; }
+  .stat-icon--primary { background: #fef9c3; color: #ca8a04; }
+  .stat-icon--accent { background: #ede9fe; color: #7c3aed; }
+  .stat-icon--success { background: #dcfce7; color: #16a34a; }
+  .stat-icon--warning { background: #fef3c7; color: #d97706; }
+  .stat-icon--info { background: #dbeafe; color: #2563eb; }
+  .stat-info { display: flex; flex-direction: column; }
+  .stat-value { font-weight: 700; font-size: 1.25rem; color: var(--text-default, #0f172a); line-height: 1.2; }
+  .stat-label { font-size: 0.75rem; color: var(--text-muted, #64748b); }
+
+  .admin-filters-card { margin-bottom: var(--space-4, 1rem); }
+  .admin-filters-form { display: flex; flex-direction: column; gap: var(--space-3, 0.75rem); }
+  .admin-filters-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-3, 0.75rem); }
+  .admin-filter-field { display: flex; flex-direction: column; gap: var(--space-1, 0.25rem); min-width: 140px; flex: 1; }
+  .filter-search { flex: 2; min-width: 200px; }
+  .admin-filter-actions { display: flex; align-items: center; gap: var(--space-2, 0.5rem); }
+  .admin-filter-reset { color: var(--text-muted, #64748b); font-size: 0.8125rem; text-decoration: underline; }
+
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  .category-title-link { text-decoration: none; }
+  .category-title-link:hover .category-name { color: var(--color-primary, #eab308); }
+  .category-name {
+    font-weight: 600; font-size: 0.875rem; color: var(--text-default, #0f172a);
+    display: block; transition: color 0.15s;
+  }
+  .category-slug {
+    font-family: var(--font-family-mono, monospace); font-size: 0.6875rem;
+    background: var(--bg-inset, #f1f5f9); padding: 0.0625rem 0.375rem;
+    border-radius: var(--border-radius-sm, 0.25rem); color: var(--text-muted, #64748b);
+    display: inline-block; margin-top: 2px;
+  }
+  .category-desc {
+    display: block; font-size: 0.75rem; color: var(--text-muted, #64748b);
+    margin-top: 2px; max-width: 220px;
+  }
+
+  .visibility-badges { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+  .parent-link {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    font-size: 0.8125rem; color: var(--text-default, #1e293b); text-decoration: none;
+  }
+  .parent-link:hover { color: var(--color-primary, #eab308); }
+  .parent-icon { width: 0.875rem; height: 0.875rem; }
+
+  .has-image {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    font-size: 0.8125rem; color: var(--text-default, #1e293b);
+  }
+  .has-image [data-icon] { width: 0.875rem; height: 0.875rem; color: #16a34a; }
+
+  .text-muted { color: var(--text-muted, #64748b); font-size: 0.8125rem; }
+
+  .date-cell { display: flex; flex-direction: column; }
+  .date-main { font-size: 0.8125rem; color: var(--text-default, #1e293b); }
+  .date-sub { font-size: 0.6875rem; color: var(--text-muted, #64748b); }
+
+  .action-buttons { display: flex; gap: 0.25rem; }
+  .action-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem); background: var(--bg-surface, white);
+    color: var(--text-muted, #64748b); cursor: pointer; transition: all 0.15s; text-decoration: none;
+  }
+  .action-btn [data-icon] { width: 1rem; height: 1rem; }
+  .action-btn:hover { border-color: var(--color-primary, #eab308); color: var(--text-default, #0f172a); }
+  .action-btn--delete:hover { color: #dc2626; border-color: #dc2626; background: #fef2f2; }
+
+  .empty-state { text-align: center; padding: var(--space-10, 3rem) var(--space-4, 1rem); color: var(--text-muted, #64748b); }
+  .empty-state-icon { width: 3rem; height: 3rem; margin: 0 auto var(--space-3, 0.75rem); opacity: 0.4; }
+
+  .admin-pagination { margin-top: var(--space-4, 1rem); display: flex; justify-content: center; }
+
+  @media (max-width: 1024px) {
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .admin-filters-row { flex-direction: column; }
+    .admin-filter-field { min-width: 100%; }
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .admin-page-title-row { flex-direction: column; align-items: flex-start; }
+  }
+</style>

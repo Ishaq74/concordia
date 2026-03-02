@@ -2,9 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import * as theme from '@/lib/theme';
 
 describe('theme utility', () => {
-  // helper to temporarily replace window properties
-  const originalLocation = globalThis.location;
-
   beforeEach(() => {
     // reset cookie and localStorage
     document.cookie = '';

@@ -1,0 +1,383 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import AlertComponent from "@components/ui/Alert.astro";
+import { Code } from "astro:components";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+---
+
+<DocLayout 
+  title="Alert Component" 
+  description="Documentation for the Alert component to display information, success, warning, and error messages"
+  variant="initial"
+>
+  <h1 id="alert-component">Alert Component</h1>
+  
+  <p>
+    The <code class="inline-code">Alert</code> component displays contextual messages
+    with different severity levels, icons, dismissible mode, and auto-close support.
+  </p>
+
+  <h2 id="demo-interactive">🎮 Interactive Demo</h2>
+  
+  <div class="demo-section">
+    <button class="demo-btn" onclick="document.getElementById('demo-info').style.display='flex'">Info</button>
+    <button class="demo-btn" onclick="document.getElementById('demo-success').style.display='flex'">Success</button>
+    <button class="demo-btn" onclick="document.getElementById('demo-warning').style.display='flex'">Warning</button>
+    <button class="demo-btn" onclick="document.getElementById('demo-danger').style.display='flex'">Danger</button>
+    <button class="demo-btn" onclick="document.getElementById('demo-dismissible').style.display='flex'">Dismissible</button>
+  </div>
+  
+  <div class="demo-container">
+    <div id="demo-info" class="demo-alert">
+      <AlertComponent status="info" title="Information" message="This is an informational message." />
+    </div>
+    <div id="demo-success" class="demo-alert">
+      <AlertComponent status="success" title="Success!" message="The operation was completed successfully." />
+    </div>
+    <div id="demo-warning" class="demo-alert">
+      <AlertComponent status="warning" title="Warning" message="Please check your data." />
+    </div>
+    <div id="demo-danger" class="demo-alert">
+      <AlertComponent status="danger" title="Error" message="A critical error has occurred." />
+    </div>
+    <div id="demo-dismissible" class="demo-alert">
+      <AlertComponent status="success" title="Dismissible" message="You can close this alert." dismissible />
+    </div>
+  </div>
+
+  <h2 id="installation">Installation</h2>
+  
+  <p>The component is available at <code class="inline-code">src/components/ui/Alert.astro</code></p>
+  
+  <Code
+    lang="typescript"
+    code={`import Alert from '@components/ui/Alert.astro';`}
+  />
+
+  <h2 id="props">Props</h2>
+
+  <div class="props-table">
+    <Table striped>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Prop</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Default</TableHead>
+          <TableHead>Description</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell><code class="inline-code">variant</code></TableCell>
+          <TableCell>initial | retro | modern | futuristic</TableCell>
+          <TableCell>initial</TableCell>
+          <TableCell>Visual style of the alert</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">status</code></TableCell>
+          <TableCell>info | success | warning | danger | error</TableCell>
+          <TableCell>info</TableCell>
+          <TableCell>Severity level</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">title</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Alert title</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">message</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Alert message</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">icon</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>auto</TableCell>
+          <TableCell>Custom icon (otherwise default icon by status)</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">dismissible</code></TableCell>
+          <TableCell>boolean</TableCell>
+          <TableCell>false</TableCell>
+          <TableCell>Show a close button</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell><code class="inline-code">className</code></TableCell>
+          <TableCell>string</TableCell>
+          <TableCell>-</TableCell>
+          <TableCell>Additional CSS classes</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <h2 id="basic-examples">Basic Examples</h2>
+
+  <h3 id="statuses">Different statuses</h3>
+  
+  <AlertComponent status="info" message="This is important information." />
+  <AlertComponent status="success" message="Operation completed successfully!" />
+  <AlertComponent status="warning" message="Warning, this action is irreversible." />
+  <AlertComponent status="danger" message="A critical error has occurred." />
+
+  <Code
+    lang="astro"
+    code={`<Alert status="info" message="This is important information." />
+<Alert status="success" message="Operation completed successfully!" />
+<Alert status="warning" message="Warning, this action is irreversible." />
+<Alert status="danger" message="A critical error has occurred." />`}
+  />
+
+  <h3 id="with-title">With title</h3>
+  
+  <AlertComponent 
+    status="info" 
+    title="Information"
+    message="See the documentation for more details."
+  />
+  <AlertComponent 
+    status="success" 
+    title="Success"
+    message="Your file has been uploaded successfully."
+  />
+
+  <Code
+    lang="astro"
+    code={`<Alert 
+  status="info" 
+  title="Information"
+  message="See the documentation for more details."
+/>`}
+  />
+
+  <h3 id="with-slot">With custom content (slot)</h3>
+  
+  <AlertComponent status="info">
+    Use the <strong>slot</strong> for custom HTML content with <em>formatting</em>.
+  </AlertComponent>
+
+  <Code
+    lang="astro"
+    code={`<Alert status="info">
+  Use the <strong>slot</strong> for custom HTML content.
+</Alert>`}
+  />
+
+  <h2 id="variants">Variants</h2>
+
+  <h3 id="variant-initial">Initial (Default)</h3>
+  
+  <AlertComponent status="info" message="Information - initial variant" />
+  <AlertComponent status="success" message="Success - initial variant" />
+  <AlertComponent status="warning" message="Warning - initial variant" />
+  <AlertComponent status="danger" message="Error - initial variant" />
+
+  <Code
+    lang="astro"
+    code={`<Alert status="success" message="Success - initial variant" />`}
+  />
+
+  <h3 id="variant-retro">Retro</h3>
+  
+  <AlertComponent variant="retro" status="info" message="Information - retro style" />
+  <AlertComponent variant="retro" status="success" message="Success - retro style" />
+  <AlertComponent variant="retro" status="warning" message="Warning - retro style" />
+  <AlertComponent variant="retro" status="danger" message="Error - retro style" />
+
+  <Code
+    lang="astro"
+    code={`<Alert variant="retro" status="success" message="Success - retro style" />`}
+  />
+
+  <h3 id="variant-modern">Modern</h3>
+  
+  <AlertComponent variant="modern" status="info" message="Information - modern style" />
+  <AlertComponent variant="modern" status="success" message="Success - modern style" />
+  <AlertComponent variant="modern" status="warning" message="Warning - modern style" />
+  <AlertComponent variant="modern" status="danger" message="Error - modern style" />
+
+  <Code
+    lang="astro"
+    code={`<Alert variant="modern" status="success" message="Success - modern style" />`}
+  />
+
+  <h3 id="variant-futuristic">Futuristic</h3>
+  
+  <AlertComponent variant="futuristic" status="info" message="Information - futuristic style" />
+  <AlertComponent variant="futuristic" status="success" message="Success - futuristic style" />
+  <AlertComponent variant="futuristic" status="warning" message="Warning - futuristic style" />
+  <AlertComponent variant="futuristic" status="danger" message="Error - futuristic style" />
+
+  <Code
+    lang="astro"
+    code={`<Alert variant="futuristic" status="success" message="Success - futuristic style" />`}
+  />
+
+  <h2 id="with-icons">With custom icons</h2>
+  
+  <AlertComponent 
+    status="info" 
+    icon="mdi:lightbulb" 
+    message="Tip: use custom icons for more clarity."
+  />
+  <AlertComponent 
+    status="success" 
+    icon="mdi:rocket" 
+    message="Deployment successful!"
+  />
+  <AlertComponent 
+    status="warning" 
+    icon="mdi:shield-alert" 
+    message="Security update available."
+  />
+
+  <Code
+    lang="astro"
+    code={`<Alert 
+  status="info" 
+  icon="mdi:lightbulb" 
+  message="Tip: use custom icons." 
+/>`}
+  />
+
+  <h2 id="dismissible">Dismissible alerts</h2>
+
+  <p>Alerts can be closed by the user with the <code class="inline-code">dismissible</code> prop.</p>
+  
+  <AlertComponent 
+    status="info" 
+    title="Information"
+    message="Click the cross to close this alert."
+    dismissible
+  />
+  <AlertComponent 
+    status="success" 
+    message="Your profile has been updated."
+    dismissible
+  />
+
+  <Code
+    lang="astro"
+    code={`<Alert 
+  status="info" 
+  title="Information"
+  message="Click the cross to close this alert."
+  dismissible
+/>`}
+  />
+
+  <h2 id="use-cases">Use cases</h2>
+
+  <h3 id="success-notification">Success notification</h3>
+  
+  <AlertComponent 
+    variant="modern"
+    status="success" 
+    title="Registration successful"
+    message="Welcome! A confirmation email has been sent to your address."
+    dismissible
+  />
+
+  <Code
+    lang="astro"
+    code={`<Alert 
+  variant="modern"
+  status="success" 
+  title="Registration successful"
+  message="Welcome! A confirmation email has been sent."
+  dismissible
+/>`}
+  />
+
+  <h3 id="error-message">Error message</h3>
+  
+  <AlertComponent 
+    status="danger" 
+    title="Connection error"
+    message="Unable to connect to the server. Please try again later."
+  />
+
+  <Code
+    lang="astro"
+    code={`<Alert 
+  status="danger" 
+  title="Connection error"
+  message="Unable to connect to the server."
+/>`}
+  />
+
+  <h3 id="important-warning">Important warning</h3>
+  
+  <AlertComponent 
+    variant="retro"
+    status="warning" 
+    title="Action required"
+  >
+    Your subscription expires in <strong>3 days</strong>. 
+    <a href="/subscribe">Renew now</a> to continue enjoying our services.
+  </AlertComponent>
+
+  <Code
+    lang="astro"
+    code={`<Alert 
+  variant="retro"
+  status="warning" 
+  title="Action required"
+>
+  Your subscription expires in <strong>3 days</strong>. 
+  <a href="/subscribe">Renew now</a>.
+</Alert>`}
+  />
+
+  <h3 id="system-info">System information</h3>
+  
+  <AlertComponent 
+    variant="futuristic"
+    status="info" 
+    icon="mdi:update"
+    title="Update available"
+    message="A new version of the application is available. Click to install."
+  />
+
+  <Code
+    lang="astro"
+    code={`<Alert 
+  variant="futuristic"
+  status="info" 
+  icon="mdi:update"
+  title="Update available"
+  message="A new version is available."
+/>`}
+  />
+
+  <h2 id="accessibility">Accessibility</h2>
+
+  <ul>
+    <li>The <code class="inline-code">role=\"alert\"</code> attribute is automatically added</li>
+    <li>Screen readers announce important alerts</li>
+    <li>The close button has a "Close alert" label</li>
+    <li>Icons are decorative and do not affect readability</li>
+    <li>Colors respect WCAG contrast guidelines</li>
+  </ul>
+
+  <h2 id="best-practices">Best practices</h2>
+
+  <ul>
+    <li>Use <code class="inline-code">status=\"info\"</code> for general information</li>
+    <li>Use <code class="inline-code">status=\"success\"</code> to confirm a successful action</li>
+    <li>Use <code class="inline-code">status=\"warning\"</code> for non-blocking warnings</li>
+    <li>Use <code class="inline-code">status=\"danger\"</code> for critical errors</li>
+    <li>Add a title for important messages</li>
+    <li>Use <code class="inline-code">dismissible</code> for non-critical alerts</li>
+    <li>Keep messages short and actionable</li>
+    <li>Avoid displaying too many alerts at once</li>
+  </ul>
+
+</DocLayout>
