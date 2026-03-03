@@ -41,12 +41,14 @@ _يتم إنشاء هذا الملف تلقائيًا لتوفير سياق شا
 - **@iconify-json/circle-flags**: `^1.2.10`
 - **@iconify-json/mdi**: `^1.2.3`
 - **@iconify-json/openmoji**: `^1.2.22`
-- **astro**: `^5.17.3`
+- **astro**: `^5.18.0`
 - **astro-font**: `^1.1.0`
 - **astro-icon**: `^1.1.5`
 - **better-auth**: `^1.4.18`
 - **dotenv**: `^17.3.1`
 - **drizzle-orm**: `^0.45.1`
+- **easymde**: `^2.20.0`
+- **fast-glob**: `^3.3.3`
 - **jose**: `^6.1.3`
 - **leaflet**: `^1.9.4`
 - **markdown-it**: `^14.1.1`
@@ -68,6 +70,7 @@ npm install
 - `npm run astro`: astro
 - `npm run sonda:report`: node scripts/run-sonda.mjs ./dist ./reports
 - `npm run readme:generate`: tsx scripts/readme-generate.ts
+- `npm run contextai:inject-scope`: tsx scripts/contextai/injectScope.ts
 - `npm run db:check`: tsx scripts/db/db.check.ts
 - `npm run db:compare`: tsx scripts/db/db.compare.ts
 - `npm run syncdb:dev-to-prod`: tsx scripts/db/db.sync.ts dev-to-prod
@@ -81,10 +84,10 @@ npm install
 - `npm run test:coverage`: vitest --coverage
 - `npm run test:unit`: vitest run tests/unit
 - `npm run test:integration`: vitest run tests/integration --maxWorkers 1 --no-file-parallelism
-- `npm run test:e2e`: vitest run tests/e2e
+- `npm run test:e2e`: vitest run tests/e2e/critical-flows.test.ts
 - `npm run test:ui`: pnpm exec playwright test tests/e2e/ui
-- `npm run test:security`: vitest run tests/e2e/security.test.ts
-- `npm run test:api`: vitest run tests/e2e/api-auth.test.ts
+- `npm run test:security`: vitest run tests/security/security.test.ts
+- `npm run test:api`: vitest run tests/integration/auth-flow.test.ts
 - `npm run test:all`: vitest run
 - `npm run test:debug`: vitest --inspect-brk --inspect --single-thread
 - `npm run test:ci`: vitest run --coverage
@@ -123,14 +126,38 @@ npm install
       - lucas-martin.png
       - sarah-leroy.png
     - placeholder.jpg
+  - **uploads**
+    - **blog**
+      - 03910dcf-82df-42ea-ab02-aaeb71cc03c9.png
+      - 35dfd524-ff95-489d-b979-7e80f2a3a59c.png
+      - 470fbdb2-568b-4c17-b018-a35f25e1defd.png
+      - 53e3cb4f-f79e-47b0-ac28-6fcdd0250992.png
+      - ba39e8a6-23fc-455f-ace0-145e57372c51.png
+      - bc9b2100-4a88-437b-8f99-1b4f79e7626c.png
+      - f573a29a-4294-47eb-8813-a54d18836666.png
+      - fb026c29-60e4-46dd-95d3-3bf4d0aae5d4.png
+      - logo.png
   - **videos**
 - README.ar.md
 - README.es.md
 - README.fr.md
 - README.md
 - **reports**
+  - i18n-audit-report.md
+  - i18n-doc-pages-audit.md
   - sonda-report.html
 - **scripts**
+  - add-admin-i18n-keys.mjs
+  - add-client-i18n-keys.mjs
+  - add-component-i18n-keys.mjs
+  - add-docs-i18n-keys.mjs
+  - add-final-i18n-keys.mjs
+  - add-i18n-keys.mjs
+  - audit-doc-headings.mjs
+  - audit-i18n-complete.mjs
+  - audit-tablecell-remaining.mjs
+  - **contextai**
+    - injectScope.ts
   - **db**
     - db.check.ts
     - db.compare.ts
@@ -142,6 +169,19 @@ npm install
   - debug-auth-login.ts
   - debug-check-permission.ts
   - debug-rate-limit.ts
+  - fix-legal-i18n.mjs
+  - fix-quote-errors.mjs
+  - fix-remaining-ui.mjs
+  - fix-todo-translate-2.mjs
+  - fix-todo-translate.mjs
+  - i18n-doc-pages.mjs
+  - i18n-docs-complete.mjs
+  - i18n-docs-phase3.mjs
+  - i18n-docs-phase4-toc.mjs
+  - i18n-docs-phase4b-toc.mjs
+  - i18n-docs-phase5-tablecell.mjs
+  - i18n-docs-phase5b-tablecell.mjs
+  - i18n-docs-ui-text.mjs
   - **readme**
     - generateDatabase.ts
     - generateDeps.ts
@@ -154,20 +194,27 @@ npm install
     - utils.ts
   - readme-generate.ts
   - run-sonda.mjs
-- snapshot-profile-2.md
+  - sync-translations.cjs
 - **src**
   - **actions**
     - blog.ts
     - comments.ts
     - index.ts
   - **components**
+    - **admin**
+      - AdminToast.astro
+      - MarkdownEditor.astro
+      - MediaPickerModal.astro
     - **modules**
       - **blog**
         - **cards**
           - AuthorCard.astro
           - PostCard.astro
         - **lists**
+          - CategoryGrid.astro
+          - FeaturedGrid.astro
           - PostGrid.astro
+          - RelatedPosts.astro
         - **single**
           - CommentItem.astro
           - PostComments.astro
@@ -245,6 +292,7 @@ npm install
         - BreadcrumbPage.astro
         - BreadcrumbSeparator.astro
         - index.ts
+        - PageBreadcrumb.astro
       - Button.astro
       - **Card**
         - Card.astro
@@ -328,6 +376,7 @@ npm install
     - **admin**
       - loaders.ts
     - **data**
+      - 01-profile.data.ts
       - 01-user.data.ts
       - 02-blog_authors.data.ts
       - 03-blog_categories.data.ts
@@ -344,8 +393,12 @@ npm install
       - factory.ts
     - **migrations**
       - 0002_narrow_silver_samurai.sql
+      - 0003_calm_chat.sql
+      - 0004_tricky_captain_flint.sql
       - **meta**
         - 0002_snapshot.json
+        - 0003_snapshot.json
+        - 0004_snapshot.json
         - _journal.json
     - **schemas**
       - audit-log.schema.ts
@@ -358,6 +411,7 @@ npm install
       - blog_posts.schema.ts
       - blog_translations.schema.ts
       - notification.schema.ts
+      - profile.schema.ts
     - schemas.ts
   - env.d.ts
   - **i18n**
@@ -365,20 +419,28 @@ npm install
     - en.json
     - es.json
     - fr.json
+    - slug-map.ts
+    - translations.ts
   - **layouts**
+    - AdminLayout.astro
     - BaseLayout.astro
     - DashboardLayout.astro
     - DocLayout.astro
   - **lib**
     - **admin**
+      - api-helpers.ts
       - config.ts
       - history.ts
       - loaders.ts
+      - markdown-editor.ts
+      - media-picker.ts
       - organizations.ts
       - permissions.ts
       - policy-store.ts
+      - toast.ts
       - users.ts
     - **auth**
+      - admin-access-control.ts
       - auth-client.ts
       - auth.test.ts
       - auth.ts
@@ -390,6 +452,7 @@ npm install
       - validate-user.ts
     - **i18n**
       - locale-url.ts
+      - route-helpers.ts
     - **notifications**
       - notifications.ts
     - **smtp**
@@ -404,6 +467,12 @@ npm install
     - 500.astro
     - **api**
       - **admin**
+        - **blog**
+          - articles.ts
+          - authors.ts
+          - categories.ts
+          - comments.ts
+          - media.ts
         - moderate.ts
         - organizations.ts
         - roles.ts
@@ -415,81 +484,50 @@ npm install
         - verification.ts
       - **profile**
         - index.ts
-    - **ar**
-      - index.astro
-    - **en**
+    - **[lang]**
+      - about.astro
+      - **admin**
+        - **audit**
+          - index.astro
+        - **blog**
+          - **articles**
+            - index.astro
+            - new.astro
+            - **[id]**
+              - edit.astro
+          - **authors**
+            - index.astro
+            - new.astro
+            - **[id]**
+              - edit.astro
+          - **categories**
+            - index.astro
+            - new.astro
+            - **[id]**
+              - edit.astro
+          - **comments**
+            - index.astro
+          - **media**
+            - index.astro
+        - **config**
+          - index.astro
+        - index.astro
+        - **moderation**
+          - index.astro
+        - **users**
+          - index.astro
       - **auth**
         - forgot-password.astro
         - invitations.astro
         - legal.astro
         - profile.astro
+        - profile.astro.bak
         - reset-password.astro
         - sign-in.astro
         - sign-up.astro
         - verify-email.astro
       - **blog**
-        - index.astro
-      - **docs**
-        - **components**
-          - accordion.astro
-          - avatar.astro
-          - breadcrumb.astro
-          - gallery.astro
-          - pagination.astro
-          - progressbar.astro
-          - skeleton.astro
-          - slider.astro
-          - timeline.astro
-        - **design**
-          - alert.astro
-          - badge.astro
-          - button.astro
-          - card.astro
-          - code.astro
-          - dialog.astro
-          - dropdown.astro
-          - form.astro
-          - index.astro
-          - kbd.astro
-          - link.astro
-          - menudropdown.astro
-          - sheet.astro
-          - switch.astro
-          - table.astro
-          - tabs.astro
-          - tooltip.astro
-          - video.astro
-        - **layouts**
-          - base.astro
-          - doc.astro
-        - **templates**
-          - footer.astro
-          - header.astro
-          - table-of-contents.astro
-      - index.astro
-      - profile.astro
-    - **es**
-      - **blog**
-        - **auteur**
-          - [slug].astro
-        - index.astro
-        - **[category]**
-          - [slug].astro
-        - [category].astro
-      - index.astro
-    - **fr**
-      - a-propos.astro
-      - **auth**
-        - connexion.astro
-        - inscription.astro
-        - invitations.astro
-        - legal.astro
-        - mot-de-passe-oublie.astro
-        - profil.astro
-        - reinitialiser-mot-de-passe.astro
-        - verifier-email.astro
-      - **blog**
-        - **auteur**
+        - **author**
           - [slug].astro
         - index.astro
         - **[category]**
@@ -502,6 +540,7 @@ npm install
           - avatar.astro
           - breadcrumb.astro
           - gallery.astro
+          - index.astro
           - pagination.astro
           - progressbar.astro
           - skeleton.astro
@@ -529,12 +568,17 @@ npm install
         - **layouts**
           - base.astro
           - doc.astro
+          - index.astro
         - **templates**
           - footer.astro
           - header.astro
+          - index.astro
           - table-of-contents.astro
       - index.astro
-      - profil.astro
+      - **organizations**
+        - index.astro
+        - [slug].astro
+      - profile.astro
   - **styles**
     - base.css
     - **components**
@@ -549,11 +593,22 @@ npm install
       - spacing.css
       - typography.css
 - **test-results**
+  - **ui-newtab-NewTabComponent--9ea60-e-loads-and-demo-is-present-chromium**
+    - test-failed-1.png
+    - trace.zip
+    - video.webm
+  - **ui-newtab-NewTabComponent--9ea60-e-loads-and-demo-is-present-chromium-retry1**
+    - test-failed-1.png
+    - trace.zip
+    - video.webm
+  - **ui-newtab-NewTabComponent--9ea60-e-loads-and-demo-is-present-chromium-retry2**
+    - test-failed-1.png
+    - trace.zip
+    - video.webm
 - **tests**
   - **a11y**
     - a11y-performance.test.ts
     - a11y-utils.ts
-  - **api**
   - **config**
     - test-db.ts
     - test-env.ts
@@ -580,19 +635,19 @@ npm install
   - **fixtures**
     - auth-fixtures.ts
     - security-payloads.ts
-  - **hooks**
+  - **i18n**
+    - routing.test.ts
+    - rtl.test.ts
+    - slug-map.test.ts
+    - translation-coverage.test.ts
   - **integration**
     - auth-emails.test.ts
     - auth-flow.test.ts
     - comments.test.ts
     - **loaders**
       - blog-loader.test.ts
-  - **modules**
-    - **blog**
-      - **cards**
-        - PostCard.astro.test.ts
   - **pages**
-    - README.md
+    - public-pages.test.ts
   - README.md
   - **security**
     - security.test.ts
@@ -600,40 +655,6 @@ npm install
   - **ssr**
     - ssr-hydration-errors.test.ts
     - ssr-utils.ts
-  - **templates**
-  - **ui**
-    - AdCard.astro.test.ts
-    - Alert.astro.test.ts
-    - ArticleCard.astro.test.ts
-    - Avatar.astro.test.ts
-    - Badge.astro.test.ts
-    - BannerPage.astro.test.ts
-    - BannerPage.video.test.ts
-    - Breadcrumb.astro.test.ts
-    - Card.astro.test.ts
-    - Dialog.astro.test.ts
-    - Dropdown.astro.test.ts
-    - EventCard.astro.test.ts
-    - FundingCampaignCard.astro.test.ts
-    - Gallery.astro.test.ts
-    - Grid.astro.test.ts
-    - GroupCard.astro.test.ts
-    - Kbd.astro.test.ts
-    - Link.astro.test.ts
-    - Map.astro.test.ts
-    - MenuDropdown.astro.test.ts
-    - Pagination.astro.test.ts
-    - PlaceCard.astro.test.ts
-    - ProductCard.astro.test.ts
-    - ProfileTemplates.astro.test.ts
-    - ProgressBar.astro.test.ts
-    - ServiceCard.astro.test.ts
-    - Sheet.astro.test.ts
-    - Skeleton.astro.test.ts
-    - ThemeSwitch.astro.test.ts
-    - ThreadCard.astro.test.ts
-    - Timeline.astro.test.ts
-    - Tooltip.astro.test.ts
   - **unit**
     - **loaders**
       - factory.test.ts
@@ -938,11 +959,25 @@ npm install
     - userAgent: text
     - data: jsonb
     - createdAt: timestamp
+- **profile.schema.ts**
+  - profile (const: profile)
+    - id: text
+    - userId: text
+    - username: text
+    - fullName: text
+    - bio: text
+    - avatarUrl: text
+    - location: text
+    - website: text
+    - preferredLanguage: text
+    - createdAt: timestamp
+    - updatedAt: timestamp
 - **blog_posts.schema.ts**
   - blog_posts (const: blogPosts)
     - id: text
     - slug: text
     - status: text
+    - organizationId: text
     - publishedAt: timestamp
     - displayInHome: boolean
     - displayInBlog: boolean
@@ -959,6 +994,7 @@ npm install
     - createdAt: timestamp
     - updatedAt: timestamp
     - Relations:
+      - organization: one
       - authors: many
       - categories: many
       - media: many
@@ -1070,6 +1106,69 @@ npm install
   - blog_organizations (const: blogOrganizations)
     - id: text
     - name: text
+    - slug: text
+    - alternateName: jsonb
+    - description: jsonb
+    - url: text
+    - logo: text
+    - image: text
+    - slogan: jsonb
+    - email: text
+    - telephone: text
+    - faxNumber: text
+    - address: jsonb
+    - contactPoint: jsonb
+    - legalName: jsonb
+    - taxID: text
+    - vatID: text
+    - leiCode: text
+    - duns: text
+    - isicV4: text
+    - naics: text
+    - nonprofitStatus: text
+    - founder: jsonb
+    - foundingDate: timestamp
+    - foundingLocation: text
+    - numberOfEmployees: integer
+    - employee: jsonb
+    - alumni: jsonb
+    - parentOrganization: text
+    - subOrganization: jsonb
+    - department: jsonb
+    - owns: jsonb
+    - brand: jsonb
+    - makesOffer: jsonb
+    - seeks: jsonb
+    - hasOfferCatalog: jsonb
+    - areaServed: jsonb
+    - serviceArea: jsonb
+    - award: jsonb
+    - hasCredential: jsonb
+    - knowsLanguage: jsonb
+    - knowsAbout: jsonb
+    - keywords: text
+    - memberOf: jsonb
+    - sameAs: jsonb
+    - publishingPrinciples: text
+    - actionableFeedbackPolicy: text
+    - correctionsPolicy: text
+    - diversityPolicy: text
+    - ethicsPolicy: text
+    - masthead: text
+    - missionCoveragePrioritiesPolicy: text
+    - noBylinesPolicy: text
+    - ownershipFundingInfo: text
+    - unnamedSourcesPolicy: text
+    - verificationFactCheckingPolicy: text
+    - diversityStaffingReport: text
+    - aggregateRating: jsonb
+    - interactionStatistic: jsonb
+    - review: jsonb
+    - event: jsonb
+    - isActive: boolean
+    - isFeatured: boolean
+    - createdAt: timestamp
+    - updatedAt: timestamp
 - **blog_translations.schema.ts**
   - blog_translations (const: blogTranslations)
     - id: text
@@ -1091,10 +1190,16 @@ npm install
   - notification (const: notification)
     - id: text
     - userId: text
-    - message: text
     - type: text
+    - title: text
+    - body: text
+    - message: text
     - status: text
+    - targetType: text
+    - targetId: text
+    - data: jsonb
     - isRead: boolean
+    - readAt: timestamp
     - createdAt: timestamp
     - updatedAt: timestamp
 
@@ -1125,7 +1230,7 @@ _جميع ملفات المخطط تم تصديرها._
 
 #### Colors
 
-المتغيرات: `244`
+المتغيرات: `249`
 
 ```css
 --color-primary: #eab308;
@@ -1133,12 +1238,12 @@ _جميع ملفات المخطط تم تصديرها._
 --color-accent: #ec4899;
 --color-success: #16a34a;
 --color-warning: #f97316;
-/* ... 239 متغيرات أخرى */
+/* ... 244 متغيرات أخرى */
 ```
 
 #### Spacing
 
-المتغيرات: `28`
+المتغيرات: `30`
 
 ```css
 --space-1: 0.25rem;
@@ -1146,7 +1251,7 @@ _جميع ملفات المخطط تم تصديرها._
 --space-3: 0.75rem;
 --space-4: 1rem;
 --space-5: 1.25rem;
-/* ... 23 متغيرات أخرى */
+/* ... 25 متغيرات أخرى */
 ```
 
 #### Typography
@@ -1197,7 +1302,6 @@ _جميع ملفات المخطط تم تصديرها._
 - **a11y**
   - a11y-performance.test.ts
   - a11y-utils.ts
-- **api**
 - **config**
   - test-db.ts
   - test-env.ts
@@ -1224,19 +1328,19 @@ _جميع ملفات المخطط تم تصديرها._
 - **fixtures**
   - auth-fixtures.ts
   - security-payloads.ts
-- **hooks**
+- **i18n**
+  - routing.test.ts
+  - rtl.test.ts
+  - slug-map.test.ts
+  - translation-coverage.test.ts
 - **integration**
   - auth-emails.test.ts
   - auth-flow.test.ts
   - comments.test.ts
   - **loaders**
     - blog-loader.test.ts
-- **modules**
-  - **blog**
-    - **cards**
-      - PostCard.astro.test.ts
 - **pages**
-  - README.md
+  - public-pages.test.ts
 - README.md
 - **security**
   - security.test.ts
@@ -1244,40 +1348,6 @@ _جميع ملفات المخطط تم تصديرها._
 - **ssr**
   - ssr-hydration-errors.test.ts
   - ssr-utils.ts
-- **templates**
-- **ui**
-  - AdCard.astro.test.ts
-  - Alert.astro.test.ts
-  - ArticleCard.astro.test.ts
-  - Avatar.astro.test.ts
-  - Badge.astro.test.ts
-  - BannerPage.astro.test.ts
-  - BannerPage.video.test.ts
-  - Breadcrumb.astro.test.ts
-  - Card.astro.test.ts
-  - Dialog.astro.test.ts
-  - Dropdown.astro.test.ts
-  - EventCard.astro.test.ts
-  - FundingCampaignCard.astro.test.ts
-  - Gallery.astro.test.ts
-  - Grid.astro.test.ts
-  - GroupCard.astro.test.ts
-  - Kbd.astro.test.ts
-  - Link.astro.test.ts
-  - Map.astro.test.ts
-  - MenuDropdown.astro.test.ts
-  - Pagination.astro.test.ts
-  - PlaceCard.astro.test.ts
-  - ProductCard.astro.test.ts
-  - ProfileTemplates.astro.test.ts
-  - ProgressBar.astro.test.ts
-  - ServiceCard.astro.test.ts
-  - Sheet.astro.test.ts
-  - Skeleton.astro.test.ts
-  - ThemeSwitch.astro.test.ts
-  - ThreadCard.astro.test.ts
-  - Timeline.astro.test.ts
-  - Tooltip.astro.test.ts
 - **unit**
   - **loaders**
     - factory.test.ts
@@ -1290,14 +1360,19 @@ _جميع ملفات المخطط تم تصديرها._
   - cleanup.ts
 - **src/lib**
 - **admin**
+  - api-helpers.ts
   - config.ts
   - history.ts
   - loaders.ts
+  - markdown-editor.ts
+  - media-picker.ts
   - organizations.ts
   - permissions.ts
   - policy-store.ts
+  - toast.ts
   - users.ts
 - **auth**
+  - admin-access-control.ts
   - auth-client.ts
   - auth.test.ts
   - auth.ts
@@ -1309,6 +1384,7 @@ _جميع ملفات المخطط تم تصديرها._
   - validate-user.ts
 - **i18n**
   - locale-url.ts
+  - route-helpers.ts
 - **notifications**
   - notifications.ts
 - **smtp**
@@ -1321,6 +1397,7 @@ _جميع ملفات المخطط تم تصديرها._
 - **admin**
   - loaders.ts
 - **data**
+  - 01-profile.data.ts
   - 01-user.data.ts
   - 02-blog_authors.data.ts
   - 03-blog_categories.data.ts
@@ -1337,8 +1414,12 @@ _جميع ملفات المخطط تم تصديرها._
   - factory.ts
 - **migrations**
   - 0002_narrow_silver_samurai.sql
+  - 0003_calm_chat.sql
+  - 0004_tricky_captain_flint.sql
   - **meta**
     - 0002_snapshot.json
+    - 0003_snapshot.json
+    - 0004_snapshot.json
     - _journal.json
 - **schemas**
   - audit-log.schema.ts
@@ -1351,9 +1432,16 @@ _جميع ملفات المخطط تم تصديرها._
   - blog_posts.schema.ts
   - blog_translations.schema.ts
   - notification.schema.ts
+  - profile.schema.ts
 - schemas.ts
 - **src/pages/api**
 - **admin**
+  - **blog**
+    - articles.ts
+    - authors.ts
+    - categories.ts
+    - comments.ts
+    - media.ts
   - moderate.ts
   - organizations.ts
   - roles.ts
@@ -1483,6 +1571,59 @@ _جميع ملفات المخطط تم تصديرها._
 - `tests\e2e\ui\video.test.ts`
   - **VideoComponent – documentation page**
 
+- `tests\i18n\routing.test.ts`
+  - **route-helpers**
+  - **isValidLocale**
+    - accepts valid locales
+    - rejects invalid locales
+  - **getSupportedLocales**
+    - returns exactly 4 locales
+  - **getLocalizedUrl**
+    - localizes top-level pages
+    - localizes auth pages
+    - localizes organizations with dynamic slug
+    - localizes blog/author with dynamic slug
+    - passes through non-localized paths unchanged
+    - handles root path
+    - strips leading/trailing slashes from canonical path
+    - falls back to fr for invalid locale
+  - **getCanonicalPath**
+    - resolves FR localized slugs to canonical paths
+    - resolves ES localized slugs to canonical paths
+    - returns null for EN (already canonical)
+    - returns null for AR (same as EN)
+    - returns null for paths without any mapping
+    - handles dynamic segments after a mapped prefix
+    - strips leading/trailing slashes
+
+- `tests\i18n\rtl.test.ts`
+  - **RTL — dir attribute correctness**
+    - /${locale}/ should have dir="${expectedDir}" and lang="${locale}"
+  - **RTL — locale detection**
+    - only Arabic is RTL
+    - RTL_LOCALES array is consistent with supported locales
+
+- `tests\i18n\slug-map.test.ts`
+  - **slug-map**
+    - exports 20 canonical entries (12 original + 7 navigation + 1 legal)
+    - every entry has all 4 locales defined
+    - EN slug always matches the canonical key
+    - AR slug matches EN slug (per mapping table)
+    - no duplicate localized slugs within a single locale
+  - **reverseSlugMap**
+    - has entries for all 4 locales
+    - reverse map resolves FR localized slugs back to canonical
+    - reverse map resolves ES localized slugs back to canonical
+    - EN reverse map is empty (EN = canonical, no rewrite needed)
+    - AR reverse map is empty (AR = EN = canonical)
+    - is strictly the inverse of slugMap for non-identity entries
+
+- `tests\i18n\translation-coverage.test.ts`
+  - **translation coverage**
+    - all locales have the same top-level sections as FR
+    - every key in FR exists in all other locales
+    - no extra keys in other locales that FR doesn't have
+
 - `tests\integration\auth-emails.test.ts`
   - **BetterAuth Email Functions**
   - **Email Verification**
@@ -1515,7 +1656,16 @@ _جميع ملفات المخطط تم تصديرها._
     - logs error on missing lang key in translation
     - logs error if two translations produce same id
 
-- `tests\modules\blog\cards\PostCard.astro.test.ts`
+- `tests\pages\public-pages.test.ts`
+  - **Public pages — localized URL generation**
+    - ${locale} → /${locale}/${expected[locale as keyof typeof expected]}
+  - **Unmapped pages — pass-through URL generation**
+    - ${locale}/${page} → /${locale}/${page}
+  - **Home page URL**
+    - ${locale} home → /${locale}/
+  - **Dynamic segment pages**
+    - organizations/my-org resolves to localized prefix
+    - blog/author/john-doe resolves to localized prefix
 
 - `tests\security\security.test.ts`
   - **RBAC/ABAC**
@@ -1532,103 +1682,8 @@ _جميع ملفات المخطط تم تصديرها._
 
 - `tests\ssr\ssr-hydration-errors.test.ts`
   - **SSR rendering**
-    - renders all pages correctly on server
-    - renders with all variants and locales
-  - **Hydration**
-    - hydrates interactive islands only
-  - **Server errors**
-    - returns 500 for uncaught exceptions
+    - renders homepage for all locales
     - returns 404 for unknown routes
-
-- `tests\ui\AdCard.astro.test.ts`
-
-- `tests\ui\Alert.astro.test.ts`
-
-- `tests\ui\ArticleCard.astro.test.ts`
-
-- `tests\ui\Avatar.astro.test.ts`
-  - **Avatar.astro**
-    - renders with default props and slot
-    - applies variant and className props
-    - renders alt text for accessibility
-
-- `tests\ui\Badge.astro.test.ts`
-
-- `tests\ui\BannerPage.astro.test.ts`
-  - **BannerPage template**
-    - renders title and subtitle
-    - applies variant and color classes and shows meta
-    - renders breadcrumbs when passed
-
-- `tests\ui\BannerPage.video.test.ts`
-  - **BannerPage template with video background**
-    - renders a video background when videoUrl is provided
-
-- `tests\ui\Breadcrumb.astro.test.ts`
-  - **Breadcrumb.astro**
-    - renders breadcrumb items from slot
-    - applies variant and className props
-    - renders aria-label for accessibility
-
-- `tests\ui\Card.astro.test.ts`
-  - **Card.astro**
-    - renders slot content and default classes
-    - applies variant and color props
-    - renders with role and aria-label for a11y
-
-- `tests\ui\Dialog.astro.test.ts`
-  - **Dialog.astro**
-    - renders slot content and dialog role
-    - applies variant and className props
-    - renders aria-modal for accessibility
-
-- `tests\ui\Dropdown.astro.test.ts`
-  - **Dropdown.astro**
-    - renders slot content and default classes
-    - applies variant and color props
-    - renders with aria-haspopup for accessibility
-
-- `tests\ui\EventCard.astro.test.ts`
-
-- `tests\ui\FundingCampaignCard.astro.test.ts`
-
-- `tests\ui\Gallery.astro.test.ts`
-
-- `tests\ui\Grid.astro.test.ts`
-
-- `tests\ui\GroupCard.astro.test.ts`
-
-- `tests\ui\Kbd.astro.test.ts`
-
-- `tests\ui\Link.astro.test.ts`
-
-- `tests\ui\Map.astro.test.ts`
-
-- `tests\ui\MenuDropdown.astro.test.ts`
-
-- `tests\ui\Pagination.astro.test.ts`
-
-- `tests\ui\PlaceCard.astro.test.ts`
-
-- `tests\ui\ProductCard.astro.test.ts`
-
-- `tests\ui\ProfileTemplates.astro.test.ts`
-
-- `tests\ui\ProgressBar.astro.test.ts`
-
-- `tests\ui\ServiceCard.astro.test.ts`
-
-- `tests\ui\Sheet.astro.test.ts`
-
-- `tests\ui\Skeleton.astro.test.ts`
-
-- `tests\ui\ThemeSwitch.astro.test.ts`
-
-- `tests\ui\ThreadCard.astro.test.ts`
-
-- `tests\ui\Timeline.astro.test.ts`
-
-- `tests\ui\Tooltip.astro.test.ts`
 
 - `tests\unit\loaders\factory.test.ts`
   - **createTranslationLoader (unit)**
