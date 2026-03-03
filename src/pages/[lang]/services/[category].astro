@@ -1,0 +1,397 @@
+---
+// src/pages/[lang]/services/[category].astro — Category filtered listing (wireframe refonte)
+import { getCollection } from "astro:content";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import BannerPage from "@templates/BannerPage.astro";
+import ServiceGrid from "@components/modules/services/lists/ServiceGrid.astro";
+import ServiceCard from "@components/modules/services/cards/ServiceCard.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const locales = ["fr", "en", "es", "ar"];
+  const allServices = await getCollection("services");
+  return locales.flatMap((lang) => {
+    const langServices = allServices.filter((s) => s.data.lang === lang);
+    const categories = new Map<string, string>();
+    langServices.forEach((svc) => {
+      const cat = svc.data.category;
+      if (cat?.slug && !categories.has(cat.slug)) categories.set(cat.slug, cat.name);
+    });
+    return Array.from(categories.entries()).map(([slug, name]) => ({
+      params: { lang, category: slug },
+      props: { name },
+    }));
+  });
+}
+
+const { category } = Astro.params;
+const { name } = Astro.props;
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const ts = t.servicesPage ?? {} as Record<string, string>;
+
+const allServices = await getCollection("services");
+const langServices = allServices.filter((s) => s.data.lang === lang && s.data.status === "active");
+const services = langServices.filter((s) => s.data.category?.slug === category);
+
+// All categories for sidebar
+const catMap = new Map<string, { name: string; slug: string; count: number }>();
+langServices.forEach((svc) => {
+  const cat = svc.data.category;
+  if (cat?.slug) {
+    const existing = catMap.get(cat.slug);
+    if (existing) existing.count++;
+    else catMap.set(cat.slug, { name: cat.name, slug: cat.slug, count: 1 });
+  }
+});
+const allCategories = Array.from(catMap.values()).sort((a, b) => b.count - a.count);
+
+// Extract unique tags
+const allTags = [...new Set(services.flatMap((s) => (s.data as any).tags ?? []))].sort();
+
+// Price bounds
+const prices = services.map((s) => parseFloat(s.data.basePrice ?? "0")).filter((p) => p > 0);
+const minPrice = prices.length ? Math.floor(Math.min(...prices)) : 0;
+const maxPrice = prices.length ? Math.ceil(Math.max(...prices)) : 1000;
+
+// Serialize service data for client-side filtering
+const serviceData = services.map((s) => ({
+  id: s.data.id,
+  slug: s.data.slug,
+  price: parseFloat(s.data.basePrice ?? "0"),
+  rating: (s.data as any).avgRating ?? 0,
+  tags: (s.data as any).tags ?? [],
+  catSlug: s.data.category?.slug ?? "",
+}));
+---
+
+<BaseLayout
+  title={`${name} — ${ts.title || "Services"}`}
+  description={`${ts.categorySubtitle ?? "Services dans la catégorie"} ${name}`}
+  lang={lang}
+>
+  <BannerPage
+    title={name}
+    subtitle={`${ts.categorySubtitle ?? "Services dans la catégorie"} ${name}`}
+    type="category"
+    color="accent"
+    breadcrumbs={[
+      { label: t.breadcrumb?.home ?? "Accueil", href: `/${lang}` },
+      { label: ts.title ?? "Services", href: `/${lang}/services` },
+      { label: name, href: `/${lang}/services/${category}` },
+    ]}
+  />
+
+  <main class="cat-main">
+    <div class="cat-layout">
+      <!-- ===== SIDEBAR FILTERS ===== -->
+      <aside class="cat-sidebar" id="sidebar-filters">
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">{ts.categories ?? "Catégories"}</h3>
+          <nav class="sidebar-cats">
+            <a href={`/${lang}/services`} class="sidebar-cat-link">{ts.allCategories ?? "Toutes"}</a>
+            {allCategories.map((cat) => (
+              <a href={`/${lang}/services/${cat.slug}`} class={`sidebar-cat-link ${cat.slug === category ? "active" : ""}`}>
+                {cat.name} <span class="sidebar-count">({cat.count})</span>
+              </a>
+            ))}
+          </nav>
+        </div>
+
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">{ts.priceRange ?? "Fourchette de prix"}</h3>
+          <div class="price-range">
+            <input type="range" id="price-min" min={minPrice} max={maxPrice} value={minPrice} />
+            <input type="range" id="price-max" min={minPrice} max={maxPrice} value={maxPrice} />
+            <div class="price-labels">
+              <span id="price-min-label">{minPrice} €</span>
+              <span id="price-max-label">{maxPrice} €</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">{ts.minRating ?? "Note minimum"}</h3>
+          <div class="rating-filter">
+            {[1,2,3,4,5].map((star) => (
+              <button type="button" class="rating-star" data-rating={star} aria-label={`${star} étoiles minimum`}>
+                <Icon name="mdi:star" />
+              </button>
+            ))}
+            <button type="button" class="rating-clear" id="rating-clear">&times;</button>
+          </div>
+        </div>
+
+        {allTags.length > 0 && (
+          <div class="sidebar-section">
+            <h3 class="sidebar-title">{ts.specialties ?? "Spécialités"}</h3>
+            <div class="tag-filter">
+              {allTags.map((tag) => (
+                <label class="tag-chip">
+                  <input type="checkbox" value={tag} class="tag-checkbox" />
+                  <span>{tag}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button type="button" class="sidebar-reset" id="reset-filters">
+          <Icon name="mdi:filter-remove-outline" />
+          {ts.resetFilters ?? "Réinitialiser"}
+        </button>
+      </aside>
+
+      <!-- ===== MAIN CONTENT ===== -->
+      <div class="cat-content">
+        <!-- Toolbar -->
+        <div class="cat-toolbar">
+          <span class="result-count" id="result-count">{services.length} {services.length > 1 ? (ts.services ?? "services") : (ts.service ?? "service")}</span>
+          <div class="toolbar-actions">
+            <select id="sort-select" class="sort-select">
+              <option value="relevance">{ts.sortRelevance ?? "Pertinence"}</option>
+              <option value="price-asc">{ts.sortPriceAsc ?? "Prix ↑"}</option>
+              <option value="price-desc">{ts.sortPriceDesc ?? "Prix ↓"}</option>
+              <option value="rating">{ts.sortRating ?? "Note"}</option>
+              <option value="recent">{ts.sortRecent ?? "Récent"}</option>
+            </select>
+            <div class="view-toggle">
+              <button type="button" class="view-btn active" data-view="grid" aria-label="Grille">
+                <Icon name="mdi:view-grid-outline" />
+              </button>
+              <button type="button" class="view-btn" data-view="list" aria-label="Liste">
+                <Icon name="mdi:view-list-outline" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Services grid -->
+        <div id="services-results" class="services-results view-grid">
+          {services.length > 0 ? (
+            <ServiceGrid>
+              {services.map((svc) => (
+                <div class="service-item" data-service-id={svc.data.id}>
+                  <ServiceCard service={svc} lang={lang} variant="retro" />
+                </div>
+              ))}
+            </ServiceGrid>
+          ) : (
+            <div class="services-empty">
+              <Icon name="mdi:briefcase-remove-outline" />
+              <p>{ts.categoryEmpty ?? "Aucun service dans cette catégorie pour le moment."}</p>
+            </div>
+          )}
+        </div>
+
+        <!-- No results after filter -->
+        <div id="no-filter-results" class="services-empty" style="display:none;">
+          <Icon name="mdi:filter-remove-outline" />
+          <p>{ts.noFilterResults ?? "Aucun service ne correspond à vos critères."}</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<!-- i18n data bridge for JS -->
+<div id="cat-data" data-services={JSON.stringify(serviceData)} style="display:none;"></div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const dataEl = document.getElementById("cat-data");
+    if (!dataEl) return;
+    const services: Array<{ id: string; slug: string; price: number; rating: number; tags: string[] }> = JSON.parse(dataEl.dataset.services || "[]");
+
+    const priceMin = document.getElementById("price-min") as HTMLInputElement;
+    const priceMax = document.getElementById("price-max") as HTMLInputElement;
+    const priceMinLabel = document.getElementById("price-min-label")!;
+    const priceMaxLabel = document.getElementById("price-max-label")!;
+    const ratingStars = document.querySelectorAll<HTMLButtonElement>(".rating-star");
+    const ratingClear = document.getElementById("rating-clear");
+    const tagCheckboxes = document.querySelectorAll<HTMLInputElement>(".tag-checkbox");
+    const sortSelect = document.getElementById("sort-select") as HTMLSelectElement;
+    const viewBtns = document.querySelectorAll<HTMLButtonElement>(".view-btn");
+    const resultsContainer = document.getElementById("services-results")!;
+    const resultCount = document.getElementById("result-count")!;
+    const noResults = document.getElementById("no-filter-results")!;
+    const resetBtn = document.getElementById("reset-filters");
+
+    let minRating = 0;
+
+    function getVisibleIds(): Set<string> {
+      const pMin = parseFloat(priceMin.value);
+      const pMax = parseFloat(priceMax.value);
+      const selectedTags = [...tagCheckboxes].filter((cb) => cb.checked).map((cb) => cb.value);
+      const visible = new Set<string>();
+      for (const svc of services) {
+        if (svc.price > 0 && (svc.price < pMin || svc.price > pMax)) continue;
+        if (minRating > 0 && svc.rating < minRating) continue;
+        if (selectedTags.length > 0 && !selectedTags.some((t) => svc.tags.includes(t))) continue;
+        visible.add(svc.id);
+      }
+      return visible;
+    }
+
+    function applySort(ids: Set<string>): string[] {
+      let arr = services.filter((s) => ids.has(s.id));
+      const sort = sortSelect.value;
+      if (sort === "price-asc") arr.sort((a, b) => a.price - b.price);
+      else if (sort === "price-desc") arr.sort((a, b) => b.price - a.price);
+      else if (sort === "rating") arr.sort((a, b) => b.rating - a.rating);
+      return arr.map((s) => s.id);
+    }
+
+    function render() {
+      const ids = getVisibleIds();
+      const sorted = applySort(ids);
+      const items = document.querySelectorAll<HTMLElement>(".service-item");
+      items.forEach((item) => {
+        const id = item.dataset.serviceId;
+        item.style.display = id && ids.has(id) ? "" : "none";
+        if (id) item.style.order = String(sorted.indexOf(id));
+      });
+      priceMinLabel.textContent = priceMin.value + " €";
+      priceMaxLabel.textContent = priceMax.value + " €";
+      resultCount.textContent = `${ids.size} service${ids.size > 1 ? "s" : ""}`;
+      noResults.style.display = ids.size === 0 ? "" : "none";
+      resultsContainer.style.display = ids.size === 0 ? "none" : "";
+    }
+
+    // Events
+    priceMin.addEventListener("input", render);
+    priceMax.addEventListener("input", render);
+    sortSelect.addEventListener("change", render);
+    tagCheckboxes.forEach((cb) => cb.addEventListener("change", render));
+
+    ratingStars.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        minRating = parseInt(btn.dataset.rating || "0");
+        ratingStars.forEach((s) => s.classList.toggle("active", parseInt(s.dataset.rating || "0") <= minRating));
+        render();
+      });
+    });
+
+    ratingClear?.addEventListener("click", () => {
+      minRating = 0;
+      ratingStars.forEach((s) => s.classList.remove("active"));
+      render();
+    });
+
+    // View toggle
+    viewBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        viewBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        resultsContainer.classList.toggle("view-grid", btn.dataset.view === "grid");
+        resultsContainer.classList.toggle("view-list", btn.dataset.view === "list");
+      });
+    });
+
+    resetBtn?.addEventListener("click", () => {
+      priceMin.value = priceMin.min;
+      priceMax.value = priceMax.max;
+      minRating = 0;
+      ratingStars.forEach((s) => s.classList.remove("active"));
+      tagCheckboxes.forEach((cb) => (cb.checked = false));
+      sortSelect.value = "relevance";
+      render();
+    });
+  });
+</script>
+
+<style>
+  .cat-main { max-width: var(--max-width, 1200px); margin: 0 auto; padding: var(--space-6, 1.5rem); }
+  .cat-layout { display: grid; grid-template-columns: 260px 1fr; gap: var(--space-6, 1.5rem); align-items: start; }
+
+  /* Sidebar */
+  .cat-sidebar {
+    position: sticky; top: var(--space-6, 1.5rem);
+    background: var(--bg-surface, white); border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--radius-lg, 0.5rem); padding: var(--space-4, 1rem);
+  }
+  .sidebar-section { margin-bottom: var(--space-4, 1rem); padding-bottom: var(--space-4, 1rem); border-bottom: 1px solid var(--border-default, #e2e8f0); }
+  .sidebar-section:last-of-type { border-bottom: none; margin-bottom: var(--space-2, 0.5rem); padding-bottom: 0; }
+  .sidebar-title { font-size: 0.875rem; font-weight: 700; margin: 0 0 var(--space-2, 0.5rem); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #64748b); }
+  .sidebar-cats { display: flex; flex-direction: column; gap: 2px; }
+  .sidebar-cat-link {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    border-radius: var(--radius-sm, 4px); text-decoration: none;
+    color: var(--text-default, #334155); font-size: 0.875rem; transition: background 0.15s;
+  }
+  .sidebar-cat-link:hover { background: var(--bg-inset, #f1f5f9); }
+  .sidebar-cat-link.active { background: var(--color-primary, #eab308); color: white; font-weight: 600; }
+  .sidebar-count { opacity: 0.6; font-size: 0.75rem; }
+
+  /* Price range */
+  .price-range { display: flex; flex-direction: column; gap: var(--space-2, 0.5rem); }
+  .price-range input[type="range"] { width: 100%; accent-color: var(--color-primary, #eab308); }
+  .price-labels { display: flex; justify-content: space-between; font-size: 0.8125rem; color: var(--text-muted, #64748b); }
+
+  /* Rating filter */
+  .rating-filter { display: flex; align-items: center; gap: 4px; }
+  .rating-star {
+    background: none; border: none; cursor: pointer; padding: 2px;
+    color: var(--border-default, #d1d5db); transition: color 0.15s;
+  }
+  .rating-star [data-icon] { width: 1.25rem; height: 1.25rem; }
+  .rating-star:hover, .rating-star.active { color: var(--color-primary, #eab308); }
+  .rating-clear { background: none; border: none; cursor: pointer; font-size: 1.25rem; color: var(--text-muted, #64748b); margin-left: auto; }
+
+  /* Tag filter */
+  .tag-filter { display: flex; flex-wrap: wrap; gap: var(--space-1, 0.25rem); }
+  .tag-chip {
+    display: flex; align-items: center; gap: 4px;
+    padding: 2px var(--space-2, 0.5rem); border-radius: var(--radius-full, 9999px);
+    border: 1px solid var(--border-default, #e2e8f0); font-size: 0.8125rem; cursor: pointer; transition: all 0.15s;
+  }
+  .tag-chip:has(input:checked) { background: var(--color-primary, #eab308); color: white; border-color: var(--color-primary, #eab308); }
+  .tag-checkbox { display: none; }
+
+  .sidebar-reset {
+    display: flex; align-items: center; gap: var(--space-2, 0.5rem); justify-content: center;
+    width: 100%; padding: var(--space-2, 0.5rem);
+    background: var(--bg-inset, #f8fafc); border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--radius-md, 0.375rem); cursor: pointer; font-size: 0.8125rem;
+    color: var(--text-muted, #64748b); transition: all 0.15s;
+  }
+  .sidebar-reset:hover { background: var(--bg-surface, white); color: var(--text-default, #0f172a); }
+  .sidebar-reset [data-icon] { width: 1rem; height: 1rem; }
+
+  /* Toolbar */
+  .cat-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: var(--space-4, 1rem); flex-wrap: wrap; gap: var(--space-3, 0.75rem);
+  }
+  .result-count { font-size: 0.9375rem; font-weight: 600; color: var(--text-default, #0f172a); }
+  .toolbar-actions { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .sort-select {
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    border: 1px solid var(--border-default, #e2e8f0); border-radius: var(--radius-md, 0.375rem);
+    font-size: 0.8125rem; background: var(--bg-surface, white);
+  }
+  .view-toggle { display: flex; border: 1px solid var(--border-default, #e2e8f0); border-radius: var(--radius-md, 0.375rem); overflow: hidden; }
+  .view-btn {
+    padding: var(--space-2, 0.5rem); background: var(--bg-surface, white); border: none;
+    cursor: pointer; color: var(--text-muted, #64748b); transition: all 0.15s;
+  }
+  .view-btn [data-icon] { width: 1.125rem; height: 1.125rem; }
+  .view-btn.active { background: var(--color-primary, #eab308); color: white; }
+
+  /* Results */
+  .services-results.view-list :global(.service-grid) { grid-template-columns: 1fr; }
+  .service-item { transition: order 0.2s; }
+
+  /* Empty */
+  .services-empty { text-align: center; padding: var(--space-12, 3rem); color: var(--text-muted, #64748b); }
+  .services-empty [data-icon] { width: 3rem; height: 3rem; opacity: 0.4; margin-bottom: var(--space-3, 0.75rem); }
+
+  @media (max-width: 768px) {
+    .cat-layout { grid-template-columns: 1fr; }
+    .cat-sidebar { position: static; }
+  }
+</style>

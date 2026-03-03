@@ -34,6 +34,7 @@ let currentSearch = "";
 let selectedItem: MediaItem | null = null;
 let pendingFile: File | null = null; // File waiting to be uploaded (after user fills metadata)
 let isInitialized = false;
+let currentApiBase = "/api/admin/blog/media"; // default, overridable per-call
 
 function getEl<T extends HTMLElement>(id: string): T | null {
   return document.getElementById(id) as T | null;
@@ -44,6 +45,8 @@ export interface MediaPickerOptions {
   initialTab?: "library" | "upload";
   /** A file to show metadata form for before uploading (e.g. from drag & drop or file input) */
   file?: File;
+  /** Base API endpoint for media. Default: "/api/admin/blog/media". Use "/api/admin/services/media" for services. */
+  apiBase?: string;
 }
 
 /**
@@ -56,7 +59,8 @@ export function openMediaPicker(options?: MediaPickerOptions): Promise<MediaPick
     currentPage = 1;
     currentSearch = "";
 
-    const { initialTab = "library", file } = options || {};
+    const { initialTab = "library", file, apiBase = "/api/admin/blog/media" } = options || {};
+    currentApiBase = apiBase;
 
     const overlay = getEl<HTMLDivElement>("media-picker-overlay");
     if (!overlay) {
@@ -214,7 +218,7 @@ async function loadLibrary() {
     });
     if (currentSearch) params.set("q", currentSearch);
 
-    const res = await fetch(`/api/admin/blog/media?${params}`);
+    const res = await fetch(`${currentApiBase}?${params}`);
     const data: MediaListResponse = await res.json();
 
     if (data.media.length === 0) {
@@ -390,7 +394,7 @@ async function doUpload(
 
     if (progressFill) progressFill.style.width = "60%";
 
-    const res = await fetch("/api/admin/blog/media", { method: "POST", body: fd });
+    const res = await fetch(currentApiBase, { method: "POST", body: fd });
     const data = await res.json();
 
     if (progressFill) progressFill.style.width = "100%";

@@ -1,0 +1,122 @@
+---
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+
+interface AvailabilitySlot {
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  isAvailable: boolean;
+}
+
+interface Props {
+  slots: AvailabilitySlot[];
+  lang: string;
+}
+
+const { slots = [], lang } = Astro.props;
+const t = getTranslations(lang);
+
+const dayNames = [
+  t.servicesPage?.daySunday ?? "Dimanche",
+  t.servicesPage?.dayMonday ?? "Lundi",
+  t.servicesPage?.dayTuesday ?? "Mardi",
+  t.servicesPage?.dayWednesday ?? "Mercredi",
+  t.servicesPage?.dayThursday ?? "Jeudi",
+  t.servicesPage?.dayFriday ?? "Vendredi",
+  t.servicesPage?.daySaturday ?? "Samedi",
+];
+
+// Group by day
+const byDay = new Map<number, AvailabilitySlot[]>();
+slots.forEach((s) => {
+  const list = byDay.get(s.dayOfWeek) ?? [];
+  list.push(s);
+  byDay.set(s.dayOfWeek, list);
+});
+
+// Sort days: start from Monday (1) through Sunday (0)
+const orderedDays = [1, 2, 3, 4, 5, 6, 0];
+---
+
+<Card class="availability-card">
+  <CardContent>
+    <h3 class="avail-title">
+      <Icon name="mdi:calendar-clock" width="22" height="22" />
+      {t.servicesPage?.availability ?? "Disponibilité"}
+    </h3>
+
+    {slots.length === 0 ? (
+      <p class="avail-empty">{t.adminServices?.availability?.empty ?? "Aucune disponibilité configurée."}</p>
+    ) : (
+      <div class="avail-list">
+        {orderedDays.map((dayNum) => {
+          const daySlots = byDay.get(dayNum);
+          return (
+            <div class={`avail-day ${!daySlots ? "closed" : ""}`}>
+              <span class="avail-day-name">{dayNames[dayNum]}</span>
+              <span class="avail-day-hours">
+                {daySlots
+                  ? daySlots
+                      .filter((s) => s.isAvailable)
+                      .map((s) => `${s.startTime}–${s.endTime}`)
+                      .join(", ") || "—"
+                  : "—"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    )}
+  </CardContent>
+</Card>
+
+<style>
+  .avail-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    margin: 0 0 var(--space-4);
+  }
+
+  .avail-empty {
+    color: var(--color-text-muted, #666);
+    font-style: italic;
+  }
+
+  .avail-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .avail-day {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm, 4px);
+    font-size: var(--text-sm);
+  }
+
+  .avail-day:nth-child(odd) {
+    background: var(--color-surface-alt, #f8fafc);
+  }
+
+  .avail-day.closed {
+    opacity: 0.5;
+  }
+
+  .avail-day-name {
+    font-weight: 600;
+    min-width: 100px;
+  }
+
+  .avail-day-hours {
+    color: var(--color-text-muted, #666);
+  }
+</style>

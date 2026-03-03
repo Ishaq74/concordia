@@ -1,0 +1,678 @@
+---
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
+import Switch from "@components/ui/Form/Switch.astro";
+import MarkdownEditor from "@components/admin/MarkdownEditor.astro";
+import MediaPickerModal from "@components/admin/MediaPickerModal.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import { servicesCategories } from "@database/schemas";
+import { getTranslations } from "@i18n/translations";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const ts = t.adminServices;
+const adminBase = `/${lang}/admin/services`;
+
+const db = await getDrizzle();
+
+const allCategories = await db
+  .select({ id: servicesCategories.id, slug: servicesCategories.slug, name: servicesCategories.name })
+  .from(servicesCategories)
+  .orderBy(servicesCategories.slug);
+
+const extractLocalized = (value: unknown, locale: string = lang): string => {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    const obj = value as Record<string, string>;
+    return obj[locale] || Object.values(obj)[0] || "";
+  }
+  return "";
+};
+
+const supportedLocales = [
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "ar", label: "العربية", flag: "🇸🇦" },
+];
+---
+
+<AdminLayout title={ts?.listings?.new ?? "Nouveau service"} activeSection="services">
+  <header class="admin-page-header">
+    <div class="admin-page-title-row">
+      <div class="admin-page-title-group">
+        <a href={adminBase} class="back-link"><Icon name="mdi:arrow-left" /></a>
+        <h1>{ts?.listings?.new ?? "Nouveau service"}</h1>
+      </div>
+    </div>
+    <p class="admin-page-subtitle">{ts?.listings?.newSubtitle ?? "Créez un service avec ses traductions, tarification et médias."}</p>
+  </header>
+
+  <form id="service-form" class="service-form">
+    <div class="form-layout">
+      <!-- Main content column -->
+      <div class="form-main">
+
+        <!-- Translation tabs -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:translate" class="card-title-icon" />
+              <span>{t.adminBlog?.form?.multilingual ?? "Contenu multilingue"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="locale-tabs" role="tablist">
+              {supportedLocales.map((loc, i) => (
+                <button
+                  type="button"
+                  role="tab"
+                  class:list={["locale-tab", { active: i === 0 }]}
+                  data-locale={loc.code}
+                  aria-selected={i === 0 ? "true" : "false"}
+                >
+                  <span class="locale-flag">{loc.flag}</span>
+                  {loc.label}
+                </button>
+              ))}
+            </div>
+
+            {supportedLocales.map((loc, i) => (
+              <div class:list={["locale-panel", { active: i === 0 }]} data-locale-panel={loc.code}>
+                <div class="form-field">
+                  <Label htmlFor={`title-${loc.code}`}>{ts?.form?.titleLabel ?? "Titre"} *</Label>
+                  <Input id={`title-${loc.code}`} name={`title-${loc.code}`} placeholder={`${ts?.form?.titleIn ?? "Titre en"} ${loc.label}…`} />
+                </div>
+                <div class="form-field">
+                  <Label htmlFor={`shortDesc-${loc.code}`}>{ts?.form?.shortDescriptionIn ?? "Description courte"}</Label>
+                  <Textarea id={`shortDesc-${loc.code}`} name={`shortDesc-${loc.code}`} rows={2} placeholder={`${ts?.form?.shortDescPlaceholder ?? "Résumé court en"} ${loc.label}…`} />
+                </div>
+                <div class="form-field">
+                  <Label htmlFor={`desc-${loc.code}`}>{ts?.form?.descriptionIn ?? "Description"} ({loc.label}) *</Label>
+                  <MarkdownEditor id={`desc-${loc.code}`} name={`desc-${loc.code}`} rows={12} placeholder={ts?.form?.descPlaceholder ?? "Décrivez le service en détail (Markdown)…"} />
+                </div>
+
+                <details class="seo-section">
+                  <summary class="seo-summary">
+                    <Icon name="mdi:search-web" class="seo-icon" />
+                    {t.adminBlog?.form?.seoSection ?? "SEO —"} {loc.label}
+                  </summary>
+                  <div class="seo-fields">
+                    <div class="form-field">
+                      <Label htmlFor={`seoTitle-${loc.code}`}>{t.adminBlog?.form?.seoTitle ?? "Titre SEO"}</Label>
+                      <Input id={`seoTitle-${loc.code}`} name={`seoTitle-${loc.code}`} placeholder={t.adminBlog?.form?.seoTitlePlaceholder ?? "Titre pour les moteurs de recherche…"} />
+                    </div>
+                    <div class="form-field">
+                      <Label htmlFor={`seoDesc-${loc.code}`}>{t.adminBlog?.form?.seoDescription ?? "Description SEO"}</Label>
+                      <Textarea id={`seoDesc-${loc.code}`} name={`seoDesc-${loc.code}`} rows={2} placeholder={t.adminBlog?.form?.seoDescPlaceholder ?? "160 caractères max…"} />
+                    </div>
+                  </div>
+                </details>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <!-- Cover image -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:image-multiple-outline" class="card-title-icon" />
+              <span>{t.adminBlog?.form?.coverImage ?? "Image de couverture"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="upload-zone" id="upload-zone">
+              <div class="upload-actions-row">
+                <button type="button" id="btn-pick-media" class="btn-pick-media">
+                  <Icon name="mdi:image-search-outline" class="pick-icon" />
+                  {t.adminBlog?.form?.library ?? "Bibliothèque"}
+                </button>
+                <span class="upload-separator">{t.adminBlog?.form?.or ?? "ou"}</span>
+                <label for="cover-upload" class="btn-upload-file">
+                  <Icon name="mdi:cloud-upload-outline" class="pick-icon" />
+                  {t.adminBlog?.form?.upload ?? "Téléverser"}
+                </label>
+              </div>
+              <input type="file" id="cover-upload" accept="image/*" class="upload-input" />
+              <div id="upload-preview" class="upload-preview hidden"></div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <!-- Gallery -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:image-multiple" class="card-title-icon" />
+              <span>{ts?.form?.gallery ?? "Galerie"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div id="gallery-grid" class="gallery-grid"></div>
+            <button type="button" id="btn-add-gallery" class="btn-pick-media" style="margin-top: var(--space-3, 0.75rem);">
+              <Icon name="mdi:plus" class="pick-icon" />
+              {ts?.form?.addGalleryImage ?? "Ajouter des images"}
+            </button>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="form-sidebar">
+
+        <!-- Publish settings -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:cog-outline" class="card-title-icon" />
+              <span>{t.adminBlog?.form?.publishing ?? "Publication"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="form-field">
+              <Label htmlFor="slug">{ts?.form?.slug ?? "Slug"} *</Label>
+              <Input id="slug" name="slug" placeholder="mon-service" />
+              <span class="field-hint">{t.adminBlog?.form?.slugAutoHint ?? "Auto-généré depuis le titre si vide"}</span>
+            </div>
+            <div class="form-field">
+              <Label htmlFor="status">{ts?.form?.status ?? "Statut"}</Label>
+              <Select id="status" name="status">
+                <option value="draft" selected>{ts?.status?.draft ?? "Brouillon"}</option>
+                <option value="pending_review">{ts?.status?.pending_review ?? "En attente"}</option>
+                <option value="active">{ts?.status?.active ?? "Actif"}</option>
+              </Select>
+            </div>
+            <div class="form-field">
+              <Label htmlFor="categoryId">{ts?.form?.category ?? "Catégorie"}</Label>
+              <Select id="categoryId" name="categoryId">
+                <option value="">{ts?.form?.none ?? "Aucune"}</option>
+                {allCategories.map((cat) => (
+                  <option value={cat.id}>{extractLocalized(cat.name)}</option>
+                ))}
+              </Select>
+            </div>
+            <div class="form-field">
+              <Label htmlFor="inLanguage">{t.adminBlog?.form?.mainLanguage ?? "Langue principale"}</Label>
+              <Select id="inLanguage" name="inLanguage">
+                {supportedLocales.map((loc) => (
+                  <option value={loc.code} selected={loc.code === "fr"}>{loc.flag} {loc.label}</option>
+                ))}
+              </Select>
+            </div>
+
+            <div class="toggle-group">
+              <div class="toggle-row">
+                <Switch id="isFeatured" name="isFeatured" />
+                <Label htmlFor="isFeatured">{ts?.form?.featured ?? "En vedette"}</Label>
+              </div>
+              <div class="toggle-row">
+                <Switch id="displayInHome" name="displayInHome" />
+                <Label htmlFor="displayInHome">{ts?.form?.displayHome ?? "Afficher en accueil"}</Label>
+              </div>
+              <div class="toggle-row">
+                <Switch id="isMobile" name="isMobile" />
+                <Label htmlFor="isMobile">{ts?.form?.mobile ?? "Service mobile"}</Label>
+              </div>
+              <div class="toggle-row">
+                <Switch id="allowReviews" name="allowReviews" checked />
+                <Label htmlFor="allowReviews">{ts?.form?.allowReviews ?? "Autoriser les avis"}</Label>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <!-- Pricing -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:currency-eur" class="card-title-icon" />
+              <span>{ts?.form?.price ?? "Tarification"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="form-field">
+              <Label htmlFor="basePrice">{ts?.form?.basePrice ?? "Prix de base"}</Label>
+              <Input id="basePrice" type="text" name="basePrice" placeholder="25.00" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="priceType">{ts?.form?.priceType ?? "Type de prix"}</Label>
+              <Select id="priceType" name="priceType">
+                <option value="fixed">{ts?.form?.priceFixed ?? "Forfait"}</option>
+                <option value="per_hour">{ts?.form?.pricePerHour ?? "Par heure"}</option>
+                <option value="per_session">{ts?.form?.pricePerSession ?? "Par séance"}</option>
+                <option value="on_quote">{ts?.form?.priceOnQuote ?? "Sur devis"}</option>
+              </Select>
+            </div>
+            <div class="form-field">
+              <Label htmlFor="currency">{ts?.form?.currency ?? "Devise"}</Label>
+              <Input id="currency" type="text" name="currency" value="EUR" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="durationMinutes">{ts?.form?.duration ?? "Durée (minutes)"}</Label>
+              <Input id="durationMinutes" type="number" name="durationMinutes" placeholder="60" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="maxParticipants">{ts?.form?.maxParticipants ?? "Participants max"}</Label>
+              <Input id="maxParticipants" type="number" name="maxParticipants" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="bookingAdvanceHours">{ts?.form?.bookingAdvance ?? "Réservation à l'avance (h)"}</Label>
+              <Input id="bookingAdvanceHours" type="number" name="bookingAdvanceHours" placeholder="24" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="cancellationHours">{ts?.form?.cancellationHours ?? "Annulation (h)"}</Label>
+              <Input id="cancellationHours" type="number" name="cancellationHours" placeholder="48" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="form-actions">
+      <a href={adminBase} class="btn-cancel">{t.adminBlog?.common?.cancel ?? "Annuler"}</a>
+      <div class="form-actions-right">
+        <button type="button" id="btn-save-draft" class="btn-secondary">
+          <Icon name="mdi:content-save-outline" /> {ts?.form?.saveDraft ?? "Enregistrer le brouillon"}
+        </button>
+        <button type="button" id="btn-publish" class="btn-primary">
+          <Icon name="mdi:publish" /> {ts?.form?.publish ?? "Publier"}
+        </button>
+      </div>
+    </div>
+  </form>
+  <MediaPickerModal />
+
+  <div id="i18n-data" hidden
+    data-title-required={ts?.js?.titleRequired ?? "Le titre en français est obligatoire."}
+    data-slug-required={ts?.js?.slugRequired ?? "Le slug est obligatoire."}
+    data-service-created={ts?.js?.serviceCreated ?? "Service créé avec succès ! Redirection…"}
+    data-unknown-error={ts?.js?.unknownError ?? "Erreur inconnue lors de la création."}
+    data-network-error={ts?.js?.networkError ?? "Erreur réseau — vérifiez votre connexion."}
+  ></div>
+</AdminLayout>
+
+<script>
+  import { initMarkdownEditors, getEditorValue } from "@lib/admin/markdown-editor";
+  import { openMediaPicker } from "@lib/admin/media-picker";
+  import { showToast } from "@lib/admin/toast";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const i18n = document.getElementById("i18n-data")?.dataset ?? {};
+    const editors = initMarkdownEditors();
+
+    // ---------- Locale tabs ----------
+    const tabs = document.querySelectorAll<HTMLElement>(".locale-tab");
+    const panels = document.querySelectorAll<HTMLElement>(".locale-panel");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const locale = tab.dataset.locale!;
+        tabs.forEach((t) => { t.classList.remove("active"); t.setAttribute("aria-selected", "false"); });
+        panels.forEach((p) => p.classList.remove("active"));
+        tab.classList.add("active");
+        tab.setAttribute("aria-selected", "true");
+        document.querySelector(`[data-locale-panel="${locale}"]`)?.classList.add("active");
+      });
+    });
+
+    // ---------- Auto-slug from title ----------
+    const slugField = document.getElementById("slug") as HTMLInputElement;
+    const titleFr = document.getElementById("title-fr") as HTMLInputElement;
+    let slugManual = false;
+    slugField?.addEventListener("input", () => { slugManual = !!slugField.value; });
+    titleFr?.addEventListener("input", () => {
+      if (!slugManual) {
+        slugField.value = titleFr.value
+          .toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      }
+    });
+
+    // ---------- Cover image ----------
+    const coverInput = document.getElementById("cover-upload") as HTMLInputElement;
+    const preview = document.getElementById("upload-preview") as HTMLElement;
+    let coverId: string | null = null;
+
+    function setCoverPreview(id: string, url: string) {
+      coverId = id;
+      preview.innerHTML = `<img src="${url}" alt="Preview" /><button type="button" class="remove-preview" title="Supprimer">&times;</button>`;
+      preview.classList.remove("hidden");
+      preview.querySelector(".remove-preview")?.addEventListener("click", () => {
+        coverId = null;
+        preview.innerHTML = "";
+        preview.classList.add("hidden");
+        coverInput.value = "";
+      });
+    }
+
+    const SERVICES_API_BASE = "/api/admin/services/media";
+
+    document.getElementById("btn-pick-media")?.addEventListener("click", async () => {
+      const result = await openMediaPicker({ apiBase: SERVICES_API_BASE });
+      if (result) setCoverPreview(result.id, result.url);
+    });
+
+    coverInput?.addEventListener("change", async () => {
+      const file = coverInput.files?.[0];
+      if (file) {
+        const result = await openMediaPicker({ file, apiBase: SERVICES_API_BASE });
+        if (result) setCoverPreview(result.id, result.url);
+      }
+      coverInput.value = "";
+    });
+
+    // ---------- Gallery ----------
+    type GalleryItem = { id: string; url: string; position: number };
+    let galleryItems: GalleryItem[] = [];
+    const galleryGrid = document.getElementById("gallery-grid") as HTMLElement;
+
+    function renderGallery() {
+      galleryGrid.innerHTML = galleryItems.map((item, idx) =>
+        `<div class="gallery-item" data-media-id="${item.id}" data-position="${idx}">
+          <img src="${item.url}" alt="Gallery ${idx + 1}" class="gallery-thumb" />
+          <button type="button" class="gallery-remove" title="Retirer">&times;</button>
+        </div>`
+      ).join("");
+      galleryGrid.querySelectorAll(".gallery-remove").forEach((btn, idx) => {
+        btn.addEventListener("click", () => {
+          galleryItems.splice(idx, 1);
+          renderGallery();
+        });
+      });
+    }
+
+    document.getElementById("btn-add-gallery")?.addEventListener("click", async () => {
+      const result = await openMediaPicker({ apiBase: SERVICES_API_BASE });
+      if (result && !galleryItems.some((g) => g.id === result.id)) {
+        galleryItems.push({ id: result.id, url: result.url, position: galleryItems.length });
+        renderGallery();
+      }
+    });
+
+    // ---------- Collect data ----------
+    const locales = ["fr", "en", "es", "ar"];
+
+    function collectData(status: string) {
+      const slug = (document.getElementById("slug") as HTMLInputElement).value.trim();
+      const categoryId = (document.getElementById("categoryId") as HTMLSelectElement).value;
+      const inLanguage = (document.getElementById("inLanguage") as HTMLSelectElement).value;
+      const isFeatured = (document.getElementById("isFeatured") as HTMLInputElement).checked;
+      const displayInHome = (document.getElementById("displayInHome") as HTMLInputElement).checked;
+      const isMobile = (document.getElementById("isMobile") as HTMLInputElement).checked;
+      const allowReviews = (document.getElementById("allowReviews") as HTMLInputElement).checked;
+      const basePrice = (document.getElementById("basePrice") as HTMLInputElement).value.trim();
+      const priceType = (document.getElementById("priceType") as HTMLSelectElement).value;
+      const currency = (document.getElementById("currency") as HTMLInputElement).value.trim() || "EUR";
+      const durationMinutes = (document.getElementById("durationMinutes") as HTMLInputElement).value;
+      const maxParticipants = (document.getElementById("maxParticipants") as HTMLInputElement).value;
+      const bookingAdvanceHours = (document.getElementById("bookingAdvanceHours") as HTMLInputElement).value;
+      const cancellationHours = (document.getElementById("cancellationHours") as HTMLInputElement).value;
+
+      const translations: any[] = [];
+      for (const loc of locales) {
+        const title = (document.getElementById(`title-${loc}`) as HTMLInputElement)?.value.trim();
+        const description = getEditorValue(editors, `desc-${loc}`).trim();
+        const shortDescription = (document.getElementById(`shortDesc-${loc}`) as HTMLTextAreaElement)?.value.trim();
+        if (title || description || shortDescription) {
+          translations.push({
+            inLanguage: loc,
+            title: title || "",
+            description: description || "",
+            shortDescription: shortDescription || "",
+            seoTitle: (document.getElementById(`seoTitle-${loc}`) as HTMLInputElement)?.value.trim() || "",
+            seoDescription: (document.getElementById(`seoDesc-${loc}`) as HTMLTextAreaElement)?.value.trim() || "",
+          });
+        }
+      }
+
+      const media: any[] = [];
+      if (coverId) media.push({ mediaId: coverId, type: "cover", position: "0" });
+      galleryItems.forEach((g, idx) => {
+        media.push({ mediaId: g.id, type: "gallery", position: String(idx + 1) });
+      });
+
+      return {
+        action: "create",
+        slug: slug || undefined,
+        status,
+        categoryId: categoryId || undefined,
+        inLanguage,
+        basePrice: basePrice || undefined,
+        priceType,
+        currency,
+        durationMinutes: durationMinutes ? Number(durationMinutes) : null,
+        maxParticipants: maxParticipants ? Number(maxParticipants) : null,
+        bookingAdvanceHours: bookingAdvanceHours ? Number(bookingAdvanceHours) : null,
+        cancellationHours: cancellationHours ? Number(cancellationHours) : null,
+        isMobile,
+        isFeatured,
+        displayInHome,
+        allowReviews,
+        translations,
+        media,
+      };
+    }
+
+    // ---------- Validation ----------
+    function validate() {
+      const title = (document.getElementById("title-fr") as HTMLInputElement)?.value.trim();
+      if (!title) {
+        showToast(i18n.titleRequired ?? "Le titre en français est obligatoire.", "warning");
+        document.querySelector<HTMLElement>('[data-locale="fr"]')?.click();
+        document.getElementById("title-fr")?.focus();
+        return false;
+      }
+      return true;
+    }
+
+    // ---------- Save / Publish ----------
+    document.getElementById("btn-save-draft")?.addEventListener("click", async () => {
+      if (!validate()) return;
+      await submitService(collectData("draft"));
+    });
+
+    document.getElementById("btn-publish")?.addEventListener("click", async () => {
+      if (!validate()) return;
+      await submitService(collectData("active"));
+    });
+
+    async function submitService(data: any) {
+      const btns = document.querySelectorAll<HTMLButtonElement>(".form-actions button");
+      btns.forEach((b) => { b.disabled = true; });
+      try {
+        const res = await fetch("/api/admin/services/services", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await res.json();
+        if (result.ok || result.id) {
+          showToast(i18n.serviceCreated ?? "Service créé !", "success");
+          setTimeout(() => {
+            window.location.href = document.querySelector<HTMLAnchorElement>(".back-link")?.href || window.location.pathname.replace("/new", "");
+          }, 800);
+        } else {
+          showToast(result.error || i18n.unknownError || "", "error");
+        }
+      } catch {
+        showToast(i18n.networkError ?? "", "error");
+      } finally {
+        btns.forEach((b) => { b.disabled = false; });
+      }
+    }
+  });
+</script>
+
+<style>
+  .admin-page-header { margin-bottom: var(--space-6, 1.5rem); }
+  .admin-page-title-row { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .admin-page-title-group { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .admin-page-header h1 {
+    font-family: var(--font-family-display, "Space Grotesk", sans-serif);
+    font-size: var(--h2-font-size, 2rem); font-weight: 800;
+    color: var(--heading-color, #0f172a); margin: 0;
+  }
+  .admin-page-subtitle { color: var(--text-muted, #64748b); font-size: 0.9375rem; margin: var(--space-1, 0.25rem) 0 0; }
+
+  .back-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2.25rem; height: 2.25rem; border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem); color: var(--text-muted, #64748b);
+    text-decoration: none; transition: all 0.15s;
+  }
+  .back-link:hover { border-color: var(--color-primary, #eab308); color: var(--text-default, #0f172a); }
+  .back-link [data-icon] { width: 1.25rem; height: 1.25rem; }
+
+  /* Two-column layout */
+  .form-layout {
+    display: grid; grid-template-columns: 1fr 340px;
+    gap: var(--space-6, 1.5rem); align-items: start;
+  }
+  .form-main { display: flex; flex-direction: column; gap: var(--space-4, 1rem); }
+  .form-sidebar { display: flex; flex-direction: column; gap: var(--space-4, 1rem); }
+
+  /* Card title row */
+  .card-title-row { display: flex; align-items: center; gap: var(--space-2, 0.5rem); font-weight: 600; font-size: 0.9375rem; }
+  .card-title-icon { width: 1.125rem; height: 1.125rem; color: var(--text-muted, #64748b); }
+
+  /* Form fields */
+  .form-field { margin-bottom: var(--space-4, 1rem); }
+  .form-field:last-child { margin-bottom: 0; }
+  .field-hint { display: block; font-size: 0.75rem; color: var(--text-muted, #64748b); margin-top: 0.25rem; }
+
+  /* Toggle group */
+  .toggle-group { margin-top: var(--space-4, 1rem); display: flex; flex-direction: column; gap: var(--space-3, 0.75rem); }
+  .toggle-row { display: flex; align-items: center; gap: var(--space-2, 0.5rem); }
+
+  /* Locale tabs */
+  .locale-tabs {
+    display: flex; gap: var(--space-1, 0.25rem); margin-bottom: var(--space-4, 1rem);
+    border-bottom: 2px solid var(--border-default, #e2e8f0); padding-bottom: 0;
+  }
+  .locale-tab {
+    display: inline-flex; align-items: center; gap: var(--space-1, 0.25rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    border: none; background: none; cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+    font-size: 0.875rem; color: var(--text-muted, #64748b);
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .locale-tab:hover { color: var(--text-default, #0f172a); }
+  .locale-tab.active { color: var(--text-default, #0f172a); border-bottom-color: var(--color-primary, #eab308); }
+  .locale-flag { font-size: 1rem; }
+  .locale-panel { display: none; }
+  .locale-panel.active { display: block; }
+
+  /* SEO section */
+  .seo-section { margin-top: var(--space-4, 1rem); border: 1px solid var(--border-default, #e2e8f0); border-radius: var(--border-radius-md, 0.375rem); }
+  .seo-summary {
+    display: flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    cursor: pointer; font-size: 0.8125rem; color: var(--text-muted, #64748b);
+    list-style: none;
+  }
+  .seo-summary::-webkit-details-marker { display: none; }
+  .seo-summary::before { content: "▸"; transition: transform 0.15s; }
+  details[open] .seo-summary::before { transform: rotate(90deg); }
+  .seo-icon { width: 1rem; height: 1rem; }
+  .seo-fields { padding: var(--space-3, 0.75rem); }
+
+  /* Upload zone */
+  .upload-zone {
+    border: 2px dashed var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem);
+    padding: var(--space-4, 1rem);
+    text-align: center;
+    transition: border-color 0.15s;
+  }
+  .upload-zone:hover { border-color: var(--color-primary, #eab308); }
+  .upload-actions-row { display: flex; align-items: center; justify-content: center; gap: var(--space-3, 0.75rem); flex-wrap: wrap; }
+  .btn-pick-media, .btn-upload-file {
+    display: inline-flex; align-items: center; gap: var(--space-1, 0.25rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem);
+    background: var(--bg-surface, white); color: var(--text-default, #0f172a);
+    font-size: 0.8125rem; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-pick-media:hover, .btn-upload-file:hover { border-color: var(--color-primary, #eab308); }
+  .pick-icon { width: 1rem; height: 1rem; }
+  .upload-separator { color: var(--text-muted, #64748b); font-size: 0.75rem; }
+  .upload-input { display: none; }
+  .upload-preview { margin-top: var(--space-3, 0.75rem); position: relative; display: inline-block; }
+  .upload-preview img { max-height: 160px; border-radius: var(--border-radius-md, 0.375rem); }
+  .upload-preview .remove-preview {
+    position: absolute; top: -0.5rem; right: -0.5rem;
+    width: 1.5rem; height: 1.5rem; border-radius: 50%;
+    background: #dc2626; color: white; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.875rem; line-height: 1;
+  }
+  .hidden { display: none !important; }
+
+  /* Gallery */
+  .gallery-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--space-3, 0.75rem);
+  }
+  .gallery-item {
+    position: relative; border-radius: var(--border-radius-md, 0.375rem);
+    overflow: hidden; border: 1px solid var(--border-default, #e2e8f0);
+    aspect-ratio: 1; background: var(--bg-subtle, #f8fafc);
+  }
+  .gallery-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .gallery-remove {
+    position: absolute; top: 0.25rem; right: 0.25rem;
+    width: 1.5rem; height: 1.5rem; border-radius: 50%;
+    background: #dc2626; color: white; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.875rem; line-height: 1; opacity: 0; transition: opacity 0.15s;
+  }
+  .gallery-item:hover .gallery-remove { opacity: 1; }
+
+  /* Form actions bar */
+  .form-actions {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: var(--space-6, 1.5rem); padding: var(--space-4, 1rem);
+    background: var(--bg-surface, white); border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem);
+  }
+  .form-actions-right { display: flex; gap: var(--space-3, 0.75rem); }
+  .btn-cancel {
+    color: var(--text-muted, #64748b); text-decoration: none; font-size: 0.875rem;
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  }
+  .btn-secondary, .btn-primary {
+    display: inline-flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+    border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem);
+    font-weight: 600; font-size: 0.875rem; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-secondary { background: var(--bg-surface, white); color: var(--text-default, #0f172a); }
+  .btn-secondary:hover { border-color: var(--color-primary, #eab308); }
+  .btn-primary { background: var(--color-primary, #eab308); color: var(--color-primary-contrast, #0f172a); border-color: var(--color-primary, #eab308); }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-secondary [data-icon], .btn-primary [data-icon] { width: 1.125rem; height: 1.125rem; }
+  .btn-secondary:disabled, .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  @media (max-width: 900px) {
+    .form-layout { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .form-actions { flex-direction: column; gap: var(--space-3, 0.75rem); }
+    .form-actions-right { width: 100%; justify-content: stretch; }
+    .form-actions-right button { flex: 1; }
+  }
+</style>

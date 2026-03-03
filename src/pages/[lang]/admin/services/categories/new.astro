@@ -1,0 +1,638 @@
+---
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
+import Switch from "@components/ui/Form/Switch.astro";
+import MediaPickerModal from "@components/admin/MediaPickerModal.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import { servicesCategories } from "@database/schemas";
+import { eq, ne } from "drizzle-orm";
+import { getTranslations } from "@i18n/translations";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const ts = t.adminServices;
+const adminBase = `/${lang}/admin/services`;
+const catBase = `${adminBase}/categories`;
+
+const editId = Astro.url.searchParams.get("edit");
+let category: (typeof servicesCategories.$inferSelect) | null = null;
+
+if (editId) {
+  const db = await getDrizzle();
+  const [found] = await db.select().from(servicesCategories).where(eq(servicesCategories.id, editId));
+  if (found) category = found;
+}
+
+const isEdit = !!category;
+const pageTitle = isEdit ? (ts?.categories?.edit ?? "Modifier la catégorie") : (ts?.categories?.create ?? "Nouvelle catégorie");
+
+const extractLocalized = (value: unknown, locale: string = lang): string => {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    const obj = value as Record<string, string>;
+    return obj[locale] || Object.values(obj)[0] || "";
+  }
+  return "";
+};
+
+const getLocalizedField = (field: unknown, locale: string): string => {
+  if (!field) return "";
+  if (typeof field === "string") return field;
+  if (typeof field === "object") return (field as Record<string, string>)[locale] ?? "";
+  return "";
+};
+
+const supportedLocales = [
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "ar", label: "العربية", flag: "🇸🇦" },
+];
+
+const db = await getDrizzle();
+const allCategories = editId
+  ? await db.select({ id: servicesCategories.id, slug: servicesCategories.slug, name: servicesCategories.name }).from(servicesCategories).where(ne(servicesCategories.id, editId)).orderBy(servicesCategories.slug)
+  : await db.select({ id: servicesCategories.id, slug: servicesCategories.slug, name: servicesCategories.name }).from(servicesCategories).orderBy(servicesCategories.slug);
+---
+
+<AdminLayout title={pageTitle} activeSection="services-categories">
+  <header class="admin-page-header">
+    <div class="admin-page-title-row">
+      <div class="admin-page-title-group">
+        <a href={catBase} class="back-link"><Icon name="mdi:arrow-left" /></a>
+        <h1>{pageTitle}</h1>
+        {isEdit && <Badge color="primary" text={category!.slug} />}
+      </div>
+    </div>
+    {isEdit && (
+      <p class="admin-page-subtitle">
+        {t.adminBlog?.articles?.createdOn ?? "Créé le"} {category!.createdAt.toLocaleDateString(lang, { day: "2-digit", month: "long", year: "numeric" })}
+      </p>
+    )}
+  </header>
+
+  <form id="category-form" class="category-form" data-category-id={editId ?? ""} data-is-edit={isEdit ? "true" : "false"}>
+    <div class="form-layout">
+      <!-- Main content -->
+      <div class="form-main">
+
+        <!-- Multilingual content -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:translate" class="card-title-icon" />
+              <span>{t.adminBlog?.form?.multilingual ?? "Contenu multilingue"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="locale-tabs" role="tablist">
+              {supportedLocales.map((loc, i) => {
+                const hasContent = isEdit && !!getLocalizedField(category?.name, loc.code);
+                return (
+                  <button
+                    type="button" role="tab"
+                    class:list={["locale-tab", { active: i === 0 }]}
+                    data-locale={loc.code} aria-selected={i === 0 ? "true" : "false"}
+                  >
+                    <span class="locale-flag">{loc.flag}</span>
+                    {loc.label}
+                    {hasContent && <span class="locale-dot" title="Contenu existant"></span>}
+                  </button>
+                );
+              })}
+            </div>
+
+            {supportedLocales.map((loc, i) => (
+              <div class:list={["locale-panel", { active: i === 0 }]} data-locale-panel={loc.code}>
+                <div class="form-field">
+                  <Label htmlFor={`name-${loc.code}`}>{ts?.form?.nameLabel ?? "Nom"} ({loc.label}) {loc.code === "fr" ? "*" : ""}</Label>
+                  <Input id={`name-${loc.code}`} name={`name_${loc.code}`} value={getLocalizedField(category?.name, loc.code)} placeholder={`${ts?.form?.nameLabel ?? "Nom"} en ${loc.label}…`} />
+                </div>
+                <div class="form-field">
+                  <Label htmlFor={`catDesc-${loc.code}`}>{ts?.form?.descriptionIn ?? "Description"} ({loc.label})</Label>
+                  <Textarea id={`catDesc-${loc.code}`} name={`description_${loc.code}`} rows={5} value={getLocalizedField(category?.description, loc.code)} />
+                </div>
+                <details class="seo-section">
+                  <summary class="seo-summary">
+                    <Icon name="mdi:search-web" class="seo-icon" />
+                    {t.adminBlog?.form?.seoSection ?? "SEO —"} {loc.label}
+                  </summary>
+                  <div class="seo-fields">
+                    <div class="form-field">
+                      <Label htmlFor={`seoTitle-${loc.code}`}>{t.adminBlog?.form?.seoTitle ?? "Titre SEO"}</Label>
+                      <Input id={`seoTitle-${loc.code}`} name={`seoTitle_${loc.code}`} value={getLocalizedField(category?.seoTitle, loc.code)} />
+                    </div>
+                    <div class="form-field">
+                      <Label htmlFor={`seoDesc-${loc.code}`}>{t.adminBlog?.form?.seoDescription ?? "Description SEO"}</Label>
+                      <Textarea id={`seoDesc-${loc.code}`} name={`seoDescription_${loc.code}`} rows={2} value={getLocalizedField(category?.seoDescription, loc.code)} />
+                    </div>
+                  </div>
+                </details>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <!-- Featured image -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:image-multiple-outline" class="card-title-icon" />
+              <span>{t.adminBlog?.form?.coverImage ?? "Image de couverture"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="upload-zone" id="upload-zone">
+              <div class="upload-actions-row">
+                <button type="button" id="btn-pick-media" class="btn-pick-media">
+                  <Icon name="mdi:image-search-outline" class="pick-icon" />
+                  {t.adminBlog?.form?.library ?? "Bibliothèque"}
+                </button>
+                <span class="upload-separator">{t.adminBlog?.form?.or ?? "ou"}</span>
+                <label for="cover-upload" class="btn-upload-file">
+                  <Icon name="mdi:cloud-upload-outline" class="pick-icon" />
+                  {t.adminBlog?.form?.upload ?? "Téléverser"}
+                </label>
+              </div>
+              <input type="file" id="cover-upload" accept="image/*" class="upload-input" />
+              <div id="upload-preview" class:list={["upload-preview", { hidden: !category?.featuredImageId }]}>
+                {category?.featuredImageId && <img src={`/uploads/${category.featuredImageId}`} alt="Cover" />}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="form-sidebar">
+
+        <!-- Settings -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:cog-outline" class="card-title-icon" />
+              <span>{ts?.form?.settings ?? "Paramètres"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="form-field">
+              <Label htmlFor="slug">{ts?.form?.slug ?? "Slug"} *</Label>
+              <Input id="slug" name="slug" value={category?.slug ?? ""} placeholder="web-development" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="icon">{ts?.form?.icon ?? "Icône"}</Label>
+              <Input id="icon" name="icon" value={category?.icon ?? ""} placeholder="mdi:web" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="parentId">{ts?.form?.parentCategory ?? "Catégorie parente"}</Label>
+              <Select id="parentId" name="parentId">
+                <option value="">{ts?.form?.none ?? "Aucune (racine)"}</option>
+                {allCategories.map((cat) => (
+                  <option value={cat.id} selected={cat.id === category?.parentId}>{extractLocalized(cat.name)}</option>
+                ))}
+              </Select>
+            </div>
+            <div class="form-field">
+              <Label htmlFor="sortOrder">{ts?.form?.sortOrder ?? "Ordre de tri"}</Label>
+              <Input id="sortOrder" type="number" name="sortOrder" value={String(category?.sortOrder ?? 0)} />
+            </div>
+
+            <div class="toggle-group">
+              <div class="toggle-row">
+                <Switch id="isActive" name="isActive" checked={category?.isActive ?? true} />
+                <Label htmlFor="isActive">{ts?.form?.active ?? "Active"}</Label>
+              </div>
+              <div class="toggle-row">
+                <Switch id="isFeatured" name="isFeatured" checked={category?.isFeatured ?? false} />
+                <Label htmlFor="isFeatured">{ts?.form?.featured ?? "En vedette"}</Label>
+              </div>
+              <div class="toggle-row">
+                <Switch id="displayInHome" name="displayInHome" checked={category?.displayInHome ?? false} />
+                <Label htmlFor="displayInHome">{ts?.form?.displayHome ?? "Accueil"}</Label>
+              </div>
+              <div class="toggle-row">
+                <Switch id="displayInMenu" name="displayInMenu" checked={category?.displayInMenu ?? false} />
+                <Label htmlFor="displayInMenu">{ts?.form?.displayMenu ?? "Menu"}</Label>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <!-- Danger zone (edit mode only) -->
+        {isEdit && (
+          <Card elevation="sm" className="danger-zone-card">
+            <CardContent>
+              <details class="danger-details">
+                <summary class="danger-summary">
+                  <Icon name="mdi:alert-outline" class="danger-icon" />
+                  {t.adminBlog?.common?.dangerZone ?? "Zone de danger"}
+                </summary>
+                <div class="danger-body">
+                  <p class="danger-text">{ts?.categories?.deleteWarning ?? "La suppression retire la catégorie et son association à tous les services."}</p>
+                  <button type="button" id="btn-delete" class="btn-danger">
+                    <Icon name="mdi:delete-outline" /> {t.adminBlog?.common?.delete ?? "Supprimer cette catégorie"}
+                  </button>
+                </div>
+              </details>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+
+    <!-- Actions bar -->
+    <div class="form-actions">
+      <a href={catBase} class="btn-cancel">{t.adminBlog?.common?.cancel ?? "Annuler"}</a>
+      <div class="form-actions-right">
+        <button type="button" id="btn-save" class="btn-primary">
+          <Icon name="mdi:content-save-outline" /> {isEdit ? (ts?.form?.save ?? "Enregistrer") : (ts?.categories?.create ?? "Créer")}
+        </button>
+      </div>
+    </div>
+  </form>
+  <MediaPickerModal />
+
+  <div id="i18n-data" hidden
+    data-cat-name-required={ts?.js?.catNameRequired ?? "Le nom en français est obligatoire."}
+    data-slug-required={ts?.js?.slugRequired ?? "Le slug est obligatoire."}
+    data-category-created={ts?.js?.categoryCreated ?? "Catégorie créée avec succès."}
+    data-category-saved={ts?.js?.categorySaved ?? "Catégorie enregistrée."}
+    data-category-deleted={ts?.js?.categoryDeleted ?? "Catégorie supprimée. Redirection…"}
+    data-error-save={ts?.js?.errorSave ?? "Erreur lors de la sauvegarde."}
+    data-error-delete={ts?.js?.errorDelete ?? "Erreur lors de la suppression."}
+    data-confirm-delete-cat={ts?.js?.confirmDeleteCat ?? "Supprimer définitivement cette catégorie ?"}
+    data-network-error={ts?.js?.networkError ?? "Erreur réseau — vérifiez votre connexion."}
+    data-cover-id={category?.featuredImageId ?? ""}
+  ></div>
+</AdminLayout>
+
+<script>
+  import { openMediaPicker } from "@lib/admin/media-picker";
+  import { showToast } from "@lib/admin/toast";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const i18n = document.getElementById("i18n-data")?.dataset ?? {};
+    const form = document.getElementById("category-form") as HTMLFormElement;
+    const isEdit = form?.dataset.isEdit === "true";
+    const categoryId = form?.dataset.categoryId;
+
+    // -------- Auto-slug from French name --------
+    if (!isEdit) {
+      const nameFr = document.getElementById("name-fr") as HTMLInputElement;
+      const slugInput = document.getElementById("slug") as HTMLInputElement;
+      let slugManual = false;
+      slugInput?.addEventListener("input", () => { slugManual = true; });
+      nameFr?.addEventListener("input", () => {
+        if (slugManual) return;
+        slugInput.value = nameFr.value
+          .toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      });
+    }
+
+    // -------- Locale tabs --------
+    const tabs = document.querySelectorAll<HTMLElement>(".locale-tab");
+    const panels = document.querySelectorAll<HTMLElement>(".locale-panel");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const locale = tab.dataset.locale!;
+        tabs.forEach((t) => { t.classList.remove("active"); t.setAttribute("aria-selected", "false"); });
+        panels.forEach((p) => p.classList.remove("active"));
+        tab.classList.add("active");
+        tab.setAttribute("aria-selected", "true");
+        document.querySelector(`[data-locale-panel="${locale}"]`)?.classList.add("active");
+      });
+    });
+
+    // -------- Cover image --------
+    const coverInput = document.getElementById("cover-upload") as HTMLInputElement;
+    const preview = document.getElementById("upload-preview") as HTMLElement;
+    let coverId: string | null = i18n.coverId || null;
+
+    function setCoverPreview(id: string, url: string) {
+      coverId = id;
+      preview.innerHTML = `<img src="${url}" alt="Preview" /><button type="button" class="remove-preview" title="Supprimer">&times;</button>`;
+      preview.classList.remove("hidden");
+      preview.querySelector(".remove-preview")?.addEventListener("click", () => {
+        coverId = null;
+        preview.innerHTML = "";
+        preview.classList.add("hidden");
+        coverInput.value = "";
+      });
+    }
+
+    if (coverId && preview.querySelector("img")) {
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "remove-preview";
+      removeBtn.title = "Supprimer";
+      removeBtn.textContent = "×";
+      preview.appendChild(removeBtn);
+      removeBtn.addEventListener("click", () => {
+        coverId = null;
+        preview.innerHTML = "";
+        preview.classList.add("hidden");
+      });
+    }
+
+    const SERVICES_API_BASE = "/api/admin/services/media";
+
+    document.getElementById("btn-pick-media")?.addEventListener("click", async () => {
+      const result = await openMediaPicker({ apiBase: SERVICES_API_BASE });
+      if (result) setCoverPreview(result.id, result.url);
+    });
+
+    coverInput?.addEventListener("change", async () => {
+      const file = coverInput.files?.[0];
+      if (file) {
+        const result = await openMediaPicker({ file, apiBase: SERVICES_API_BASE });
+        if (result) setCoverPreview(result.id, result.url);
+      }
+      coverInput.value = "";
+    });
+
+    // -------- Collect data --------
+    const locales = ["fr", "en", "es", "ar"];
+
+    function collectData() {
+      const fd = new FormData(form);
+      const name: Record<string, string> = {};
+      const description: Record<string, string> = {};
+      const seoTitle: Record<string, string> = {};
+      const seoDescription: Record<string, string> = {};
+
+      locales.forEach((loc) => {
+        const n = fd.get(`name_${loc}`) as string;
+        if (n) name[loc] = n;
+        const d = fd.get(`description_${loc}`) as string;
+        if (d) description[loc] = d;
+        const st = fd.get(`seoTitle_${loc}`) as string;
+        if (st) seoTitle[loc] = st;
+        const sd = fd.get(`seoDescription_${loc}`) as string;
+        if (sd) seoDescription[loc] = sd;
+      });
+
+      return {
+        action: isEdit ? "update" : "create",
+        ...(isEdit ? { id: categoryId } : {}),
+        slug: (document.getElementById("slug") as HTMLInputElement).value.trim(),
+        icon: (document.getElementById("icon") as HTMLInputElement).value.trim() || null,
+        parentId: (document.getElementById("parentId") as HTMLSelectElement).value || null,
+        sortOrder: Number((document.getElementById("sortOrder") as HTMLInputElement).value) || 0,
+        isActive: (document.getElementById("isActive") as HTMLInputElement).checked,
+        isFeatured: (document.getElementById("isFeatured") as HTMLInputElement).checked,
+        displayInHome: (document.getElementById("displayInHome") as HTMLInputElement).checked,
+        displayInMenu: (document.getElementById("displayInMenu") as HTMLInputElement).checked,
+        featuredImageId: coverId || null,
+        name,
+        description,
+        seoTitle,
+        seoDescription,
+      };
+    }
+
+    // -------- Validate --------
+    function validate(): boolean {
+      const nameFr = (document.getElementById("name-fr") as HTMLInputElement)?.value.trim();
+      if (!nameFr) {
+        showToast(i18n.catNameRequired ?? "Le nom en français est obligatoire.", "warning");
+        document.querySelector<HTMLElement>('[data-locale="fr"]')?.click();
+        document.getElementById("name-fr")?.focus();
+        return false;
+      }
+      const slug = (document.getElementById("slug") as HTMLInputElement)?.value.trim();
+      if (!slug) {
+        showToast(i18n.slugRequired ?? "Le slug est obligatoire.", "warning");
+        document.getElementById("slug")?.focus();
+        return false;
+      }
+      return true;
+    }
+
+    // -------- Save --------
+    document.getElementById("btn-save")?.addEventListener("click", async () => {
+      if (!validate()) return;
+      const btn = document.getElementById("btn-save") as HTMLButtonElement;
+      btn.disabled = true;
+
+      try {
+        const data = collectData();
+        const res = await fetch("/api/admin/services/categories", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await res.json();
+
+        if (result.ok || result.id) {
+          showToast(isEdit ? (i18n.categorySaved ?? "Enregistré !") : (i18n.categoryCreated ?? "Catégorie créée !"), "success");
+          setTimeout(() => {
+            window.location.href = form.querySelector<HTMLAnchorElement>(".btn-cancel")?.href
+              || `/${window.location.pathname.split("/")[1]}/admin/services/categories`;
+          }, 800);
+        } else {
+          showToast(result.error || i18n.errorSave || "", "error");
+        }
+      } catch {
+        showToast(i18n.networkError ?? "", "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // -------- Delete --------
+    document.getElementById("btn-delete")?.addEventListener("click", async () => {
+      if (!confirm(i18n.confirmDeleteCat ?? "Supprimer ?")) return;
+      try {
+        const res = await fetch("/api/admin/services/categories", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "delete", id: categoryId }),
+        });
+        if (res.ok) {
+          showToast(i18n.categoryDeleted ?? "Supprimé.", "success");
+          setTimeout(() => {
+            window.location.href = `/${window.location.pathname.split("/")[1]}/admin/services/categories`;
+          }, 800);
+        } else {
+          showToast(i18n.errorDelete ?? "", "error");
+        }
+      } catch {
+        showToast(i18n.networkError ?? "", "error");
+      }
+    });
+  });
+</script>
+
+<style>
+  .admin-page-header { margin-bottom: var(--space-6, 1.5rem); }
+  .admin-page-title-row {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: var(--space-3, 0.75rem);
+  }
+  .admin-page-title-group { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .admin-page-header h1 {
+    font-family: var(--font-family-display, "Space Grotesk", sans-serif);
+    font-size: var(--h2-font-size, 2rem); font-weight: 800;
+    color: var(--heading-color, #0f172a); margin: 0;
+  }
+  .admin-page-subtitle { color: var(--text-muted, #64748b); font-size: 0.9375rem; margin: var(--space-1, 0.25rem) 0 0; }
+
+  .back-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2.25rem; height: 2.25rem; border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem); color: var(--text-muted, #64748b);
+    text-decoration: none; transition: all 0.15s;
+  }
+  .back-link:hover { border-color: var(--color-primary, #eab308); color: var(--text-default, #0f172a); }
+  .back-link [data-icon] { width: 1.25rem; height: 1.25rem; }
+
+  /* Two-column layout */
+  .form-layout {
+    display: grid; grid-template-columns: 1fr 340px;
+    gap: var(--space-6, 1.5rem); align-items: start;
+  }
+  .form-main { display: flex; flex-direction: column; gap: var(--space-4, 1rem); }
+  .form-sidebar { display: flex; flex-direction: column; gap: var(--space-4, 1rem); }
+
+  /* Card title */
+  .card-title-row { display: flex; align-items: center; gap: var(--space-2, 0.5rem); font-weight: 600; font-size: 0.9375rem; }
+  .card-title-icon { width: 1.125rem; height: 1.125rem; color: var(--text-muted, #64748b); }
+
+  /* Form fields */
+  .form-field { margin-bottom: var(--space-4, 1rem); }
+  .form-field:last-child { margin-bottom: 0; }
+
+  /* Toggle group */
+  .toggle-group { margin-top: var(--space-4, 1rem); display: flex; flex-direction: column; gap: var(--space-3, 0.75rem); }
+  .toggle-row { display: flex; align-items: center; gap: var(--space-2, 0.5rem); }
+
+  /* Locale tabs */
+  .locale-tabs {
+    display: flex; gap: var(--space-1, 0.25rem); margin-bottom: var(--space-4, 1rem);
+    border-bottom: 2px solid var(--border-default, #e2e8f0); padding-bottom: 0; flex-wrap: wrap;
+  }
+  .locale-tab {
+    display: inline-flex; align-items: center; gap: var(--space-1, 0.25rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    border: none; background: none; cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+    font-size: 0.875rem; color: var(--text-muted, #64748b);
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .locale-tab:hover { color: var(--text-default, #0f172a); }
+  .locale-tab.active { color: var(--text-default, #0f172a); border-bottom-color: var(--color-primary, #eab308); }
+  .locale-flag { font-size: 1rem; }
+  .locale-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #16a34a; display: inline-block; margin-left: 2px;
+  }
+  .locale-tab.active .locale-dot { background: var(--color-primary, #eab308); }
+  .locale-panel { display: none; }
+  .locale-panel.active { display: block; }
+
+  /* SEO */
+  .seo-section { margin-top: var(--space-4, 1rem); border: 1px solid var(--border-default, #e2e8f0); border-radius: var(--border-radius-md, 0.375rem); }
+  .seo-summary {
+    display: flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    cursor: pointer; font-size: 0.8125rem; color: var(--text-muted, #64748b); list-style: none;
+  }
+  .seo-summary::-webkit-details-marker { display: none; }
+  .seo-summary::before { content: "▸"; transition: transform 0.15s; }
+  details[open] .seo-summary::before { transform: rotate(90deg); }
+  .seo-icon { width: 1rem; height: 1rem; }
+  .seo-fields { padding: var(--space-3, 0.75rem); }
+
+  /* Upload zone */
+  .upload-zone {
+    border: 2px dashed var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem);
+    padding: var(--space-4, 1rem); text-align: center;
+    transition: border-color 0.15s;
+  }
+  .upload-zone:hover { border-color: var(--color-primary, #eab308); }
+  .upload-actions-row { display: flex; align-items: center; justify-content: center; gap: var(--space-3, 0.75rem); flex-wrap: wrap; }
+  .btn-pick-media, .btn-upload-file {
+    display: inline-flex; align-items: center; gap: var(--space-1, 0.25rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem);
+    background: var(--bg-surface, white); color: var(--text-default, #0f172a);
+    font-size: 0.8125rem; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-pick-media:hover, .btn-upload-file:hover { border-color: var(--color-primary, #eab308); }
+  .pick-icon { width: 1rem; height: 1rem; }
+  .upload-separator { color: var(--text-muted, #64748b); font-size: 0.75rem; }
+  .upload-input { display: none; }
+  .upload-preview { margin-top: var(--space-3, 0.75rem); position: relative; display: inline-block; }
+  .upload-preview img { max-height: 160px; border-radius: var(--border-radius-md, 0.375rem); }
+  .upload-preview .remove-preview {
+    position: absolute; top: -0.5rem; right: -0.5rem;
+    width: 1.5rem; height: 1.5rem; border-radius: 50%;
+    background: #dc2626; color: white; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.875rem; line-height: 1;
+  }
+  .hidden { display: none !important; }
+
+  /* Danger zone */
+  .danger-zone-card { border-color: #fecaca; }
+  .danger-summary {
+    display: flex; align-items: center; gap: var(--space-2, 0.5rem);
+    cursor: pointer; font-weight: 600; font-size: 0.875rem;
+    color: #dc2626; list-style: none;
+  }
+  .danger-summary::-webkit-details-marker { display: none; }
+  .danger-icon { width: 1.125rem; height: 1.125rem; }
+  .danger-body { margin-top: var(--space-3, 0.75rem); }
+  .danger-text { font-size: 0.8125rem; color: var(--text-muted, #64748b); margin-bottom: var(--space-3, 0.75rem); }
+  .btn-danger {
+    display: inline-flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+    background: #dc2626; color: white; border: none;
+    border-radius: var(--border-radius-md, 0.375rem);
+    cursor: pointer; font-weight: 600; font-size: 0.8125rem;
+    transition: opacity 0.15s;
+  }
+  .btn-danger:hover { opacity: 0.9; }
+  .btn-danger [data-icon] { width: 1rem; height: 1rem; }
+
+  /* Form actions bar */
+  .form-actions {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: var(--space-6, 1.5rem); padding: var(--space-4, 1rem);
+    background: var(--bg-surface, white); border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem);
+  }
+  .form-actions-right { display: flex; gap: var(--space-3, 0.75rem); }
+  .btn-cancel {
+    color: var(--text-muted, #64748b); text-decoration: none; font-size: 0.875rem;
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+    background: var(--color-primary, #eab308); color: var(--color-primary-contrast, #0f172a);
+    border: 1px solid var(--color-primary, #eab308);
+    border-radius: var(--border-radius-md, 0.375rem);
+    font-weight: 600; font-size: 0.875rem; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary [data-icon] { width: 1.125rem; height: 1.125rem; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  @media (max-width: 900px) { .form-layout { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .form-actions { flex-direction: column; gap: var(--space-3, 0.75rem); } }
+</style>

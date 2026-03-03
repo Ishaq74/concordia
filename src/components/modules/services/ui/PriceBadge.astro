@@ -1,0 +1,44 @@
+---
+import Badge from "@components/ui/Badge.astro";
+import { getTranslations } from "@i18n/translations";
+
+interface Props {
+  basePrice?: string | null;
+  priceType?: string | null;
+  currency?: string | null;
+  lang: string;
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+}
+
+const { basePrice, priceType, currency = "EUR", lang, variant = "initial" } = Astro.props;
+const t = getTranslations(lang);
+
+function formatPrice(): string {
+  if (!basePrice || basePrice === "0") return t.servicesPage?.priceFree ?? "Gratuit";
+  const amount = `${basePrice}\u00A0${currency}`;
+  switch (priceType) {
+    case "per_hour":
+      return `${amount}${t.servicesPage?.pricePerHour ?? "/h"}`;
+    case "per_session":
+      return `${amount}${t.servicesPage?.pricePerSession ?? "/séance"}`;
+    case "on_quote":
+      return t.servicesPage?.priceOnQuote ?? "Sur devis";
+    case "fixed":
+    default:
+      return amount;
+  }
+}
+
+const label = formatPrice();
+const color = (!basePrice || basePrice === "0") ? "accent" : "primary";
+---
+
+<Badge variant={variant} color={color} text={label}>
+  {label}
+</Badge>
+
+<style>
+  :global(.price-badge) {
+    font-weight: 600;
+  }
+</style>

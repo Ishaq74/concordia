@@ -1,0 +1,517 @@
+---
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Pagination from "@components/ui/Pagination.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import {
+  servicesBookings,
+  servicesTranslations,
+} from "@database/schemas";
+import { user } from "@database/schemas/auth-schema";
+import { eq, desc, and, ilike, count, inArray, gte, lte } from "drizzle-orm";
+import { getTranslations } from "@i18n/translations";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const ts = t.adminServices;
+const adminBase = `/${lang}/admin/services`;
+const bookingBase = `${adminBase}/bookings`;
+
+const url = new URL(Astro.request.url);
+const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));
+const perPage = 20;
+const statusFilter = url.searchParams.get("status")?.trim() ?? "";
+const search = url.searchParams.get("q")?.trim() ?? "";
+const dateFrom = url.searchParams.get("from")?.trim() ?? "";
+const dateTo = url.searchParams.get("to")?.trim() ?? "";
+
+const db = await getDrizzle();
+
+// Build conditions
+const conditions: any[] = [];
+if (statusFilter) conditions.push(eq(servicesBookings.status, statusFilter));
+if (search) conditions.push(ilike(servicesBookings.customerMessage, `%${search}%`));
+if (dateFrom) conditions.push(gte(servicesBookings.bookingDate, dateFrom));
+if (dateTo) conditions.push(lte(servicesBookings.bookingDate, dateTo));
+
+const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+const [totalResult] = whereClause
+  ? await db.select({ value: count() }).from(servicesBookings).where(whereClause)
+  : await db.select({ value: count() }).from(servicesBookings);
+const totalBookings = totalResult.value;
+const totalPages = Math.max(1, Math.ceil(totalBookings / perPage));
+
+const bookings = whereClause
+  ? await db.select().from(servicesBookings).where(whereClause).orderBy(desc(servicesBookings.bookingDate)).limit(perPage).offset((page - 1) * perPage)
+  : await db.select().from(servicesBookings).orderBy(desc(servicesBookings.bookingDate)).limit(perPage).offset((page - 1) * perPage);
+
+// Batch-fetch service names (no N+1)
+const serviceIds = [...new Set(bookings.map((b) => b.serviceId).filter(Boolean))];
+const serviceNameMap = new Map<string, string>();
+if (serviceIds.length > 0) {
+  const translations = await db
+    .select({ serviceId: servicesTranslations.serviceId, title: servicesTranslations.title, inLanguage: servicesTranslations.inLanguage })
+    .from(servicesTranslations)
+    .where(inArray(servicesTranslations.serviceId, serviceIds));
+
+  const grouped = new Map<string, typeof translations>();
+  translations.forEach((tr) => {
+    if (!grouped.has(tr.serviceId)) grouped.set(tr.serviceId, []);
+    grouped.get(tr.serviceId)!.push(tr);
+  });
+
+  for (const [sid, trs] of grouped) {
+    const match = trs.find((t) => t.inLanguage === lang) ?? trs[0];
+    if (match) {
+      const title = typeof match.title === "string" ? match.title : (match.title as Record<string, string>)?.[lang] || Object.values(match.title as Record<string, string>)[0] || sid;
+      serviceNameMap.set(sid, title);
+    }
+  }
+}
+
+// Batch-fetch customer info (no N+1)
+const customerIds = [...new Set(bookings.map((b) => b.customerId).filter(Boolean))];
+const customerMap = new Map<string, { name: string; email: string; image: string | null }>();
+if (customerIds.length > 0) {
+  const users = await db
+    .select({ id: user.id, name: user.name, email: user.email, image: user.image })
+    .from(user)
+    .where(inArray(user.id, customerIds));
+  users.forEach((u) => customerMap.set(u.id, { name: u.name, email: u.email, image: u.image }));
+}
+
+// Stats
+const [totalAll] = await db.select({ value: count() }).from(servicesBookings);
+const [pendingCount] = await db.select({ value: count() }).from(servicesBookings).where(eq(servicesBookings.status, "pending"));
+const [confirmedCount] = await db.select({ value: count() }).from(servicesBookings).where(eq(servicesBookings.status, "confirmed"));
+const [completedCount] = await db.select({ value: count() }).from(servicesBookings).where(eq(servicesBookings.status, "completed"));
+const [cancelledCount] = await db.select({ value: count() }).from(servicesBookings).where(eq(servicesBookings.status, "cancelled"));
+
+const statusColors: Record<string, "warning" | "accent" | "error" | "primary" | "secondary" | "default"> = {
+  pending: "warning",
+  confirmed: "accent",
+  cancelled: "error",
+  completed: "primary",
+  no_show: "secondary",
+};
+const statusLabels: Record<string, string> = {
+  pending: ts?.bookingStatus?.pending ?? "En attente",
+  confirmed: ts?.bookingStatus?.confirmed ?? "Confirmé",
+  cancelled: ts?.bookingStatus?.cancelled ?? "Annulé",
+  completed: ts?.bookingStatus?.completed ?? "Terminé",
+  no_show: ts?.bookingStatus?.no_show ?? "Absent",
+};
+const statuses = ["pending", "confirmed", "cancelled", "completed", "no_show"];
+
+const hasFilters = statusFilter || search || dateFrom || dateTo;
+const filterParams = new URLSearchParams();
+if (statusFilter) filterParams.set("status", statusFilter);
+if (search) filterParams.set("q", search);
+if (dateFrom) filterParams.set("from", dateFrom);
+if (dateTo) filterParams.set("to", dateTo);
+const paginationBase = `${bookingBase}?${filterParams.toString()}${filterParams.toString() ? "&" : ""}page=`;
+---
+
+<AdminLayout title={ts?.bookings?.title ?? "Réservations"} activeSection="services-bookings">
+  <header class="admin-page-header">
+    <div class="admin-page-title-row">
+      <div class="admin-page-title-group">
+        <a href={adminBase} class="back-link"><Icon name="mdi:arrow-left" /></a>
+        <h1>{ts?.bookings?.title ?? "Réservations"}</h1>
+        <Badge color="primary" text={`${totalBookings} ${totalBookings > 1 ? (t.adminBlog?.common?.results ?? "résultats") : (t.adminBlog?.common?.result ?? "résultat")}`} />
+      </div>
+    </div>
+    <p class="admin-page-subtitle">{ts?.bookings?.subtitle ?? "Consultez et gérez les réservations de services."}</p>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <a href={bookingBase} class:list={["stat-card", { active: !hasFilters }]}>
+      <div class="stat-icon stat-icon--primary"><Icon name="mdi:calendar-multiple" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{totalAll.value}</span>
+        <span class="stat-label">{ts?.bookings?.totalAll ?? "Total"}</span>
+      </div>
+    </a>
+    <a href={`${bookingBase}?status=pending`} class:list={["stat-card", { active: statusFilter === "pending" }]}>
+      <div class="stat-icon stat-icon--warning"><Icon name="mdi:clock-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{pendingCount.value}</span>
+        <span class="stat-label">{statusLabels.pending}</span>
+      </div>
+    </a>
+    <a href={`${bookingBase}?status=confirmed`} class:list={["stat-card", { active: statusFilter === "confirmed" }]}>
+      <div class="stat-icon stat-icon--accent"><Icon name="mdi:check-circle-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{confirmedCount.value}</span>
+        <span class="stat-label">{statusLabels.confirmed}</span>
+      </div>
+    </a>
+    <a href={`${bookingBase}?status=completed`} class:list={["stat-card", { active: statusFilter === "completed" }]}>
+      <div class="stat-icon stat-icon--success"><Icon name="mdi:check-all" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{completedCount.value}</span>
+        <span class="stat-label">{statusLabels.completed}</span>
+      </div>
+    </a>
+    <a href={`${bookingBase}?status=cancelled`} class:list={["stat-card", { active: statusFilter === "cancelled" }]}>
+      <div class="stat-icon stat-icon--error"><Icon name="mdi:cancel" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{cancelledCount.value}</span>
+        <span class="stat-label">{statusLabels.cancelled}</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <Card elevation="sm" className="admin-filters-card">
+    <CardContent>
+      <form method="get" action={bookingBase} class="admin-filters-form">
+        <div class="admin-filters-row">
+          <div class="admin-filter-field filter-search">
+            <Label htmlFor="q">{t.adminBlog?.common?.search ?? "Rechercher"}</Label>
+            <Input id="q" name="q" type="search" placeholder={ts?.bookings?.searchPlaceholder ?? "Message client…"} value={search} />
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="filter-status">{ts?.form?.status ?? "Statut"}</Label>
+            <Select id="filter-status" name="status">
+              <option value="">{ts?.bookings?.allStatuses ?? "Tous les statuts"}</option>
+              {statuses.map((s) => (
+                <option value={s} selected={s === statusFilter}>{statusLabels[s] ?? s}</option>
+              ))}
+            </Select>
+          </div>
+        </div>
+        <div class="admin-filters-row">
+          <div class="admin-filter-field">
+            <Label htmlFor="from">{ts?.bookings?.dateFrom ?? "Date du"}</Label>
+            <Input id="from" name="from" type="date" value={dateFrom} />
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="to">{ts?.bookings?.dateTo ?? "Date au"}</Label>
+            <Input id="to" name="to" type="date" value={dateTo} />
+          </div>
+          <div class="admin-filter-actions">
+            <Button type="submit" color="primary" icon={{ name: "mdi:magnify", side: "left" }}>
+              {t.adminBlog?.common?.filter ?? "Filtrer"}
+            </Button>
+            {hasFilters && (
+              <a href={bookingBase} class="admin-filter-reset">{t.adminBlog?.common?.reset ?? "Réinitialiser"}</a>
+            )}
+          </div>
+        </div>
+      </form>
+    </CardContent>
+  </Card>
+
+  <!-- Table -->
+  <Card>
+    <CardContent>
+      {bookings.length === 0 ? (
+        <div class="empty-state">
+          <Icon name="mdi:calendar-blank-outline" class="empty-state-icon" />
+          <p>{ts?.bookings?.empty ?? "Aucune réservation trouvée."}</p>
+        </div>
+      ) : (
+        <div class="table-responsive">
+          <Table striped>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{ts?.form?.service ?? "Service"}</TableHead>
+                <TableHead>{ts?.bookings?.customer ?? "Client"}</TableHead>
+                <TableHead>{ts?.bookings?.date ?? "Date"}</TableHead>
+                <TableHead>{ts?.bookings?.time ?? "Heure"}</TableHead>
+                <TableHead>{ts?.bookings?.duration ?? "Durée"}</TableHead>
+                <TableHead>{ts?.form?.price ?? "Prix"}</TableHead>
+                <TableHead>{ts?.form?.status ?? "Statut"}</TableHead>
+                <TableHead>{t.adminBlog?.common?.actions ?? "Actions"}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {bookings.map((booking) => {
+                const serviceName = serviceNameMap.get(booking.serviceId) ?? booking.serviceId;
+                return (
+                  <TableRow>
+                    <TableCell>
+                      <span class="booking-service-name">{serviceName}</span>
+                      {booking.customerMessage && (
+                        <span class="booking-message" title={booking.customerMessage}>
+                          💬 {booking.customerMessage.slice(0, 40)}{booking.customerMessage.length > 40 ? "…" : ""}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <a href={`${bookingBase}/${booking.id}`} class="booking-customer-cell">
+                        {customerMap.get(booking.customerId)?.image ? (
+                          <img src={customerMap.get(booking.customerId)!.image!} alt="" class="customer-avatar" loading="lazy" />
+                        ) : (
+                          <div class="customer-avatar-placeholder"><Icon name="mdi:account" /></div>
+                        )}
+                        <div class="customer-info">
+                          <span class="customer-name">{customerMap.get(booking.customerId)?.name ?? "—"}</span>
+                          <span class="customer-email">{customerMap.get(booking.customerId)?.email ?? ""}</span>
+                        </div>
+                      </a>
+                    </TableCell>
+                    <TableCell>
+                      <div class="date-cell">
+                        <span class="date-main">{booking.bookingDate}</span>
+                        <span class="date-sub">
+                          {t.adminBlog?.articles?.createdOn ?? "Créé"} {booking.createdAt.toLocaleDateString(lang, { day: "2-digit", month: "short" })}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{booking.bookingTime || "—"}</TableCell>
+                    <TableCell>{booking.durationMinutes ? `${booking.durationMinutes} min` : "—"}</TableCell>
+                    <TableCell>
+                      {booking.totalPrice
+                        ? <span class="price-cell">{booking.totalPrice} {booking.currency ?? "EUR"}</span>
+                        : <span class="text-muted">—</span>}
+                    </TableCell>
+                    <TableCell>
+                      <Badge color={statusColors[booking.status] ?? "default"} text={statusLabels[booking.status] ?? booking.status} />
+                    </TableCell>
+                    <TableCell>
+                      <div class="action-buttons">
+                        <a href={`${bookingBase}/${booking.id}`} class="action-btn action-btn--view" title={ts?.bookings?.detail ?? "Détail"}>
+                          <Icon name="mdi:eye-outline" />
+                        </a>
+                        {booking.status === "pending" && (
+                          <button type="button" class="action-btn action-btn--confirm" data-booking-id={booking.id} data-action="confirm" title={statusLabels.confirmed}>
+                            <Icon name="mdi:check" />
+                          </button>
+                        )}
+                        {(booking.status === "pending" || booking.status === "confirmed") && (
+                          <button type="button" class="action-btn action-btn--cancel" data-booking-id={booking.id} data-action="cancel" title={statusLabels.cancelled}>
+                            <Icon name="mdi:close" />
+                          </button>
+                        )}
+                        {booking.status === "confirmed" && (
+                          <>
+                            <button type="button" class="action-btn action-btn--complete" data-booking-id={booking.id} data-action="complete" title={statusLabels.completed}>
+                              <Icon name="mdi:check-all" />
+                            </button>
+                            <button type="button" class="action-btn action-btn--noshow" data-booking-id={booking.id} data-action="no_show" title={statusLabels.no_show}>
+                              <Icon name="mdi:account-off" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </CardContent>
+  </Card>
+
+  {totalPages > 1 && (
+    <div class="admin-pagination">
+      <Pagination currentPage={page} totalPages={totalPages} baseUrl={paginationBase} showPrevNext color="primary" />
+    </div>
+  )}
+
+  <div id="i18n-data" hidden
+    data-booking-updated={ts?.js?.bookingUpdated ?? "Réservation mise à jour."}
+    data-error-save={ts?.js?.errorSave ?? "Erreur lors de la mise à jour."}
+    data-confirm-booking-action={ts?.js?.confirmBookingAction ?? "Modifier le statut de cette réservation ?"}
+    data-confirm-cancel-booking={ts?.js?.confirmCancelBooking ?? "Annuler cette réservation ?"}
+    data-network-error={ts?.js?.networkError ?? "Erreur réseau — vérifiez votre connexion."}
+  ></div>
+</AdminLayout>
+
+<script>
+  import { showToast } from "@lib/admin/toast";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const i18n = document.getElementById("i18n-data")?.dataset ?? {};
+
+    document.querySelectorAll<HTMLElement>("[data-booking-id]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const bookingId = btn.dataset.bookingId;
+        const action = btn.dataset.action;
+        if (!bookingId || !action) return;
+
+        const msg = action === "cancel"
+          ? (i18n.confirmCancelBooking ?? "Annuler cette réservation ?")
+          : (i18n.confirmBookingAction ?? "Modifier le statut ?");
+        if (!confirm(msg)) return;
+
+        btn.classList.add("loading");
+
+        try {
+          const res = await fetch("/api/admin/services/bookings", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: bookingId, action }),
+          });
+          const data = await res.json();
+
+          if (data.ok || res.ok) {
+            showToast(i18n.bookingUpdated ?? "Mis à jour.", "success");
+            setTimeout(() => window.location.reload(), 800);
+          } else {
+            showToast(data.error || i18n.errorSave || "", "error");
+          }
+        } catch {
+          showToast(i18n.networkError ?? "", "error");
+        } finally {
+          btn.classList.remove("loading");
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .admin-page-header { margin-bottom: var(--space-6, 1.5rem); }
+  .admin-page-title-row {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: var(--space-3, 0.75rem);
+  }
+  .admin-page-title-group { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .admin-page-header h1 {
+    font-family: var(--font-family-display, "Space Grotesk", sans-serif);
+    font-size: var(--h2-font-size, 2rem); font-weight: 800;
+    color: var(--heading-color, #0f172a); margin: 0;
+  }
+  .admin-page-subtitle { color: var(--text-muted, #64748b); font-size: 0.9375rem; margin: var(--space-1, 0.25rem) 0 0; }
+
+  .back-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2.25rem; height: 2.25rem; border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem); color: var(--text-muted, #64748b);
+    text-decoration: none; transition: all 0.15s;
+  }
+  .back-link:hover { border-color: var(--color-primary, #eab308); color: var(--text-default, #0f172a); }
+  .back-link [data-icon] { width: 1.25rem; height: 1.25rem; }
+
+  /* Stats */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-3, 0.75rem); margin-bottom: var(--space-4, 1rem);
+  }
+  .stat-card {
+    display: flex; align-items: center; gap: var(--space-3, 0.75rem);
+    padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+    background: var(--bg-surface, white); border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-lg, 0.5rem); text-decoration: none; color: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .stat-card:hover { border-color: var(--color-primary, #eab308); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .stat-card.active { border-color: var(--color-primary, #eab308); background: var(--bg-subtle, #f8fafc); }
+  .stat-icon {
+    width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;
+    border-radius: var(--border-radius-md, 0.375rem);
+  }
+  .stat-icon [data-icon] { width: 1.25rem; height: 1.25rem; }
+  .stat-icon--primary { background: #fef9c3; color: #ca8a04; }
+  .stat-icon--warning { background: #fef3c7; color: #d97706; }
+  .stat-icon--accent { background: #ede9fe; color: #7c3aed; }
+  .stat-icon--success { background: #dcfce7; color: #16a34a; }
+  .stat-icon--error { background: #fee2e2; color: #dc2626; }
+  .stat-info { display: flex; flex-direction: column; }
+  .stat-value { font-weight: 700; font-size: 1.25rem; color: var(--text-default, #0f172a); line-height: 1.2; }
+  .stat-label { font-size: 0.75rem; color: var(--text-muted, #64748b); }
+
+  /* Filters */
+  .admin-filters-card { margin-bottom: var(--space-4, 1rem); }
+  .admin-filters-form { display: flex; flex-direction: column; gap: var(--space-3, 0.75rem); }
+  .admin-filters-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-3, 0.75rem); }
+  .admin-filter-field { display: flex; flex-direction: column; gap: var(--space-1, 0.25rem); min-width: 140px; flex: 1; }
+  .filter-search { flex: 2; min-width: 200px; }
+  .admin-filter-actions { display: flex; align-items: center; gap: var(--space-2, 0.5rem); }
+  .admin-filter-reset { color: var(--text-muted, #64748b); font-size: 0.8125rem; text-decoration: underline; }
+
+  /* Table */
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  .booking-service-name { font-weight: 600; font-size: 0.875rem; color: var(--text-default, #0f172a); display: block; }
+  .booking-message {
+    display: block; font-size: 0.75rem; color: var(--text-muted, #64748b);
+    margin-top: 2px; max-width: 220px; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .customer-id {
+    font-family: var(--font-family-mono, monospace); font-size: 0.6875rem;
+    background: var(--bg-inset, #f1f5f9); padding: 0.0625rem 0.375rem;
+    border-radius: var(--border-radius-sm, 0.25rem); color: var(--text-muted, #64748b);
+  }
+  .booking-customer-cell {
+    display: flex; align-items: center; gap: var(--space-2, 0.5rem);
+    text-decoration: none; color: inherit;
+  }
+  .booking-customer-cell:hover .customer-name { color: var(--color-primary, #eab308); }
+  .customer-avatar {
+    width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+    border: 1px solid var(--border-default, #e2e8f0);
+  }
+  .customer-avatar-placeholder {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg-inset, #f1f5f9); color: var(--text-muted, #94a3b8);
+    border: 1px solid var(--border-default, #e2e8f0);
+  }
+  .customer-avatar-placeholder [data-icon] { width: 1rem; height: 1rem; }
+  .customer-info { display: flex; flex-direction: column; }
+  .customer-name { font-weight: 600; font-size: 0.8125rem; color: var(--text-default, #0f172a); transition: color 0.15s; }
+  .customer-email { font-size: 0.6875rem; color: var(--text-muted, #64748b); }
+
+  .date-cell { display: flex; flex-direction: column; }
+  .date-main { font-size: 0.8125rem; font-weight: 600; color: var(--text-default, #1e293b); }
+  .date-sub { font-size: 0.6875rem; color: var(--text-muted, #64748b); }
+  .price-cell { font-weight: 600; font-size: 0.875rem; }
+  .text-muted { color: var(--text-muted, #64748b); font-size: 0.8125rem; }
+
+  .action-buttons { display: flex; gap: 0.25rem; }
+  .action-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem); background: var(--bg-surface, white);
+    color: var(--text-muted, #64748b); cursor: pointer; transition: all 0.15s;
+  }
+  .action-btn [data-icon] { width: 1rem; height: 1rem; }
+  .action-btn:hover { border-color: var(--color-primary, #eab308); }
+  .action-btn--confirm:hover { color: #16a34a; border-color: #16a34a; background: #f0fdf4; }
+  .action-btn--cancel:hover { color: #dc2626; border-color: #dc2626; background: #fef2f2; }
+  .action-btn--complete:hover { color: #2563eb; border-color: #2563eb; background: #eff6ff; }
+  .action-btn--noshow:hover { color: #9333ea; border-color: #9333ea; background: #faf5ff; }
+  .action-btn--view { text-decoration: none; }
+  .action-btn--view:hover { color: var(--color-primary, #eab308); border-color: var(--color-primary, #eab308); background: #fffbeb; }
+  .action-btn.loading { opacity: 0.5; pointer-events: none; }
+
+  .empty-state { text-align: center; padding: var(--space-10, 3rem) var(--space-4, 1rem); color: var(--text-muted, #64748b); }
+  .empty-state-icon { width: 3rem; height: 3rem; margin: 0 auto var(--space-3, 0.75rem); opacity: 0.4; }
+
+  .admin-pagination { margin-top: var(--space-4, 1rem); display: flex; justify-content: center; }
+
+  @media (max-width: 1024px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .admin-filters-row { flex-direction: column; }
+    .admin-filter-field { min-width: 100%; }
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .admin-page-title-row { flex-direction: column; align-items: flex-start; }
+  }
+</style>

@@ -1,0 +1,535 @@
+---
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Pagination from "@components/ui/Pagination.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import { servicesCategories, servicesListings, servicesMedia } from "@database/schemas";
+import { count, eq, ilike, inArray, and } from "drizzle-orm";
+import { getTranslations } from "@i18n/translations";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const ts = t.adminServices;
+const adminBase = `/${lang}/admin/services`;
+
+const url = new URL(Astro.request.url);
+const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));
+const perPage = 20;
+const search = url.searchParams.get("q")?.trim() ?? "";
+const featuredFilter = url.searchParams.get("featured")?.trim() ?? "";
+const homeFilter = url.searchParams.get("home")?.trim() ?? "";
+const menuFilter = url.searchParams.get("menu")?.trim() ?? "";
+const activeFilter = url.searchParams.get("active")?.trim() ?? "";
+
+const db = await getDrizzle();
+
+// Build filter conditions
+const conditions: any[] = [];
+if (search) conditions.push(ilike(servicesCategories.slug, `%${search}%`));
+if (featuredFilter === "true") conditions.push(eq(servicesCategories.isFeatured, true));
+if (featuredFilter === "false") conditions.push(eq(servicesCategories.isFeatured, false));
+if (homeFilter === "true") conditions.push(eq(servicesCategories.displayInHome, true));
+if (homeFilter === "false") conditions.push(eq(servicesCategories.displayInHome, false));
+if (menuFilter === "true") conditions.push(eq(servicesCategories.displayInMenu, true));
+if (menuFilter === "false") conditions.push(eq(servicesCategories.displayInMenu, false));
+if (activeFilter === "true") conditions.push(eq(servicesCategories.isActive, true));
+if (activeFilter === "false") conditions.push(eq(servicesCategories.isActive, false));
+
+const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+const [totalResult] = whereClause
+  ? await db.select({ value: count() }).from(servicesCategories).where(whereClause)
+  : await db.select({ value: count() }).from(servicesCategories);
+const totalCategories = totalResult.value;
+const totalPages = Math.max(1, Math.ceil(totalCategories / perPage));
+
+const categories = whereClause
+  ? await db.select().from(servicesCategories).where(whereClause).orderBy(servicesCategories.sortOrder, servicesCategories.slug).limit(perPage).offset((page - 1) * perPage)
+  : await db.select().from(servicesCategories).orderBy(servicesCategories.sortOrder, servicesCategories.slug).limit(perPage).offset((page - 1) * perPage);
+
+// Service count per category (batch)
+const categoryIds = categories.map((c) => c.id);
+const serviceCountMap = new Map<string, number>();
+if (categoryIds.length > 0) {
+  const counts = await db
+    .select({ categoryId: servicesListings.categoryId, count: count() })
+    .from(servicesListings)
+    .where(inArray(servicesListings.categoryId, categoryIds))
+    .groupBy(servicesListings.categoryId);
+  counts.forEach((c) => { if (c.categoryId) serviceCountMap.set(c.categoryId, c.count); });
+}
+
+// All categories for parent resolution
+const allCategories = await db
+  .select({ id: servicesCategories.id, slug: servicesCategories.slug, name: servicesCategories.name, parentId: servicesCategories.parentId })
+  .from(servicesCategories)
+  .orderBy(servicesCategories.slug);
+
+const categoryNameMap = new Map<string, string>();
+allCategories.forEach((c) => {
+  const n = c.name;
+  categoryNameMap.set(c.id, typeof n === "string" ? n : (n as Record<string, string>)?.[lang] || Object.values(n as Record<string, string>)[0] || c.slug);
+});
+
+// Stats
+const [totalAll] = await db.select({ value: count() }).from(servicesCategories);
+const [activeCount] = await db.select({ value: count() }).from(servicesCategories).where(eq(servicesCategories.isActive, true));
+const [featuredCount] = await db.select({ value: count() }).from(servicesCategories).where(eq(servicesCategories.isFeatured, true));
+const [homeCount] = await db.select({ value: count() }).from(servicesCategories).where(eq(servicesCategories.displayInHome, true));
+
+// Batch featured image URLs
+const featuredImageIds = categories.map((c) => c.featuredImageId).filter(Boolean) as string[];
+const featuredImageMap = new Map<string, string>();
+if (featuredImageIds.length > 0) {
+  const media = await db
+    .select({ id: servicesMedia.id, url: servicesMedia.url })
+    .from(servicesMedia)
+    .where(inArray(servicesMedia.id, featuredImageIds));
+  media.forEach((m) => featuredImageMap.set(m.id, m.url));
+}
+
+const extractLocalized = (value: unknown): string => {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    const obj = value as Record<string, string>;
+    return obj[lang] || Object.values(obj)[0] || "—";
+  }
+  return "—";
+};
+
+const catBase = `${adminBase}/categories`;
+const hasFilters = search || featuredFilter || homeFilter || menuFilter || activeFilter;
+
+const filterParams = new URLSearchParams();
+if (search) filterParams.set("q", search);
+if (featuredFilter) filterParams.set("featured", featuredFilter);
+if (homeFilter) filterParams.set("home", homeFilter);
+if (menuFilter) filterParams.set("menu", menuFilter);
+if (activeFilter) filterParams.set("active", activeFilter);
+const paginationBase = `${catBase}?${filterParams.toString()}${filterParams.toString() ? "&" : ""}page=`;
+---
+
+<AdminLayout title={ts?.categories?.title ?? "Catégories de services"} activeSection="services-categories">
+  <header class="admin-page-header">
+    <div class="admin-page-title-row">
+      <div class="admin-page-title-group">
+        <a href={adminBase} class="back-link"><Icon name="mdi:arrow-left" /></a>
+        <h1>{ts?.categories?.title ?? "Catégories de services"}</h1>
+        <Badge color="primary" text={`${totalCategories} ${totalCategories > 1 ? (t.adminBlog?.common?.results ?? "résultats") : (t.adminBlog?.common?.result ?? "résultat")}`} />
+      </div>
+      <a href={`${catBase}/new`} class="btn-create">
+        <Icon name="mdi:plus-circle-outline" />
+        {ts?.categories?.create ?? "Nouvelle catégorie"}
+      </a>
+    </div>
+    <p class="admin-page-subtitle">{ts?.categories?.subtitle ?? "Organisez vos services par catégories thématiques."}</p>
+  </header>
+
+  <!-- Stats grid -->
+  <div class="stats-grid">
+    <a href={catBase} class:list={["stat-card", { active: !hasFilters }]}>
+      <div class="stat-icon stat-icon--primary"><Icon name="mdi:folder-multiple-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{totalAll.value}</span>
+        <span class="stat-label">{ts?.categories?.total ?? "Total"}</span>
+      </div>
+    </a>
+    <a href={`${catBase}?active=true`} class:list={["stat-card", { active: activeFilter === "true" }]}>
+      <div class="stat-icon stat-icon--success"><Icon name="mdi:check-circle-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{activeCount.value}</span>
+        <span class="stat-label">{ts?.status?.active ?? "Actives"}</span>
+      </div>
+    </a>
+    <a href={`${catBase}?featured=true`} class:list={["stat-card", { active: featuredFilter === "true" }]}>
+      <div class="stat-icon stat-icon--accent"><Icon name="mdi:star-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{featuredCount.value}</span>
+        <span class="stat-label">{ts?.form?.featured ?? "En vedette"}</span>
+      </div>
+    </a>
+    <a href={`${catBase}?home=true`} class:list={["stat-card", { active: homeFilter === "true" }]}>
+      <div class="stat-icon stat-icon--warning"><Icon name="mdi:home-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{homeCount.value}</span>
+        <span class="stat-label">{ts?.form?.displayHome ?? "Accueil"}</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <Card elevation="sm" className="admin-filters-card">
+    <CardContent>
+      <form method="get" action={catBase} class="admin-filters-form">
+        <div class="admin-filters-row">
+          <div class="admin-filter-field filter-search">
+            <Label htmlFor="q">{t.adminBlog?.common?.search ?? "Rechercher"}</Label>
+            <Input id="q" name="q" type="search" placeholder={ts?.categories?.searchPlaceholder ?? "Slug, nom…"} value={search} />
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="featured">{ts?.form?.featured ?? "En vedette"}</Label>
+            <Select id="featured" name="featured">
+              <option value="">{t.adminBlog?.common?.all ?? "Toutes"}</option>
+              <option value="true" selected={featuredFilter === "true"}>{t.adminBlog?.common?.yes ?? "Oui"}</option>
+              <option value="false" selected={featuredFilter === "false"}>{t.adminBlog?.common?.no ?? "Non"}</option>
+            </Select>
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="home">{ts?.form?.displayHome ?? "Accueil"}</Label>
+            <Select id="home" name="home">
+              <option value="">{t.adminBlog?.common?.all ?? "Toutes"}</option>
+              <option value="true" selected={homeFilter === "true"}>{t.adminBlog?.common?.yes ?? "Oui"}</option>
+              <option value="false" selected={homeFilter === "false"}>{t.adminBlog?.common?.no ?? "Non"}</option>
+            </Select>
+          </div>
+        </div>
+        <div class="admin-filters-row">
+          <div class="admin-filter-field">
+            <Label htmlFor="menu">{ts?.form?.displayInMenu ?? "Visible menu"}</Label>
+            <Select id="menu" name="menu">
+              <option value="">{t.adminBlog?.common?.all ?? "Toutes"}</option>
+              <option value="true" selected={menuFilter === "true"}>{t.adminBlog?.common?.yes ?? "Oui"}</option>
+              <option value="false" selected={menuFilter === "false"}>{t.adminBlog?.common?.no ?? "Non"}</option>
+            </Select>
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="active">{ts?.status?.active ?? "Active"}</Label>
+            <Select id="active" name="active">
+              <option value="">{t.adminBlog?.common?.all ?? "Toutes"}</option>
+              <option value="true" selected={activeFilter === "true"}>{t.adminBlog?.common?.yes ?? "Oui"}</option>
+              <option value="false" selected={activeFilter === "false"}>{t.adminBlog?.common?.no ?? "Non"}</option>
+            </Select>
+          </div>
+          <div class="admin-filter-actions">
+            <Button type="submit" color="primary" icon={{ name: "mdi:magnify", side: "left" }}>
+              {t.adminBlog?.common?.filter ?? "Filtrer"}
+            </Button>
+            {hasFilters && (
+              <a href={catBase} class="admin-filter-reset">{t.adminBlog?.common?.reset ?? "Réinitialiser"}</a>
+            )}
+          </div>
+        </div>
+      </form>
+    </CardContent>
+  </Card>
+
+  <!-- Table -->
+  <Card>
+    <CardContent>
+      {categories.length === 0 ? (
+        <div class="empty-state">
+          <Icon name="mdi:folder-outline" class="empty-state-icon" />
+          <p>{ts?.categories?.empty ?? "Aucune catégorie trouvée."}</p>
+          <a href={`${catBase}/new`} class="btn-create-sm">
+            <Icon name="mdi:plus" /> {ts?.categories?.create ?? "Créer une catégorie"}
+          </a>
+        </div>
+      ) : (
+        <div class="table-responsive">
+          <Table striped>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{ts?.form?.nameLabel ?? "Catégorie"}</TableHead>
+                <TableHead>{ts?.categories?.serviceCount ?? "Services"}</TableHead>
+                <TableHead>{t.adminBlog?.categories?.tableVisibility ?? "Visibilité"}</TableHead>
+                <TableHead>{t.adminBlog?.categories?.tableParent ?? "Parent"}</TableHead>
+                <TableHead>{ts?.form?.icon ?? "Icône"}</TableHead>
+                <TableHead>{t.adminBlog?.categories?.tableDate ?? "Date"}</TableHead>
+                <TableHead>{t.adminBlog?.common?.actions ?? "Actions"}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {categories.map((cat) => {
+                const name = extractLocalized(cat.name);
+                const description = extractLocalized(cat.description);
+                const svcCount = serviceCountMap.get(cat.id) ?? 0;
+                const parentName = cat.parentId ? categoryNameMap.get(cat.parentId) : null;
+                return (
+                  <TableRow>
+                    <TableCell>
+                      <div class="category-title-cell">
+                        {cat.featuredImageId && featuredImageMap.get(cat.featuredImageId) ? (
+                          <img src={featuredImageMap.get(cat.featuredImageId)} alt="" class="category-thumb" loading="lazy" />
+                        ) : (
+                          <div class="category-thumb-placeholder"><Icon name="mdi:shape-outline" /></div>
+                        )}
+                        <div>
+                          <a href={`${catBase}/new?edit=${cat.id}`} class="category-title-link">
+                            <span class="category-name">{name}</span>
+                          </a>
+                          <code class="category-slug">{cat.slug}</code>
+                          {description !== "—" && (
+                            <span class="category-desc">{description.slice(0, 60)}{description.length > 60 ? "…" : ""}</span>
+                          )}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge color={svcCount > 0 ? "primary" : "default"} text={`${svcCount} service${svcCount > 1 ? "s" : ""}`} />
+                    </TableCell>
+                    <TableCell>
+                      <div class="visibility-badges">
+                        {cat.isActive && <Badge color="success" text={ts?.status?.active ?? "Actif"} />}
+                        {!cat.isActive && <Badge color="error" text={ts?.form?.inactive ?? "Inactif"} />}
+                        {cat.isFeatured && <Badge color="accent" text={ts?.form?.featured ?? "★ Vedette"} />}
+                        {cat.displayInHome && <Badge color="primary" text={ts?.form?.displayHome ?? "Accueil"} />}
+                        {cat.displayInMenu && <Badge color="default" text={ts?.form?.displayInMenu ?? "Menu"} />}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {parentName ? (
+                        <span class="parent-link">
+                          <Icon name="mdi:folder-outline" class="parent-icon" />
+                          {parentName}
+                        </span>
+                      ) : (
+                        <span class="text-muted">{t.adminBlog?.categories?.treeRoot ?? "Racine"}</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {cat.icon ? (
+                        <span class="icon-preview">{cat.icon}</span>
+                      ) : (
+                        <span class="text-muted">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div class="date-cell">
+                        <time datetime={cat.createdAt.toISOString()} class="date-main">
+                          {cat.createdAt.toLocaleDateString(lang, { day: "2-digit", month: "short", year: "numeric" })}
+                        </time>
+                        <time datetime={cat.updatedAt.toISOString()} class="date-sub">
+                          {t.adminBlog?.categories?.modifiedOn ?? "Modifié"} {cat.updatedAt.toLocaleDateString(lang, { day: "2-digit", month: "short" })}
+                        </time>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div class="action-buttons">
+                        <a href={`${catBase}/new?edit=${cat.id}`} class="action-btn" title={t.adminBlog?.categories?.editAction ?? "Modifier"}>
+                          <Icon name="mdi:pencil-outline" />
+                        </a>
+                        <button type="button" class="action-btn action-btn--delete" title={t.adminBlog?.categories?.deleteAction ?? "Supprimer"} data-action="delete" data-id={cat.id} data-name={name}>
+                          <Icon name="mdi:delete-outline" />
+                        </button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </CardContent>
+  </Card>
+
+  {totalPages > 1 && (
+    <div class="admin-pagination">
+      <Pagination currentPage={page} totalPages={totalPages} baseUrl={paginationBase} showPrevNext color="primary" />
+    </div>
+  )}
+
+  <div id="i18n-data" hidden
+    data-category-deleted={ts?.js?.categoryDeleted ?? "Catégorie supprimée."}
+    data-error-delete={ts?.js?.errorDelete ?? "Erreur lors de la suppression."}
+    data-confirm-delete-cat={ts?.js?.confirmDeleteCat ?? "Supprimer définitivement cette catégorie ?"}
+    data-network-error={ts?.js?.networkError ?? "Erreur réseau — vérifiez votre connexion."}
+  ></div>
+</AdminLayout>
+
+<script>
+  import { showToast } from "@lib/admin/toast";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const i18n = document.getElementById("i18n-data")?.dataset ?? {};
+
+    document.querySelectorAll<HTMLElement>("[data-action]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const action = btn.dataset.action!;
+        const id = btn.dataset.id!;
+        const name = btn.dataset.name || "";
+
+        if (action === "delete") {
+          const msg = (i18n.confirmDeleteCat ?? "Supprimer ?").replace("?", ` « ${name} » ?`);
+          if (!confirm(msg)) return;
+        }
+
+        try {
+          const res = await fetch("/api/admin/services/categories", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action, id }),
+          });
+          const data = await res.json();
+          if (data.ok) {
+            showToast(i18n.categoryDeleted ?? "Supprimé.", "success");
+            setTimeout(() => window.location.reload(), 800);
+          } else {
+            showToast(`${i18n.errorDelete || "Erreur"} — ${data.error || ""}`, "error");
+          }
+        } catch {
+          showToast(i18n.networkError ?? "", "error");
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .admin-page-header { margin-bottom: var(--space-6, 1.5rem); }
+  .admin-page-title-row {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: var(--space-3, 0.75rem);
+  }
+  .admin-page-title-group { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .admin-page-header h1 {
+    font-family: var(--font-family-display, "Space Grotesk", sans-serif);
+    font-size: var(--h2-font-size, 2rem); font-weight: 800;
+    color: var(--heading-color, #0f172a); margin: 0;
+  }
+  .admin-page-subtitle { color: var(--text-muted, #64748b); font-size: 0.9375rem; margin: var(--space-1, 0.25rem) 0 0; }
+
+  .back-link {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2.25rem; height: 2.25rem; border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem); color: var(--text-muted, #64748b);
+    text-decoration: none; transition: all 0.15s;
+  }
+  .back-link:hover { border-color: var(--color-primary, #eab308); color: var(--text-default, #0f172a); }
+  .back-link [data-icon] { width: 1.25rem; height: 1.25rem; }
+
+  .btn-create {
+    display: inline-flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+    background: var(--color-primary, #eab308); color: var(--color-primary-contrast, #0f172a);
+    border-radius: var(--border-radius-md, 0.375rem); font-weight: 600; font-size: 0.875rem;
+    text-decoration: none; transition: opacity 0.15s, transform 0.1s; white-space: nowrap;
+  }
+  .btn-create:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-create [data-icon] { width: 1.25rem; height: 1.25rem; }
+  .btn-create-sm {
+    display: inline-flex; align-items: center; gap: var(--space-1, 0.25rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    background: var(--color-primary, #eab308); color: var(--color-primary-contrast, #0f172a);
+    border-radius: var(--border-radius-md, 0.375rem); font-weight: 600; font-size: 0.8125rem;
+    text-decoration: none; margin-top: var(--space-3, 0.75rem);
+  }
+  .btn-create-sm [data-icon] { width: 1rem; height: 1rem; }
+
+  /* Stats */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3, 0.75rem); margin-bottom: var(--space-4, 1rem);
+  }
+  .stat-card {
+    display: flex; align-items: center; gap: var(--space-3, 0.75rem);
+    padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+    background: var(--bg-surface, white); border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-lg, 0.5rem); text-decoration: none; color: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .stat-card:hover { border-color: var(--color-primary, #eab308); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .stat-card.active { border-color: var(--color-primary, #eab308); background: var(--bg-subtle, #f8fafc); }
+  .stat-icon {
+    width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;
+    border-radius: var(--border-radius-md, 0.375rem);
+  }
+  .stat-icon [data-icon] { width: 1.25rem; height: 1.25rem; }
+  .stat-icon--primary { background: #fef9c3; color: #ca8a04; }
+  .stat-icon--success { background: #dcfce7; color: #16a34a; }
+  .stat-icon--accent { background: #ede9fe; color: #7c3aed; }
+  .stat-icon--warning { background: #fef3c7; color: #d97706; }
+  .stat-info { display: flex; flex-direction: column; }
+  .stat-value { font-weight: 700; font-size: 1.25rem; color: var(--text-default, #0f172a); line-height: 1.2; }
+  .stat-label { font-size: 0.75rem; color: var(--text-muted, #64748b); }
+
+  /* Filters */
+  .admin-filters-card { margin-bottom: var(--space-4, 1rem); }
+  .admin-filters-form { display: flex; flex-direction: column; gap: var(--space-3, 0.75rem); }
+  .admin-filters-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-3, 0.75rem); }
+  .admin-filter-field { display: flex; flex-direction: column; gap: var(--space-1, 0.25rem); min-width: 140px; flex: 1; }
+  .filter-search { flex: 2; min-width: 200px; }
+  .admin-filter-actions { display: flex; align-items: center; gap: var(--space-2, 0.5rem); }
+  .admin-filter-reset { color: var(--text-muted, #64748b); font-size: 0.8125rem; text-decoration: underline; }
+
+  /* Table */
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .category-title-cell { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .category-thumb {
+    width: 44px; height: 44px; border-radius: var(--border-radius-md, 0.375rem);
+    object-fit: cover; flex-shrink: 0; border: 1px solid var(--border-default, #e2e8f0);
+  }
+  .category-thumb-placeholder {
+    width: 44px; height: 44px; border-radius: var(--border-radius-md, 0.375rem);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    background: var(--bg-inset, #f1f5f9); color: var(--text-muted, #94a3b8);
+    border: 1px solid var(--border-default, #e2e8f0);
+  }
+  .category-thumb-placeholder [data-icon] { width: 1.125rem; height: 1.125rem; }
+  .category-title-link { text-decoration: none; }
+  .category-title-link:hover .category-name { color: var(--color-primary, #eab308); }
+  .category-name { font-weight: 600; font-size: 0.875rem; color: var(--text-default, #0f172a); display: block; transition: color 0.15s; }
+  .category-slug {
+    font-family: var(--font-family-mono, monospace); font-size: 0.6875rem;
+    background: var(--bg-inset, #f1f5f9); padding: 0.0625rem 0.375rem;
+    border-radius: var(--border-radius-sm, 0.25rem); color: var(--text-muted, #64748b);
+    display: inline-block; margin-top: 2px;
+  }
+  .category-desc { display: block; font-size: 0.75rem; color: var(--text-muted, #64748b); margin-top: 2px; max-width: 220px; }
+  .visibility-badges { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+  .parent-link {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    font-size: 0.8125rem; color: var(--text-default, #1e293b);
+  }
+  .parent-icon { width: 0.875rem; height: 0.875rem; }
+
+  .icon-preview { font-size: 1.25rem; }
+  .text-muted { color: var(--text-muted, #64748b); font-size: 0.8125rem; }
+
+  .date-cell { display: flex; flex-direction: column; }
+  .date-main { font-size: 0.8125rem; color: var(--text-default, #1e293b); }
+  .date-sub { font-size: 0.6875rem; color: var(--text-muted, #64748b); }
+
+  .action-buttons { display: flex; gap: 0.25rem; }
+  .action-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem); background: var(--bg-surface, white);
+    color: var(--text-muted, #64748b); cursor: pointer; transition: all 0.15s; text-decoration: none;
+  }
+  .action-btn [data-icon] { width: 1rem; height: 1rem; }
+  .action-btn:hover { border-color: var(--color-primary, #eab308); color: var(--text-default, #0f172a); }
+  .action-btn--delete:hover { color: #dc2626; border-color: #dc2626; background: #fef2f2; }
+
+  .empty-state { text-align: center; padding: var(--space-10, 3rem) var(--space-4, 1rem); color: var(--text-muted, #64748b); }
+  .empty-state-icon { width: 3rem; height: 3rem; margin: 0 auto var(--space-3, 0.75rem); opacity: 0.4; }
+
+  .admin-pagination { margin-top: var(--space-4, 1rem); display: flex; justify-content: center; }
+
+  @media (max-width: 1024px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .admin-filters-row { flex-direction: column; }
+    .admin-filter-field { min-width: 100%; }
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .admin-page-title-row { flex-direction: column; align-items: flex-start; }
+  }
+</style>

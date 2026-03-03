@@ -14,6 +14,11 @@
 
 <div id="admin-toast-container" class="admin-toast-container" aria-live="polite" aria-atomic="true"></div>
 
+<!-- Load toast.ts globally so window.showToast is available for define:vars scripts -->
+<script>
+  import "@lib/admin/toast";
+</script>
+
 <style is:global>
   /* ── Toast container — fixed overlay ── */
   .admin-toast-container {

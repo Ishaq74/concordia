@@ -1,0 +1,422 @@
+---
+// src/pages/[lang]/services/[category]/[slug].astro — Service detail (wireframe refonte)
+import { getEntry, getCollection } from "astro:content";
+import MarkdownIt from "markdown-it";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import ServiceHeader from "@components/modules/services/single/ServiceHeader.astro";
+import ServiceBooking from "@components/modules/services/single/ServiceBooking.astro";
+import AvailabilityCalendar from "@components/modules/services/single/AvailabilityCalendar.astro";
+import ServiceCard from "@components/modules/services/cards/ServiceCard.astro";
+import ServiceGrid from "@components/modules/services/lists/ServiceGrid.astro";
+import ShareButtons from "@components/modules/blog/ui/ShareButtons.astro";
+import StarRating from "@components/modules/blog/ui/StarRating.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+import { getDrizzle } from "@database/drizzle";
+import { servicesAvailability, servicesReviews } from "@database/schemas";
+import { user } from "@database/schemas/auth-schema";
+import { eq, and, inArray } from "drizzle-orm";
+
+const { slug, category } = Astro.params;
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const ts = t.servicesPage ?? {} as Record<string, string>;
+
+const service = await getEntry("services", `${slug}-${lang}`);
+if (!service) return Astro.redirect(`/${lang}/404`);
+
+const md = new MarkdownIt({ html: true, linkify: true, typographer: true });
+const renderedHtml = md.render(String(service.data.description ?? ""));
+
+const db = await getDrizzle();
+
+// Fetch availability slots
+const availabilitySlots = await db
+  .select().from(servicesAvailability)
+  .where(eq(servicesAvailability.serviceId, service.data.id))
+  .orderBy(servicesAvailability.dayOfWeek, servicesAvailability.startTime);
+
+// Fetch approved reviews
+const reviews = await db
+  .select().from(servicesReviews)
+  .where(and(eq(servicesReviews.serviceId, service.data.id), eq(servicesReviews.status, "approved")));
+
+// Batch-fetch reviewer info
+const reviewerIds = [...new Set(reviews.map((r) => r.authorId).filter(Boolean) as string[])];
+const reviewerMap = new Map<string, { name: string; image: string | null }>();
+if (reviewerIds.length > 0) {
+  const reviewers = await db.select({ id: user.id, name: user.name, image: user.image }).from(user).where(inArray(user.id, reviewerIds));
+  reviewers.forEach((u) => reviewerMap.set(u.id, { name: u.name, image: u.image }));
+}
+
+// Provider info
+let providerInfo: { name: string; image: string | null; email: string } | null = null;
+if (service.data.providerId) {
+  const [prov] = await db.select({ id: user.id, name: user.name, image: user.image, email: user.email }).from(user).where(eq(user.id, service.data.providerId));
+  if (prov) providerInfo = prov;
+}
+
+const catName = service.data.category?.name ?? category;
+
+// Related services
+const allServices = await getCollection("services");
+const relatedServices = allServices
+  .filter((s) => s.data.lang === lang && s.data.category?.slug === category && s.data.id !== service.data.id)
+  .slice(0, 3);
+
+// Gallery images
+const gallery = service.data.gallery ?? [];
+
+// Average rating
+const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
+---
+
+<BaseLayout
+  title={service.data.seo?.title || service.data.title}
+  description={service.data.seo?.description || service.data.shortDescription}
+  lang={lang}
+>
+  <ServiceHeader service={service} categoryName={catName} lang={lang} />
+
+  <main class="service-page">
+    <div class="service-layout">
+      <!-- ===== LEFT: MAIN CONTENT ===== -->
+      <div class="service-content">
+
+        <!-- Gallery with lightbox -->
+        {gallery.length > 0 && (
+          <section class="service-gallery" aria-label="Galerie">
+            <div class="gallery-carousel" id="gallery-carousel">
+              {gallery.map((img: any, idx: number) => (
+                <button type="button" class="gallery-slide" data-index={idx} data-src={img.url} aria-label={`Image ${idx + 1}`}>
+                  <img src={img.url} alt={img.alt || service.data.title} class="gallery-img" loading="lazy" />
+                </button>
+              ))}
+            </div>
+            {gallery.length > 1 && (
+              <div class="gallery-thumbs">
+                {gallery.map((img: any, idx: number) => (
+                  <button type="button" class="gallery-thumb" data-index={idx}>
+                    <img src={img.url} alt="" loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        <!-- Description -->
+        <section class="service-description">
+          <h2>{ts.serviceDetails ?? "Détails du service"}</h2>
+          <div class="prose" set:html={renderedHtml} />
+        </section>
+
+        <!-- Reviews with avatars + provider responses -->
+        <section class="service-reviews" aria-label={ts.reviews ?? "Avis"}>
+          <div class="reviews-header">
+            <h2>
+              <Icon name="mdi:star-outline" />
+              {ts.reviews ?? "Avis"} ({reviews.length})
+            </h2>
+            {avgRating > 0 && (
+              <div class="reviews-avg">
+                <span class="reviews-avg__number">{avgRating.toFixed(1)}</span>
+                <StarRating rating={avgRating} size="md" />
+              </div>
+            )}
+          </div>
+          {reviews.length > 0 ? (
+            <div class="reviews-list">
+              {reviews.map((review) => {
+                const reviewer = review.authorId ? reviewerMap.get(review.authorId) : undefined;
+                return (
+                  <div class="review-card">
+                    <div class="review-header">
+                      <div class="review-author">
+                        {reviewer?.image ? (
+                          <img src={reviewer.image} alt="" class="review-avatar" />
+                        ) : (
+                          <div class="review-avatar review-avatar--placeholder">
+                            <Icon name="mdi:account" />
+                          </div>
+                        )}
+                        <div>
+                          <span class="review-name">{reviewer?.name ?? ts.anonymous ?? "Anonyme"}</span>
+                          <time class="review-date" datetime={review.createdAt.toISOString()}>
+                            {review.createdAt.toLocaleDateString(lang, { day: "numeric", month: "short", year: "numeric" })}
+                          </time>
+                        </div>
+                      </div>
+                      <StarRating rating={review.rating} size="sm" />
+                    </div>
+                    {review.content && <p class="review-comment">{review.content}</p>}
+                    {(review as any).providerResponse && (
+                      <div class="review-response">
+                        <div class="review-response__header">
+                          <Icon name="mdi:reply" />
+                          <strong>{ts.providerResponse ?? "Réponse du prestataire"}</strong>
+                        </div>
+                        <p>{(review as any).providerResponse}</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p class="reviews-empty">{ts.noReviews ?? "Aucun avis pour le moment."}</p>
+          )}
+        </section>
+
+        <!-- Share -->
+        <div class="service-share">
+          <ShareButtons title={service.data.title} />
+        </div>
+
+        <!-- Related services -->
+        {relatedServices.length > 0 && (
+          <section class="service-related" aria-label={ts.relatedServices ?? "Services similaires"}>
+            <h2>{ts.relatedServices ?? "Services similaires"}</h2>
+            <ServiceGrid>
+              {relatedServices.map((svc) => (
+                <ServiceCard service={svc} lang={lang} variant="retro" />
+              ))}
+            </ServiceGrid>
+          </section>
+        )}
+      </div>
+
+      <!-- ===== RIGHT: STICKY SIDEBAR ===== -->
+      <aside class="service-sidebar">
+        <ServiceBooking
+          serviceId={service.data.id}
+          providerId={service.data.providerId}
+          basePrice={service.data.basePrice}
+          priceType={service.data.priceType}
+          currency={service.data.currency}
+          durationMinutes={service.data.durationMinutes}
+          lang={lang}
+        />
+
+        <AvailabilityCalendar
+          slots={availabilitySlots.map((s) => ({
+            dayOfWeek: s.dayOfWeek,
+            startTime: s.startTime,
+            endTime: s.endTime,
+            isAvailable: s.isAvailable,
+          }))}
+          lang={lang}
+        />
+
+        <!-- Provider card (enhanced with real data) -->
+        <Card class="provider-card-enhanced">
+          <CardContent>
+            <h3 class="provider-title">
+              <Icon name="mdi:account-circle-outline" />
+              {ts.aboutProvider ?? "À propos du prestataire"}
+            </h3>
+            <div class="provider-profile">
+              {providerInfo?.image ? (
+                <img src={providerInfo.image} alt="" class="provider-avatar" />
+              ) : (
+                <div class="provider-avatar provider-avatar--placeholder">
+                  <Icon name="mdi:account" />
+                </div>
+              )}
+              <div class="provider-details">
+                <span class="provider-name">{providerInfo?.name ?? ts.provider ?? "Prestataire"}</span>
+                {providerInfo?.email && <span class="provider-email">{providerInfo.email}</span>}
+              </div>
+            </div>
+            <div class="provider-badges">
+              <Badge variant="retro" color="accent">
+                <Icon name="mdi:check-decagram" width="14" height="14" />
+                {ts.verified ?? "Vérifié"}
+              </Badge>
+              <Badge variant="retro" color="secondary">
+                <Icon name="mdi:lightning-bolt" width="14" height="14" />
+                {ts.responsive ?? "Réactif"}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Lightbox overlay -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" style="display:none;">
+    <button type="button" class="lightbox__close" aria-label="Fermer">&times;</button>
+    <button type="button" class="lightbox__prev" aria-label="Précédent"><Icon name="mdi:chevron-left" /></button>
+    <img class="lightbox__img" id="lightbox-img" src="" alt="" />
+    <button type="button" class="lightbox__next" aria-label="Suivant"><Icon name="mdi:chevron-right" /></button>
+  </div>
+</BaseLayout>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Gallery lightbox
+    const slides = document.querySelectorAll<HTMLButtonElement>(".gallery-slide");
+    const thumbs = document.querySelectorAll<HTMLButtonElement>(".gallery-thumb");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img") as HTMLImageElement;
+    if (!lightbox || !lightboxImg) return;
+
+    const srcs = Array.from(slides).map((s) => s.dataset.src || "");
+    let currentIdx = 0;
+
+    function showLightbox(idx: number) {
+      currentIdx = idx;
+      lightboxImg.src = srcs[idx] || "";
+      lightbox!.style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+    function hideLightbox() {
+      lightbox!.style.display = "none";
+      document.body.style.overflow = "";
+    }
+
+    slides.forEach((s) => s.addEventListener("click", () => showLightbox(parseInt(s.dataset.index || "0"))));
+    lightbox.querySelector(".lightbox__close")?.addEventListener("click", hideLightbox);
+    lightbox.querySelector(".lightbox__prev")?.addEventListener("click", () => showLightbox((currentIdx - 1 + srcs.length) % srcs.length));
+    lightbox.querySelector(".lightbox__next")?.addEventListener("click", () => showLightbox((currentIdx + 1) % srcs.length));
+    lightbox.addEventListener("click", (e) => { if (e.target === lightbox) hideLightbox(); });
+    document.addEventListener("keydown", (e) => {
+      if (lightbox!.style.display !== "flex") return;
+      if (e.key === "Escape") hideLightbox();
+      if (e.key === "ArrowLeft") showLightbox((currentIdx - 1 + srcs.length) % srcs.length);
+      if (e.key === "ArrowRight") showLightbox((currentIdx + 1) % srcs.length);
+    });
+
+    // Thumb highlight
+    thumbs.forEach((thumb) => {
+      thumb.addEventListener("click", () => {
+        const idx = parseInt(thumb.dataset.index || "0");
+        const carousel = document.getElementById("gallery-carousel");
+        const target = slides[idx];
+        if (carousel && target) carousel.scrollTo({ left: target.offsetLeft, behavior: "smooth" });
+      });
+    });
+  });
+</script>
+
+<style>
+  .service-page { max-width: var(--max-width, 1200px); margin: 0 auto; padding: var(--space-6, 1.5rem); }
+  .service-layout { display: grid; grid-template-columns: 1fr 360px; gap: var(--space-6, 1.5rem); align-items: start; }
+
+  /* Gallery carousel */
+  .gallery-carousel {
+    display: flex; gap: var(--space-3, 0.75rem); overflow-x: auto;
+    scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+    margin-bottom: var(--space-3, 0.75rem); border-radius: var(--radius-lg, 0.5rem); overflow-y: hidden;
+  }
+  .gallery-slide {
+    flex-shrink: 0; border: none; padding: 0; background: none; cursor: zoom-in; scroll-snap-align: start;
+  }
+  .gallery-img {
+    width: 100%; min-width: 400px; max-height: 400px; object-fit: cover;
+    border-radius: var(--radius-md, 0.375rem); transition: transform 0.2s;
+  }
+  .gallery-img:hover { transform: scale(1.01); }
+  .gallery-thumbs { display: flex; gap: var(--space-2, 0.5rem); margin-bottom: var(--space-6, 1.5rem); }
+  .gallery-thumb {
+    width: 64px; height: 48px; border: 2px solid transparent; border-radius: var(--radius-sm, 4px);
+    overflow: hidden; cursor: pointer; padding: 0; background: none; transition: border-color 0.15s;
+  }
+  .gallery-thumb:hover { border-color: var(--color-primary, #eab308); }
+  .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.9);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .lightbox__img { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: var(--radius-md, 0.375rem); }
+  .lightbox__close {
+    position: absolute; top: var(--space-4, 1rem); right: var(--space-4, 1rem);
+    background: none; border: none; color: white; font-size: 2rem; cursor: pointer; z-index: 1;
+  }
+  .lightbox__prev, .lightbox__next {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,0.15); border: none; color: white; padding: var(--space-3, 0.75rem);
+    border-radius: var(--radius-full, 9999px); cursor: pointer; transition: background 0.15s;
+  }
+  .lightbox__prev:hover, .lightbox__next:hover { background: rgba(255,255,255,0.3); }
+  .lightbox__prev { left: var(--space-4, 1rem); }
+  .lightbox__next { right: var(--space-4, 1rem); }
+  .lightbox__prev [data-icon], .lightbox__next [data-icon] { width: 1.5rem; height: 1.5rem; }
+
+  /* Description */
+  .service-description { margin-bottom: var(--space-8, 2rem); }
+  .service-description h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-4, 1rem); }
+  .prose { line-height: 1.7; color: var(--text-default, #334155); }
+  .prose :global(h2), .prose :global(h3) { margin-top: var(--space-6, 1.5rem); margin-bottom: var(--space-3, 0.75rem); }
+  .prose :global(p) { margin-bottom: var(--space-4, 1rem); }
+  .prose :global(ul), .prose :global(ol) { padding-left: var(--space-6, 1.5rem); margin-bottom: var(--space-4, 1rem); }
+
+  /* Reviews */
+  .reviews-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: var(--space-4, 1rem); }
+  .reviews-header h2 { display: flex; align-items: center; gap: var(--space-2, 0.5rem); font-size: 1.25rem; font-weight: 700; margin: 0; }
+  .reviews-avg { display: flex; align-items: center; gap: var(--space-2, 0.5rem); }
+  .reviews-avg__number { font-size: 1.5rem; font-weight: 800; color: var(--color-primary, #eab308); }
+  .reviews-list { display: flex; flex-direction: column; gap: var(--space-4, 1rem); margin-bottom: var(--space-6, 1.5rem); }
+  .review-card {
+    padding: var(--space-4, 1rem); border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--radius-lg, 0.5rem); background: var(--bg-surface, white);
+  }
+  .review-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-3, 0.75rem); }
+  .review-author { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .review-avatar { width: 40px; height: 40px; border-radius: var(--radius-full, 50%); object-fit: cover; flex-shrink: 0; }
+  .review-avatar--placeholder {
+    background: var(--bg-inset, #f1f5f9); display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted, #64748b);
+  }
+  .review-avatar--placeholder [data-icon] { width: 1.25rem; height: 1.25rem; }
+  .review-name { font-weight: 600; font-size: 0.9375rem; display: block; }
+  .review-date { font-size: 0.75rem; color: var(--text-muted, #64748b); }
+  .review-comment { font-size: 0.875rem; line-height: 1.6; margin: 0; }
+  .reviews-empty { color: var(--text-muted, #64748b); font-style: italic; }
+
+  /* Provider response */
+  .review-response {
+    margin-top: var(--space-3, 0.75rem); padding: var(--space-3, 0.75rem);
+    background: var(--bg-inset, #f8fafc); border-radius: var(--radius-md, 0.375rem);
+    border-left: 3px solid var(--color-primary, #eab308);
+  }
+  .review-response__header { display: flex; align-items: center; gap: var(--space-2, 0.5rem); font-size: 0.8125rem; color: var(--text-muted, #64748b); margin-bottom: var(--space-2, 0.5rem); }
+  .review-response__header [data-icon] { width: 1rem; height: 1rem; }
+  .review-response p { font-size: 0.875rem; margin: 0; }
+
+  /* Share */
+  .service-share { margin-bottom: var(--space-8, 2rem); padding: var(--space-4, 1rem) 0; border-top: 1px solid var(--border-default, #e2e8f0); border-bottom: 1px solid var(--border-default, #e2e8f0); }
+
+  /* Related */
+  .service-related h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-4, 1rem); }
+
+  /* Sidebar */
+  .service-sidebar { display: flex; flex-direction: column; gap: var(--space-4, 1rem); position: sticky; top: var(--space-6, 1.5rem); }
+
+  /* Enhanced provider card */
+  .provider-title { display: flex; align-items: center; gap: var(--space-2, 0.5rem); font-size: 1.125rem; font-weight: 700; margin: 0 0 var(--space-4, 1rem); }
+  .provider-title [data-icon] { width: 1.375rem; height: 1.375rem; }
+  .provider-profile { display: flex; align-items: center; gap: var(--space-3, 0.75rem); margin-bottom: var(--space-3, 0.75rem); }
+  .provider-avatar { width: 56px; height: 56px; border-radius: var(--radius-full, 50%); object-fit: cover; flex-shrink: 0; }
+  .provider-avatar--placeholder {
+    background: var(--bg-inset, #f1f5f9); display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted, #64748b);
+  }
+  .provider-avatar--placeholder [data-icon] { width: 1.5rem; height: 1.5rem; }
+  .provider-name { font-weight: 600; display: block; }
+  .provider-email { font-size: 0.8125rem; color: var(--text-muted, #64748b); }
+  .provider-details { display: flex; flex-direction: column; gap: 2px; }
+  .provider-badges { display: flex; gap: var(--space-2, 0.5rem); flex-wrap: wrap; }
+
+  @media (max-width: 968px) {
+    .service-layout { grid-template-columns: 1fr; }
+    .service-sidebar { position: static; order: -1; }
+    .gallery-img { min-width: 280px; }
+  }
+</style>

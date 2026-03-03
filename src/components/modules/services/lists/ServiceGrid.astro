@@ -1,0 +1,33 @@
+---
+import Grid from "@components/Tools/Grid.astro";
+---
+
+<Grid
+  tag="section"
+  display="grid"
+  justifyItems
+  autoFit
+  gap="sm"
+  color="secondary"
+  sameHeight
+  padding="lg"
+  gridTemplateColumns="repeat(auto-fit, minmax(320px, 1fr))"
+  ariaLabel="Liste de services"
+  className="service-grid"
+>
+  <slot />
+</Grid>
+
+<style scoped>
+  .service-grid {
+    max-width: var(--max-width, 1200px);
+    margin: 0 auto;
+  }
+
+  @media (max-width: 768px) {
+    .service-grid {
+      padding-left: var(--space-4);
+      padding-right: var(--space-4);
+    }
+  }
+</style>

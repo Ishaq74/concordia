@@ -1,0 +1,179 @@
+---
+import Badge from "@components/ui/Badge.astro";
+import PriceBadge from "@components/modules/services/ui/PriceBadge.astro";
+import ServiceMeta from "@components/modules/services/ui/ServiceMeta.astro";
+import StarRating from "@components/modules/blog/ui/StarRating.astro";
+import ImageWithFallback from "@components/modules/blog/ui/ImageWithFallback.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+
+interface Props {
+  service: any;
+  categoryName?: string;
+  lang: string;
+}
+
+const { service, categoryName, lang } = Astro.props;
+const t = getTranslations(lang);
+
+const cat = service.data.category;
+const catSlug = cat?.slug;
+---
+
+<section class="service-hero">
+  <div class="service-hero__img-wrap">
+    {service.data.cover?.url ? (
+      <img
+        src={service.data.cover.url}
+        alt={service.data.cover.alt || service.data.title}
+        class="service-hero__img"
+        loading="eager"
+      />
+    ) : (
+      <div class="service-hero__placeholder">
+        <Icon name="mdi:image-outline" />
+      </div>
+    )}
+    <div class="service-hero__overlay" />
+  </div>
+
+  <div class="service-hero__content">
+    <nav class="service-hero__breadcrumb" aria-label={t.aria?.breadcrumb ?? "Fil d'Ariane"}>
+      <a href={`/${lang}`}>{t.breadcrumb?.home ?? "Accueil"}</a>
+      <Icon name="mdi:chevron-right" />
+      <a href={`/${lang}/services`}>{t.servicesPage?.title ?? "Services"}</a>
+      {catSlug && (
+        <>
+          <Icon name="mdi:chevron-right" />
+          <a href={`/${lang}/services/${catSlug}`}>{categoryName ?? catSlug}</a>
+        </>
+      )}
+    </nav>
+
+    {categoryName && (
+      <Badge variant="retro" color="accent">{categoryName}</Badge>
+    )}
+
+    <h1 class="service-hero__title">{service.data.title}</h1>
+    {service.data.shortDescription && (
+      <p class="service-hero__subtitle">{service.data.shortDescription}</p>
+    )}
+
+    <div class="service-hero__meta-row">
+      <PriceBadge
+        basePrice={service.data.basePrice}
+        priceType={service.data.priceType}
+        currency={service.data.currency}
+        lang={lang}
+      />
+      <StarRating
+        rating={service.data.avgRating ?? 0}
+        count={service.data.reviewCount ?? 0}
+        size="md"
+      />
+      <ServiceMeta
+        durationMinutes={service.data.durationMinutes}
+        isMobile={service.data.isMobile}
+        maxParticipants={service.data.maxParticipants}
+        lang={lang}
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .service-hero {
+    position: relative;
+    min-height: 340px;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+
+  .service-hero__img-wrap {
+    position: absolute;
+    inset: 0;
+  }
+
+  .service-hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .service-hero__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface-alt, #f1f5f9);
+    font-size: 4rem;
+    color: var(--color-text-muted, #999);
+  }
+
+  .service-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 70%);
+  }
+
+  .service-hero__content {
+    position: relative;
+    z-index: 1;
+    padding: var(--space-8) var(--space-6);
+    max-width: var(--max-width, 1200px);
+    margin: 0 auto;
+    width: 100%;
+    color: #fff;
+  }
+
+  .service-hero__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-3);
+    opacity: 0.85;
+  }
+
+  .service-hero__breadcrumb a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .service-hero__breadcrumb a:hover {
+    text-decoration: underline;
+  }
+
+  .service-hero__title {
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    margin: var(--space-3) 0 var(--space-2);
+    line-height: 1.2;
+  }
+
+  .service-hero__subtitle {
+    font-size: var(--text-lg);
+    opacity: 0.9;
+    margin-bottom: var(--space-4);
+    max-width: 600px;
+  }
+
+  .service-hero__meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  @media (max-width: 768px) {
+    .service-hero {
+      min-height: 260px;
+    }
+
+    .service-hero__title {
+      font-size: var(--text-2xl);
+    }
+  }
+</style>

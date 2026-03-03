@@ -1,0 +1,137 @@
+---
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardFooter from "@components/ui/Card/CardFooter.astro";
+import Link from "@components/ui/Link.astro";
+import Flex from "@components/Tools/Flex.astro";
+
+import CategoryBadge from "@components/modules/services/ui/CategoryBadge.astro";
+import PriceBadge from "@components/modules/services/ui/PriceBadge.astro";
+import ServiceMeta from "@components/modules/services/ui/ServiceMeta.astro";
+import StarRating from "@components/modules/blog/ui/StarRating.astro";
+import ImageWithFallback from "@components/modules/blog/ui/ImageWithFallback.astro";
+
+interface Props {
+  service: any;
+  lang: string;
+  variant?: "initial" | "retro" | "modern" | "futuristic";
+}
+
+const { service, lang, variant = "initial" } = Astro.props;
+
+const cat = service.data.category;
+const link = cat?.slug
+  ? `/${lang}/services/${cat.slug}/${service.data.slug}`
+  : `/${lang}/services/${service.data.slug}`;
+
+const rating = service.data.avgRating ?? 0;
+const reviewCount = service.data.reviewCount ?? 0;
+---
+
+<Card
+  class={`service-card ${variant}`}
+  role="article"
+  aria-labelledby={`service-title-${service.data.slug}`}
+>
+  <Link href={link} className="service-image-link" ariaLabel={`Service: ${service.data.title}`}>
+    <ImageWithFallback
+      src={service.data.cover?.url}
+      text={service.data.title}
+      alt={service.data.cover?.alt}
+      class="service-image"
+    />
+  </Link>
+
+  <CardHeader class="service-header">
+    <div class="service-header-top">
+      <Flex alignItems="center" justifyContent="space-between" marginBottom="md">
+        {cat && (
+          <CategoryBadge name={cat.name} slug={cat.slug} lang={lang} />
+        )}
+        <PriceBadge
+          basePrice={service.data.basePrice}
+          priceType={service.data.priceType}
+          currency={service.data.currency}
+          lang={lang}
+          variant={variant}
+        />
+      </Flex>
+      <StarRating rating={rating} count={reviewCount} size="sm" variant={variant} color="primary" />
+    </div>
+
+    <div class="service-title-row">
+      <Link href={link} className="service-title-link" ariaLabel={service.data.title}>
+        <h3 id={`service-title-${service.data.slug}`} class="service-title">
+          {service.data.title}
+        </h3>
+      </Link>
+    </div>
+  </CardHeader>
+
+  <CardContent class="service-body">
+    {service.data.shortDescription && (
+      <p class="service-excerpt">{service.data.shortDescription}</p>
+    )}
+    <ServiceMeta
+      durationMinutes={service.data.durationMinutes}
+      isMobile={service.data.isMobile}
+      maxParticipants={service.data.maxParticipants}
+      lang={lang}
+    />
+  </CardContent>
+</Card>
+
+<style>
+  .service-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1));
+  }
+
+  :global(.service-image-link) {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+  }
+
+  :global(.service-image) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .service-card:hover :global(.service-image) {
+    transform: scale(1.03);
+  }
+
+  .service-header-top {
+    margin-bottom: var(--space-2);
+  }
+
+  .service-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .service-excerpt {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted, #666);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: var(--space-3);
+  }
+</style>

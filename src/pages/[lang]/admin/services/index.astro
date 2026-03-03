@@ -1,0 +1,588 @@
+---
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Pagination from "@components/ui/Pagination.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import {
+  servicesListings,
+  servicesTranslations,
+  servicesCategories,
+  servicesMediaLinks,
+  servicesMedia,
+} from "@database/schemas";
+import { count, eq, desc, ilike, inArray, and } from "drizzle-orm";
+import { getTranslations } from "@i18n/translations";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const ts = t.adminServices;
+const adminBase = `/${lang}/admin/services`;
+
+const url = new URL(Astro.request.url);
+const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));
+const perPage = 20;
+const search = url.searchParams.get("q")?.trim() ?? "";
+const statusFilter = url.searchParams.get("status")?.trim() ?? "";
+const featuredFilter = url.searchParams.get("featured")?.trim() ?? "";
+const homeFilter = url.searchParams.get("home")?.trim() ?? "";
+const categoryFilter = url.searchParams.get("category")?.trim() ?? "";
+
+const db = await getDrizzle();
+
+// ---------- Org scoping ----------
+const activeOrgId = Astro.locals.organizationId ?? null;
+
+// ---------- Build filter conditions ----------
+const conditions: any[] = [];
+if (activeOrgId) conditions.push(eq(servicesListings.organizationId, activeOrgId));
+if (search) conditions.push(ilike(servicesListings.slug, `%${search}%`));
+if (statusFilter) conditions.push(eq(servicesListings.status, statusFilter));
+if (featuredFilter === "true") conditions.push(eq(servicesListings.isFeatured, true));
+if (featuredFilter === "false") conditions.push(eq(servicesListings.isFeatured, false));
+if (homeFilter === "true") conditions.push(eq(servicesListings.displayInHome, true));
+if (homeFilter === "false") conditions.push(eq(servicesListings.displayInHome, false));
+if (categoryFilter) conditions.push(eq(servicesListings.categoryId, categoryFilter));
+
+const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+// ---------- Total + paginated services ----------
+const [totalResult] = whereClause
+  ? await db.select({ value: count() }).from(servicesListings).where(whereClause)
+  : await db.select({ value: count() }).from(servicesListings);
+const totalServices = totalResult.value;
+const totalPages = Math.max(1, Math.ceil(totalServices / perPage));
+
+const services = whereClause
+  ? await db.select().from(servicesListings).where(whereClause).orderBy(desc(servicesListings.updatedAt)).limit(perPage).offset((page - 1) * perPage)
+  : await db.select().from(servicesListings).orderBy(desc(servicesListings.updatedAt)).limit(perPage).offset((page - 1) * perPage);
+
+// ---------- Batch translations (no N+1) ----------
+const serviceIds = services.map((s) => s.id);
+const translationsMap = new Map<string, { inLanguage: string; title: unknown }[]>();
+if (serviceIds.length > 0) {
+  const translations = await db
+    .select({
+      serviceId: servicesTranslations.serviceId,
+      title: servicesTranslations.title,
+      inLanguage: servicesTranslations.inLanguage,
+    })
+    .from(servicesTranslations)
+    .where(inArray(servicesTranslations.serviceId, serviceIds));
+  translations.forEach((tr) => {
+    const list = translationsMap.get(tr.serviceId) ?? [];
+    list.push(tr);
+    translationsMap.set(tr.serviceId, list);
+  });
+}
+
+// ---------- Batch category names (no N+1) ----------
+const catIds = [...new Set(services.map((s) => s.categoryId).filter(Boolean))] as string[];
+const categoryNameMap = new Map<string, { name: unknown; slug: string }>();
+if (catIds.length > 0) {
+  const cats = await db
+    .select({ id: servicesCategories.id, name: servicesCategories.name, slug: servicesCategories.slug })
+    .from(servicesCategories)
+    .where(inArray(servicesCategories.id, catIds));
+  cats.forEach((c) => categoryNameMap.set(c.id, { name: c.name, slug: c.slug }));
+}
+
+// ---------- Batch cover thumbnails (no N+1) ----------
+const coverUrlMap = new Map<string, string>();
+if (serviceIds.length > 0) {
+  const coverLinks = await db
+    .select({ serviceId: servicesMediaLinks.serviceId, mediaId: servicesMediaLinks.mediaId })
+    .from(servicesMediaLinks)
+    .where(and(inArray(servicesMediaLinks.serviceId, serviceIds), eq(servicesMediaLinks.type, "cover")));
+  const coverMediaIds = coverLinks.map((cl) => cl.mediaId).filter(Boolean);
+  if (coverMediaIds.length > 0) {
+    const media = await db
+      .select({ id: servicesMedia.id, url: servicesMedia.url })
+      .from(servicesMedia)
+      .where(inArray(servicesMedia.id, coverMediaIds));
+    const mediaUrlMap = new Map(media.map((m) => [m.id, m.url]));
+    coverLinks.forEach((cl) => {
+      const url = mediaUrlMap.get(cl.mediaId);
+      if (url) coverUrlMap.set(cl.serviceId, url);
+    });
+  }
+}
+
+// ---------- All categories for filter dropdown ----------
+const allCategories = await db
+  .select({ id: servicesCategories.id, slug: servicesCategories.slug, name: servicesCategories.name })
+  .from(servicesCategories)
+  .orderBy(servicesCategories.slug);
+
+// ---------- Stats ----------
+const [activeCount] = await db.select({ value: count() }).from(servicesListings).where(eq(servicesListings.status, "active"));
+const [draftCount] = await db.select({ value: count() }).from(servicesListings).where(eq(servicesListings.status, "draft"));
+const [featuredCount] = await db.select({ value: count() }).from(servicesListings).where(eq(servicesListings.isFeatured, true));
+const [homeCount] = await db.select({ value: count() }).from(servicesListings).where(eq(servicesListings.displayInHome, true));
+
+// ---------- Helpers ----------
+function extractLocalized(value: unknown, locale: string = lang): string {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    const obj = value as Record<string, string>;
+    return obj[locale] || Object.values(obj)[0] || "";
+  }
+  return "";
+}
+
+const statusBadge = (s: string) => {
+  if (s === "active") return { color: "success" as const, text: ts?.status?.active ?? "Actif" };
+  if (s === "draft") return { color: "warning" as const, text: ts?.status?.draft ?? "Brouillon" };
+  if (s === "pending_review") return { color: "accent" as const, text: ts?.status?.pending_review ?? "En attente" };
+  if (s === "suspended") return { color: "error" as const, text: ts?.status?.suspended ?? "Suspendu" };
+  return { color: "default" as const, text: s };
+};
+
+const hasFilters = search || statusFilter || featuredFilter || homeFilter || categoryFilter;
+
+const filterParams = new URLSearchParams();
+if (search) filterParams.set("q", search);
+if (statusFilter) filterParams.set("status", statusFilter);
+if (featuredFilter) filterParams.set("featured", featuredFilter);
+if (homeFilter) filterParams.set("home", homeFilter);
+if (categoryFilter) filterParams.set("category", categoryFilter);
+const paginationBase = `${adminBase}?${filterParams.toString()}${filterParams.toString() ? "&" : ""}`;
+---
+
+<AdminLayout title={ts?.listings?.title ?? "Services"} activeSection="services">
+  <header class="admin-page-header">
+    <div class="admin-page-title-row">
+      <div class="admin-page-title-group">
+        <h1>{ts?.listings?.title ?? "Services"}</h1>
+        <Badge color="primary" text={`${totalServices} ${totalServices > 1 ? (t.adminBlog?.common?.results ?? "résultats") : (t.adminBlog?.common?.result ?? "résultat")}`} />
+      </div>
+      <a href={`${adminBase}/new`} class="btn-create">
+        <Icon name="mdi:plus-circle-outline" />
+        {ts?.listings?.new ?? "Nouveau service"}
+      </a>
+    </div>
+    <p class="admin-page-subtitle">{ts?.listings?.subtitle ?? "Créez, modifiez et gérez les services de la plateforme."}</p>
+  </header>
+
+  <!-- Quick stats -->
+  <div class="stats-grid">
+    <a href={`${adminBase}?status=active`} class:list={["stat-card", { active: statusFilter === "active" }]}>
+      <div class="stat-icon stat-icon--success"><Icon name="mdi:check-circle-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{activeCount.value}</span>
+        <span class="stat-label">{ts?.status?.active ?? "Actifs"}</span>
+      </div>
+    </a>
+    <a href={`${adminBase}?status=draft`} class:list={["stat-card", { active: statusFilter === "draft" }]}>
+      <div class="stat-icon stat-icon--warning"><Icon name="mdi:file-edit-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{draftCount.value}</span>
+        <span class="stat-label">{ts?.status?.draft ?? "Brouillons"}</span>
+      </div>
+    </a>
+    <a href={`${adminBase}?featured=true`} class:list={["stat-card", { active: featuredFilter === "true" }]}>
+      <div class="stat-icon stat-icon--accent"><Icon name="mdi:star-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{featuredCount.value}</span>
+        <span class="stat-label">{ts?.listings?.flagFeatured ?? "En vedette"}</span>
+      </div>
+    </a>
+    <a href={`${adminBase}?home=true`} class:list={["stat-card", { active: homeFilter === "true" }]}>
+      <div class="stat-icon stat-icon--primary"><Icon name="mdi:home-outline" /></div>
+      <div class="stat-info">
+        <span class="stat-value">{homeCount.value}</span>
+        <span class="stat-label">{ts?.listings?.flagHome ?? "Accueil"}</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <Card elevation="sm" className="admin-filters-card">
+    <CardContent>
+      <form method="get" action={adminBase} class="admin-filters-form">
+        <div class="admin-filters-row">
+          <div class="admin-filter-field filter-search">
+            <Label htmlFor="q">{t.adminBlog?.common?.search ?? "Rechercher"}</Label>
+            <Input id="q" name="q" type="search" placeholder={ts?.listings?.searchPlaceholder ?? "Titre, slug…"} value={search} />
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="status">{ts?.form?.status ?? "Statut"}</Label>
+            <Select id="status" name="status">
+              <option value="">{t.adminBlog?.common?.all ?? "Tous"}</option>
+              <option value="active" selected={statusFilter === "active"}>{ts?.status?.active ?? "Actif"}</option>
+              <option value="draft" selected={statusFilter === "draft"}>{ts?.status?.draft ?? "Brouillon"}</option>
+              <option value="pending_review" selected={statusFilter === "pending_review"}>{ts?.status?.pending_review ?? "En attente"}</option>
+              <option value="suspended" selected={statusFilter === "suspended"}>{ts?.status?.suspended ?? "Suspendu"}</option>
+            </Select>
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="category">{ts?.form?.category ?? "Catégorie"}</Label>
+            <Select id="category" name="category">
+              <option value="">{t.adminBlog?.common?.all ?? "Toutes"}</option>
+              {allCategories.map((cat) => (
+                <option value={cat.id} selected={categoryFilter === cat.id}>{extractLocalized(cat.name)}</option>
+              ))}
+            </Select>
+          </div>
+        </div>
+        <div class="admin-filters-row">
+          <div class="admin-filter-field">
+            <Label htmlFor="featured">{ts?.form?.featured ?? "En vedette"}</Label>
+            <Select id="featured" name="featured">
+              <option value="">{t.adminBlog?.common?.all ?? "Tous"}</option>
+              <option value="true" selected={featuredFilter === "true"}>{t.adminBlog?.common?.yes ?? "Oui"}</option>
+              <option value="false" selected={featuredFilter === "false"}>{t.adminBlog?.common?.no ?? "Non"}</option>
+            </Select>
+          </div>
+          <div class="admin-filter-field">
+            <Label htmlFor="home">{ts?.form?.displayHome ?? "Afficher en accueil"}</Label>
+            <Select id="home" name="home">
+              <option value="">{t.adminBlog?.common?.all ?? "Tous"}</option>
+              <option value="true" selected={homeFilter === "true"}>{t.adminBlog?.common?.yes ?? "Oui"}</option>
+              <option value="false" selected={homeFilter === "false"}>{t.adminBlog?.common?.no ?? "Non"}</option>
+            </Select>
+          </div>
+          <div class="admin-filter-actions">
+            <Button type="submit" color="primary" icon={{ name: "mdi:magnify", side: "left" }}>
+              {t.adminBlog?.common?.filter ?? "Filtrer"}
+            </Button>
+            {hasFilters && (
+              <a href={adminBase} class="admin-filter-reset">{t.adminBlog?.common?.reset ?? "Réinitialiser"}</a>
+            )}
+          </div>
+        </div>
+      </form>
+    </CardContent>
+  </Card>
+
+  <!-- Services table -->
+  <Card>
+    <CardContent>
+      {services.length === 0 ? (
+        <div class="empty-state">
+          <Icon name="mdi:briefcase-outline" class="empty-state-icon" />
+          <p>{ts?.listings?.empty ?? "Aucun service trouvé."}</p>
+          <a href={`${adminBase}/new`} class="btn-create-sm">
+            <Icon name="mdi:plus" /> {ts?.listings?.createCta ?? "Créer un service"}
+          </a>
+        </div>
+      ) : (
+        <div class="table-responsive">
+          <Table striped>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{ts?.listings?.tableService ?? "Service"}</TableHead>
+                <TableHead>{ts?.listings?.tableCategory ?? "Catégorie"}</TableHead>
+                <TableHead>{ts?.listings?.tableStatus ?? "Statut"}</TableHead>
+                <TableHead>{ts?.listings?.tablePrice ?? "Prix"}</TableHead>
+                <TableHead>{ts?.listings?.tableFlags ?? "Indicateurs"}</TableHead>
+                <TableHead>{ts?.listings?.tableDate ?? "Date"}</TableHead>
+                <TableHead>{ts?.listings?.tableActions ?? "Actions"}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {services.map((svc) => {
+                const trs = translationsMap.get(svc.id) ?? [];
+                const langTr = trs.find((tr) => tr.inLanguage === lang) ?? trs[0];
+                const title = langTr ? extractLocalized(langTr.title) : svc.slug;
+                const cat = svc.categoryId ? categoryNameMap.get(svc.categoryId) : null;
+                const sb = statusBadge(svc.status);
+                return (
+                  <TableRow>
+                    <TableCell>
+                      <div class="service-title-cell">
+                        {coverUrlMap.get(svc.id) ? (
+                          <img src={coverUrlMap.get(svc.id)} alt="" class="service-thumb" loading="lazy" />
+                        ) : (
+                          <div class="service-thumb-placeholder"><Icon name="mdi:image-outline" /></div>
+                        )}
+                        <div>
+                          <a href={`${adminBase}/${svc.id}/edit`} class="article-title-link">
+                            <span class="article-title">{title}</span>
+                          </a>
+                          <code class="article-slug">{svc.slug}</code>
+                          <div class="lang-badges">
+                            {trs.map((tr) => (
+                              <Badge color="secondary" text={tr.inLanguage.toUpperCase()} />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {cat ? (
+                        <a href={`${adminBase}?category=${svc.categoryId}`} class="tag-chip">{extractLocalized(cat.name)}</a>
+                      ) : <span class="text-muted">—</span>}
+                    </TableCell>
+                    <TableCell>
+                      <Badge color={sb.color} text={sb.text} />
+                    </TableCell>
+                    <TableCell>
+                      {svc.basePrice ? `${svc.basePrice} ${svc.currency ?? "EUR"}` : "—"}
+                    </TableCell>
+                    <TableCell>
+                      <div class="flag-list">
+                        {svc.isFeatured && <Badge color="accent" text={ts?.listings?.flagFeatured ?? "★ Vedette"} />}
+                        {svc.displayInHome && <Badge color="primary" text={ts?.listings?.flagHome ?? "Accueil"} />}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div class="date-cell">
+                        <time datetime={svc.updatedAt.toISOString()} class="date-main">
+                          {svc.updatedAt.toLocaleDateString(lang, { day: "2-digit", month: "short", year: "numeric" })}
+                        </time>
+                        <time datetime={svc.createdAt.toISOString()} class="date-sub">
+                          {t.adminBlog?.articles?.createdOn ?? "Créé le"} {svc.createdAt.toLocaleDateString(lang, { day: "2-digit", month: "short" })}
+                        </time>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div class="action-buttons">
+                        <a href={`${adminBase}/${svc.id}/edit`} class="action-btn" title={ts?.listings?.edit ?? "Modifier"}>
+                          <Icon name="mdi:pencil-outline" />
+                        </a>
+                        <button type="button" class="action-btn action-btn--duplicate" title={t.adminBlog?.articles?.duplicate ?? "Dupliquer"} data-action="duplicate" data-id={svc.id}>
+                          <Icon name="mdi:content-copy" />
+                        </button>
+                        {svc.status === "draft" || svc.status === "suspended" ? (
+                          <button type="button" class="action-btn action-btn--publish" title={ts?.listings?.activate ?? "Activer"} data-action="activate" data-id={svc.id}>
+                            <Icon name="mdi:publish" />
+                          </button>
+                        ) : svc.status === "active" ? (
+                          <button type="button" class="action-btn action-btn--unpublish" title={ts?.listings?.deactivate ?? "Désactiver"} data-action="deactivate" data-id={svc.id}>
+                            <Icon name="mdi:eye-off-outline" />
+                          </button>
+                        ) : null}
+                        <button type="button" class="action-btn action-btn--delete" title={t.adminBlog?.common?.delete ?? "Supprimer"} data-action="delete" data-id={svc.id} data-title={title}>
+                          <Icon name="mdi:delete-outline" />
+                        </button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </CardContent>
+  </Card>
+
+  {totalPages > 1 && (
+    <div class="admin-pagination">
+      <Pagination currentPage={page} totalPages={totalPages} baseUrl={paginationBase} showPrevNext color="primary" />
+    </div>
+  )}
+
+  <div id="i18n-data" hidden
+    data-confirm-delete={ts?.js?.confirmDelete ?? "Supprimer définitivement ce service et toutes ses traductions ? Cette action est irréversible."}
+    data-confirm-duplicate={ts?.js?.confirmDuplicate ?? "Dupliquer ce service ?"}
+    data-action-completed={ts?.js?.actionCompleted ?? "Action effectuée."}
+    data-error-prefix={ts?.js?.errorPrefix ?? "Erreur :"}
+    data-unknown-error={ts?.js?.unknownError ?? "Inconnu"}
+    data-network-error={ts?.js?.networkError ?? "Erreur réseau."}
+  ></div>
+</AdminLayout>
+
+<script>
+  import { showToast } from "@lib/admin/toast";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const i18n = document.getElementById("i18n-data")?.dataset ?? {};
+
+    document.querySelectorAll<HTMLElement>("[data-action]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const action = btn.dataset.action!;
+        const id = btn.dataset.id!;
+        const title = btn.dataset.title || "";
+
+        if (action === "delete") {
+          const msg = (i18n.confirmDelete ?? "Supprimer ?").replace("{title}", title);
+          if (!confirm(msg)) return;
+        }
+        if (action === "duplicate" && !confirm(i18n.confirmDuplicate ?? "Dupliquer ?")) return;
+
+        try {
+          const res = await fetch("/api/admin/services/services", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action, id }),
+          });
+          const data = await res.json();
+          if (data.ok || data.activated || data.deactivated || data.deleted) {
+            showToast(i18n.actionCompleted ?? "OK", "success");
+            setTimeout(() => window.location.reload(), 800);
+          } else {
+            showToast(`${i18n.errorPrefix ?? "Erreur :"} ${data.error || i18n.unknownError || ""}`, "error");
+          }
+        } catch {
+          showToast(i18n.networkError ?? "Erreur réseau.", "error");
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .admin-page-header { margin-bottom: var(--space-6, 1.5rem); }
+  .admin-page-title-row {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: var(--space-3, 0.75rem);
+  }
+  .admin-page-title-group { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .admin-page-header h1 {
+    font-family: var(--font-family-display, "Space Grotesk", sans-serif);
+    font-size: var(--h2-font-size, 2rem);
+    font-weight: 800;
+    color: var(--heading-color, #0f172a);
+    margin: 0;
+  }
+  .admin-page-subtitle {
+    color: var(--text-muted, #64748b);
+    font-size: 0.9375rem;
+    margin: var(--space-1, 0.25rem) 0 0;
+  }
+
+  /* ---- Create button ---- */
+  .btn-create {
+    display: inline-flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+    background: var(--color-primary, #eab308); color: var(--color-primary-contrast, #0f172a);
+    border-radius: var(--border-radius-md, 0.375rem); font-weight: 600; font-size: 0.875rem;
+    text-decoration: none; transition: opacity 0.15s, transform 0.1s; white-space: nowrap;
+  }
+  .btn-create:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-create [data-icon] { width: 1.25rem; height: 1.25rem; }
+  .btn-create-sm {
+    display: inline-flex; align-items: center; gap: var(--space-1, 0.25rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    background: var(--color-primary, #eab308); color: var(--color-primary-contrast, #0f172a);
+    border-radius: var(--border-radius-md, 0.375rem); font-weight: 600; font-size: 0.8125rem;
+    text-decoration: none; margin-top: var(--space-3, 0.75rem);
+  }
+  .btn-create-sm [data-icon] { width: 1rem; height: 1rem; }
+
+  /* ---- Stats grid ---- */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3, 0.75rem); margin-bottom: var(--space-4, 1rem);
+  }
+  .stat-card {
+    display: flex; align-items: center; gap: var(--space-3, 0.75rem);
+    padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+    background: var(--bg-surface, white); border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-lg, 0.5rem); text-decoration: none; color: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .stat-card:hover { border-color: var(--color-primary, #eab308); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .stat-card.active { border-color: var(--color-primary, #eab308); background: var(--bg-subtle, #f8fafc); }
+  .stat-icon {
+    width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;
+    border-radius: var(--border-radius-md, 0.375rem);
+  }
+  .stat-icon [data-icon] { width: 1.25rem; height: 1.25rem; }
+  .stat-icon--success { background: #dcfce7; color: #16a34a; }
+  .stat-icon--warning { background: #fef3c7; color: #d97706; }
+  .stat-icon--accent { background: #ede9fe; color: #7c3aed; }
+  .stat-icon--primary { background: #fef9c3; color: #ca8a04; }
+  .stat-info { display: flex; flex-direction: column; }
+  .stat-value { font-weight: 700; font-size: 1.25rem; color: var(--text-default, #0f172a); line-height: 1.2; }
+  .stat-label { font-size: 0.75rem; color: var(--text-muted, #64748b); }
+
+  /* ---- Filters ---- */
+  .admin-filters-card { margin-bottom: var(--space-4, 1rem); }
+  .admin-filters-form { display: flex; flex-direction: column; gap: var(--space-3, 0.75rem); }
+  .admin-filters-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-3, 0.75rem); }
+  .admin-filter-field { display: flex; flex-direction: column; gap: var(--space-1, 0.25rem); min-width: 140px; flex: 1; }
+  .filter-search { flex: 2; min-width: 200px; }
+  .admin-filter-actions { display: flex; align-items: center; gap: var(--space-2, 0.5rem); padding-bottom: 2px; }
+  .admin-filter-reset { color: var(--text-muted, #64748b); font-size: 0.8125rem; text-decoration: underline; }
+
+  /* ---- Table ---- */
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .service-title-cell { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .service-thumb {
+    width: 48px; height: 48px; border-radius: var(--border-radius-md, 0.375rem);
+    object-fit: cover; flex-shrink: 0; border: 1px solid var(--border-default, #e2e8f0);
+  }
+  .service-thumb-placeholder {
+    width: 48px; height: 48px; border-radius: var(--border-radius-md, 0.375rem);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    background: var(--bg-inset, #f1f5f9); color: var(--text-muted, #94a3b8);
+    border: 1px solid var(--border-default, #e2e8f0);
+  }
+  .service-thumb-placeholder [data-icon] { width: 1.25rem; height: 1.25rem; }
+  .article-title-link { text-decoration: none; }
+  .article-title-link:hover .article-title { color: var(--color-primary, #eab308); }
+  .article-title {
+    font-weight: 600; font-size: 0.875rem;
+    color: var(--text-default, #0f172a); display: block;
+    transition: color 0.15s;
+  }
+  .article-slug {
+    font-family: var(--font-family-mono, monospace); font-size: 0.6875rem;
+    background: var(--bg-inset, #f1f5f9); padding: 0.0625rem 0.375rem;
+    border-radius: var(--border-radius-sm, 0.25rem); color: var(--text-muted, #64748b);
+    display: inline-block; margin-top: 2px;
+  }
+  .lang-badges { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.25rem; }
+  .text-muted { color: var(--text-muted, #64748b); font-size: 0.8125rem; }
+  .tag-chip {
+    display: inline-block; padding: 0.0625rem 0.5rem; font-size: 0.6875rem;
+    background: var(--bg-inset, #f1f5f9); border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-full, 9999px); color: var(--text-default, #1e293b);
+    text-decoration: none; white-space: nowrap; transition: border-color 0.15s;
+  }
+  .tag-chip:hover { border-color: var(--color-primary, #eab308); }
+  .flag-list { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+  .date-cell { display: flex; flex-direction: column; }
+  .date-main { font-size: 0.8125rem; color: var(--text-default, #1e293b); }
+  .date-sub { font-size: 0.6875rem; color: var(--text-muted, #64748b); }
+
+  /* ---- Action buttons ---- */
+  .action-buttons { display: flex; gap: 0.25rem; }
+  .action-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem); background: var(--bg-surface, white);
+    color: var(--text-muted, #64748b); cursor: pointer; transition: all 0.15s; text-decoration: none;
+  }
+  .action-btn [data-icon] { width: 1rem; height: 1rem; }
+  .action-btn:hover { border-color: var(--color-primary, #eab308); color: var(--text-default, #0f172a); }
+  .action-btn--publish:hover { color: #16a34a; border-color: #16a34a; }
+  .action-btn--unpublish:hover { color: #d97706; border-color: #d97706; }
+  .action-btn--delete:hover { color: #dc2626; border-color: #dc2626; background: #fef2f2; }
+  .action-btn--duplicate:hover { color: #7c3aed; border-color: #7c3aed; }
+
+  /* ---- Empty state ---- */
+  .empty-state { text-align: center; padding: var(--space-10, 3rem) var(--space-4, 1rem); color: var(--text-muted, #64748b); }
+  .empty-state-icon { width: 3rem; height: 3rem; margin: 0 auto var(--space-3, 0.75rem); opacity: 0.4; }
+
+  /* ---- Pagination ---- */
+  .admin-pagination { margin-top: var(--space-4, 1rem); display: flex; justify-content: center; }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 768px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .admin-filters-row { flex-direction: column; }
+    .admin-filter-field { min-width: 100%; }
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .admin-page-title-row { flex-direction: column; align-items: flex-start; }
+  }
+</style>

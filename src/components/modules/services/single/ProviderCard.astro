@@ -1,0 +1,80 @@
+---
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+
+interface Props {
+  providerId: string;
+  organizationName?: string | null;
+  lang: string;
+}
+
+const { providerId, organizationName, lang } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<Card class="provider-card">
+  <CardContent>
+    <h3 class="provider-title">
+      <Icon name="mdi:account-circle-outline" width="22" height="22" />
+      {t.servicesPage?.aboutProvider ?? "À propos du prestataire"}
+    </h3>
+
+    <div class="provider-info">
+      <div class="provider-avatar">
+        <Icon name="mdi:account" width="40" height="40" />
+      </div>
+      <div class="provider-details">
+        <p class="provider-id">{t.servicesPage?.provider ?? "Prestataire"}: {providerId}</p>
+        {organizationName && (
+          <Badge variant="retro" color="secondary">
+            <Icon name="mdi:office-building-outline" width="14" height="14" />
+            {organizationName}
+          </Badge>
+        )}
+      </div>
+    </div>
+  </CardContent>
+</Card>
+
+<style>
+  .provider-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    margin: 0 0 var(--space-4);
+  }
+
+  .provider-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .provider-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-full, 50%);
+    background: var(--color-surface-alt, #f1f5f9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted, #999);
+    flex-shrink: 0;
+  }
+
+  .provider-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .provider-id {
+    margin: 0;
+    font-weight: 500;
+  }
+</style>

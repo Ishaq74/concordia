@@ -33,6 +33,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
   const blog = url.searchParams.get("blog");
   const categoryId = url.searchParams.get("category")?.trim() ?? "";
   const articleId = url.searchParams.get("id")?.trim() ?? "";
+  const orgId = url.searchParams.get("organizationId")?.trim() ?? "";
 
   // Single article fetch
   if (articleId) {
@@ -70,6 +71,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   // Build conditions
   const conditions: ReturnType<typeof eq>[] = [];
+  if (orgId) conditions.push(eq(blogPosts.organizationId, orgId));
   if (search) conditions.push(ilike(blogPosts.slug, `%${search}%`));
   if (statusFilter) conditions.push(eq(blogPosts.status, statusFilter));
   if (featured === "true") conditions.push(eq(blogPosts.isFeatured, true));
@@ -199,11 +201,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
       const status = String(payload.status || "draft");
       const inLanguage = String(payload.inLanguage || "fr");
 
+      const organizationId = payload.organizationId ? String(payload.organizationId) : null;
+
       await db.insert(blogPosts).values({
         id,
         slug,
         status,
         inLanguage,
+        organizationId,
         publishedAt: status === "published" ? new Date() : null,
         displayInHome: Boolean(payload.displayInHome),
         displayInBlog: payload.displayInBlog !== false,

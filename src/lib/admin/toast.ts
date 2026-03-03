@@ -138,3 +138,8 @@ function escapeHTML(str: string): string {
   div.textContent = str;
   return div.innerHTML;
 }
+
+// Register showToast globally for scripts that use define:vars (can't import ES modules)
+if (typeof window !== "undefined") {
+  (window as any).showToast = showToast;
+}

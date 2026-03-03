@@ -1,0 +1,60 @@
+---
+import Flex from "@components/Tools/Flex.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+
+interface Props {
+  durationMinutes?: number | null;
+  isMobile?: boolean;
+  maxParticipants?: number | null;
+  lang: string;
+  className?: string;
+}
+
+const { durationMinutes, isMobile = false, maxParticipants, lang, className = "" } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<Flex alignItems="center" gap="sm" className={`service-meta ${className}`}>
+  {durationMinutes && (
+    <span class="meta-item" title={t.servicesPage?.duration ?? "Durée"}>
+      <Icon name="mdi:clock-outline" width="16" height="16" />
+      {durationMinutes} {t.servicesPage?.durationMinutes ?? "min"}
+    </span>
+  )}
+
+  {isMobile && (
+    <span class="meta-item meta-mobile" title={t.servicesPage?.mobile ?? "Se déplace"}>
+      <Icon name="mdi:truck-delivery-outline" width="16" height="16" />
+      {t.servicesPage?.mobile ?? "Se déplace"}
+    </span>
+  )}
+
+  {maxParticipants && (
+    <span class="meta-item" title={t.servicesPage?.maxParticipants ?? "Participants max"}>
+      <Icon name="mdi:account-group-outline" width="16" height="16" />
+      {maxParticipants}
+    </span>
+  )}
+</Flex>
+
+<style>
+  .service-meta {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted, #666);
+  }
+
+  .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .meta-mobile {
+    color: var(--color-accent, #10b981);
+    font-weight: 500;
+  }
+</style>

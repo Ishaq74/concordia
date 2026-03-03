@@ -11,9 +11,11 @@ import Button from "@components/ui/Button.astro";
 import { Icon } from "astro-icon/components";
 import { getTranslations } from "@i18n/translations";
 
+import ServiceCard from "@components/modules/services/cards/ServiceCard.astro";
 import { getDrizzle } from "@database/drizzle";
 import { blogOrganizations, blogAuthors, blogPosts, blogTranslations } from "@database/schemas";
 import { eq, and, sql } from "drizzle-orm";
+import { getCollection } from "astro:content";
 
 const lang = Astro.params.lang as string;
 const LANG = lang;
@@ -75,6 +77,14 @@ const translations = postIds.length > 0
   : [];
 
 const translationMap = new Map(translations.map(t => [t.postId, t]));
+
+// Fetch services for this organization
+const allServices = await getCollection("services");
+const orgServices = allServices
+  .filter((s) => s.data.lang === LANG && s.data.status === "active" && s.data.organizationId === org.id)
+  .slice(0, 6);
+const totalOrgServices = allServices
+  .filter((s) => s.data.lang === LANG && s.data.status === "active" && s.data.organizationId === org.id).length;
 
 // --- Derived data ---
 const desc = loc(org.description);
@@ -247,6 +257,34 @@ const makesOffer = (org.makesOffer ?? []) as string[];
                 );
               })}
             </div>
+          </Card>
+        )}
+
+        {/* --- SERVICES --- */}
+        {orgServices.length > 0 && (
+          <Card variant="modern" elevation="sm" class="org-section">
+            <h2 class="org-section__title">
+              <Icon name="mdi:briefcase-outline" /> {t.servicesPage?.ourServices ?? "Nos Services"}
+            </h2>
+            <div class="org-services-grid">
+              {orgServices.map((svc) => (
+                <ServiceCard service={svc} lang={LANG} variant="retro" />
+              ))}
+            </div>
+            {totalOrgServices > 6 && (
+              <a href={`/${LANG}/organizations/${slug}/services`} class="org-section__more">
+                <Button variant="modern" color="primary" icon={{ name: "mdi:arrow-right", side: "right" }}>
+                  {t.servicesPage?.seeAll ?? "Voir tous les services"} ({totalOrgServices})
+                </Button>
+              </a>
+            )}
+            {totalOrgServices <= 6 && (
+              <a href={`/${LANG}/organizations/${slug}/services`} class="org-section__more">
+                <Button variant="modern" color="secondary" icon={{ name: "mdi:arrow-right", side: "right" }}>
+                  {t.servicesPage?.title ?? "Services"}
+                </Button>
+              </a>
+            )}
           </Card>
         )}
 
@@ -723,6 +761,14 @@ const makesOffer = (org.makesOffer ?? []) as string[];
   padding: 0.25rem 0;
 }
 
+/* --- Services Grid --- */
+.org-services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
 /* --- Responsive --- */
 @media (max-width: 768px) {
   .org-identity__header { flex-direction: column; align-items: center; text-align: center; }
@@ -731,5 +777,6 @@ const makesOffer = (org.makesOffer ?? []) as string[];
   .org-identity__socials { justify-content: center; }
   .org-team { grid-template-columns: 1fr; }
   .org-stats { grid-template-columns: repeat(2, 1fr); }
+  .org-services-grid { grid-template-columns: 1fr; }
 }
 </style>

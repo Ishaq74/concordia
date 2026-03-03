@@ -1,0 +1,455 @@
+---
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
+import Label from "@components/ui/Form/Label.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import { servicesBookings, servicesListings, servicesTranslations } from "@database/schemas";
+import { user } from "@database/schemas/auth-schema";
+import { eq, inArray } from "drizzle-orm";
+import { getTranslations } from "@i18n/translations";
+
+const lang = Astro.params.lang as string;
+const bookingId = Astro.params.id as string;
+const t = getTranslations(lang);
+const ts = t.adminServices;
+const adminBase = `/${lang}/admin/services`;
+const bookingBase = `${adminBase}/bookings`;
+
+const db = await getDrizzle();
+
+// Fetch booking
+const [booking] = await db.select().from(servicesBookings).where(eq(servicesBookings.id, bookingId)).limit(1);
+if (!booking) return Astro.redirect(bookingBase);
+
+// Fetch service info
+const [service] = await db
+  .select({ id: servicesListings.id, slug: servicesListings.slug, basePrice: servicesListings.basePrice, currency: servicesListings.currency })
+  .from(servicesListings)
+  .where(eq(servicesListings.id, booking.serviceId))
+  .limit(1);
+
+// Fetch service title
+const translations = await db
+  .select({ title: servicesTranslations.title, inLanguage: servicesTranslations.inLanguage })
+  .from(servicesTranslations)
+  .where(eq(servicesTranslations.serviceId, booking.serviceId));
+const langTr = translations.find((tr) => tr.inLanguage === lang) ?? translations[0];
+const serviceTitle = langTr
+  ? (typeof langTr.title === "string" ? langTr.title : (langTr.title as Record<string, string>)?.[lang] || Object.values(langTr.title as Record<string, string>)[0] || "—")
+  : service?.slug ?? "—";
+
+// Fetch customer + provider info
+const userIds = [...new Set([booking.customerId, booking.providerId].filter(Boolean))];
+const userMap = new Map<string, { name: string; email: string; image: string | null }>();
+if (userIds.length > 0) {
+  const users = await db
+    .select({ id: user.id, name: user.name, email: user.email, image: user.image })
+    .from(user)
+    .where(inArray(user.id, userIds));
+  users.forEach((u) => userMap.set(u.id, { name: u.name, email: u.email, image: u.image }));
+}
+const customer = userMap.get(booking.customerId);
+const provider = userMap.get(booking.providerId);
+
+// Status helpers
+const statusColors: Record<string, "warning" | "accent" | "error" | "primary" | "secondary" | "default"> = {
+  pending: "warning",
+  confirmed: "accent",
+  cancelled: "error",
+  cancelled_by_provider: "error",
+  completed: "primary",
+  no_show: "secondary",
+};
+const statusLabels: Record<string, string> = {
+  pending: ts?.bookingStatus?.pending ?? "En attente",
+  confirmed: ts?.bookingStatus?.confirmed ?? "Confirmé",
+  cancelled: ts?.bookingStatus?.cancelled ?? "Annulé",
+  cancelled_by_provider: ts?.bookingStatus?.cancelled ?? "Annulé (prestataire)",
+  completed: ts?.bookingStatus?.completed ?? "Terminé",
+  no_show: ts?.bookingStatus?.no_show ?? "Absent",
+};
+
+const bookingDateFormatted = new Date(booking.bookingDate + "T" + (booking.bookingTime || "00:00")).toLocaleDateString(lang, {
+  weekday: "long", day: "numeric", month: "long", year: "numeric",
+});
+const bookingTimeFormatted = booking.bookingTime || "—";
+
+const canConfirm = booking.status === "pending";
+const canCancel = ["pending", "confirmed"].includes(booking.status);
+const canComplete = booking.status === "confirmed";
+const canNoShow = booking.status === "confirmed";
+---
+
+<AdminLayout title={`${ts?.bookings?.detail ?? "Réservation"} #${bookingId.slice(0, 8)}`} activeSection="services-bookings">
+  <header class="admin-page-header">
+    <div class="admin-page-title-row">
+      <div class="admin-page-title-group">
+        <a href={bookingBase} class="back-link"><Icon name="mdi:arrow-left" /></a>
+        <h1>{ts?.bookings?.detail ?? "Détail de la réservation"}</h1>
+        <Badge color={statusColors[booking.status] ?? "default"} text={statusLabels[booking.status] ?? booking.status} />
+      </div>
+    </div>
+    <p class="admin-page-subtitle">#{bookingId} &middot; {bookingDateFormatted}</p>
+  </header>
+
+  <form id="booking-form" data-booking-id={bookingId}>
+    <div class="detail-grid">
+      <!-- Main column -->
+      <div class="detail-main">
+
+        <!-- Service Card -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:briefcase-outline" class="card-title-icon" />
+              <span>{ts?.bookings?.service ?? "Service"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="info-row">
+              <span class="info-label">{ts?.form?.nameLabel ?? "Nom"}</span>
+              <a href={`${adminBase}/${booking.serviceId}/edit`} class="info-value link">{serviceTitle}</a>
+            </div>
+            <div class="info-row">
+              <span class="info-label">{ts?.form?.slug ?? "Slug"}</span>
+              <code class="info-slug">{service?.slug ?? "—"}</code>
+            </div>
+            <div class="info-row">
+              <span class="info-label">{ts?.form?.basePrice ?? "Prix"}</span>
+              <span class="info-value">{booking.totalPrice ?? service?.basePrice ?? "—"} {booking.currency ?? service?.currency ?? "EUR"}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <!-- Booking Details -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:calendar-clock" class="card-title-icon" />
+              <span>{ts?.bookings?.details ?? "Détails"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="info-row">
+              <span class="info-label">{ts?.bookings?.date ?? "Date"}</span>
+              <span class="info-value">{bookingDateFormatted}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">{ts?.bookings?.time ?? "Heure"}</span>
+              <span class="info-value">{bookingTimeFormatted}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">{ts?.bookings?.duration ?? "Durée"}</span>
+              <span class="info-value">{booking.durationMinutes} min</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">{ts?.bookings?.created ?? "Créée le"}</span>
+              <span class="info-value">
+                <time datetime={booking.createdAt.toISOString()}>
+                  {booking.createdAt.toLocaleDateString(lang, { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                </time>
+              </span>
+            </div>
+            {booking.cancelledAt && (
+              <div class="info-row">
+                <span class="info-label">{ts?.bookings?.cancelledAt ?? "Annulée le"}</span>
+                <span class="info-value info-error">
+                  <time datetime={booking.cancelledAt.toISOString()}>
+                    {booking.cancelledAt.toLocaleDateString(lang, { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  </time>
+                </span>
+              </div>
+            )}
+            {booking.completedAt && (
+              <div class="info-row">
+                <span class="info-label">{ts?.bookings?.completedAt ?? "Terminée le"}</span>
+                <span class="info-value info-success">
+                  <time datetime={booking.completedAt.toISOString()}>
+                    {booking.completedAt.toLocaleDateString(lang, { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  </time>
+                </span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <!-- Messages -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:message-text-outline" class="card-title-icon" />
+              <span>{ts?.bookings?.messages ?? "Messages"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {booking.customerMessage ? (
+              <div class="message-block">
+                <div class="message-author">
+                  {customer?.image && <img src={customer.image} alt="" class="avatar-sm" />}
+                  <strong>{customer?.name ?? "Client"}</strong>
+                </div>
+                <p class="message-text">{booking.customerMessage}</p>
+              </div>
+            ) : (
+              <p class="text-muted">{ts?.bookings?.noCustomerMessage ?? "Aucun message du client."}</p>
+            )}
+            <hr class="divider" />
+            <div class="form-field">
+              <Label htmlFor="providerResponse">{ts?.bookings?.providerResponse ?? "Réponse du prestataire"}</Label>
+              <Textarea id="providerResponse" name="providerResponse" rows={3} placeholder={ts?.bookings?.providerResponsePlaceholder ?? "Écrire une réponse…"}>
+                {booking.providerResponse ?? ""}
+              </Textarea>
+              <button type="button" id="btn-respond" class="btn-secondary" style="margin-top: var(--space-2, 0.5rem);">
+                <Icon name="mdi:send-outline" /> {ts?.bookings?.sendResponse ?? "Envoyer la réponse"}
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="detail-sidebar">
+
+        <!-- Customer Card -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:account-outline" class="card-title-icon" />
+              <span>{ts?.bookings?.customer ?? "Client"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="profile-card">
+              {customer?.image ? (
+                <img src={customer.image} alt={customer.name} class="avatar-lg" />
+              ) : (
+                <div class="avatar-placeholder-lg"><Icon name="mdi:account" /></div>
+              )}
+              <div class="profile-info">
+                <strong>{customer?.name ?? "—"}</strong>
+                <span class="text-muted">{customer?.email ?? "—"}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <!-- Provider Card -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:briefcase-account-outline" class="card-title-icon" />
+              <span>{ts?.bookings?.provider ?? "Prestataire"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="profile-card">
+              {provider?.image ? (
+                <img src={provider.image} alt={provider.name} class="avatar-lg" />
+              ) : (
+                <div class="avatar-placeholder-lg"><Icon name="mdi:account" /></div>
+              )}
+              <div class="profile-info">
+                <strong>{provider?.name ?? "—"}</strong>
+                <span class="text-muted">{provider?.email ?? "—"}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <!-- Status Actions -->
+        <Card elevation="sm">
+          <CardHeader>
+            <div class="card-title-row">
+              <Icon name="mdi:cog-outline" class="card-title-icon" />
+              <span>{ts?.bookings?.actions ?? "Actions"}</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div class="action-buttons">
+              {canConfirm && (
+                <button type="button" class="btn-action btn-confirm" data-action="confirm">
+                  <Icon name="mdi:check" /> {ts?.bookings?.confirm ?? "Confirmer"}
+                </button>
+              )}
+              {canComplete && (
+                <button type="button" class="btn-action btn-complete" data-action="complete">
+                  <Icon name="mdi:check-all" /> {ts?.bookings?.complete ?? "Terminer"}
+                </button>
+              )}
+              {canNoShow && (
+                <button type="button" class="btn-action btn-noshow" data-action="no_show">
+                  <Icon name="mdi:account-cancel-outline" /> {ts?.bookings?.noShow ?? "Absent"}
+                </button>
+              )}
+              {canCancel && (
+                <button type="button" class="btn-action btn-cancel-action" data-action="cancel">
+                  <Icon name="mdi:close-circle-outline" /> {ts?.bookings?.cancel ?? "Annuler"}
+                </button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+      </div>
+    </div>
+  </form>
+
+  <div id="i18n-data" hidden
+    data-action-success={ts?.js?.bookingUpdated ?? "Réservation mise à jour."}
+    data-action-error={ts?.js?.bookingError ?? "Erreur lors de la mise à jour."}
+    data-confirm-cancel={ts?.js?.confirmCancel ?? "Annuler cette réservation ?"}
+    data-response-sent={ts?.js?.responseSent ?? "Réponse envoyée."}
+    data-response-empty={ts?.js?.responseEmpty ?? "La réponse ne peut pas être vide."}
+    data-network-error={ts?.js?.networkError ?? "Erreur réseau — vérifiez votre connexion."}
+  ></div>
+</AdminLayout>
+
+<script>
+  import { showToast } from "@lib/admin/toast";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const i18n = document.getElementById("i18n-data")?.dataset ?? {};
+    const form = document.getElementById("booking-form") as HTMLFormElement;
+    const bookingId = form?.dataset.bookingId;
+
+    async function doAction(action: string, extra?: Record<string, unknown>) {
+      try {
+        const res = await fetch("/api/admin/services/bookings", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: bookingId, action, ...extra }),
+        });
+        const result = await res.json();
+        if (result.updated) {
+          showToast(i18n.actionSuccess ?? "OK", "success");
+          setTimeout(() => window.location.reload(), 600);
+        } else {
+          showToast(result.error || i18n.actionError || "Error", "error");
+        }
+      } catch {
+        showToast(i18n.networkError ?? "", "error");
+      }
+    }
+
+    // Action buttons (confirm, complete, no_show, cancel)
+    document.querySelectorAll<HTMLButtonElement>(".btn-action[data-action]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const action = btn.dataset.action!;
+        if (action === "cancel") {
+          if (!confirm(i18n.confirmCancel ?? "Annuler ?")) return;
+        }
+        btn.disabled = true;
+        await doAction(action);
+        btn.disabled = false;
+      });
+    });
+
+    // Provider respond
+    document.getElementById("btn-respond")?.addEventListener("click", async () => {
+      const textarea = document.getElementById("providerResponse") as HTMLTextAreaElement;
+      const response = textarea?.value.trim();
+      if (!response) {
+        showToast(i18n.responseEmpty ?? "", "warning");
+        textarea?.focus();
+        return;
+      }
+      const btn = document.getElementById("btn-respond") as HTMLButtonElement;
+      btn.disabled = true;
+      await doAction("respond", { providerResponse: response });
+      btn.disabled = false;
+    });
+  });
+</script>
+
+<style>
+  .admin-page-header { margin-bottom: var(--space-6, 1.5rem); }
+  .admin-page-title-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3, 0.75rem); flex-wrap: wrap; }
+  .admin-page-title-group { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .admin-page-title-group h1 { font-size: 1.5rem; margin: 0; color: var(--text-default, #0f172a); }
+  .admin-page-subtitle { margin: var(--space-2, 0.5rem) 0 0; color: var(--text-muted, #64748b); font-size: 0.875rem; font-family: var(--font-family-mono, monospace); }
+  .back-link { color: var(--text-muted, #64748b); display: inline-flex; align-items: center; }
+  .back-link:hover { color: var(--color-primary, #eab308); }
+  .back-link [data-icon] { width: 1.25rem; height: 1.25rem; }
+
+  /* Detail grid */
+  .detail-grid {
+    display: grid; grid-template-columns: 1fr 340px; gap: var(--space-5, 1.25rem);
+  }
+  @media (max-width: 900px) { .detail-grid { grid-template-columns: 1fr; } }
+  .detail-main { display: flex; flex-direction: column; gap: var(--space-5, 1.25rem); }
+  .detail-sidebar { display: flex; flex-direction: column; gap: var(--space-5, 1.25rem); }
+
+  /* Card title */
+  .card-title-row { display: flex; align-items: center; gap: var(--space-2, 0.5rem); font-weight: 600; font-size: 0.875rem; }
+  .card-title-icon { width: 1.125rem; height: 1.125rem; color: var(--color-primary, #eab308); }
+
+  /* Info rows */
+  .info-row { display: flex; align-items: center; justify-content: space-between; padding: var(--space-2, 0.5rem) 0; border-bottom: 1px solid var(--border-default, #e2e8f0); }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { font-size: 0.8125rem; color: var(--text-muted, #64748b); }
+  .info-value { font-size: 0.875rem; font-weight: 500; color: var(--text-default, #0f172a); }
+  .info-value.link { color: var(--color-primary, #eab308); text-decoration: none; }
+  .info-value.link:hover { text-decoration: underline; }
+  .info-slug { font-family: var(--font-family-mono, monospace); font-size: 0.75rem; background: var(--bg-inset, #f1f5f9); padding: 0.125rem 0.5rem; border-radius: var(--border-radius-sm, 0.25rem); }
+  .info-error { color: #dc2626; }
+  .info-success { color: #16a34a; }
+
+  /* Profile card */
+  .profile-card { display: flex; align-items: center; gap: var(--space-3, 0.75rem); }
+  .profile-info { display: flex; flex-direction: column; }
+  .profile-info strong { font-size: 0.875rem; color: var(--text-default, #0f172a); }
+  .avatar-sm { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+  .avatar-lg { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-default, #e2e8f0); }
+  .avatar-placeholder-lg {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg-inset, #f1f5f9); color: var(--text-muted, #94a3b8);
+    border: 2px solid var(--border-default, #e2e8f0);
+  }
+  .avatar-placeholder-lg [data-icon] { width: 1.5rem; height: 1.5rem; }
+
+  /* Messages */
+  .message-block { margin-bottom: var(--space-3, 0.75rem); }
+  .message-author { display: flex; align-items: center; gap: var(--space-2, 0.5rem); margin-bottom: var(--space-2, 0.5rem); font-size: 0.8125rem; }
+  .message-text { font-size: 0.875rem; color: var(--text-default, #0f172a); background: var(--bg-subtle, #f8fafc); padding: var(--space-3, 0.75rem); border-radius: var(--border-radius-md, 0.375rem); margin: 0; }
+  .divider { border: none; border-top: 1px solid var(--border-default, #e2e8f0); margin: var(--space-4, 1rem) 0; }
+  .text-muted { color: var(--text-muted, #64748b); font-size: 0.8125rem; }
+
+  /* Form field */
+  .form-field { display: flex; flex-direction: column; gap: var(--space-1, 0.25rem); }
+
+  /* Action buttons */
+  .action-buttons { display: flex; flex-direction: column; gap: var(--space-2, 0.5rem); }
+  .btn-action {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-4, 1rem);
+    border: none; border-radius: var(--border-radius-md, 0.375rem);
+    font-weight: 600; font-size: 0.8125rem; cursor: pointer;
+    transition: opacity 0.15s; width: 100%;
+  }
+  .btn-action:hover { opacity: 0.9; }
+  .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-action [data-icon] { width: 1rem; height: 1rem; }
+  .btn-confirm { background: #22c55e; color: white; }
+  .btn-complete { background: #3b82f6; color: white; }
+  .btn-noshow { background: #64748b; color: white; }
+  .btn-cancel-action { background: #dc2626; color: white; }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: var(--space-2, 0.5rem);
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: var(--border-radius-md, 0.375rem);
+    background: var(--bg-surface, white); color: var(--text-default, #0f172a);
+    font-size: 0.8125rem; font-weight: 600; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--color-primary, #eab308); }
+  .btn-secondary [data-icon] { width: 1rem; height: 1rem; }
+</style>

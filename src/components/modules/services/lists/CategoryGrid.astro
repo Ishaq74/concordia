@@ -1,0 +1,85 @@
+---
+import Grid from "@components/Tools/Grid.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Link from "@components/ui/Link.astro";
+import Badge from "@components/ui/Badge.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+
+interface CategoryItem {
+  name: string;
+  slug: string;
+  count: number;
+  icon?: string | null;
+}
+
+interface Props {
+  categories: CategoryItem[];
+  lang: string;
+}
+
+const { categories, lang } = Astro.props;
+const t = getTranslations(lang);
+---
+
+<Grid
+  tag="section"
+  display="grid"
+  autoFit
+  gap="sm"
+  gridTemplateColumns="repeat(auto-fit, minmax(200px, 1fr))"
+  ariaLabel={t.servicesPage?.categories ?? "Catégories"}
+  className="service-category-grid"
+>
+  {categories.map((cat) => (
+    <Link href={`/${lang}/services/${cat.slug}`} className="cat-card-link" style="link">
+      <Card class="cat-card">
+        <CardContent>
+          <div class="cat-icon">
+            {cat.icon ? (
+              <Icon name={cat.icon} width="28" height="28" />
+            ) : (
+              <Icon name="mdi:tag-outline" width="28" height="28" />
+            )}
+          </div>
+          <h3 class="cat-name">{cat.name}</h3>
+          <Badge variant="retro" color="secondary">
+            {cat.count} {cat.count === 1 ? "service" : "services"}
+          </Badge>
+        </CardContent>
+      </Card>
+    </Link>
+  ))}
+</Grid>
+
+<style>
+  .cat-card {
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+
+  .cat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1));
+  }
+
+  .cat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto var(--space-3);
+    border-radius: var(--radius-full, 50%);
+    background: var(--color-surface-alt, #f1f5f9);
+    color: var(--color-accent, #10b981);
+  }
+
+  .cat-name {
+    font-size: var(--text-base);
+    font-weight: 600;
+    margin: 0 0 var(--space-2);
+  }
+</style>
