@@ -1,6 +1,6 @@
 ---
 import Dropdown from "@components/ui/Dropdown.astro";
-import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+import { getLocalizedUrl, getCanonicalPath, getSupportedLocales } from "@lib/i18n/route-helpers";
 
 interface Props {
   variant?: "initial" | "retro" | "modern" | "futuristic";
@@ -16,43 +16,45 @@ const {
 } = Astro.props;
 
 // Detect current locale from URL
+const locales = getSupportedLocales();
+const localePattern = new RegExp(`^\\/(${locales.join("|")})(\\/.*)$`);
 const currentLocale = Astro.currentLocale || "fr";
 
-// Get current path without locale prefix
-const pathWithoutLocale = Astro.url.pathname.replace(
-  /^\/(fr|en|ar|es)(\/|$)/,
-  "/",
-);
+// Extract the canonical path from the current URL for accurate lang switching
+const match = Astro.url.pathname.match(localePattern);
+const detectedLang = match?.[1] ?? "fr";
+const restOfPath = match?.[2]?.replace(/^\//, "") ?? "";
+const canonicalPath = getCanonicalPath(detectedLang, restOfPath) ?? restOfPath;
 
 const languages = [
   {
     label: "Français",
     icon: "🇫🇷",
-    href: getRelativeLocaleUrl("fr", pathWithoutLocale) || '#',
+    href: getLocalizedUrl("fr", canonicalPath) || '#',
     value: "fr",
   },
   {
     label: "English",
     icon: "🇬🇧",
-    href: getRelativeLocaleUrl("en", pathWithoutLocale) || '#',
+    href: getLocalizedUrl("en", canonicalPath) || '#',
     value: "en",
   },
   {
     label: "العربية",
     icon: "🇸🇦",
-    href: getRelativeLocaleUrl("ar", pathWithoutLocale) || '#',
+    href: getLocalizedUrl("ar", canonicalPath) || '#',
     value: "ar",
   },
   {
     label: "Español",
     icon: "🇪🇸",
-    href: getRelativeLocaleUrl("es", pathWithoutLocale) || '#',
+    href: getLocalizedUrl("es", canonicalPath) || '#',
     value: "es",
   },
 ];
 
 // Determine current language display
-const currentLang =
+const currentLangDisplay =
   languages.find((lang) => lang.value === currentLocale) || languages[0];
 ---
 
@@ -60,7 +62,7 @@ const currentLang =
   items={languages}
   variant={variant}
   position="bottom-right"
-  triggerLabel={currentLang.icon}
+  triggerLabel={currentLangDisplay.icon}
   ismenu={isMenu}
   class={className}
 />

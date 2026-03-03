@@ -1,0 +1,364 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import SwitchComponent from "@components/ui/Form/Switch.astro";
+import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import { getTranslations } from "@i18n/translations";
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const d = t.docs?.common ?? {};
+const p = t.docs?.pages?.switch ?? {};
+---
+
+<DocLayout 
+  title={p.title ?? "Switch Component"} 
+  description={p.description ?? "Interactive toggle button with variants and states"} 
+  variant="initial"
+>
+  <h1 id="switch-component">{p.title ?? "Switch Component"}</h1>
+
+  <p set:html={p.intro ?? `The <code class="inline-code">Switch</code> component is an interactive toggle button that allows enabling or disabling an option. It uses the ARIA <code class="inline-code">switch</code> role for optimal accessibility.`} />
+
+  <TableOfContents
+    items={[
+      { label: d.installation ?? "Installation", href: "#installation" },
+      { label: d.props ?? "Props", href: "#props" },
+      { label: d.basicUsage ?? "Basic usage", href: "#basic" },
+      { label: d.variants ?? "Variants", href: "#variants" },
+      { label: d.states ?? "States", href: "#states" },
+      { label: d.withLabels ?? "With labels", href: "#labels" },
+      { label: d.disabledState ?? "Disabled state", href: "#disabled" },
+      { label: d.errorHandling ?? "Error handling", href: "#error" },
+      { label: d.accessibility ?? "Accessibility", href: "#accessibility" },
+    ]}
+    title={d.tableOfContents ?? "Table of Contents"}
+  />
+
+  <h2 id="installation">{d.installation ?? "Installation"}</h2>
+
+  <Code
+    lang="astro"
+    code={`import Switch from '@components/ui/Form/Switch.astro';`}
+  />
+
+  <h2 id="props">{d.props ?? "Props"}</h2>
+
+  <Table variant="initial">
+    <TableHeader>
+      <TableRow>
+        <TableHead>{d.prop ?? "Prop"}</TableHead>
+        <TableHead>{d.type ?? "Type"}</TableHead>
+        <TableHead>{d.default ?? "Default"}</TableHead>
+        <TableHead>{d.description ?? "Description"}</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      <TableRow>
+        <TableCell><code class="inline-code">id</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><em>Required</em></TableCell>
+        <TableCell>{p?.propDescs?.descUniqueIdLabel ?? "Unique identifier to link the label"}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">name</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><em>Required</em></TableCell>
+        <TableCell>{p?.propDescs?.descFieldName ?? "Field name for form submission"}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">variant</code></TableCell>
+        <TableCell><code class="inline-code">"initial" | "retro" | "modern" | "futuristic"</code></TableCell>
+        <TableCell><code class="inline-code">"initial"</code></TableCell>
+        <TableCell>{d.descVisualStyle ?? "Visual style of the switch"}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">checked</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">false</code></TableCell>
+        <TableCell>{p?.propDescs?.descDefaultChecked ?? "Default checked state"}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">disabled</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">false</code></TableCell>
+        <TableCell>{p?.propDescs?.descDisableSwitch ?? "Disables the switch"}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">required</code></TableCell>
+        <TableCell><code class="inline-code">boolean</code></TableCell>
+        <TableCell><code class="inline-code">false</code></TableCell>
+        <TableCell>{d.descRequired ?? "Required field"}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code class="inline-code">error</code></TableCell>
+        <TableCell><code class="inline-code">string</code></TableCell>
+        <TableCell><code class="inline-code">undefined</code></TableCell>
+        <TableCell>{p?.propDescs?.descErrorToDisplay ?? "Error message to display"}</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <h2 id="basic">{d.basicUsage ?? "Basic usage"}</h2>
+
+  <div class="demo-section">
+    <SwitchComponent id="basic-switch" name="basic">
+      Enable notifications
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="basic-switch" name="basic">
+  Enable notifications
+</SwitchComponent>`}
+  />
+
+  <h2 id="variants">{d.variants ?? "Variants"}</h2>
+
+  <h3>{d.variantInitial ?? "Initial"}</h3>
+  <div class="demo-section">
+    <SwitchComponent id="initial-off" name="initial1" variant="initial">
+      Initial Mode (Off)
+    </SwitchComponent>
+    <SwitchComponent id="initial-on" name="initial2" variant="initial" checked>
+      Initial Mode (On)
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="initial-off" name="initial1" variant="initial">
+  Initial Mode (Off)
+</SwitchComponent>
+<SwitchComponent id="initial-on" name="initial2" variant="initial" checked>
+  Initial Mode (On)
+</SwitchComponent>`}
+  />
+
+  <h3>{d.variantRetro ?? "Retro"}</h3>
+  <div class="demo-section">
+    <SwitchComponent id="retro-off" name="retro1" variant="retro">
+      Retro Mode (Off)
+    </SwitchComponent>
+    <SwitchComponent id="retro-on" name="retro2" variant="retro" checked>
+      Retro Mode (On)
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="retro-off" name="retro1" variant="retro">
+  Retro Mode (Off)
+</SwitchComponent>
+<SwitchComponent id="retro-on" name="retro2" variant="retro" checked>
+  Retro Mode (On)
+</SwitchComponent>`}
+  />
+
+  <h3>{d.variantModern ?? "Modern"}</h3>
+  <div class="demo-section">
+    <SwitchComponent id="modern-off" name="modern1" variant="modern">
+      Modern Mode (Off)
+    </SwitchComponent>
+    <SwitchComponent id="modern-on" name="modern2" variant="modern" checked>
+      Modern Mode (On)
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="modern-off" name="modern1" variant="modern">
+  Modern Mode (Off)
+</SwitchComponent>
+<SwitchComponent id="modern-on" name="modern2" variant="modern" checked>
+  Modern Mode (On)
+</SwitchComponent>`}
+  />
+
+  <h3>{d.variantFuturistic ?? "Futuristic"}</h3>
+  <div class="demo-section">
+    <SwitchComponent id="futuristic-off" name="futuristic1" variant="futuristic">
+      Futuristic Mode (Off)
+    </SwitchComponent>
+    <SwitchComponent id="futuristic-on" name="futuristic2" variant="futuristic" checked>
+      Futuristic Mode (On)
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="futuristic-off" name="futuristic1" variant="futuristic">
+  Futuristic Mode (Off)
+</SwitchComponent>
+<SwitchComponent id="futuristic-on" name="futuristic2" variant="futuristic" checked>
+  Futuristic Mode (On)
+</SwitchComponent>`}
+  />
+
+  <h2 id="states">{d.states ?? "States"}</h2>
+
+  <div class="demo-section">
+    <SwitchComponent id="state-off" name="state1">
+      Disabled state
+    </SwitchComponent>
+    <SwitchComponent id="state-on" name="state2" checked>
+      Enabled state
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="state-off" name="state1">
+  Disabled state
+</SwitchComponent>
+<SwitchComponent id="state-on" name="state2" checked>
+  Enabled state
+</SwitchComponent>`}
+  />
+
+  <h2 id="labels">{d.withLabels ?? "With labels"}</h2>
+
+  <div class="demo-section">
+    <SwitchComponent id="notifications" name="notifications">
+      Receive email notifications
+    </SwitchComponent>
+    <SwitchComponent id="marketing" name="marketing" checked>
+      Accept marketing communications
+    </SwitchComponent>
+    <SwitchComponent id="analytics" name="analytics">
+      Enable anonymous analytics
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="notifications" name="notifications">
+  Receive email notifications
+</SwitchComponent>
+<SwitchComponent id="marketing" name="marketing" checked>
+  Accept marketing communications
+</SwitchComponent>
+<SwitchComponent id="analytics" name="analytics">
+  Enable anonymous analytics
+</SwitchComponent>`}
+  />
+
+  <h2 id="disabled">{d.disabledState ?? "Disabled state"}</h2>
+
+  <div class="demo-section">
+    <SwitchComponent id="disabled-off" name="disabled1" disabled>
+      Switch disabled (Off)
+    </SwitchComponent>
+    <SwitchComponent id="disabled-on" name="disabled2" disabled checked>
+      Switch disabled (On)
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent id="disabled-off" name="disabled1" disabled>
+  Switch disabled (Off)
+</SwitchComponent>
+<SwitchComponent id="disabled-on" name="disabled2" disabled checked>
+  Switch disabled (On)
+</SwitchComponent>`}
+  />
+
+  <h2 id="error">{d.errorHandling ?? "Error handling"}</h2>
+
+  <div class="demo-section">
+    <SwitchComponent 
+      id="terms" 
+      name="terms" 
+      required 
+      error="You must accept the terms and conditions"
+    >
+      I accept the terms and conditions
+    </SwitchComponent>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<SwitchComponent 
+  id="terms" 
+  name="terms" 
+  required 
+  error="You must accept the terms and conditions"
+>
+  I accept the terms and conditions
+</SwitchComponent>`}
+  />
+
+  <h2 id="accessibility">{d.accessibility ?? "Accessibility"}</h2>
+
+  <p>
+    {p.ui2 ?? "The <code class=\"inline-code\">Switch</code> component fol..."}
+  </p>
+
+  <ul>
+    <li>
+      <code class="inline-code">role="switch"</code>: Indicates it is a toggle button
+    </li>
+    <li>
+      <code class="inline-code">aria-checked</code>: Communicates checked/unchecked state
+    </li>
+    <li>
+      <code class="inline-code">aria-invalid</code>: Indicates if the field has an error
+    </li>
+    <li>
+      <code class="inline-code">aria-describedby</code>: Links the error message to the switch
+    </li>
+    <li>
+      {p.ui3 ?? "The label is properly linked via the <code class=\"inline-..."}
+    </li>
+    <li>
+      {p.ui4 ?? "Keyboard navigation: <kbd>Space</kbd> or <kbd>Enter</kbd>..."}
+    </li>
+    <li>{p.ui1 ?? "Visible focus for keyboard navigation"}</li>
+  </ul>
+
+  <h3>{d.accessibleFormExample ?? "Accessible form example"}</h3>
+
+  <div class="demo-section">
+    <form style="display: flex; flex-direction: column; gap: 1rem;">
+      <fieldset style="border: 1px solid var(--color-border); padding: 1rem; border-radius: var(--radius-md);">
+        <legend style="font-weight: 600; padding: 0 0.5rem;">Notification preferences</legend>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <SwitchComponent id="email-notifs" name="emailNotifs" checked>
+            Email notifications
+          </SwitchComponent>
+          <SwitchComponent id="push-notifs" name="pushNotifs">
+            Push notifications
+          </SwitchComponent>
+          <SwitchComponent id="sms-notifs" name="smsNotifs">
+            SMS notifications
+          </SwitchComponent>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+
+  <Code
+    lang="astro"
+    code={`<form>
+  <fieldset>
+    <legend>Notification preferences</legend>
+    <SwitchComponent id="email-notifs" name="emailNotifs" checked>
+      Email notifications
+    </SwitchComponent>
+    <SwitchComponent id="push-notifs" name="pushNotifs">
+      Push notifications
+    </SwitchComponent>
+    <SwitchComponent id="sms-notifs" name="smsNotifs">
+      SMS notifications
+    </SwitchComponent>
+  </fieldset>
+</form>`}
+  />
+</DocLayout>

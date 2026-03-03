@@ -1,4 +1,6 @@
 ---
+import { getTranslations } from "@i18n/translations";
+
 export interface Props {
   variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
   items: { label: string; href: string }[];
@@ -6,10 +8,12 @@ export interface Props {
   className?: string;
 }
 
+const t = getTranslations(Astro.currentLocale || "fr");
+
 const { 
   variant = 'initial', 
   items = [],
-  title = 'Table of Contents',
+  title = t.docs?.common?.tableOfContents ?? 'Table des matières',
   className = ''
 } = Astro.props;
 ---

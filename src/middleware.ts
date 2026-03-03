@@ -1,5 +1,10 @@
 import { defineMiddleware, sequence } from "astro:middleware";
 import { getAuth } from "@lib/auth/auth";
+import {
+  getCanonicalPath,
+  getLocalizedUrl,
+  getSupportedLocales,
+} from "@lib/i18n/route-helpers";
 
 // ==================== SECURITY HEADERS ====================
 
@@ -136,27 +141,55 @@ const csrfProtection = defineMiddleware(async (context, next) => {
   return next();
 });
 
-// ==================== LOCALE REDIRECT ====================
+// ==================== LOCALE REDIRECT + SLUG REWRITE ====================
+
+// Build a locale-prefix regex dynamically from the single source of truth
+const localePrefixRegex = new RegExp(
+  `^\\/(${getSupportedLocales().join("|")})(\\/.*)$`,
+);
 
 const localeRedirect = defineMiddleware(async (context, next) => {
   const pathname = context.url.pathname;
 
-  // Pas de redirect pour les routes API, assets statiques, ou si déjà prefixé
+  // Skip API routes and static assets
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_astro/") ||
-    pathname.startsWith("/fonts/") ||
-    pathname.startsWith("/fr/") ||
-    pathname.startsWith("/en/") ||
-    pathname.startsWith("/ar/") ||
-    pathname.startsWith("/es/")
+    pathname.startsWith("/fonts/")
   ) {
     return next();
   }
 
-  // Root "/" → /fr/ (le redirect est aussi dans astro.config mais ça sécurise le runtime)
+  // Root "/" → /fr/
   if (pathname === "/") {
     return context.redirect("/fr/", 302);
+  }
+
+  // Match /{locale}/...
+  const match = pathname.match(localePrefixRegex);
+  if (!match) {
+    // No valid locale prefix — let Astro handle (will 404 or match other routes)
+    return next();
+  }
+
+  const lang = match[1]; // "fr", "en", etc.
+  const restWithSlash = match[2]; // "/a-propos", "/auth/connexion", etc.
+  const rest = restWithSlash.replace(/^\//, "").replace(/\/$/, ""); // strip leading/trailing /
+
+  if (!rest) {
+    // It's just /{lang}/ — no rewrite needed
+    return next();
+  }
+
+  // Check if the localized slug needs rewriting to its canonical form
+  const canonical = getCanonicalPath(lang, rest);
+  if (canonical) {
+    // Rewrite the URL so Astro routes to the canonical [lang]/... file
+    // The visible URL stays the same (e.g. /fr/a-propos)
+    const newUrl = new URL(context.url);
+    const trailingSlash = pathname.endsWith("/") ? "/" : "";
+    newUrl.pathname = `/${lang}/${canonical}${trailingSlash}`;
+    return context.rewrite(new Request(newUrl, context.request));
   }
 
   return next();
@@ -167,33 +200,29 @@ const localeRedirect = defineMiddleware(async (context, next) => {
 const protectedRoutes = defineMiddleware(async (context, next) => {
   const pathname = context.url.pathname;
 
-  // Routes qui nécessitent une session active
-  const protectedPatterns = [
-    /^\/(?:fr|en|ar|es)\/tableau-de-bord/,       // Dashboard FR
-    /^\/(?:fr|en|ar|es)\/dashboard/,               // Dashboard EN
-    /^\/(?:fr|en|ar|es)\/admin/,                   // Admin panel
-    /^\/(?:fr|en|ar|es)\/profil/,                  // Profil FR
-    /^\/(?:fr|en|ar|es)\/profile/,                 // Profile EN
-    /^\/(?:fr|en|ar|es)\/messagerie/,              // Messagerie FR
-    /^\/(?:fr|en|ar|es)\/messages/,                // Messages EN
+  // Extract locale from first URL segment
+  const localeMatch = pathname.match(localePrefixRegex);
+  if (!localeMatch) return next(); // Not a locale-prefixed route
+
+  const locale = localeMatch[1];
+  const rest = localeMatch[2].replace(/^\//, "").replace(/\/$/, "");
+
+  // Resolve to canonical path (handles localized slugs like "profil" → "profile")
+  const canonical = getCanonicalPath(locale, rest) ?? rest;
+
+  // Canonical protected route prefixes
+  const protectedPrefixes = [
+    "admin",
+    "profile",
+    "auth/profile",
   ];
 
-  const isProtected = protectedPatterns.some((pattern) => pattern.test(pathname));
+  const isProtected = protectedPrefixes.some(
+    (prefix) => canonical === prefix || canonical.startsWith(prefix + "/"),
+  );
 
   if (isProtected && !context.locals.user) {
-    // Extraire la locale du pathname
-    const localeMatch = pathname.match(/^\/(fr|en|ar|es)\//);
-    const locale = localeMatch?.[1] ?? "fr";
-
-    // Slugs de connexion par locale
-    const signInSlugs: Record<string, string> = {
-      fr: "connexion",
-      en: "sign-in",
-      ar: "sign-in",
-      es: "sign-in",
-    };
-
-    const signInPath = `/${locale}/auth/${signInSlugs[locale]}`;
+    const signInPath = getLocalizedUrl(locale, "auth/sign-in");
     const returnUrl = encodeURIComponent(pathname);
     return context.redirect(`${signInPath}?redirect=${returnUrl}`, 302);
   }

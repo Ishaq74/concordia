@@ -3,45 +3,30 @@
 > **Document de spécification technique** — Fusion du PRD Concordia (restaurer l'humanité) et de la conception Ville Numérique Vivante.
 > Stack cible : Astro 5.x SSR, Better Auth, Drizzle ORM, PostgreSQL. Voir `.github/copilot-instructions.md` pour les conventions.
 
----
-
 ## Table of Contents
 
-- [0. MÉTA](#0-méta)
-- [1. MODÈLE DE DOMAINE & DICTIONNAIRE DE DONNÉES](#1-modèle-de-domaine--dictionnaire-de-données)
-  - [1.1 Catalogue des entités](#11-catalogue-des-entités)
-  - [1.2 Spécification détaillée par entité](#12-spécification-détaillée-par-entité)
-  - [1.3 Relations globales](#13-relations-globales)
-- [2. PERMISSIONS & SÉCURITÉ](#2-permissions--sécurité)
-  - [2.1 Rôles & acteurs](#21-rôles--acteurs)
-  - [2.2 Matrice d'autorisations CRUD+](#22-matrice-dautorisations-crud)
-  - [2.3 Règles transverses](#23-règles-transverses)
-- [3. OPÉRATIONS LOGIQUES](#3-opérations-logiques)
-- [4. PARCOURS UTILISATEURS](#4-parcours-utilisateurs)
-- [5. PLAN UI](#5-plan-ui)
-- [6. EXIGENCES NON FONCTIONNELLES](#6-exigences-non-fonctionnelles)
-- [7. INTÉGRATIONS EXTERNES](#7-intégrations-externes)
-- [8. TÂCHES D'IMPLÉMENTATION](#8-tâches-dimplémentation)
-- [9. PLAN DE TESTS](#9-plan-de-tests)
-- [10. FICHIERS & MÉDIAS](#10-fichiers--médias)
-- [11. TRAITEMENTS DIFFÉRÉS & PLANIFICATION](#11-traitements-différés--planification)
-- [12. OBSERVABILITÉ & ANALYTIQUE](#12-observabilité--analytique)
-- [13. MIGRATIONS & DONNÉES INITIALES](#13-migrations--données-initiales)
-- [14. RISQUES, HYPOTHÈSES & QUESTIONS OUVERTES](#14-risques-hypothèses--questions-ouvertes)
-- [15. ANNEXES NORMATIVES](#15-annexes-normatives)
-- [16. CONTRÔLES QUALITÉ & CHECKLISTS](#16-contrôles-qualité--checklists)
-
----
-
-# 0. MÉTA
-
-### Version
-
-2.0.0
-
-### Date de génération
-
-2026-02-13
+- [1. MODÈLE DE DOMAINE & DICTIONNAIRE DE DONNÉES]<(#1-modèle-de-domaine--dictionnaire-de-données)>
+  - [1.1 Catalogue des entités]<(#11-catalogue-des-entités)>
+  - [1.2 Spécification détaillée par entité]<(#12-spécification-détaillée-par-entité)>
+  - [1.3 Relations globales]<(#13-relations-globales)>
+- [2. PERMISSIONS & SÉCURITÉ]<(#2-permissions--sécurité)>
+  - [2.1 Rôles & acteurs]<(#21-rôles--acteurs)>
+  - [2.2 Matrice d'autorisations CRUD+]<(#22-matrice-dautorisations-crud)>
+  - [2.3 Règles transverses]<(#23-règles-transverses)>
+- [3. OPÉRATIONS LOGIQUES]<(#3-opérations-logiques)>
+- [4. PARCOURS UTILISATEURS]<(#4-parcours-utilisateurs)
+- [5. PLAN UI](#5-plan-ui)>
+- [6. EXIGENCES NON FONCTIONNELLES]<(#6-exigences-non-fonctionnelles)>
+- [7. INTÉGRATIONS EXTERNES]<(#7-intégrations-externes)>
+- [8. TÂCHES D'IMPLÉMENTATION]<(#8-tâches-dimplémentation)>
+- [9. PLAN DE TESTS]<(#9-plan-de-tests)>
+- [10. FICHIERS & MÉDIAS]<(#10-fichiers--médias)>
+- [11. TRAITEMENTS DIFFÉRÉS & PLANIFICATION]<(#11-traitements-différés--planification)>
+- [12. OBSERVABILITÉ & ANALYTIQUE]<(#12-observabilité--analytique)>
+- [13. MIGRATIONS & DONNÉES INITIALES]<(#13-migrations--données-initiales)>
+- [14. RISQUES, HYPOTHÈSES & QUESTIONS OUVERTES]<(#14-risques-hypothèses--questions-ouvertes)>
+- [15. ANNEXES NORMATIVES]<(#15-annexes-normatives)>
+- [16. CONTRÔLES QUALITÉ & CHECKLISTS]<(#16-contrôles-qualité--checklists)>
 
 ### Auteur
 
@@ -67,41 +52,30 @@ Concepteur IA
 
 #### Livrables
 
-- Annuaire de lieux avec soumission propriétaire, attributs dynamiques, traductions multilingues.
+- Annuaire de lieux et d'organisations avec soumission propriétaire, attributs dynamiques, équipe, sa propre administrations, ses auteurs, ses membres, son blog, ses services etc... traductions multilingues.
 - Blog d'articles (CMS) avec intégration lieux et catégories.
+- ballades (CMS) avec intégration lieux et catégories.
+- Services (CMS) avec intégration lieux et catégories.
+- Formations (CMS) avec intégration lieux et catégories.
+- Événements (CMS) avec intégration lieux et catégories.
 - Système d'avis et commentaires avec sous-notations et modération.
 - Forum thématique hiérarchique.
-- Place de marché solidaire (annonces classées, services locaux).
+- Place de marché solidaire type leboncoin (annonces classées, services locaux).
 - Messagerie privée en temps réel.
-- Portefeuille numérique (crédit, transfert, paiement).
 - Système de réservation (disponibilités, paiement, commissions).
-- Système de médiation en ligne (cas, sessions, accords).
-- Modules d'éducation et d'ateliers (cours, leçons, progression).
-- Organisation de bénévolat (projets, tâches, participation).
-- Micro-financement (campagnes, dons, décaissement).
 - Tableaux de bord de transparence et d'impact.
 - Panneau d'administration (modération, gestion utilisateurs, taxonomie).
-- Activités, événements, sentiers, produits locaux, groupes communautaires.
+- Activités, événements, ballades, produits locaux, groupes communautaires.
 - Système de favoris/signets.
-
-#### Non-objectifs
-
-- Réseau social général (pas de fil d'actualité, pas de followers, pas de stories).
-- Place de marché commerciale pure (pas de panier, pas de checkout e-commerce).
-- Application mobile native (progressive web app uniquement).
-- Conception graphique/maquettes (seule la description logique des vues).
-- Hébergement/déploiement infrastructure (géré séparément).
 
 ### Parties prenantes
 
 | Acteur | Description | Portée |
 |---|---|---|
 | **Anonyme** | Visiteur non authentifié | Consultation publique : lieux, articles, forum, annonces, services, événements, sentiers |
-| **Citoyen** | Utilisateur authentifié (rôle par défaut) | Profil, avis, commentaires, forum, messagerie, annonces, portefeuille, réservations, favoris, signalements |
+| **Citoyen** | Utilisateur authentifié (rôle par défaut) | Profil, avis, commentaires, forum, messagerie, annonces, réservations, favoris, signalements |
 | **Propriétaire** | Citoyen gérant un ou plusieurs établissements | Soumission/gestion de lieux, disponibilités, réponse aux avis, perception des paiements |
 | **Auteur** | Citoyen publiant du contenu rédactionnel | Création/gestion d'articles via back-office |
-| **Médiateur** | Citoyen certifié pour la résolution de conflits | Prise en charge de cas de médiation, animation de sessions, rédaction d'accords |
-| **Éducateur** | Citoyen créant du contenu pédagogique | Création/gestion de modules et leçons d'éducation |
 | **Modérateur** | Citoyen avec droits de modération | Modération du contenu communautaire (avis, commentaires, forum, annonces) |
 | **Administrateur** | Gestion globale de la plateforme | Gestion utilisateurs, taxonomie, configuration, audit, rapports |
 | **Système** | Processus automatisés | Notifications, jobs différés, agrégation métriques, commissions |
@@ -127,14 +101,9 @@ Concepteur IA
 | **Impact metric** | Indicateur mesurable de l'effet positif d'une action (projets achevés, heures bénévoles, conflits résolus) |
 | **Leçon** | Unité pédagogique au sein d'un module d'éducation |
 | **Lieu** | Établissement physique ou point d'intérêt référencé dans l'annuaire |
-| **Médiation** | Processus structuré de résolution de conflit assisté par un tiers neutre |
-| **Module d'éducation** | Parcours pédagogique structuré (cours) avec leçons ordonnées |
-| **Notification** | Alerte envoyée à un utilisateur (nouveau message, avis reçu, lieu approuvé, etc.) |
 | **Ownership** | Concept de propriété : l'utilisateur ayant créé une ressource détient des droits privilégiés |
 | **POI** | Point d'intérêt sur un sentier (point de vue, fontaine, etc.) |
-| **Portefeuille numérique** | Solde de crédit interne pour les transactions sur la plateforme |
 | **Produit local** | Bien produit localement, référencé avec saisonnalité et producteur |
-| **Projet bénévole** | Initiative communautaire avec tâches, participants et objectifs mesurables |
 | **Réservation** | Blocage d'un créneau ou d'une date pour un service ou hébergement |
 | **RLS** | Contrôle d'accès au niveau des lignes de données |
 | **Sentier** | Itinéraire de randonnée/balade avec tracé GPX, difficulté, dénivelé |
@@ -143,14 +112,12 @@ Concepteur IA
 | **Sous-notation** | Note granulaire sur un aspect spécifique d'un lieu, composant d'un avis |
 | **Sujet de forum** | Publication initiale dans une catégorie de forum, déclenchant un fil de discussion |
 | **Taxonomie** | Système de classification hiérarchique (catégories, attributs, tags) |
-| **Transaction** | Opération financière affectant un portefeuille (crédit, transfert, paiement, commission) |
-| **Transparence** | Publication ouverte des indicateurs d'impact et de la gestion financière |
 
 ---
 
-# 1. MODÈLE DE DOMAINE & DICTIONNAIRE DE DONNÉES
+## 1. MODÈLE DE DOMAINE & DICTIONNAIRE DE DONNÉES
 
-## 1.1 Catalogue des entités
+### 1.1 Catalogue des entités
 
 > Les entités marquées **[EXISTANT]** sont déjà implémentées dans le repo Concordia (Better Auth). Les autres sont à créer.
 
@@ -228,7 +195,7 @@ Concepteur IA
 
 ---
 
-## 1.2 Spécification détaillée par entité
+### 1.2 Spécification détaillée par entité
 
 > Les 9 entités **[EXISTANT]** (user, session, account, verification, organization, member, invitation, rate_limit, audit_log) sont documentées dans `.github/copilot-instructions.md` et les schemas Drizzle dans `src/database/schemas/`. Seules les extensions nécessaires sont notées ici. Les entités suivantes couvrent tout ce qui est à construire.
 
@@ -267,7 +234,7 @@ Concepteur IA
 
 **Exemple JSON** :
 
-```json
+json
 {
   "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "user_id": "u1v2w3x4-y5z6-7890-abcd-ef1234567890",
@@ -282,7 +249,6 @@ Concepteur IA
   "created_at": "2026-02-13T10:00:00Z",
   "updated_at": "2026-02-13T10:00:00Z"
 }
-```
 
 ---
 
@@ -350,7 +316,7 @@ Concepteur IA
 
 **Exemple JSON** :
 
-```json
+json
 {
   "id": "cat-hebergement-uuid",
   "parent_id": null,
@@ -365,7 +331,7 @@ Concepteur IA
   "created_at": "2026-01-01T00:00:00Z",
   "updated_at": "2026-01-01T00:00:00Z"
 }
-```
+
 
 ---
 
@@ -449,13 +415,13 @@ Concepteur IA
 
 **Machine à états** :
 
-```
+md
 pending_review → published    (Admin approuve)
 pending_review → rejected     (Admin rejette, motif obligatoire)
 published      → archived     (Propriétaire ou Admin archive)
 rejected       → pending_review (Propriétaire resoumet après corrections)
 archived       → pending_review (Propriétaire réactive, repasse en revue)
-```
+
 
 **Indexation** : `slug` (unique, lookup), `category_id` (listing), `owner_id` (mes lieux), `status` (admin moderation queue), `latitude` + `longitude` (recherche géographique), `rating_avg` (tri).
 
@@ -483,7 +449,7 @@ archived       → pending_review (Propriétaire réactive, repasse en revue)
 
 **Exemple JSON** :
 
-```json
+json
 {
   "id": "place-uuid-1",
   "owner_id": "user-uuid-1",
@@ -511,7 +477,7 @@ archived       → pending_review (Propriétaire réactive, repasse en revue)
   "created_at": "2026-01-15T09:00:00Z",
   "updated_at": "2026-02-01T11:00:00Z"
 }
-```
+
 
 ---
 
@@ -781,14 +747,14 @@ archived       → pending_review (Propriétaire réactive, repasse en revue)
 
 **Machine à états** :
 
-```
+md
 draft          → pending_review  (Auteur soumet)
 pending_review → published       (Admin approuve)
 pending_review → rejected        (Admin rejette, motif obligatoire)
 published      → archived        (Auteur ou Admin)
 rejected       → draft           (Auteur corrige)
 archived       → draft           (Auteur réactive)
-```
+
 
 ---
 
@@ -1186,70 +1152,6 @@ PK unique composite `(conversation_id, user_id)`.
 
 ---
 
-### `wallet`
-
-**Description** : Portefeuille numérique d'un utilisateur. Créé automatiquement à l'inscription.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `user_id` | uuid FK → user.id | Oui | Oui | — | 1 portefeuille par utilisateur | — |
-| `balance` | decimal(12,2) | Oui | Non | `0.00` | ≥ 0. Jamais négatif (vérifier avant débit) | `125.50` |
-| `currency` | text | Oui | Non | `"EUR"` | ISO 4217 | `"EUR"` |
-| `created_at` | timestamp | Oui | Non | now() | — | — |
-| `updated_at` | timestamp | Oui | Non | now() | — | — |
-
-**Invariants** : Le solde ne peut jamais être négatif. Toute modification de solde doit être tracée par une `transaction`. Les opérations de crédit/débit doivent être atomiques (transaction DB).
-
----
-
-### `transaction`
-
-**Description** : Opération financière affectant un ou deux portefeuilles.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `sender_wallet_id` | uuid FK → wallet.id | Non | Non | null | Null si crédit externe | — |
-| `receiver_wallet_id` | uuid FK → wallet.id | Non | Non | null | Null si débit/commission | — |
-| `amount` | decimal(12,2) | Oui | Non | — | > 0 | `50.00` |
-| `type` | enum | Oui | Non | — | `external_credit`, `p2p_transfer`, `service_payment`, `refund`, `commission` | `"p2p_transfer"` |
-| `status` | enum | Oui | Non | `"pending"` | `pending`, `completed`, `failed`, `cancelled` | `"completed"` |
-| `description` | text | Non | Non | null | Max 255 chars | `"Paiement réservation plomberie"` |
-| `related_post_type` | text | Non | Non | null | `booking`, `donation`, etc. | `"booking"` |
-| `related_entity_id` | uuid | Non | Non | null | ID de l'entité liée | — |
-| `idempotency_key` | text | Non | Oui | null | Clé d'idempotence pour prévenir les doublons | — |
-| `created_at` | timestamp | Oui | Non | now() | — | — |
-
-**Invariants** : Pour `p2p_transfer`, sender et receiver doivent être différents et le sender doit avoir un solde suffisant. Pour `external_credit`, seul `receiver_wallet_id` est renseigné. Pour `commission`, seul `sender_wallet_id` est renseigné (débit). Toute transaction `completed` doit avoir effectué les mouvements de solde correspondants de manière atomique.
-
----
-
-### `system_commission`
-
-**Description** : Paramétrage de la commission plateforme sur les transactions.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `name` | text | Oui | Oui | — | — | `"booking_commission"` |
-| `percentage` | decimal(5,2) | Oui | Non | — | 0-100 | `5.00` |
-| `flat_fee` | decimal(8,2) | Oui | Non | `0.00` | ≥ 0 | `0.50` |
-| `applies_to` | text | Oui | Non | — | `booking`, `service_payment`, `classified_payment` | `"booking"` |
-| `is_active` | boolean | Oui | Non | true | — | `true` |
-| `created_at` | timestamp | Oui | Non | now() | — | — |
-| `updated_at` | timestamp | Oui | Non | now() | — | — |
-
-**Formule** : commission = (montant × percentage / 100) + flat_fee.
-
----
-
 ### `service_availability`
 
 **Description** : Créneau de disponibilité pour un service local.
@@ -1295,7 +1197,7 @@ PK unique composite `(conversation_id, user_id)`.
 
 **Machine à états** :
 
-```
+md
 pending    → confirmed              (Prestataire confirme)
 pending    → cancelled_by_client    (Client annule)
 pending    → cancelled_by_provider  (Prestataire refuse)
@@ -1303,368 +1205,13 @@ confirmed  → completed              (Service effectué)
 confirmed  → cancelled_by_client    (Client annule, politique de remboursement)
 confirmed  → cancelled_by_provider  (Prestataire annule, remboursement automatique)
 confirmed  → no_show                (Client absent)
-```
 
----
-
-### `mediation_case`
-
-**Description** : Dossier de résolution de conflit entre deux ou plusieurs parties. Le conflit peut concerner un avis, un commentaire, une réservation, une annonce, etc.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `reporter_id` | uuid FK → user.id | Oui | Non | — | Citoyen ayant signalé | — |
-| `reported_user_id` | uuid FK → user.id | Non | Non | null | Utilisateur mis en cause | — |
-| `mediator_id` | uuid FK → user.id | Non | Non | null | Médiateur assigné (rôle `mediator`) | — |
-| `related_post_type` | text | Non | Non | null | `review`, `comment`, `forum_post`, `classified`, `booking`, `message` | `"review"` |
-| `related_entity_id` | uuid | Non | Non | null | — | — |
-| `title` | text | Oui | Non | — | 5-200 chars | `"Litige sur avis diffamatoire"` |
-| `description` | text | Oui | Non | — | 10-2000 chars | — |
-| `category` | text | Non | Non | null | `defamation`, `harassment`, `scam`, `quality_dispute`, `payment_dispute`, `discrimination`, `other` | `"defamation"` |
-| `priority` | enum | Oui | Non | `"normal"` | `low`, `normal`, `high`, `urgent` | `"normal"` |
-| `status` | enum | Oui | Non | `"opened"` | Voir machine à états | `"opened"` |
-| `resolution` | text | Non | Non | null | Résumé de la résolution | — |
-| `opened_at` | timestamp | Oui | Non | now() | — | — |
-| `assigned_at` | timestamp | Non | Non | null | Quand un médiateur est assigné | — |
-| `resolved_at` | timestamp | Non | Non | null | Quand le cas est résolu | — |
-| `closed_at` | timestamp | Non | Non | null | Quand le cas est clôturé | — |
-
-**Machine à états** :
-
-```
-opened    → assigned     (Admin/système assigne un médiateur)
-assigned  → in_progress  (Médiateur commence les sessions)
-in_progress → resolved   (Accord trouvé)
-in_progress → failed     (Pas d'accord, escalade possible)
-resolved  → closed       (Après période de confirmation)
-failed    → closed       (Admin clôture)
-opened    → closed       (Reporter retire sa plainte)
-```
-
-**Enum `mediation_status`** : `opened`, `assigned`, `in_progress`, `resolved`, `failed`, `closed`
-
----
-
-### `mediation_session`
-
-**Description** : Session de médiation planifiée entre les parties.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `case_id` | uuid FK → mediation_case.id | Oui | Non | — | — | — |
-| `scheduled_at` | timestamp | Oui | Non | — | Futur | `"2026-03-20T14:00:00Z"` |
-| `duration_minutes` | integer | Oui | Non | 60 | 15-180 | `60` |
-| `type` | text | Oui | Non | `"video"` | `text`, `video`, `in_person` | `"video"` |
-| `notes` | text | Non | Non | null | Notes du médiateur (confidentielles) | — |
-| `outcome` | text | Non | Non | null | Résultat de la session | — |
-| `status` | enum | Oui | Non | `"scheduled"` | `scheduled`, `in_progress`, `completed`, `cancelled` | `"scheduled"` |
-| `conversation_id` | uuid FK → conversation.id | Non | Non | null | Conversation de médiation associée | — |
-| `created_at` | timestamp | Oui | Non | now() | — | — |
-
----
-
-### `mediation_agreement`
-
-**Description** : Accord de résolution signé par les parties.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `case_id` | uuid FK → mediation_case.id | Oui | Oui | — | 1 accord par cas | — |
-| `content` | text | Oui | Non | — | Termes de l'accord, 50-5000 chars | — |
-| `actions` | jsonb | Non | Non | null | Actions correctives à entreprendre | `[{"actor": "user-1", "action": "retirer l'avis", "deadline": "2026-04-01"}]` |
-| `signed_by_reporter` | boolean | Oui | Non | false | — | `true` |
-| `signed_by_reported` | boolean | Oui | Non | false | — | `true` |
-| `signed_by_mediator` | boolean | Oui | Non | false | — | `true` |
-| `signed_at` | timestamp | Non | Non | null | Quand toutes les parties ont signé | — |
-| `created_at` | timestamp | Oui | Non | now() | — | — |
-
-**Invariant** : L'accord est considéré valide uniquement quand les 3 signatures sont true.
-
----
-
-### `education_module`
-
-**Description** : Parcours pédagogique structuré (cours civique, atelier pratique, guide).
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `educator_id` | uuid FK → user.id | Oui | Non | — | Rôle `educator` | — |
-| `category_id` | uuid FK → category.id | Non | Non | null | Catégorie type `education` | — |
-| `title` | text | Oui | Non | — | 5-200 chars | `"Les bases de la médiation communautaire"` |
-| `slug` | text | Oui | Oui | — | Unique global | `"bases-mediation-communautaire"` |
-| `description` | text | Non | Non | null | Max 1000 chars | — |
-| `cover_image_url` | text | Non | Non | null | — | — |
-| `difficulty` | enum | Oui | Non | `"beginner"` | `beginner`, `intermediate`, `advanced` | `"beginner"` |
-| `estimated_duration_hours` | decimal | Non | Non | null | > 0 | `4.5` |
-| `is_free` | boolean | Oui | Non | true | — | `true` |
-| `price` | decimal | Non | Non | null | Si is_free = false, > 0 | — |
-| `lesson_count` | integer | Oui | Non | 0 | Dénormalisé, mis à jour quand leçons ajoutées/supprimées | `6` |
-| `enrollment_count` | integer | Oui | Non | 0 | Dénormalisé | `42` |
-| `status` | enum | Oui | Non | `"draft"` | `draft`, `published`, `archived` | `"published"` |
-| `published_at` | timestamp | Non | Non | null | — | — |
-| `created_at` | timestamp | Oui | Non | now() | — | — |
-| `updated_at` | timestamp | Oui | Non | now() | — | — |
-
----
-
-### `education_lesson`
-
-**Description** : Leçon individuelle au sein d'un module. Ordonnée par `sort_order`.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `module_id` | uuid FK → education_module.id | Oui | Non | — | — | — |
-| `title` | text | Oui | Non | — | 3-200 chars | `"Comprendre les émotions"` |
-| `slug` | text | Oui | Non | — | Unique dans le module | `"comprendre-emotions"` |
-| `content_json` | jsonb | Oui | Non | `[]` | Blocs de contenu : text, image, video, exercise, quiz | — |
-| `type` | enum | Oui | Non | `"text"` | `text`, `video`, `exercise`, `quiz` | `"text"` |
-| `sort_order` | integer | Oui | Non | 0 | Ordre dans le module | `1` |
-| `estimated_minutes` | integer | Non | Non | null | > 0 | `30` |
-| `created_at` | timestamp | Oui | Non | now() | — | — |
-| `updated_at` | timestamp | Oui | Non | now() | — | — |
-
-**Contraintes** : Unique composite `(module_id, slug)` et `(module_id, sort_order)`.
-
----
-
-### `education_enrollment`
-
-**Description** : Inscription d'un citoyen à un module d'éducation.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `module_id` | uuid FK → education_module.id | Oui | Non | — | Module publié | — |
-| `user_id` | uuid FK → user.id | Oui | Non | — | — | — |
-| `status` | enum | Oui | Non | `"active"` | `active`, `completed`, `dropped` | `"active"` |
-| `progress_percent` | decimal(5,2) | Oui | Non | `0.00` | 0-100, calculé depuis education_progress | `66.67` |
-| `completed_at` | timestamp | Non | Non | null | Quand progress_percent atteint 100 | — |
-| `payment_transaction_id` | uuid FK → transaction.id | Non | Non | null | Si module payant | — |
-| `enrolled_at` | timestamp | Oui | Non | now() | — | — |
-
-**Contraintes** : Unique composite `(module_id, user_id)`.
-
----
-
-### `education_progress`
-
-**Description** : Suivi de progression par leçon pour un utilisateur inscrit.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `enrollment_id` | uuid FK → education_enrollment.id | Oui | Non | — | — | — |
-| `lesson_id` | uuid FK → education_lesson.id | Oui | Non | — | — | — |
-| `is_completed` | boolean | Oui | Non | false | — | `true` |
-| `score` | decimal | Non | Non | null | Si quiz/exercise, 0-100 | `85.0` |
-| `time_spent_seconds` | integer | Non | Non | null | Temps passé en secondes | `1800` |
-| `completed_at` | timestamp | Non | Non | null | Quand is_completed → true | — |
-| `started_at` | timestamp | Oui | Non | now() | — | — |
-
-**Contraintes** : Unique composite `(enrollment_id, lesson_id)`.
-
-**Effets** : Quand is_completed → true, recalculer `enrollment.progress_percent = (leçons complétées / total leçons du module) × 100`. Si 100%, mettre à jour `enrollment.status → completed` et `enrollment.completed_at`.
-
----
-
-### `volunteer_project`
-
-**Description** : Projet bénévole communautaire (réhabilitation d'espace, atelier, service d'entraide).
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `coordinator_id` | uuid FK → user.id | Oui | Non | — | — | — |
-| `category_id` | uuid FK → category.id | Non | Non | null | Catégorie type `project` | — |
-| `title` | text | Oui | Non | — | 5-200 chars | `"Restauration du jardin communautaire"` |
-| `slug` | text | Oui | Oui | — | Unique | `"restauration-jardin-communautaire"` |
-| `description` | text | Oui | Non | — | 20-5000 chars | — |
-| `location` | text | Non | Non | null | — | `"Parc des Buttes-Chaumont"` |
-| `latitude` | decimal(10,7) | Non | Non | null | — | — |
-| `longitude` | decimal(10,7) | Non | Non | null | — | — |
-| `start_date` | date | Non | Non | null | — | `"2026-04-01"` |
-| `end_date` | date | Non | Non | null | ≥ start_date | `"2026-06-30"` |
-| `volunteer_goal` | integer | Non | Non | null | Nombre de bénévoles recherchés | `20` |
-| `volunteer_count` | integer | Oui | Non | 0 | Dénormalisé | `8` |
-| `funding_goal` | decimal(12,2) | Non | Non | null | Si micro-financement associé | `5000.00` |
-| `funding_raised` | decimal(12,2) | Oui | Non | `0.00` | Dénormalisé | `1200.00` |
-| `status` | enum | Oui | Non | `"draft"` | `draft`, `recruiting`, `in_progress`, `completed`, `cancelled` | `"recruiting"` |
-| `impact_summary` | text | Non | Non | null | Résumé de l'impact post-projet | — |
-| `created_at` | timestamp | Oui | Non | now() | — | — |
-| `updated_at` | timestamp | Oui | Non | now() | — | — |
-
----
-
-### `volunteer_task`
-
-**Description** : Tâche atomique au sein d'un projet bénévole.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `project_id` | uuid FK → volunteer_project.id | Oui | Non | — | — | — |
-| `title` | text | Oui | Non | — | 3-200 chars | `"Désherber les plates-bandes"` |
-| `description` | text | Non | Non | null | Max 1000 chars | — |
-| `required_skills` | text[] | Non | Non | null | — | `["jardinage", "port de charges"]` |
-| `max_volunteers` | integer | Non | Non | null | > 0 | `5` |
-| `current_volunteers` | integer | Oui | Non | 0 | Dénormalisé | `3` |
-| `scheduled_date` | date | Non | Non | null | — | `"2026-04-15"` |
-| `estimated_hours` | decimal | Non | Non | null | > 0 | `3.0` |
-| `status` | enum | Oui | Non | `"open"` | `open`, `filled`, `in_progress`, `completed`, `cancelled` | `"open"` |
-| `sort_order` | integer | Oui | Non | 0 | — | `1` |
-| `created_at` | timestamp | Oui | Non | now() | — | — |
-
----
-
-### `volunteer_participation`
-
-**Description** : Engagement d'un bénévole sur une tâche.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `task_id` | uuid FK → volunteer_task.id | Oui | Non | — | — | — |
-| `user_id` | uuid FK → user.id | Oui | Non | — | — | — |
-| `status` | enum | Oui | Non | `"signed_up"` | `signed_up`, `confirmed`, `completed`, `no_show`, `cancelled` | `"signed_up"` |
-| `hours_logged` | decimal | Non | Non | null | ≥ 0, renseigné après complétion | `3.0` |
-| `feedback` | text | Non | Non | null | Feedback du bénévole, max 500 chars | — |
-| `signed_up_at` | timestamp | Oui | Non | now() | — | — |
-| `completed_at` | timestamp | Non | Non | null | — | — |
-
-**Contraintes** : Unique composite `(task_id, user_id)`. Vérifier que `current_volunteers < max_volunteers` avant inscription.
-
-**Effets** : Après inscription, incrémenter `volunteer_task.current_volunteers` et `volunteer_project.volunteer_count`. Après complétion, créer/mettre à jour un `impact_metric`.
-
----
-
-### `funding_campaign`
-
-**Description** : Campagne de micro-financement pour un projet communautaire.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `creator_id` | uuid FK → user.id | Oui | Non | — | — | — |
-| `project_id` | uuid FK → volunteer_project.id | Non | Non | null | Projet bénévole associé | — |
-| `title` | text | Oui | Non | — | 5-200 chars | `"Financer le matériel de jardinage"` |
-| `slug` | text | Oui | Oui | — | Unique | `"financer-materiel-jardinage"` |
-| `description` | text | Oui | Non | — | 20-3000 chars | — |
-| `goal_amount` | decimal(12,2) | Oui | Non | — | > 0 | `5000.00` |
-| `raised_amount` | decimal(12,2) | Oui | Non | `0.00` | Dénormalisé, mis à jour à chaque don | `1200.00` |
-| `donor_count` | integer | Oui | Non | 0 | Dénormalisé | `15` |
-| `currency` | text | Oui | Non | `"EUR"` | ISO 4217 | `"EUR"` |
-| `deadline` | date | Oui | Non | — | Futur | `"2026-05-31"` |
-| `status` | enum | Oui | Non | `"active"` | `draft`, `active`, `funded`, `expired`, `cancelled` | `"active"` |
-| `funded_at` | timestamp | Non | Non | null | Quand raised_amount ≥ goal_amount | — |
-| `created_at` | timestamp | Oui | Non | now() | — | — |
-| `updated_at` | timestamp | Oui | Non | now() | — | — |
-
-**Machine à états** :
-
-```
-draft     → active       (Créateur publie)
-active    → funded       (raised_amount ≥ goal_amount)
-active    → expired      (deadline passée sans atteindre l'objectif)
-active    → cancelled    (Créateur annule, remboursement des dons)
-funded    → closed       (Fonds décaissés au projet)
-```
-
----
-
-### `donation`
-
-**Description** : Don individuel à une campagne de micro-financement.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `campaign_id` | uuid FK → funding_campaign.id | Oui | Non | — | Campagne active | — |
-| `donor_id` | uuid FK → user.id | Oui | Non | — | — | — |
-| `amount` | decimal(12,2) | Oui | Non | — | > 0 | `25.00` |
-| `is_anonymous` | boolean | Oui | Non | false | Le donateur souhaite rester anonyme | `false` |
-| `message` | text | Non | Non | null | Max 255 chars | `"Courage pour le projet !"` |
-| `transaction_id` | uuid FK → transaction.id | Oui | Non | — | Transaction de paiement | — |
-| `created_at` | timestamp | Oui | Non | now() | — | — |
-
-**Effets** : Après création, mettre à jour `funding_campaign.raised_amount += amount` et `funding_campaign.donor_count += 1`. Si `raised_amount ≥ goal_amount`, passer le statut de la campagne à `funded`.
-
----
-
-### `impact_metric`
-
-**Description** : Indicateur mesurable de l'impact positif des actions sur la plateforme.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `type` | enum | Oui | Non | — | `projects_completed`, `volunteer_hours`, `funds_raised`, `mediations_resolved`, `lessons_completed`, `active_citizens`, `resources_shared` | `"volunteer_hours"` |
-| `value` | decimal | Oui | Non | — | ≥ 0 | `1250.5` |
-| `period_start` | date | Oui | Non | — | — | `"2026-01-01"` |
-| `period_end` | date | Oui | Non | — | ≥ period_start | `"2026-03-31"` |
-| `scope` | text | Non | Non | `"global"` | `global`, `city`, `region`, identifiant géographique | `"global"` |
-| `metadata` | jsonb | Non | Non | null | Détails supplémentaires | `{"breakdown": {"jardinage": 400, "construction": 850}}` |
-| `computed_at` | timestamp | Oui | Non | now() | — | — |
-
-**Contraintes** : Unique composite `(type, period_start, period_end, scope)`.
-
----
-
-### `transparency_report`
-
-**Description** : Rapport de transparence publié périodiquement, agrégant les métriques d'impact.
-
-**Champs** :
-
-| Nom | Type | Obligatoire | Unique | Défaut | Validation | Exemple |
-|---|---|---|---|---|---|---|
-| `id` | uuid | Oui | Oui | gen_random_uuid() | — | — |
-| `title` | text | Oui | Non | — | 5-200 chars | `"Rapport d'impact T1 2026"` |
-| `slug` | text | Oui | Oui | — | Unique | `"rapport-impact-t1-2026"` |
-| `content_json` | jsonb | Oui | Non | — | Structure du rapport : sections, graphiques, métriques | — |
-| `period_start` | date | Oui | Non | — | — | `"2026-01-01"` |
-| `period_end` | date | Oui | Non | — | — | `"2026-03-31"` |
-| `metric_ids` | uuid[] | Non | Non | null | Métriques incluses | — |
-| `published_by` | uuid FK → user.id | Oui | Non | — | Admin | — |
-| `status` | enum | Oui | Non | `"draft"` | `draft`, `published` | `"published"` |
-| `published_at` | timestamp | Non | Non | null | — | — |
-| `created_at` | timestamp | Oui | Non | now() | — | — |
 
 ---
 
 ## 1.3 Relations globales
 
-```
+md
 user 1──N session
 user 1──N account
 user 1──1 profile
@@ -1689,26 +1236,14 @@ user 1──N favorite
 user 1──N conversation_participant
 user 1──N message (as sender)
 user 1──N notification (as recipient)
-user 1──1 wallet
-user 1──N mediation_case (as reporter)
-user 1──N mediation_case (as mediator)
-user 1──N education_module (as educator)
-user 1──N education_enrollment
-user 1──N volunteer_project (as coordinator)
-user 1──N volunteer_participation
-user 1──N funding_campaign (as creator)
-user 1──N donation (as donor)
 user 1──N product (as producer)
 user 1──N trail (as creator)
-
 category 0──N category (self-ref parent)
 category 1──N place
 category 0──N article_category_link
 category 0──N forum_thread
 category 0──N classified
 category 0──N local_service
-category 0──N education_module
-category 0──N volunteer_project
 category 0──N event
 
 place 1──0..1 accommodation_detail
@@ -1767,22 +1302,6 @@ local_service 1──N booking
 
 booking 0──1 transaction (payment)
 
-mediation_case 1──N mediation_session
-mediation_case 1──0..1 mediation_agreement
-mediation_case 0──1 conversation (type=mediation)
-
-education_module 1──N education_lesson
-education_module 1──N education_enrollment
-education_enrollment 1──N education_progress
-education_progress N──1 education_lesson
-
-volunteer_project 1──N volunteer_task
-volunteer_project 0──1 funding_campaign
-volunteer_task 1──N volunteer_participation
-
-funding_campaign 1──N donation
-donation 1──1 transaction
-```
 
 ---
 
@@ -1798,16 +1317,14 @@ donation 1──1 transaction
 | **Citoyen** | `citizen` | Automatique (inscription) | Base | Rôle par défaut de tout utilisateur authentifié |
 | **Propriétaire** | `owner` | Attribution admin ou auto-attribution contrôlée | Oui | Gère des lieux et leurs services |
 | **Auteur** | `author` | Attribution admin | Oui | Publie des articles dans le blog |
-| **Médiateur** | `mediator` | Attribution admin (certification requise) | Oui | Anime les cas de médiation |
-| **Éducateur** | `educator` | Attribution admin | Oui | Crée des modules d'éducation |
 | **Modérateur** | `moderator` | Attribution admin | Oui | Modère le contenu communautaire |
 | **Administrateur** | `admin` | Attribution super-admin | Oui | Gestion complète de la plateforme |
 
 ### Hiérarchie implicite
 
 - `admin` hérite de tous les droits de `moderator`.
-- `moderator` a des droits de modération transverses (pas de droits de création spécifiques comme `author` ou `educator`).
-- Tous les rôles spécialisés (`owner`, `author`, `mediator`, `educator`) incluent implicitement `citizen`.
+- `moderator` a des droits de modération transverses (pas de droits de création spécifiques comme `author`).
+- Tous les rôles spécialisés (`owner`, `author`) incluent implicitement `citizen`.
 - Le rôle `citizen` est **toujours** présent dans `user_role` pour tout utilisateur actif.
 
 ### Système existant (Better Auth)
@@ -1967,75 +1484,6 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 | `booking` | U (cancel) | ❌ | ⚡ customer | ⚡ provider | ❌ | ❌ | ❌ | ❌ | ✅ |
 | `booking` | U (confirm/complete) | ❌ | ❌ | ⚡ provider | ❌ | ❌ | ❌ | ❌ | ✅ |
 
-### Domaine : Médiation
-
-| Entité | Action | Anonyme | Citoyen | Propriétaire | Auteur | Médiateur | Éducateur | Modérateur | Admin |
-|---|---|---|---|---|---|---|---|---|---|
-| `mediation_case` | C | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `mediation_case` | R | ❌ | ⚡ reporter/reported | ⚡ | ⚡ | ⚡ assigned parties | ⚡ | ❌ | ✅ |
-| `mediation_case` | U (assign) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | 🔒 |
-| `mediation_case` | U (status) | ❌ | ❌ | ❌ | ❌ | ⚡ assigned | ❌ | ❌ | ✅ |
-| `mediation_case` | U (withdraw) | ❌ | ⚡ reporter | ⚡ reporter | ⚡ reporter | ❌ | ⚡ reporter | ❌ | ✅ |
-| `mediation_session` | C/U | ❌ | ❌ | ❌ | ❌ | ⚡ assigned | ❌ | ❌ | ✅ |
-| `mediation_session` | R | ❌ | ⚡ parties | ⚡ | ⚡ | ⚡ assigned | ⚡ | ❌ | ✅ |
-| `mediation_agreement` | C | ❌ | ❌ | ❌ | ❌ | ⚡ assigned | ❌ | ❌ | ✅ |
-| `mediation_agreement` | R | ❌ | ⚡ parties | ⚡ | ⚡ | ⚡ assigned | ⚡ | ❌ | ✅ |
-| `mediation_agreement` | U (sign) | ❌ | ⚡ party | ⚡ | ⚡ | ⚡ | ⚡ | ❌ | ✅ |
-
-### Domaine : Éducation
-
-| Entité | Action | Anonyme | Citoyen | Propriétaire | Auteur | Médiateur | Éducateur | Modérateur | Admin |
-|---|---|---|---|---|---|---|---|---|---|
-| `education_module` | C | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `education_module` | R/L | ✅ published | ✅ published | ✅ published | ✅ published | ✅ published | ✅ published + ⚡ all | ✅ all | ✅ all |
-| `education_module` | U | ❌ | ❌ | ❌ | ❌ | ❌ | ⚡ | ❌ | ✅ |
-| `education_module` | D | ❌ | ❌ | ❌ | ❌ | ❌ | ⚡ | ❌ | ✅ |
-| `education_lesson` | C/U/D | ❌ | ❌ | ❌ | ❌ | ❌ | ⚡ module | ❌ | ✅ |
-| `education_lesson` | R | ✅ enrolled/published | ✅ enrolled | ✅ enrolled | ✅ enrolled | ✅ enrolled | ✅ | ✅ | ✅ |
-| `education_enrollment` | C | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `education_enrollment` | R | ❌ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ + ⚡ module | ⚡ | ✅ |
-| `education_enrollment` | U (drop) | ❌ | ⚡ | ⚡ | ⚡ | ⚡ | ❌ | ❌ | ✅ |
-| `education_progress` | C/U | ❌ | ⚡ enrolled | ⚡ | ⚡ | ⚡ | ❌ | ❌ | ✅ |
-| `education_progress` | R | ❌ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ module educator | ❌ | ✅ |
-
-### Domaine : Bénévolat
-
-| Entité | Action | Anonyme | Citoyen | Propriétaire | Auteur | Médiateur | Éducateur | Modérateur | Admin |
-|---|---|---|---|---|---|---|---|---|---|
-| `volunteer_project` | C | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `volunteer_project` | R/L | ✅ published | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `volunteer_project` | U | ❌ | ⚡ coordinator | ⚡ | ⚡ | ⚡ | ⚡ | ✅ | ✅ |
-| `volunteer_project` | D | ❌ | ⚡ coordinator (draft) | ❌ | ❌ | ❌ | ❌ | ✅ M | ✅ |
-| `volunteer_task` | C/U/D | ❌ | ⚡ coordinator | ⚡ | ⚡ | ⚡ | ⚡ | ✅ | ✅ |
-| `volunteer_task` | R/L | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `volunteer_participation` | C | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `volunteer_participation` | R | ❌ | ⚡ + coordinator | ⚡ | ⚡ | ⚡ | ⚡ | ✅ | ✅ |
-| `volunteer_participation` | U (confirm/complete) | ❌ | ⚡ coordinator | ⚡ coordinator | ⚡ | ⚡ | ⚡ | ✅ | ✅ |
-| `volunteer_participation` | U (cancel) | ❌ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ | ❌ | ✅ |
-
-### Domaine : Financement
-
-| Entité | Action | Anonyme | Citoyen | Propriétaire | Auteur | Médiateur | Éducateur | Modérateur | Admin |
-|---|---|---|---|---|---|---|---|---|---|
-| `funding_campaign` | C | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `funding_campaign` | R/L | ✅ active | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ all | ✅ all |
-| `funding_campaign` | U | ❌ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ | ❌ | ✅ |
-| `funding_campaign` | D (cancel) | ❌ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ | ✅ M | ✅ |
-| `donation` | C | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `donation` | R/L | ❌ | ⚡ donor + campaign creator | ⚡ | ⚡ | ⚡ | ⚡ | ❌ | ✅ |
-
-### Domaine : Transparence & Notifications
-
-| Entité | Action | Anonyme | Citoyen | Propriétaire | Auteur | Médiateur | Éducateur | Modérateur | Admin |
-|---|---|---|---|---|---|---|---|---|---|
-| `impact_metric` | R/L | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `impact_metric` | C/U/D | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | 🔒 système |
-| `transparency_report` | R/L | ✅ published | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `transparency_report` | C/U/D | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | 🔒 |
-| `notification` | R/L | ❌ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ |
-| `notification` | U (mark read) | ❌ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ |
-| `notification` | D | ❌ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ | ⚡ | ✅ |
-
 ## 2.3 Règles transverses
 
 ### Règles d'ownership
@@ -2046,12 +1494,12 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 
 ### Règles temporelles de modification
 
-4. **Fenêtre d'édition** : Les avis (`review`) et commentaires (`comment`) ne sont modifiables par leur auteur que dans les **15 minutes** suivant la création. Les posts de forum dans les **30 minutes**.
+1. **Fenêtre d'édition** : Les avis (`review`) et commentaires (`comment`) ne sont modifiables par leur auteur que dans les **15 minutes** suivant la création. Les posts de forum dans les **30 minutes**.
 2. **Pas de suppression réelle par l'utilisateur** : Les utilisateurs "suppriment" via un changement de status (`deleted`). Le contenu reste en base mais n'est plus visible publiquement.
 
 ### Règles anti-abus
 
-6. **1 avis par lieu par citoyen** : Un utilisateur ne peut poster qu'un seul avis racine par lieu. Il peut le modifier ou le supprimer.
+1. **1 avis par lieu par citoyen** : Un utilisateur ne peut poster qu'un seul avis racine par lieu. Il peut le modifier ou le supprimer.
 2. **Pas d'auto-avis** : Le propriétaire d'un lieu ne peut pas laisser un avis sur son propre lieu. Il peut uniquement répondre aux avis existants.
 3. **Pas d'auto-réservation** : Un prestataire ne peut pas réserver son propre service.
 4. **Pas d'auto-don** : Le créateur d'une campagne ne peut pas donner à sa propre campagne.
@@ -2059,13 +1507,13 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 
 ### Règles de modération
 
-11. **Soft delete** : La modération change le `status` à `moderated`. Le contenu original est conservé en base à des fins d'audit et de contestation.
+1. **Soft delete** : La modération change le `status` à `moderated`. Le contenu original est conservé en base à des fins d'audit et de contestation.
 2. **Modération = notification** : Chaque action de modération génère une notification au propriétaire du contenu avec la raison.
 3. **Recours** : Un utilisateur dont le contenu est modéré peut ouvrir un `mediation_case` pour contester.
 
 ### Règles de sécurité
 
-14. **Validation des inputs** : Toutes les entrées utilisateur passent par le système de validation existant (`validate-user.ts` étendu) : XSS, SQLi, NoSQLi, command injection, path traversal, null bytes, unicode spoofing, template injection.
+1. **Validation des inputs** : Toutes les entrées utilisateur passent par le système de validation existant (`validate-user.ts` étendu) : XSS, SQLi, NoSQLi, command injection, path traversal, null bytes, unicode spoofing, template injection.
 2. **Rate limiting** : Configurable par endpoint (existant dans Better Auth). Étendre aux nouvelles routes API :
     - Création d'avis : 5/heure/utilisateur
     - Création de commentaires : 20/heure/utilisateur
@@ -2080,7 +1528,7 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 
 ### Règles RGPD
 
-19. **Anonymisation** : Les données personnelles sont anonymisables sur demande de l'utilisateur (profil, avis, commentaires → auteur anonymisé).
+1. **Anonymisation** : Les données personnelles sont anonymisables sur demande de l'utilisateur (profil, avis, commentaires → auteur anonymisé).
 2. **Export** : Un utilisateur peut exporter la totalité de ses données personnelles au format JSON.
 3. **Suppression** : La suppression d'un compte entraîne l'anonymisation des contributions publiques et la suppression des données privées (messages, favoris, notifications) après un délai de grâce de 30 jours.
 
@@ -2092,403 +1540,6 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 > **Format** : Nom · Acteur(s) · Entrées · Préconditions · Étapes · Sorties · Effets de bord · Erreurs
 
 ## 3.1 Domaine : Utilisateurs & Profils
-
-### OP-001 : Créer un profil
-
-- **Acteur** : Système (automatique après inscription)
-- **Entrées** : `user_id` (depuis Better Auth callback)
-- **Préconditions** : Utilisateur créé en base via Better Auth. Pas de profil existant.
-- **Étapes** :
-  1. Créer un enregistrement `profile` avec `user_id`, `username` dérivé de l'email (partie locale, unicité garantie par suffix numérique si collision), `preferred_language` détecté depuis l'Accept-Language du navigateur (fallback `fr`).
-  2. Insérer `user_role` avec `role = citizen`.
-  3. Créer `wallet` avec `balance = 0.00`.
-- **Sorties** : `profile`, `user_role`, `wallet` créés.
-- **Effets de bord** : Entrée `audit_log` (user_created).
-- **Erreurs** : `PROFILE_ALREADY_EXISTS` (409) si profil existe déjà.
-
-### OP-002 : Mettre à jour le profil
-
-- **Acteur** : Citoyen (ownership) ou Admin
-- **Entrées** : `{ username?, full_name?, bio?, avatar_url?, location?, website?, preferred_language? }`
-- **Préconditions** : Utilisateur authentifié. Profil existe. Si Citoyen : `profile.user_id === session.user_id`.
-- **Étapes** :
-  1. Valider tous les champs (longueurs, formats, mots réservés pour username).
-  2. Si `username` modifié : vérifier unicité insensible à la casse.
-  3. Si `avatar_url` modifié et ancienne avatar existe : marquer l'ancienne image pour nettoyage.
-  4. Mettre à jour `profile`, set `updated_at`.
-- **Sorties** : `profile` mis à jour.
-- **Effets de bord** : `audit_log` si admin modifie un profil tiers.
-- **Erreurs** : `USERNAME_TAKEN` (409), `PROFILE_NOT_FOUND` (404), `FORBIDDEN` (403).
-
-### OP-003 : Attribuer un rôle
-
-- **Acteur** : Administrateur
-- **Entrées** : `{ user_id, role }`
-- **Préconditions** : Admin authentifié. Utilisateur cible existe et est actif. Le rôle n'est pas déjà attribué.
-- **Étapes** :
-  1. Vérifier que l'utilisateur cible n'est pas l'admin lui-même (pas d'auto-attribution).
-  2. Insérer `user_role`.
-- **Sorties** : `user_role` créé.
-- **Effets de bord** : `audit_log` (role_granted). `notification` à l'utilisateur.
-- **Erreurs** : `ROLE_ALREADY_ASSIGNED` (409), `USER_NOT_FOUND` (404), `SELF_ROLE_CHANGE` (400).
-
-### OP-004 : Révoquer un rôle
-
-- **Acteur** : Administrateur
-- **Entrées** : `{ user_id, role }`
-- **Préconditions** : Le rôle existe pour l'utilisateur. Le rôle `citizen` ne peut pas être révoqué.
-- **Étapes** :
-  1. Vérifier que le rôle n'est pas `citizen`.
-  2. Vérifier impacts : si `owner` et lieux publiés existent, requérir transfert ou archivage préalable.
-  3. Supprimer l'enregistrement `user_role`.
-- **Sorties** : `user_role` supprimé.
-- **Effets de bord** : `audit_log` (role_revoked). `notification` à l'utilisateur.
-- **Erreurs** : `CANNOT_REVOKE_CITIZEN` (400), `ACTIVE_RESOURCES_EXIST` (409).
-
-## 3.2 Domaine : Taxonomie
-
-### OP-010 : Créer une catégorie
-
-- **Acteur** : Administrateur
-- **Entrées** : `{ name, slug, type, parent_id?, description?, icon?, sort_order? }`
-- **Préconditions** : Unicité `(parent_id, slug)`. Si parent_id fourni : parent existe, parent.level < 3, parent.type === type.
-- **Étapes** :
-  1. Calculer `level` : parent ? parent.level + 1 : 1.
-  2. Valider que level ≤ 3.
-  3. Insérer `category`.
-- **Sorties** : `category` créée.
-- **Erreurs** : `DUPLICATE_SLUG` (409), `MAX_DEPTH_EXCEEDED` (400), `PARENT_NOT_FOUND` (404), `TYPE_MISMATCH` (400).
-
-### OP-011 : Créer un attribut
-
-- **Acteur** : Administrateur
-- **Entrées** : `{ name, slug, value_type, possible_values?, description?, applicable_category_ids? }`
-- **Préconditions** : Unicité `name` et `slug`.
-- **Étapes** :
-  1. Si value_type = `enum`, vérifier que `possible_values` est non vide.
-  2. Insérer `attribute_definition`.
-- **Sorties** : `attribute_definition` créée.
-- **Erreurs** : `DUPLICATE_ATTRIBUTE` (409), `ENUM_VALUES_REQUIRED` (400).
-
-## 3.3 Domaine : Lieux
-
-### OP-020 : Soumettre un lieu
-
-- **Acteur** : Propriétaire
-- **Entrées** : `{ category_id, slug, type, translations: [{ language, name, description }], address?, latitude?, longitude?, email?, phone?, website?, open_hours?, accessibility?, audience?, price_range?, attributes?: [{ attribute_id, value }], tags?: string[] }`
-- **Préconditions** : Utilisateur a le rôle `owner`. Catégorie existe et est de type `place`. Slug globalement unique.
-- **Étapes** :
-  1. Valider tous les champs.
-  2. Si address fournie : créer `address` si nouvelle, sinon lier existante.
-  3. Créer `place` avec `status = pending_review`.
-  4. Créer les `place_translation` (au moins 1 obligatoire).
-  5. Créer les `place_attribute_value` le cas échéant.
-  6. Créer ou lier les `tag` / `place_tag`.
-  7. Si type hébergement/gastronomie/activité : créer le détail spécifique.
-- **Sorties** : `place` + traductions + attributs + tags + détails créés.
-- **Effets de bord** : `notification` aux admins (nouveau lieu en attente). `audit_log` (place_submitted).
-- **Erreurs** : `SLUG_TAKEN` (409), `CATEGORY_NOT_FOUND` (404), `MISSING_TRANSLATION` (400), `INVALID_ATTRIBUTE_VALUE` (400).
-
-### OP-021 : Valider un lieu (admin)
-
-- **Acteur** : Administrateur
-- **Entrées** : `{ place_id, action: 'approve' | 'reject', reason? }`
-- **Préconditions** : Lieu en statut `pending_review`.
-- **Étapes** :
-  1. Si `approve` : changer status à `published`, set `published_at`.
-  2. Si `reject` : changer status à `rejected`. `reason` obligatoire.
-- **Sorties** : `place` mis à jour.
-- **Effets de bord** : `notification` au propriétaire. `audit_log` (place_approved / place_rejected).
-- **Erreurs** : `PLACE_NOT_PENDING` (400), `REASON_REQUIRED` (400, si reject).
-
-### OP-022 : Mettre à jour un lieu
-
-- **Acteur** : Propriétaire (ownership) ou Admin
-- **Entrées** : Champs modifiables de `place`, `place_translation`, `place_attribute_value`, détails.
-- **Préconditions** : Lieu existe. Si Propriétaire : `place.owner_id === session.user_id`. Lieu non `rejected` (doit repasser par OP-020 pour re-soumission).
-- **Étapes** :
-  1. Valider les champs modifiés.
-  2. Mettre à jour les entités concernées.
-  3. Si lieu était `published` et des champs critiques changent (catégorie, type), repasser en `pending_review`.
-- **Sorties** : Entités mises à jour.
-- **Effets de bord** : `audit_log` si admin. Si re-modération nécessaire : `notification` au propriétaire.
-
-### OP-023 : Archiver un lieu
-
-- **Acteur** : Propriétaire (ownership) ou Admin
-- **Entrées** : `{ place_id }`
-- **Préconditions** : Lieu en statut `published`. Pas de réservations `pending` ou `confirmed` en cours.
-- **Étapes** :
-  1. Vérifier absence de booking actifs.
-  2. Changer status à `archived`.
-- **Sorties** : `place` archivé.
-- **Effets de bord** : Disponibilités de services liées désactivées. `audit_log`.
-- **Erreurs** : `ACTIVE_BOOKINGS_EXIST` (409).
-
-### OP-024 : Rechercher des lieux
-
-- **Acteur** : Tous (anonyme ou authentifié)
-- **Entrées** : `{ query?, category_id?, type?, tags?, latitude?, longitude?, radius_km?, price_range?, min_rating?, accessibility?, audience?, sort_by?, page?, page_size? }`
-- **Préconditions** : Aucune.
-- **Étapes** :
-  1. Construire la requête Drizzle avec les filtres : seuls les lieux `published` pour les non-admin.
-  2. Si coordonnées fournies : tri par distance (Haversine ou pg_trgm).
-  3. Paginer les résultats.
-  4. Joindre traductions dans la langue de l'utilisateur (fallback `fr`).
-- **Sorties** : `{ items: Place[], total: number, page: number, page_size: number }`.
-- **Note** : La recherche full-text est configurée sur `place_translation.name` et `place_translation.description` via `pg_trgm`.
-
-## 3.4 Domaine : Contenu (Blog)
-
-### OP-030 : Créer un article
-
-- **Acteur** : Auteur
-- **Entrées** : `{ title, slug, summary?, cover_image_url?, category_ids: uuid[], content_json }`
-- **Préconditions** : Utilisateur a le rôle `author`. Slug unique. Catégories de type `blog`.
-- **Étapes** :
-  1. Créer `article` avec `status = draft`.
-  2. Créer `article_content` avec `content_json` et `language` de l'auteur.
-  3. Créer `article_category_link` pour chaque catégorie.
-- **Sorties** : `article` + `article_content` + liens créés.
-- **Erreurs** : `SLUG_TAKEN` (409), `INVALID_CATEGORY` (400).
-
-### OP-031 : Soumettre un article pour publication
-
-- **Acteur** : Auteur (ownership)
-- **Entrées** : `{ article_id }`
-- **Préconditions** : Article en statut `draft`. `content_json` non vide. Au moins 1 catégorie liée.
-- **Étapes** :
-  1. Changer status à `pending_review`.
-- **Sorties** : `article` mis à jour.
-- **Effets de bord** : `notification` aux admins.
-
-### OP-032 : Valider un article (admin)
-
-- **Acteur** : Administrateur
-- **Entrées** : `{ article_id, action: 'approve' | 'reject', reason? }`
-- **Préconditions** : Article en statut `pending_review`.
-- **Étapes** :
-  1. Approuver : status → `published`, set `published_at`.
-  2. Rejeter : status → `rejected`, raison obligatoire.
-- **Sorties** : `article` mis à jour.
-- **Effets de bord** : `notification` à l'auteur. `audit_log`.
-
-### OP-033 : Lier des lieux à un article
-
-- **Acteur** : Auteur (ownership)
-- **Entrées** : `{ article_id, place_ids: uuid[] }`
-- **Préconditions** : Article existe. Lieux existent et sont `published`.
-- **Étapes** :
-  1. Créer `article_place_link` pour chaque lieu.
-  2. Optionnel : créer `article_place_comparison` si critères fournis.
-- **Sorties** : Liens créés.
-
-## 3.5 Domaine : Interactions
-
-### OP-040 : Publier un avis
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ place_id, title?, content, rating, sub_ratings?: [{ criterion, score }] }`
-- **Préconditions** : Lieu `published`. Citoyen n'a pas déjà un avis sur ce lieu. Citoyen n'est pas le propriétaire du lieu.
-- **Étapes** :
-  1. Valider contenu (anti-XSS, longueur).
-  2. Valider rating (0.5-5.0 par incréments de 0.5).
-  3. Créer `review` avec `status = published`.
-  4. Créer `sub_rating` si fournis.
-  5. Recalculer `place.rating_avg` et `place.rating_count`.
-- **Sorties** : `review` + `sub_rating` créés.
-- **Effets de bord** : `notification` au propriétaire du lieu. Mise à jour `place.rating_avg`.
-- **Erreurs** : `ALREADY_REVIEWED` (409), `SELF_REVIEW` (403), `PLACE_NOT_PUBLISHED` (400).
-
-### OP-041 : Répondre à un avis (propriétaire)
-
-- **Acteur** : Propriétaire du lieu
-- **Entrées** : `{ review_id, content }`
-- **Préconditions** : Avis existe et est `published`. Lieu appartient au propriétaire. Pas de réponse existante du propriétaire sur cet avis.
-- **Étapes** :
-  1. Créer `review` avec `parent_review_id = review_id`, `rating = null`.
-- **Sorties** : Réponse créée.
-- **Effets de bord** : `notification` à l'auteur de l'avis.
-
-### OP-042 : Publier un commentaire
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ target_type, target_id, content, parent_comment_id? }`
-- **Préconditions** : Ressource cible existe et est publique. Si parent : même cible, profondeur < 3.
-- **Étapes** :
-  1. Résoudre le FK cible (`article_id`, `place_id`, etc.) depuis `target_type` et `target_id`.
-  2. Valider contenu.
-  3. Créer `comment`.
-- **Sorties** : `comment` créé.
-- **Effets de bord** : `notification` à l'auteur du contenu parent / du commentaire parent.
-
-### OP-043 : Ajouter aux favoris
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ target_type: 'place' | 'event' | 'trail', target_id }`
-- **Préconditions** : Ressource existe. Pas déjà en favori.
-- **Étapes** :
-  1. Résoudre le FK cible.
-  2. Créer `favorite`.
-- **Sorties** : `favorite` créé.
-- **Erreurs** : `ALREADY_FAVORITED` (409).
-
-### OP-044 : Modérer un contenu
-
-- **Acteur** : Modérateur ou Admin
-- **Entrées** : `{ post_type: 'review' | 'comment' | 'forum_post' | 'forum_thread' | 'classified', entity_id, reason }`
-- **Préconditions** : Entité existe. Status actuel ≠ `moderated`. Le modérateur n'est pas l'auteur.
-- **Étapes** :
-  1. Changer status de l'entité à `moderated`.
-  2. Créer `notification` à l'auteur avec la raison.
-  3. Enregistrer dans `audit_log`.
-- **Sorties** : Entité modérée.
-- **Erreurs** : `SELF_MODERATION` (403), `ALREADY_MODERATED` (400).
-
-## 3.6 Domaine : Forum
-
-### OP-050 : Créer un sujet de forum
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ category_id, title, slug, content }`
-- **Préconditions** : Catégorie de type `forum`. Unique `(category_id, slug)`.
-- **Étapes** :
-  1. Créer `forum_thread`.
-  2. Créer le premier `forum_post` (contenu initial du sujet).
-  3. Set `forum_thread.last_post_at` et `post_count = 1`.
-- **Sorties** : `forum_thread` + `forum_post` créés.
-
-### OP-051 : Répondre dans un fil de forum
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ thread_id, content, parent_post_id? }`
-- **Préconditions** : Fil existe, non `locked`, non `deleted`.
-- **Étapes** :
-  1. Créer `forum_post`.
-  2. Mettre à jour `forum_thread.last_post_at` et incrémenter `post_count`.
-- **Sorties** : `forum_post` créé.
-- **Effets de bord** : `notification` à l'auteur du fil et au parent cité.
-
-### OP-052 : Verrouiller / Épingler un sujet
-
-- **Acteur** : Modérateur ou Admin
-- **Entrées** : `{ thread_id, action: 'pin' | 'unpin' | 'lock' | 'unlock' }`
-- **Préconditions** : Fil existe.
-- **Étapes** :
-  1. Modifier `is_pinned` ou `is_locked`.
-- **Sorties** : `forum_thread` mis à jour.
-- **Effets de bord** : `audit_log`.
-
-## 3.7 Domaine : Marché
-
-### OP-060 : Publier une annonce
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ title, description, price?, condition?, location?, category_id?, images?: File[] }`
-- **Préconditions** : Rate limit (10/jour). Si catégorie : type `classified`.
-- **Étapes** :
-  1. Valider.
-  2. Créer `classified` avec `status = pending_review`, `expires_at = now() + 30j`.
-  3. Uploader images, créer `image` avec `content_type = classified`.
-- **Sorties** : `classified` créé.
-- **Effets de bord** : `notification` aux admins.
-
-### OP-061 : Contacter un vendeur
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ classified_id, initial_message }`
-- **Préconditions** : Annonce `active`. Citoyen n'est pas le vendeur.
-- **Étapes** :
-  1. Créer `conversation` de type `classified_contact`.
-  2. Ajouter les 2 participants.
-  3. Créer le premier `message`.
-- **Sorties** : `conversation` + `message`.
-- **Effets de bord** : `notification` au vendeur.
-
-### OP-062 : Proposer un service local
-
-- **Acteur** : Citoyen ou Propriétaire
-- **Entrées** : `{ title, description, base_price?, price_type?, category_id?, place_id?, is_mobile?, duration_minutes?, max_participants?, booking_advance_hours?, cancellation_hours? }`
-- **Préconditions** : Si place_id fourni : lieu appartient à l'utilisateur.
-- **Étapes** :
-  1. Créer `local_service` avec `status = pending_review`.
-- **Sorties** : `local_service` créé.
-
-### OP-063 : Définir les disponibilités d'un service
-
-- **Acteur** : Prestataire (ownership du service)
-- **Entrées** : `{ service_id, availabilities: [{ day_of_week, start_time, end_time }] }`
-- **Préconditions** : Service existe. Pas de chevauchement.
-- **Étapes** :
-  1. Valider non-chevauchement par jour.
-  2. Insérer les `service_availability`.
-- **Sorties** : Disponibilités créées.
-
-## 3.8 Domaine : Messagerie
-
-### OP-070 : Initier une conversation
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ recipient_id, initial_message, type?: 'direct' }`
-- **Préconditions** : Destinataire existe. Pas de conversation `direct` existante entre les 2 utilisateurs.
-- **Étapes** :
-  1. Créer `conversation` de type `direct`.
-  2. Créer 2 `conversation_participant`.
-  3. Créer le premier `message`.
-  4. Set `conversation.last_message_at`.
-- **Sorties** : `conversation` + `message` créés.
-- **Effets de bord** : `notification` (new_message) au destinataire.
-- **Erreurs** : `CONVERSATION_EXISTS` (409), `SELF_MESSAGE` (400).
-
-### OP-071 : Envoyer un message
-
-- **Acteur** : Participant d'une conversation
-- **Entrées** : `{ conversation_id, content }`
-- **Préconditions** : Conversation existe. L'expéditeur est participant.
-- **Étapes** :
-  1. Valider contenu.
-  2. Créer `message`.
-  3. Mettre à jour `conversation.last_message_at`.
-- **Sorties** : `message` créé.
-- **Effets de bord** : `notification` (new_message) aux autres participants non-lus.
-
-### OP-072 : Marquer comme lu
-
-- **Acteur** : Participant
-- **Entrées** : `{ conversation_id }`
-- **Préconditions** : Participant de la conversation.
-- **Étapes** :
-  1. Mettre à jour `conversation_participant.last_read_at = now()`.
-- **Sorties** : Participant mis à jour.
-
-## 3.9 Domaine : Économie
-
-### OP-080 : Créditer un portefeuille (externe)
-
-- **Acteur** : Système (après validation de paiement externe)
-- **Entrées** : `{ user_id, amount, idempotency_key }`
-- **Préconditions** : Portefeuille existe. `idempotency_key` non utilisée.
-- **Étapes** : (atomique dans une transaction DB)
-  1. Vérifier unicité `idempotency_key`.
-  2. Créer `transaction` de type `external_credit`, `receiver_wallet_id = wallet.id`, `status = completed`.
-  3. Incrémenter `wallet.balance += amount`.
-- **Sorties** : `transaction` + `wallet` mis à jour.
-- **Effets de bord** : `notification` (transaction_completed). `audit_log`.
-- **Erreurs** : `DUPLICATE_TRANSACTION` (409).
-
-### OP-081 : Transférer entre portefeuilles
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ receiver_user_id, amount, description?, idempotency_key }`
-- **Préconditions** : Expéditeur ≠ destinataire. Solde suffisant. `idempotency_key` unique.
-- **Étapes** : (atomique)
-  1. Vérifier `sender.wallet.balance >= amount`.
-  2. Créer `transaction` type `p2p_transfer`, status `completed`.
-  3. `sender.wallet.balance -= amount`.
-  4. `receiver.wallet.balance += amount`.
-- **Sorties** : `transaction` créée, 2 wallets mis à jour.
-- **Effets de bord** : `notification` au destinataire. `audit_log`.
-- **Erreurs** : `INSUFFICIENT_BALANCE` (400), `SELF_TRANSFER` (400).
 
 ### OP-082 : Réserver un service
 
@@ -2529,196 +1580,6 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 - **Sorties** : `booking` annulé. `transaction` de remboursement le cas échéant.
 - **Effets de bord** : `notification` à l'autre partie.
 - **Erreurs** : `BOOKING_NOT_CANCELLABLE` (400).
-
-## 3.10 Domaine : Médiation
-
-### OP-090 : Ouvrir un cas de médiation
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ title, description, category?, related_post_type?, related_entity_id?, reported_user_id? }`
-- **Préconditions** : Si reported_user_id : utilisateur existe. Si entity liée : entité existe.
-- **Étapes** :
-  1. Créer `mediation_case` avec `status = opened`.
-- **Sorties** : `mediation_case` créé.
-- **Effets de bord** : `notification` aux admins. `audit_log`.
-
-### OP-091 : Assigner un médiateur
-
-- **Acteur** : Administrateur
-- **Entrées** : `{ case_id, mediator_id }`
-- **Préconditions** : Cas en statut `opened`. Médiateur a le rôle `mediator`. Médiateur ≠ reporter et ≠ reported.
-- **Étapes** :
-  1. Set `mediation_case.mediator_id` et `status = assigned`, `assigned_at = now()`.
-  2. Créer `conversation` de type `mediation` avec 3+ participants (reporter, reported, mediator).
-- **Sorties** : Cas mis à jour + conversation créée.
-- **Effets de bord** : `notification` à toutes les parties.
-- **Erreurs** : `MEDIATOR_IS_PARTY` (400), `CASE_NOT_OPENED` (400).
-
-### OP-092 : Planifier une session de médiation
-
-- **Acteur** : Médiateur (assigné)
-- **Entrées** : `{ case_id, scheduled_at, duration_minutes?, type? }`
-- **Préconditions** : Cas `assigned` ou `in_progress`. Médiateur assigné = session.user_id.
-- **Étapes** :
-  1. Créer `mediation_session`.
-  2. Si premier session : changer case status à `in_progress`.
-- **Sorties** : `mediation_session` créée.
-- **Effets de bord** : `notification` aux parties avec date/heure.
-
-### OP-093 : Rédiger un accord de médiation
-
-- **Acteur** : Médiateur (assigné)
-- **Entrées** : `{ case_id, content, actions? }`
-- **Préconditions** : Cas `in_progress`. Pas d'accord existant.
-- **Étapes** :
-  1. Créer `mediation_agreement` avec les 3 signatures à `false`.
-- **Sorties** : `mediation_agreement` créé.
-- **Effets de bord** : `notification` aux parties pour signature.
-
-### OP-094 : Signer un accord
-
-- **Acteur** : Partie impliquée (reporter, reported, mediator)
-- **Entrées** : `{ agreement_id }`
-- **Préconditions** : Accord existe. L'utilisateur est une des parties. N'a pas déjà signé.
-- **Étapes** :
-  1. Set le champ de signature correspondant à `true`.
-  2. Si les 3 signatures sont true : set `signed_at = now()`, changer case status à `resolved`, set `case.resolved_at`.
-- **Sorties** : Accord mis à jour, éventuellement cas résolu.
-- **Effets de bord** : `notification` aux parties.
-
-## 3.11 Domaine : Éducation
-
-### OP-100 : Créer un module d'éducation
-
-- **Acteur** : Éducateur
-- **Entrées** : `{ title, slug, description?, category_id?, difficulty, cover_image_url?, is_free, price?, estimated_duration_hours? }`
-- **Préconditions** : Rôle `educator`. Slug unique. Si pas gratuit : price > 0.
-- **Étapes** :
-  1. Créer `education_module` avec `status = draft`.
-- **Sorties** : `education_module` créé.
-
-### OP-101 : Ajouter une leçon
-
-- **Acteur** : Éducateur (ownership du module)
-- **Entrées** : `{ module_id, title, slug, content_json, type, sort_order, estimated_minutes? }`
-- **Préconditions** : Module existe, éducateur est le propriétaire. Module en `draft` ou `published`. Unique `(module_id, slug)` et `(module_id, sort_order)`.
-- **Étapes** :
-  1. Créer `education_lesson`.
-  2. Incrémenter `education_module.lesson_count`.
-- **Sorties** : `education_lesson` créée.
-
-### OP-102 : Publier un module
-
-- **Acteur** : Éducateur (ownership)
-- **Entrées** : `{ module_id }`
-- **Préconditions** : Module en `draft`. Au moins 1 leçon.
-- **Étapes** :
-  1. Status → `published`, set `published_at`.
-- **Sorties** : Module mis à jour.
-
-### OP-103 : S'inscrire à un module
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ module_id, idempotency_key? }`
-- **Préconditions** : Module `published`. Pas déjà inscrit. Si payant : solde suffisant.
-- **Étapes** :
-  1. Créer `education_enrollment` avec `status = active`.
-  2. Si payant : créer `transaction` type `service_payment`, débiter wallet.
-  3. Incrémenter `education_module.enrollment_count`.
-- **Sorties** : `education_enrollment` créé.
-- **Erreurs** : `ALREADY_ENROLLED` (409), `INSUFFICIENT_BALANCE` (400).
-
-### OP-104 : Compléter une leçon
-
-- **Acteur** : Citoyen (inscrit)
-- **Entrées** : `{ enrollment_id, lesson_id, score? }`
-- **Préconditions** : Enrollment `active`. Leçon appartient au module de l'enrollment. Pas déjà complétée.
-- **Étapes** :
-  1. Créer ou mettre à jour `education_progress` avec `is_completed = true`, `completed_at = now()`.
-  2. Recalculer `enrollment.progress_percent`.
-  3. Si 100% : set `enrollment.status = completed`, `enrollment.completed_at = now()`.
-- **Sorties** : Progression mise à jour.
-- **Effets de bord** : Si module complété : `notification` à l'éducateur et au citoyen. `impact_metric` mis à jour.
-
-## 3.12 Domaine : Bénévolat
-
-### OP-110 : Créer un projet bénévole
-
-- **Acteur** : Citoyen (coordinateur)
-- **Entrées** : `{ title, slug, description, category_id?, location?, latitude?, longitude?, start_date?, end_date?, volunteer_goal?, funding_goal? }`
-- **Préconditions** : Slug unique.
-- **Étapes** :
-  1. Créer `volunteer_project` avec `status = draft`.
-  2. Si `funding_goal` : créer `funding_campaign` associée (status `draft`).
-- **Sorties** : `volunteer_project` + éventuellement `funding_campaign`.
-
-### OP-111 : Ajouter une tâche bénévole
-
-- **Acteur** : Coordinateur du projet
-- **Entrées** : `{ project_id, title, description?, required_skills?, max_volunteers?, scheduled_date?, estimated_hours? }`
-- **Préconditions** : Projet existe, coordinateur = user.
-- **Étapes** :
-  1. Créer `volunteer_task`.
-- **Sorties** : `volunteer_task` créée.
-
-### OP-112 : S'inscrire à une tâche bénévole
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ task_id }`
-- **Préconditions** : Tâche `open`. `current_volunteers < max_volunteers` (si max défini). Pas déjà inscrit.
-- **Étapes** :
-  1. Créer `volunteer_participation` avec `status = signed_up`.
-  2. Incrémenter `volunteer_task.current_volunteers`.
-  3. Si `current_volunteers == max_volunteers` : changer task status à `filled`.
-  4. Incrémenter `volunteer_project.volunteer_count`.
-- **Sorties** : `volunteer_participation` créée.
-- **Erreurs** : `TASK_FULL` (409), `ALREADY_SIGNED_UP` (409).
-
-### OP-113 : Valider la participation (coordinateur)
-
-- **Acteur** : Coordinateur
-- **Entrées** : `{ participation_id, hours_logged }`
-- **Préconditions** : Participation `signed_up` ou `confirmed`.
-- **Étapes** :
-  1. Set `status = completed`, `hours_logged`, `completed_at = now()`.
-  2. Créer/mettre à jour `impact_metric` type `volunteer_hours`.
-- **Sorties** : Participation mise à jour.
-- **Effets de bord** : `notification` au bénévole.
-
-## 3.13 Domaine : Financement
-
-### OP-120 : Créer une campagne de financement
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ title, slug, description, goal_amount, deadline, project_id? }`
-- **Préconditions** : Slug unique. Deadline dans le futur.
-- **Étapes** :
-  1. Créer `funding_campaign` avec `status = draft`.
-- **Sorties** : `funding_campaign` créée.
-
-### OP-121 : Publier une campagne
-
-- **Acteur** : Créateur (ownership)
-- **Entrées** : `{ campaign_id }`
-- **Préconditions** : Campagne en `draft`. Description et objectif renseignés.
-- **Étapes** :
-  1. Status → `active`.
-- **Sorties** : Campagne publiée.
-
-### OP-122 : Faire un don
-
-- **Acteur** : Citoyen
-- **Entrées** : `{ campaign_id, amount, is_anonymous?, message?, idempotency_key }`
-- **Préconditions** : Campagne `active`. Donateur ≠ créateur. Solde suffisant.
-- **Étapes** : (atomique)
-  1. Créer `transaction` type `service_payment` (wallet donateur → wallet créateur campagne).
-  2. Créer `donation`.
-  3. Incrémenter `campaign.raised_amount += amount`, `campaign.donor_count += 1`.
-  4. Si `raised_amount >= goal_amount` : status → `funded`, set `funded_at`.
-  5. Si projet associé : mettre à jour `project.funding_raised`.
-- **Sorties** : `donation` + `transaction` créés.
-- **Effets de bord** : `notification` au créateur. Si `funded` : `notification` à tous les donateurs.
-- **Erreurs** : `SELF_DONATION` (403), `CAMPAIGN_NOT_ACTIVE` (400), `INSUFFICIENT_BALANCE` (400).
 
 ## 3.14 Domaine : Communauté (Événements, Groupes)
 
@@ -2796,7 +1657,6 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 
 ## PU-01 : Inscription et activation
 
-```
 1. Anonyme → Page d'inscription (/{locale}/inscription ou /{locale}/sign-up)
 2. Remplit formulaire : email, mot de passe, nom d'utilisateur
 3. [OP-001] Profil + wallet + rôle citizen créés automatiquement
@@ -2804,7 +1664,6 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 5. Utilisateur clique le lien → /{locale}/verify-email?token=...
 6. Email vérifié → Redirection vers /{locale}/profile
 7. Utilisateur peut compléter son profil [OP-002]
-```
 
 **Points d'attention** :
 
@@ -2814,7 +1673,6 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 
 ## PU-02 : Soumission et publication d'un lieu
 
-```
 1. Propriétaire → Dashboard propriétaire → "Ajouter un lieu"
 2. Formulaire multi-étapes :
    a. Informations de base (catégorie, type, slug auto-généré)
@@ -2830,11 +1688,9 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 6. Propriétaire reçoit notification du résultat
 7. Si rejeté : propriétaire corrige → resoumet [OP-020 en mode re-soumission]
 8. Si approuvé : lieu visible publiquement dans l'annuaire
-```
 
 ## PU-03 : Recherche et consultation d'un lieu
 
-```
 1. Visiteur → Page annuaire (/{locale}/places)
 2. Barre de recherche : texte libre + filtres (catégorie, type, tags, zone géo, prix, note min)
 3. [OP-024] Résultats paginés avec cartes et liste
@@ -2843,11 +1699,11 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 6. Section avis : avis existants + sous-notations + réponses propriétaire
 7. Si authentifié et non-propriétaire : bouton "Laisser un avis" [OP-040]
 8. Bouton favori [OP-043] si authentifié
-```
+
 
 ## PU-04 : Publication d'un article
 
-```
+
 1. Auteur → Dashboard auteur → "Nouvel article"
 2. Éditeur de contenu riche (blocs JSON) :
    - Texte, titres, images, citations, listes, code
@@ -2859,11 +1715,11 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 6. Soumission [OP-031]
 7. Admin valide [OP-032]
 8. Article publié → accessible /{locale}/blog/{slug}
-```
+
 
 ## PU-05 : Parcours de réservation
 
-```
+
 1. Citoyen → Page service local (/{locale}/services/{slug})
 2. Consultation description, prix, disponibilités
 3. Sélection créneau dans le calendrier de disponibilités
@@ -2874,20 +1730,20 @@ Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organizat
 8. Client reçoit la confirmation
 9. Après le service : prestataire marque "complété"
 10. Optionnel : client laisse un avis sur le lieu du prestataire [OP-040]
-```
+
 
 **Flux d'annulation** :
 
-```
+
 A. Client annule [OP-084] :
    - Avant le délai : remboursement total
    - Après le délai : pas de remboursement
 B. Prestataire annule [OP-084] : remboursement total automatique
-```
+
 
 ## PU-06 : Médiation d'un conflit
 
-```
+
 1. Citoyen constate un problème (avis diffamatoire, litige commercial, harcèlement)
 2. Via la page du contenu litigieux : bouton "Signaler" → formulaire de signalement
 3. Ouverture du cas [OP-090]
@@ -2900,11 +1756,11 @@ B. Prestataire annule [OP-084] : remboursement total automatique
 10. Chaque partie signe l'accord [OP-094]
 11. Quand toutes les signatures sont collectées : cas résolu
 12. Période de confirmation → cas clôturé
-```
+
 
 ## PU-07 : Parcours éducatif
 
-```
+
 1. Citoyen → Page éducation (/{locale}/education)
 2. Catalogue de modules filtrables (catégorie, difficulté, gratuit/payant)
 3. Clic sur un module → Page détaillée avec programme et description
@@ -2917,11 +1773,11 @@ B. Prestataire annule [OP-084] : remboursement total automatique
    - Barre de progression mise à jour en temps réel
 7. Complétion du module → badge ou certificat (futur)
 8. Impact comptabilisé dans les métriques
-```
+
 
 ## PU-08 : Projet bénévole
 
-```
+
 1. Citoyen → "Créer un projet bénévole" [OP-110]
 2. Ajout de tâches [OP-111]
 3. Optionnel : création d'une campagne de financement associée [OP-120]
@@ -2932,11 +1788,11 @@ B. Prestataire annule [OP-084] : remboursement total automatique
 8. Coordinateur valide les heures [OP-113]
 9. Résumé d'impact renseigné
 10. Impact comptabilisé [OP-140]
-```
+
 
 ## PU-09 : Forum communautaire
 
-```
+
 1. Visiteur → Page forum (/{locale}/forum)
 2. Navigation par catégories de forum
 3. Si authentifié : "Nouveau sujet" [OP-050]
@@ -2945,11 +1801,11 @@ B. Prestataire annule [OP-084] : remboursement total automatique
 6. Threading possible (réponse à un message spécifique)
 7. Modération : épinglage / verrouillage [OP-052] par modérateurs
 8. Signalement de messages problématiques → médiation
-```
+
 
 ## PU-10 : Place de marché solidaire
 
-```
+
 1. Citoyen → Petites annonces (/{locale}/classifieds)
 2. Filtrage par catégorie, prix, localisation, état
 3. "Publier une annonce" [OP-060]
@@ -2959,18 +1815,18 @@ B. Prestataire annule [OP-084] : remboursement total automatique
 7. Conversation privée entre acheteur et vendeur
 8. Transaction éventuelle via portefeuille [OP-081]
 9. Annonce marquée comme vendue ou expire automatiquement après 30 jours
-```
+
 
 ## PU-11 : Tableau de bord de transparence
 
-```
+
 1. Visiteur → Page Transparence (/{locale}/transparency)
 2. Vue des métriques d'impact globales (chiffres clés animés)
 3. Graphiques temporels : évolution par trimestre
 4. Détail par domaine : bénévolat, médiation, éducation, financement
 5. Rapports publiés téléchargeables / consultables
 6. Données vérifiables et traçables
-```
+
 
 ---
 
@@ -2982,23 +1838,23 @@ B. Prestataire annule [OP-084] : remboursement total automatique
 
 ### Navigation principale (Header)
 
-```
+
 Logo | Annuaire | Blog | Forum | Services | Événements | Éducation | Bénévolat | Transparence | [Langue] | [Thème] | [Auth/Profil]
-```
+
 
 Sur mobile (≤ 1024px) : menu hamburger dans un `Sheet` drawer (comportement existant).
 
 ### Navigation secondaire (footer)
 
-```
+
 À propos | Contact | Mentions légales | CGU | Politique de confidentialité | Réseaux sociaux
-```
+
 
 ### Dashboard utilisateur
 
 Menu latéral (visible après authentification) :
 
-```
+
 Mon profil
 Mes lieux (si owner)
 Mes articles (si author)
@@ -3012,13 +1868,13 @@ Notifications
 Portefeuille
 Médiation (si mediator : cas assignés ; sinon : mes signalements)
 Mon contenu éducatif (si educator)
-```
+
 
 ### Panneau d'administration
 
 Menu latéral admin :
 
-```
+
 Dashboard (statistiques globales)
 Utilisateurs (liste, recherche, rôles)
 Modération (file d'attente : lieux, articles, annonces, signalements)
@@ -3027,7 +1883,7 @@ Taxonomie (catégories, attributs, tags)
 Métriques & Transparence (métriques, rapports)
 Audit (journal d'audit)
 Configuration (paramètres système)
-```
+
 
 ## 5.2 Pages publiques
 
@@ -3679,7 +2535,7 @@ Versioning via préfixe `/api/v1/`. Documentation OpenAPI générée automatique
 
 ### Ordre d'implémentation recommandé
 
-```
+
 Phase 1 (P0 — MVP core) : WP-0 → WP-1 → WP-2 → WP-3 → WP-4 → WP-5
   ~59.25j — Fondations + Lieux + Avis + Articles + Commentaires
 
@@ -3688,7 +2544,7 @@ Phase 2 (P1 — Écosystème) : WP-6 → WP-9 → WP-10 → WP-11 → WP-14 → 
 
 Phase 3 (P2 — Extension) : WP-7 → WP-8 → WP-12 → WP-13 → WP-15 → WP-16 → WP-17 → WP-18
   ~46.5j — Annonces + Événements + Sentiers + Groupes + Éducation + Bénévolat + Financement + Transparence
-```
+
 
 ---
 
@@ -3792,7 +2648,7 @@ Extension des tests de sécurité existants aux nouvelles entités.
 
 ## 10.2 Pipeline d'upload
 
-```
+
 1. Client envoie fichier via FormData → POST /api/uploads
 2. Serveur vérifie :
    a. Authentification (session valide)
@@ -3807,18 +2663,18 @@ Extension des tests de sécurité existants aux nouvelles entités.
 5. Upload vers stockage S3 : /{content_type}/{year}/{month}/{uuid}.webp
 6. Retour de l'URL publique (CDN)
 7. Entrée créée dans table `image`
-```
+
 
 ## 10.3 Structure de stockage
 
-```
+
 /places/{year}/{month}/{uuid}.webp          — Photos de lieux
 /places/{year}/{month}/{uuid}_thumb.webp     — Thumbnails
 /blog/{year}/{month}/{uuid}.webp         — Images d'articles
 /profiles/{year}/{month}/{uuid}.webp         — Avatars
 /trails/{year}/{month}/{uuid}.gpx            — Fichiers GPX
 /mediation/{year}/{month}/{uuid}.pdf         — Documents de médiation
-```
+
 
 ## 10.4 Nettoyage
 
@@ -3850,6 +2706,7 @@ Extension des tests de sécurité existants aux nouvelles entités.
 Format : `GET /api/cron/{job-name}` avec header d'authentification `Authorization: Bearer {CRON_SECRET}`.
 
 Chaque job :
+
 - Vérifie le token d'authentification
 - Log le début et la fin dans `audit_log`
 - Capture et log les erreurs sans interrompre les items restants
@@ -3889,6 +2746,7 @@ Chaque job :
 | `created_at` | Timestamp |
 
 **Événements loggés** :
+
 - Toute création / modification / suppression d'entité
 - Toute opération financière (transaction, don, commission)
 - Toute action de modération (approbation, rejet, ban)
@@ -3915,7 +2773,7 @@ Chaque job :
 
 `GET /api/health` — Endpoint sans authentification.
 
-```json
+json
 {
   "status": "ok",
   "version": "2.0.0",
@@ -3926,7 +2784,7 @@ Chaque job :
     "storage": "ok"
   }
 }
-```
+
 
 Chaque check retourne `"ok"`, `"degraded"`, ou `"down"`. Le status global est le pire des checks.
 
@@ -3942,15 +2800,9 @@ Chaque check retourne `"ok"`, `"degraded"`, ou `"down"`. Le status global est le
 
 Les nouvelles tables doivent être créées dans l'ordre suivant (respect des dépendances FK) :
 
-```
-Vague 1 (aucune dépendance métier) :
-  profile, wallet, user_role, notification, favorite, image,
-  category, category_translation, tag, tag_translation,
-  attribute_definition, attribute_def_translation
 
 Vague 2 (dépend de Vague 1) :
   place, place_translation, place_attribute_value, place_tag,
-  article, article_content,
   forum_category, forum_thread, forum_post,
   group, group_member,
   trail, poi,
@@ -3972,23 +2824,7 @@ Vague 3 (dépend de Vague 2) :
 Vague 4 (dépend de Vague 3) :
   transaction (dépend wallet + booking + donation),
   funding_campaign, donation
-```
 
-### Convention de nommage des fichiers de migration
-
-```
-{NNNN}_{descriptive_name}.sql
-```
-
-Exemple :
-```
-0006_create_profile_wallet_roles.sql
-0007_create_taxonomy_tables.sql
-0008_create_place_tables.sql
-0009_create_article_tables.sql
-0010_create_forum_tables.sql
-...
-```
 
 ### Règles
 
@@ -4002,24 +2838,10 @@ Exemple :
 
 **Infrastructure existante** : `pnpm db:seed` avec fichiers `*.data.ts` dans `src/lib/database/data/`.
 
-### Fichiers de seed à créer
-
-| Ordre | Fichier | Contenu | Quantité |
-|---|---|---|---|
-| 10 | `10-categories.data.ts` | 7 types de catégories × 4 langues | 28 traductions |
-| 11 | `11-attribute-definitions.data.ts` | ~30 définitions d'attributs × 4 langues | ~120 traductions |
-| 12 | `12-tags.data.ts` | ~50 tags courants × 4 langues | ~200 traductions |
-| 20 | `20-places.data.ts` | 10 lieux de démonstration (diversité de types) | 10 |
-| 21 | `21-place-translations.data.ts` | Traductions FR + EN pour les 10 lieux | 20 |
-| 22 | `22-place-attributes.data.ts` | ~5 attributs par lieu | ~50 |
-| 30 | `30-articles.data.ts` | 5 articles de démonstration | 5 |
-| 31 | `31-article-content.data.ts` | Contenu FR + EN pour les 5 articles | 10 |
-| 40 | `40-forum-categories.data.ts` | 5 catégories de forum × 4 langues | 20 |
-| 50 | `50-education-modules.data.ts` | 3 modules éducatifs avec leçons | 3 modules + 9 leçons |
-
 ### Données de démonstration
 
 Toutes les données de seed sont réalistes et contextuellement pertinentes :
+
 - Lieux : commerces, restaurants, espaces culturels, services de quartier — noms et descriptions crédibles
 - Articles : guides pratiques, comparatifs de quartier, reportages locaux
 - Tags : thématiques réelles (bio, accessible PMR, wifi gratuit, parking, terrasse, etc.)
@@ -4028,6 +2850,247 @@ Toutes les données de seed sont réalistes et contextuellement pertinentes :
 -ANNECY BIEN SUR
 
 Aucun "Lorem ipsum", aucun "Test 1", aucun "Example".
+
+1. HABITATION & HÉBERGEMENT
+1.1 Résidentiel
+
+Maison individuelle
+Maison mitoyenne
+Maison en bande
+Maison de ville
+Villa
+Appartement (T1 à T5+)
+Studio
+Duplex
+Triplex
+Loft
+Résidence étudiante
+Résidence senior
+Résidence services
+Logement social (HLM)
+Foyer pour travailleurs
+Logement d’urgence
+Logement de fonction
+Colocation
+Tiny house
+Yourte
+Cabane
+Mobil-home résidentiel
+Bateau-logement
+Filtres :
+
+Surface (m²), Nombre de pièces/chambres
+Équipements (jardin, balcon, parking, ascenseur, etc.)
+Localisation (quartier, proximité transports/commerces)
+Accessibilité (PMR, animaux)
+Type de chauffage, isolation, année de construction
+
+1.2 Hébergement temporaire/touristique
+
+Hôtel (1 à 5 étoiles, boutique, spa, casino, etc.)
+Auberge de jeunesse
+Gîte (rural/urbain)
+Chambre d’hôtes
+Résidence hôtelière
+Camping (tente, chalet, mobil-home, bungalow, glamping)
+Refuge (montagne/forêt)
+Location saisonnière
+Village vacances
+Bateau-hôtel
+Yourte touristique
+Cabane dans les arbres
+Filtres :
+
+Nombre d’étoiles, services (piscine, spa, petit-déjeuner)
+Thématique (écologique, familial, luxe)
+Localisation (proche centre-ville, vue mer/montagne)
+Accessibilité (PMR, animaux)
+
+1. COMMERCES & SERVICES
+2.1 Alimentation
+
+Boulangerie/Pâtisserie
+Fromagerie/Crémerie
+Boucherie/Charcuterie/Triperie
+Poissonnerie
+Primeur/Marché
+Supermarché/Hypermarché/Supérette
+Épicerie (quartier, fine, bio, ethnique, de nuit)
+Café/Brasserie/Salon de thé
+Bar (à vin, cocktails, jus, bières)
+Restaurant (tous types : gastronomique, ethnique, fast-food, etc.)
+Traiteur
+Caviste
+Chocolaterie/Confiserie/Glacerie
+Snack/Food truck
+Filtres :
+
+Type de cuisine, régime (halal, casher, bio, vegan, etc.)
+Services (terrasse, livraison, drive)
+Ambiance, gamme de prix, horaires
+
+2.2 Shopping & Artisanat
+
+Boutique de vêtements (homme, femme, enfant, luxe, sport, seconde main)
+Chaussures/Maroquinerie/Accessoires
+Bijouterie/Horlogerie
+Décoration/Ameublement/Literie
+Librairie/Papeterie
+Fleuriste
+Jouets/Puériculture
+Artisanat local
+Brocante/Antiquaire
+High-tech/Téléphonie/Électroménager
+Bricolage/Jardinage
+Sport/Chasse/Pêche
+Musique/Beaux-arts
+Cosmétiques/Parfumerie
+CBD/Sex-shop
+Filtres :
+
+Gamme de prix, type de produits (neuf, occasion, local)
+Services (livraison, SAV, click & collect)
+
+2.3 Services
+
+Banque/Assurance
+Coiffeur/Barbier/Institut de beauté
+Laverie/Pressing
+Réparation (téléphone, vélo, électroménager, voiture)
+Agence immobilière/voyage
+Location (voiture, matériel, costume)
+Photographe/Agence événementielle
+Imprimerie/Centre d’appels
+Nettoyage/Déménagement/Sécurité
+Filtres :
+
+Spécialisation, horaires, langues parlées
+
+1. LOISIRS & CULTURE
+3.1 Sports & Activités physiques
+
+Salle de sport/Fitness/Musculation
+Piscine/Patinoire/Bowling
+Salle d’escalade/Yoga/Danse/Arts martiaux
+Court de tennis/Stade/Terrain de sport
+Centre équestre/Parc de loisirs
+Club (plongée, voile, randonnée, etc.)
+Filtres :
+
+Public, niveau, équipements, cours, abonnements
+
+3.2 Culture & Divertissement
+
+Cinéma/Théâtre/Opéra
+Musée/Galerie d’art/Bibliothèque
+Salle de concert/Casino
+Escape game/Centre culturel
+Discothèque/Bar à thème
+Filtres :
+
+Type, public, événements, tarifs
+
+3.3 Nature & Détente
+
+Parc/Jardin public/Botanique
+Plage/Lac/Forêt/Réserve naturelle
+Zoo/Aquarium/Ferme pédagogique
+Spa/Thalasso/Hammam/Sauna
+Filtres :
+
+Activités, équipements, accessibilité
+
+1. SANTÉ & BIEN-ÊTRE
+
+Hôpital/Clinique/Centre de soins
+Pharmacie/Cabinet médical
+Dentiste/Kiné/Ostéo/Psy
+Centre de radiologie/Analyses
+Maison de retraite/Crèche
+Vétérinaire
+Filtres :
+
+Spécialité, urgences, langues, accessibilité
+
+1. ÉDUCATION & FORMATION
+
+École (maternelle à lycée)
+Université/Grande école
+Centre de formation/Auto-école
+Crèche/Centre aéré
+Filtres :
+
+Public/privé, internat, bilingue
+
+1. TRANSPORTS & MOBILITÉ
+
+Gare/Aéroport/Port
+Station (bus, métro, taxi, VTC)
+Parking/Station-service/Borne électrique
+Location (voiture, vélo, scooter)
+Atelier de réparation
+Filtres :
+
+Horaires, services, accessibilité
+
+1. ESPACES PUBLICS & INSTITUTIONS
+
+Mairie/Préfecture/Commissariat
+Tribunal/Bureau de poste
+CAF/CPAM/Pôle Emploi
+Cimetière/Crématorium
+Centre de tri/Déchèterie
+Filtres :
+
+Services en ligne, horaires
+
+1. INDUSTRIE & ENTREPRISES
+
+Usine/Atelier/Entrepôt
+Zone (industrielle, artisanale, commerciale)
+Siège social/Bureau
+Centre de recherche/Laboratoire
+Filtres :
+
+Secteur, taille, visites possibles
+
+1. LIEUX DE CULTE
+
+Église/Mosquée/Synagogue/Temple
+Monastère/Couvent
+Salle de prière/Salle du Royaume
+Filtres :
+
+Horaires des offices, langues
+
+1. LIEUX PUBLICS & MONUMENTS
+
+Château/Monument historique
+Site archéologique/Grottes
+Phare/Observatoire/Station météo
+Parc national/Réserve naturelle
+Base militaire/Caserne
+Filtres :
+
+Visites guidées, accessibilité
+
+1. LIEUX ÉVÉNEMENTIELS & PROFESSIONNELS
+
+Centre de congrès/Salle de séminaire
+Salle de réception/mariage
+Foyer rural/Maison des jeunes
+Centre de protection/réinsertion
+Filtres :
+
+Capacité, équipements, événements
+
+Filtres transversaux (applicables à toutes les catégories) :
+
+Accessible PMR
+Horaires d’ouverture
+Services en ligne/Réservation
+Langues parlées/Moyens de paiement
+Parking/Wifi/Animal accepté
 
 ---
 
@@ -4039,11 +3102,9 @@ Aucun "Lorem ipsum", aucun "Test 1", aucun "Example".
 |---|---|---|---|---|
 | R-01 | Performance full-text dégradée au-delà de 50k entrées | Moyenne | Élevé | Monitoring p95, migration vers search externe (MeiliSearch) en fallback |
 | R-02 | Complexité du système de permissions à mesure que les rôles s'accumulent | Élevée | Moyen | Tests exhaustifs de la matrice, review systématique lors d'ajout de rôle |
-| R-03 | Conflit d'atomicité sur les transactions portefeuille sous charge | Faible | Critique | Transactions SQL SERIALIZABLE, retry automatique, tests de charge |
 | R-04 | Surcharge de la messagerie (spam) | Moyenne | Moyen | Rate limiting par conversation, détection de patterns, signalement |
-| R-05 | Complexité de l'éditeur de blocs JSON (article) | Élevée | Élevé | Bibliothèque existante (tiptap, editor.js) adaptée plutôt que from scratch |
 | R-06 | Coût stockage S3 croissant avec les uploads | Faible | Faible | Compression agressive, nettoyage orphelins, quotas par utilisateur |
-| R-07 | Intégration Stripe : complexité fiscale et conformité | Moyenne | Élevé | Phase initiale sans argent réel (portefeuille virtuel), ajout paiement en Phase 2 |
+| R-07 | Intégration Stripe (via Better-auth) : complexité fiscale et conformité | Moyenne | Élevé | Phase initiale sans argent réel (portefeuille virtuel), ajout paiement en Phase 2 |
 | R-08 | Disponibilité des APIs de géocodage (Nominatim) | Faible | Moyen | Cache résultats, fallback sur coordonnées manuelles |
 | R-09 | Croissance exponentielle des notifications | Moyenne | Moyen | Agrégation intelligente (batch), TTL 90 jours, pagination |
 | R-10 | GPX parsing : fichiers volumineux / malformés | Faible | Faible | Limite de taille 20Mo, validation XSD, timeout 30s |
@@ -4052,9 +3113,7 @@ Aucun "Lorem ipsum", aucun "Test 1", aucun "Example".
 
 | # | Risque | Probabilité | Impact | Mitigation |
 |---|---|---|---|---|
-| R-11 | Manque de modérateurs pour la file de validation | Élevée | Élevé | Auto-approbation après N publications validées (trust score), modération communautaire |
 | R-12 | Contenu insuffisant au lancement | Élevée | Élevé | Seed data réaliste, partenariats locaux pré-lancement, import de données ouvertes |
-| R-13 | Adoption médiation : méfiante initiale | Moyenne | Moyen | Formation médiateurs, processus transparent, garanties de confidentialité |
 | R-14 | Multi-langue : coût de traduction du contenu dynamique | Élevée | Moyen | Minimum FR + EN, ajout AR + ES progressif, traduction communautaire |
 
 ## 14.3 Hypothèses
@@ -4062,11 +3121,8 @@ Aucun "Lorem ipsum", aucun "Test 1", aucun "Example".
 | # | Hypothèse | Validée par |
 |---|---|---|
 | H-01 | PostgreSQL est suffisant jusqu'à 10k utilisateurs sans partitionnement | Tests de charge Phase 1 |
-| H-02 | SSE est suffisant pour le temps réel (pas besoin de WebSocket) | Évaluation en Phase 2 si limites atteintes |
-| H-03 | Le portefeuille virtuel précède le paiement réel | Décision produit, pas technique |
-| H-04 | Le système de médiation est viable sans cadre légal formalisé | Validation juridique avant Phase 2 |
-| H-05 | La cartographie OpenStreetMap est suffisante en couverture | Vérification sur les zones cibles |
-| H-06 | Vercel gère le volume de SSR sans scaling custom | Monitoring, migration vers Node standalone si nécessaire |
+| H-02 | SSE est non suffisant pour le temps réel ( besoin de WebSocket) |
+| H-05 | La cartographie (OpenStreetMap ou leaflet?) est suffisante en couverture | Vérification sur les zones cibles |
 | H-07 | Les utilisateurs fournissent du contenu de qualité | Modération + guidelines + gamification impact |
 
 ---
@@ -4077,7 +3133,7 @@ Aucun "Lorem ipsum", aucun "Test 1", aucun "Example".
 
 ### Statuts d'entité
 
-```typescript
+typescript
 // Lieu
 type PlaceStatus = 'draft' | 'pending_review' | 'published' | 'rejected' | 'archived';
 
@@ -4096,255 +3152,5 @@ type MediationStatus = 'opened' | 'assigned' | 'in_progress' | 'agreement_reache
 // Événement
 type EventStatus = 'draft' | 'published' | 'cancelled' | 'completed';
 
-// Module éducatif
-type ModuleStatus = 'draft' | 'published' | 'archived';
-
-// Projet bénévole
-type VolunteerProjectStatus = 'draft' | 'recruiting' | 'in_progress' | 'completed' | 'cancelled';
-
-// Tâche bénévole
-type VolunteerTaskStatus = 'open' | 'assigned' | 'in_progress' | 'completed' | 'cancelled';
-
-// Campagne de financement
-type FundingCampaignStatus = 'draft' | 'active' | 'completed' | 'failed' | 'cancelled';
-
-// Rapport de transparence
-type ReportStatus = 'draft' | 'published';
-```
-
-### Types
-
-```typescript
-// Catégorie
-type CategoryType = 'accommodation' | 'gastronomy' | 'activity' | 'service' | 'culture' | 'education' | 'health';
-
-// Transaction
-type TransactionType = 'credit' | 'debit' | 'commission' | 'refund' | 'donation' | 'transfer';
-
-// Événement
-type EventType = 'workshop' | 'meetup' | 'festival' | 'conference' | 'exhibition' | 'sport' | 'concert' | 'market';
-
-// Annonce condition
-type ClassifiedCondition = 'new' | 'like_new' | 'good' | 'fair' | 'for_parts';
-
-// Difficulté (sentier / éducation)
-type Difficulty = 'easy' | 'moderate' | 'hard' | 'expert';
-
-// Médiation type
-type MediationType = 'commercial' | 'interpersonal' | 'content' | 'service';
-
-// Notification type
-type NotificationType = 'review' | 'message' | 'booking' | 'moderation' | 'mediation' | 'system' | 'donation' | 'education' | 'volunteer';
-
-// Image content type
-type ImageContentType = 'place' | 'article' | 'profile' | 'event' | 'trail' | 'classified';
-
-// Rôle
-type UserRoleType = 'citizen' | 'owner' | 'author' | 'mediator' | 'educator' | 'moderator' | 'admin';
-
-// Attribut type de valeur
-type AttributeValueType = 'text' | 'number' | 'boolean' | 'select' | 'multi_select';
-
-// Section de sous-notation (avis)
-type SubRatingSection = 'cleanliness' | 'service' | 'value' | 'location' | 'atmosphere' | 'food' | 'comfort' | 'accessibility';
-```
-
-## 15.2 Catalogue des codes d'erreur
-
-### Erreurs d'authentification (AUTH_*)
-
-| Code | HTTP | Message | Contexte |
-|---|---|---|---|
-| `AUTH_UNAUTHORIZED` | 401 | Non authentifié | Token absent ou expiré |
-| `AUTH_FORBIDDEN` | 403 | Accès interdit | Rôle insuffisant |
-| `AUTH_INVALID_CREDENTIALS` | 401 | Identifiants invalides | Login échoué |
-| `AUTH_EMAIL_NOT_VERIFIED` | 403 | Email non vérifié | Action requérant vérification |
-| `AUTH_RATE_LIMITED` | 429 | Trop de tentatives | Rate limit atteint |
-| `AUTH_ACCOUNT_BANNED` | 403 | Compte suspendu | Utilisateur banni |
-
-### Erreurs de validation (VAL_*)
-
-| Code | HTTP | Message | Contexte |
-|---|---|---|---|
-| `VAL_REQUIRED_FIELD` | 400 | Champ requis manquant | Champ obligatoire absent |
-| `VAL_INVALID_FORMAT` | 400 | Format invalide | Email, téléphone, URL mal formé |
-| `VAL_TOO_LONG` | 400 | Valeur trop longue | Dépassement de la longueur max |
-| `VAL_TOO_SHORT` | 400 | Valeur trop courte | En dessous de la longueur min |
-| `VAL_INVALID_RANGE` | 400 | Valeur hors limites | Nombre hors [min, max] |
-| `VAL_DUPLICATE` | 409 | Valeur en doublon | Unicité violée (slug, email, etc.) |
-| `VAL_INVALID_ENUM` | 400 | Valeur non autorisée | Valeur hors liste d'enum |
-| `VAL_XSS_DETECTED` | 400 | Contenu dangereux détecté | Payload XSS intercepté |
-| `VAL_SQLI_DETECTED` | 400 | Contenu dangereux détecté | Payload SQLi intercepté |
-
-### Erreurs métier (BIZ_*)
-
-| Code | HTTP | Message | Contexte |
-|---|---|---|---|
-| `BIZ_NOT_FOUND` | 404 | Ressource introuvable | Entité inexistante ou non publiée |
-| `BIZ_ALREADY_EXISTS` | 409 | Déjà existant | Avis déjà posté, inscription déjà faite |
-| `BIZ_INSUFFICIENT_BALANCE` | 402 | Solde insuffisant | Wallet ne couvre pas le montant |
-| `BIZ_SELF_ACTION` | 403 | Action sur soi-même interdite | Auto-avis, auto-réservation, etc. |
-| `BIZ_EDIT_WINDOW_EXPIRED` | 403 | Fenêtre de modification expirée | Délai 15min ou 30min dépassé |
-| `BIZ_ENTITY_LOCKED` | 423 | Entité verrouillée | Thread verrouillé, cas médiation clos |
-| `BIZ_CAPACITY_REACHED` | 409 | Capacité atteinte | Événement complet, tâche complète |
-| `BIZ_INVALID_TRANSITION` | 422 | Transition de statut invalide | Ex: draft → published sans passer par pending |
-| `BIZ_MODERATION_REQUIRED` | 403 | En attente de modération | Lieu/article/annonce non encore approuvé |
-| `BIZ_CAMPAIGN_ENDED` | 410 | Campagne terminée | Don sur campagne close |
-| `BIZ_THREAD_LOCKED` | 423 | Fil verrouillé | Post dans un thread verrouillé |
-
-### Erreurs système (SYS_*)
-
-| Code | HTTP | Message | Contexte |
-|---|---|---|---|
-| `SYS_INTERNAL_ERROR` | 500 | Erreur serveur | Erreur non gérée |
-| `SYS_DATABASE_ERROR` | 503 | Service indisponible | Connexion DB perdue |
-| `SYS_STORAGE_ERROR` | 503 | Service de stockage indisponible | S3 en panne |
-| `SYS_SMTP_ERROR` | 503 | Service email indisponible | SMTP en panne |
-| `SYS_TIMEOUT` | 504 | Timeout | Requête trop longue |
-| `SYS_UPLOAD_FAILED` | 500 | Upload échoué | Erreur pendant le transfert |
-
-## 15.3 Index des opérations
-
-| ID | Nom | Section |
-|---|---|---|
-| OP-001 | Créer un compte utilisateur | 3.1 |
-| OP-002 | Mettre à jour le profil | 3.1 |
-| OP-003 | Supprimer son compte (RGPD) | 3.1 |
-| OP-004 | Exporter ses données (RGPD) | 3.1 |
-| OP-005 | Assigner un rôle | 3.1 |
-| OP-010 | Créer une catégorie | 3.2 |
-| OP-011 | Créer un tag | 3.2 |
-| OP-012 | Créer une définition d'attribut | 3.2 |
-| OP-020 | Soumettre un lieu | 3.3 |
-| OP-021 | Approuver / Rejeter un lieu | 3.3 |
-| OP-022 | Mettre à jour un lieu | 3.3 |
-| OP-023 | Archiver un lieu | 3.3 |
-| OP-024 | Rechercher des lieux | 3.3 |
-| OP-030 | Créer un brouillon d'article | 3.4 |
-| OP-031 | Soumettre un article | 3.4 |
-| OP-032 | Approuver / Rejeter un article | 3.4 |
-| OP-033 | Lier un lieu à un article | 3.4 |
-| OP-034 | Archiver un article | 3.4 |
-| OP-040 | Créer un avis | 3.5 |
-| OP-041 | Modifier un avis | 3.5 |
-| OP-042 | Supprimer un avis | 3.5 |
-| OP-043 | Ajouter / Retirer un favori | 3.5 |
-| OP-050 | Créer un sujet de forum | 3.6 |
-| OP-051 | Répondre dans un fil | 3.6 |
-| OP-052 | Épingler / Verrouiller un fil | 3.6 |
-| OP-060 | Publier une annonce | 3.7 |
-| OP-061 | Contacter un annonceur | 3.7 |
-| OP-070 | Créer une conversation | 3.8 |
-| OP-071 | Envoyer un message | 3.8 |
-| OP-072 | Créer un événement | 3.9 |
-| OP-073 | S'inscrire à un événement | 3.9 |
-| OP-080 | Créditer le portefeuille | 3.10 |
-| OP-081 | Transférer des fonds | 3.10 |
-| OP-082 | Créer une réservation | 3.11 |
-| OP-083 | Confirmer une réservation | 3.11 |
-| OP-084 | Annuler une réservation | 3.11 |
-| OP-090 | Ouvrir un cas de médiation | 3.12 |
-| OP-091 | Assigner un médiateur | 3.12 |
-| OP-092 | Planifier une session | 3.12 |
-| OP-093 | Rédiger un accord | 3.12 |
-| OP-094 | Signer un accord | 3.12 |
-| OP-100 | Créer un module éducatif | 3.13 |
-| OP-101 | Ajouter une leçon | 3.13 |
-| OP-102 | Publier un module | 3.13 |
-| OP-103 | S'inscrire à un module | 3.13 |
-| OP-104 | Compléter une leçon | 3.13 |
-| OP-110 | Créer un projet bénévole | 3.14 |
-| OP-111 | Ajouter une tâche | 3.14 |
-| OP-112 | S'inscrire à une tâche | 3.14 |
-| OP-113 | Valider des heures | 3.14 |
-| OP-120 | Créer une campagne de financement | 3.15 |
-| OP-121 | Faire un don | 3.15 |
-| OP-122 | Clôturer une campagne | 3.15 |
-| OP-140 | Mettre à jour une métrique d'impact | 3.15 |
-| OP-141 | Publier un rapport de transparence | 3.15 |
-
----
-
-# 16. CHECKLISTS QUALITÉ
-
-## 16.1 Checklist pré-implémentation (par entité)
-
-- [ ] Table(s) et migration(s) créées
-- [ ] Schema Drizzle écrit dans `src/database/schemas/`
-- [ ] Schema exporté dans le barrel file `src/database/schemas.ts`
-- [ ] `pnpm db:generate` exécuté sans erreur
-- [ ] `pnpm db:migrate` exécuté localement
-- [ ] Types TypeScript auto-générés (`astro sync`)
-- [ ] Indexes de performance créés (voir Section 1.2)
-- [ ] Seed data préparé (si applicable)
-
-## 16.2 Checklist par API route
-
-- [ ] Route créée dans `src/pages/api/`
-- [ ] `export const prerender = false`
-- [ ] Validation des entrées (Zod schema)
-- [ ] Authentification vérifiée (`Astro.locals.user`)
-- [ ] Autorisation vérifiée (RBAC + ABAC, permissions.ts)
-- [ ] Rate limiting appliqué
-- [ ] Headers de sécurité injectés (CSP, X-Frame-Options, etc.)
-- [ ] Audit log écrit pour les opérations d'écriture
-- [ ] Notifications déclenchées (side effects)
-- [ ] Codes d'erreur standardisés (Section 15.2)
-- [ ] Tests d'intégration écrits
-- [ ] Tests de sécurité écrits
-- [ ] `pnpm astro check` passe
-
-## 16.3 Checklist par page Astro
-
-- [ ] Fichier créé dans `src/pages/{locale}/`
-- [ ] Layout approprié (BaseLayout ou DocLayout)
-- [ ] Textes via i18n JSON (`src/i18n/{locale}.json`)
-- [ ] Liens via `getRelativeLocaleUrl()`
-- [ ] Support des 4 variantes CSS
-- [ ] Accessibilité WCAG 2.2 AA :
-  - [ ] Sémantique HTML (headings, landmarks, lists)
-  - [ ] `alt` sur toutes les images
-  - [ ] Labels sur tous les formulaires
-  - [ ] Focus visible sur tous les éléments interactifs
-  - [ ] Contraste vérifié (4.5:1 / 3:1)
-  - [ ] Navigation clavier complète
-  - [ ] ARIA attributes pour les composants dynamiques
-- [ ] Responsive (320px → 2560px)
-- [ ] RTL correct pour `ar`
-- [ ] Meta tags (title, description, og:*)
-- [ ] Pas de JavaScript client sauf nécessité justifiée
-- [ ] `pnpm astro check` passe
-
-## 16.4 Checklist par composant UI
-
-- [ ] Props typées avec interface TypeScript
-- [ ] Props `variant`, `color`, `className` supportées (si applicable)
-- [ ] Rest props spreadés sur l'élément racine
-- [ ] Styles scoped dans le fichier `.astro`
-- [ ] Fonctionne dans les 4 variantes
-- [ ] Accessible (rôle, aria-label, sémantique)
-- [ ] Documenté dans la page docs correspondante
-- [ ] Exemples live dans toutes les variantes
-
-## 16.5 Checklist par domaine fonctionnel (avant merge)
-
-- [ ] Toutes les tables créées et migrées
-- [ ] Toutes les opérations (OP-*) implémentées
-- [ ] Permissions vérifiées (matrice Section 2)
-- [ ] Tests unitaires écrits et passent
-- [ ] Tests d'intégration écrits et passent
-- [ ] Tests E2E écrits et passent (si applicable)
-- [ ] Tests de sécurité écrits et passent
-- [ ] Seed data créé
-- [ ] i18n : clés ajoutées dans les 4 fichiers JSON
-- [ ] Pages créées dans les 4 locales
-- [ ] Documentation docs (EN + FR) mise à jour
-- [ ] `pnpm astro check` → 0 erreur
-- [ ] `pnpm test:all` → 0 échec
-- [ ] Couverture ≥ seuils (85/85/80)
-- [ ] `pnpm run readme:generate` exécuté
-- [ ] Review code complète
-
----
 
 *Fin du document. Ce fichier est la source de vérité pour toute implémentation de fonctionnalité dans Concordia.*

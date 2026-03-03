@@ -3,6 +3,8 @@ import Avatar from "../../ui/Avatar/Avatar.astro";
 import Dropdown from "../../ui/Dropdown.astro";
 import Link from "../../ui/Link.astro";
 import { isAdminUser } from "@lib/admin/permissions";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
+import { getTranslations } from "@i18n/translations";
 
 interface Props {
   variant?: "initial" | "retro" | "modern" | "futuristic";
@@ -12,77 +14,25 @@ interface Props {
 
 const { variant = "initial", lang, isMenu = false } = Astro.props;
 
-// Détecter la langue depuis l'URL si non fournie (fallback uniquement si lang est undefined)
+// Détecter la langue depuis l'URL si non fournie
 const currentPath = Astro.url.pathname;
 const detectedLang =
-  lang ||
-  (currentPath.startsWith("/fr")
-    ? "fr"
-    : currentPath.startsWith("/es")
-      ? "es"
-      : currentPath.startsWith("/ar")
-        ? "ar"
-        : "en");
+  lang || Astro.currentLocale || 
+  (currentPath.match(/^\/(fr|en|es|ar)/) ?? [])[1] || "fr";
 
-// Routes multilingues
-// Chaque langue a ses propres slugs, en attendant de copier/adapter
-const loginRoute =
-  detectedLang === "fr" ? "/fr/auth/connexion" :
-  detectedLang === "en" ? "/en/auth/sign-in" :
-  detectedLang === "es" ? "/es/auth/sign-in" :
-  detectedLang === "ar" ? "/ar/auth/sign-in" :
-  "/fr/auth/connexion"; // fallback
-const profileRoute =
-  detectedLang === "fr" ? "/fr/auth/profil" :
-  detectedLang === "en" ? "/en/auth/profile" :
-  detectedLang === "es" ? "/es/auth/profile" :
-  detectedLang === "ar" ? "/ar/auth/profile" :
-  "/fr/auth/profil";
+// Routes dynamiques via le slug map
+const loginRoute = getLocalizedUrl(detectedLang, "auth/sign-in");
+const profileRoute = getLocalizedUrl(detectedLang, "auth/profile");
+const adminRoute = getLocalizedUrl(detectedLang, "admin");
 
-const adminRoute =
-  detectedLang === "fr" ? "/fr/admin" :
-  detectedLang === "en" ? "/en/admin" :
-  detectedLang === "es" ? "/es/admin" :
-  detectedLang === "ar" ? "/ar/admin" :
-  "/fr/admin";
-
-// Traductions locales avec fallback robustes
-const dictionaries: Record<string, any> = {
-  fr: {
-    login: "Se connecter",
-    profile: "Mon profil",
-    logout: "Se déconnecter",
-    admin: "Administration",
-  },
-  en: { login: "Sign in", profile: "My profile", logout: "Sign out", admin: "Administration" },
-  es: {
-    login: "Iniciar sesión",
-    profile: "Mi perfil",
-    logout: "Cerrar sesión",
-    admin: "Administración",
-  },
-  ar: { login: "تسجيل الدخول", profile: "ملفي الشخصي", logout: "تسجيل الخروج", admin: "الإدارة" },
+// Traductions centralisées via le système i18n
+const loaded = getTranslations(detectedLang);
+const t = {
+  login: loaded?.auth?.signIn ?? "Se connecter",
+  profile: loaded?.auth?.profile ?? "Mon profil",
+  logout: loaded?.auth?.signOut ?? "Se déconnecter",
+  admin: loaded?.adminPanel?.title ?? loaded?.nav?.admin ?? "Administration",
 };
-
-let t = dictionaries[detectedLang] || dictionaries.en;
-
-// Tentative de chargement des traductions complètes du projet
-try {
-  // Charge le fichier JSON de la langue
-  // Note: En dev, Vite gère dynamiquement les imports. En prod, Astro bundle tout.
-  // Si le fichier n'existe pas, le catch prendra le relais.
-  const loaded = (await import(`../../../i18n/${detectedLang}.json`)).default;
-  if (loaded?.auth) {
-    t = {
-      login: loaded.auth.signIn || t.login,
-      profile: loaded.auth.profile || t.profile,
-      logout: loaded.auth.signOut || t.logout,
-      admin: loaded.adminPanel?.title || loaded.nav?.admin || t.admin,
-    };
-  }
-} catch (e) {
-  // Silencieusement ignorer si le fichier de langue manque (fallback utilisé)
-}
 
 const user = Astro.locals.user;
 const userIsAdmin = isAdminUser(user);

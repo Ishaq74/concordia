@@ -5,6 +5,7 @@ import Header from "@components/templates/Header/Header.astro";
 import Footer from "@components/templates/Footer/Footer.astro";
 import verifyClientScript from "@components/templates/auth/verify-email.client.ts?url";
 import forgotClientScript from "@components/templates/auth/forgot-password.client.ts?url";
+import { getTranslations } from "@i18n/translations";
 
 interface Props {
   title?: string;
@@ -48,12 +49,13 @@ const {
   dir,
 } = props;
 
-// Titre: NomDuSite > NomDeLaPage
-const siteTitle = "Default Title";
-const pageTitle = rawTitle ? `${siteTitle} > ${rawTitle}` : siteTitle;
-
 // Get current locale from Astro
 const currentLocale = Astro.currentLocale || "fr";
+const t = getTranslations(currentLocale);
+
+// Titre: NomDuSite > NomDeLaPage
+const siteTitle = t.common?.defaultTitle ?? "Concordia";
+const pageTitle = rawTitle ? `${siteTitle} > ${rawTitle}` : siteTitle;
 
 // Safe fallbacks from site identity
 const htmlLang = lang ?? currentLocale;

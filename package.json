@@ -25,10 +25,10 @@
     "test:coverage": "vitest --coverage",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration --maxWorkers 1 --no-file-parallelism",
-    "test:e2e": "vitest run tests/e2e",
+    "test:e2e": "vitest run tests/e2e/critical-flows.test.ts",
     "test:ui": "pnpm exec playwright test tests/e2e/ui",
-    "test:security": "vitest run tests/e2e/security.test.ts",
-    "test:api": "vitest run tests/e2e/api-auth.test.ts",
+    "test:security": "vitest run tests/security/security.test.ts",
+    "test:api": "vitest run tests/integration/auth-flow.test.ts",
     "test:all": "vitest run",
     "test:debug": "vitest --inspect-brk --inspect --single-thread",
     "test:ci": "vitest run --coverage"

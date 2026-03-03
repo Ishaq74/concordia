@@ -2,7 +2,7 @@
 export const prerender = false;
 
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
 
 interface Props {
@@ -12,15 +12,16 @@ interface Props {
 }
 
 const { title, description, activeSection } = Astro.props;
+import { getTranslations } from "@i18n/translations";
 const currentLocale = Astro.currentLocale || "fr";
-const t = await import(`../i18n/${currentLocale}.json`);
+const t = getTranslations(currentLocale);
 
 const user = Astro.locals.user;
 if (!user) {
   return Astro.redirect(
-    getRelativeLocaleUrl(
+    getLocalizedUrl(
       currentLocale,
-      currentLocale === "fr" ? "/auth/connexion" : "/auth/sign-in"
+      "/auth/sign-in"
     ) || '#'
   );
 }
@@ -30,70 +31,70 @@ const dashboardLinks = [
     key: "profile",
     label: t.dashboard.profile,
     href:
-      getRelativeLocaleUrl(
+      getLocalizedUrl(
         currentLocale,
-        currentLocale === "fr" ? "/profil" : "/profile"
+        "/profile"
       ) || '#',
     icon: "mdi:account",
   },
   {
     key: "places",
     label: t.dashboard.myPlaces,
-    href: getRelativeLocaleUrl(currentLocale, "/dashboard/places") || '#',
+    href: getLocalizedUrl(currentLocale, "/dashboard/places") || '#',
     icon: "mdi:map-marker",
   },
   {
     key: "blog",
     label: t.dashboard.myArticles,
-    href: getRelativeLocaleUrl(currentLocale, "/dashboard/blog") || '#',
+    href: getLocalizedUrl(currentLocale, "/dashboard/blog") || '#',
     icon: "mdi:newspaper",
   },
   {
     key: "ads",
     label: t.dashboard.myAds,
-    href: getRelativeLocaleUrl(currentLocale, "/dashboard/classifieds") || '#',
+    href: getLocalizedUrl(currentLocale, "/dashboard/classifieds") || '#',
     icon: "mdi:tag",
   },
   {
     key: "services",
     label: t.dashboard.myServices,
-    href: getRelativeLocaleUrl(currentLocale, "/dashboard/services") || '#',
+    href: getLocalizedUrl(currentLocale, "/dashboard/services") || '#',
     icon: "mdi:briefcase",
   },
   {
     key: "bookings",
     label: t.dashboard.myBookings,
-    href: getRelativeLocaleUrl(currentLocale, "/dashboard/bookings") || '#',
+    href: getLocalizedUrl(currentLocale, "/dashboard/bookings") || '#',
     icon: "mdi:calendar-check",
   },
   {
     key: "favorites",
     label: t.dashboard.favorites,
-    href: getRelativeLocaleUrl(currentLocale, "/dashboard/favorites") || '#',
+    href: getLocalizedUrl(currentLocale, "/dashboard/favorites") || '#',
     icon: "mdi:heart",
   },
   {
     key: "messages",
     label: t.dashboard.messages,
-    href: getRelativeLocaleUrl(currentLocale, "/dashboard/messages") || '#',
+    href: getLocalizedUrl(currentLocale, "/dashboard/messages") || '#',
     icon: "mdi:message",
   },
   {
     key: "notifications",
     label: t.dashboard.notifications,
-    href: getRelativeLocaleUrl(currentLocale, "/dashboard/notifications") || '#',
+    href: getLocalizedUrl(currentLocale, "/dashboard/notifications") || '#',
     icon: "mdi:bell",
   },
   {
     key: "wallet",
     label: t.dashboard.wallet,
-    href: getRelativeLocaleUrl(currentLocale, "/dashboard/wallet") || '#',
+    href: getLocalizedUrl(currentLocale, "/dashboard/wallet") || '#',
     icon: "mdi:wallet",
   },
   {
     key: "mediation",
     label: t.dashboard.mediation,
-    href: getRelativeLocaleUrl(currentLocale, "/dashboard/mediation") || '#',
+    href: getLocalizedUrl(currentLocale, "/dashboard/mediation") || '#',
     icon: "mdi:scale-balance",
   },
 ];

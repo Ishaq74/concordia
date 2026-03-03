@@ -2,6 +2,7 @@
 import BaseLayout from "./BaseLayout.astro";
 import Sidebar from "@components/templates/docs/Sidebar.astro";
 import MainDoc from "@components/templates/docs/MainDoc.astro";
+import { getTranslations } from "@i18n/translations";
 
 export interface Props {
   title: string;
@@ -10,6 +11,7 @@ export interface Props {
 }
 
 const { title, description, variant = 'initial' } = Astro.props;
+const t = getTranslations(Astro.currentLocale || "fr");
 
 // Récupérer les headings de la page pour le sommaire
 let headings: Array<{depth: number, slug: string, text: string}> = [];
@@ -39,7 +41,7 @@ try {
     {headings.length > 0 && (
       <aside class="doc-toc">
         <div class="doc-toc-content">
-          <h2 class="doc-toc-title">Sur cette page</h2>
+          <h2 class="doc-toc-title">{t.docs?.common?.tableOfContents ?? "Table des matières"}</h2>
           <nav class="doc-toc-nav">
             <ul class="doc-toc-list">
               {headings.map(heading => (

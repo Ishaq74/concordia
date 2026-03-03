@@ -58,10 +58,10 @@ const hasOrganizations = organizations.length > 0;
       <div class="profile-org__header-text">
         <h2 class="profile-org__title">
           <Icon name="mdi:office-building-outline" />
-          Gestion des organisations
+          {translations.profile?.orgManagement ?? "Gestion des organisations"}
         </h2>
         <p class="profile-org__description">
-          Gérez vos organisations, invitez des membres et configurez les paramètres.
+          {translations.profile?.orgManagementDesc ?? "Gérez vos organisations, invitez des membres et configurez les paramètres."}
         </p>
       </div>
     </div>
@@ -69,10 +69,9 @@ const hasOrganizations = organizations.length > 0;
     {!hasOrganizations ? (
       <div class="profile-org__empty">
         <Icon name="mdi:account-group-outline" />
-        <p class="profile-org__empty-title">Aucune organisation</p>
+        <p class="profile-org__empty-title">{translations.profile?.noOrganization ?? "Aucune organisation"}</p>
         <p class="profile-org__empty-hint">
-          Vous n'êtes membre d'aucune organisation pour le moment.
-          Rejoignez ou créez une organisation pour collaborer avec d'autres citoyens.
+          {translations.profile?.noOrgHint ?? "Vous n'êtes membre d'aucune organisation pour le moment. Rejoignez ou créez une organisation pour collaborer avec d'autres citoyens."}
         </p>
       </div>
     ) : (
@@ -91,7 +90,7 @@ const hasOrganizations = organizations.length > 0;
                 )}
               </div>
               {org.id === activeOrganizationId && (
-                <span class="profile-org__card-active">Active</span>
+                <span class="profile-org__card-active">{translations.profile?.active ?? "Active"}</span>
               )}
             </div>
           ))}
@@ -104,35 +103,35 @@ const hasOrganizations = organizations.length > 0;
             <div class="profile-org__members">
               <Flex justifyContent="space-between" alignItems="center">
                 <h3 class="profile-org__section-title">
-                  Membres ({members.length})
+                  {translations.profile?.membersLabel ?? "Membres"} ({members.length})
                 </h3>
                 {canManageOrganization && (
                   <Dialog id="dialog-invite-member">
                     <DialogTrigger for="dialog-invite-member">
                       <Button variant="modern" color="primary" icon={{ name: "mdi:account-plus-outline", side: "left" }}>
-                        Inviter
+                        {translations.profile?.invite ?? "Inviter"}
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Inviter un membre</DialogTitle>
+                        <DialogTitle>{translations.profile?.inviteMember ?? "Inviter un membre"}</DialogTitle>
                       </DialogHeader>
                       <form method="POST" class="profile-org__invite-form">
                         <input type="hidden" name="intent" value="invite-member" />
                         <Label htmlFor="invite-email">{translations.auth?.email ?? "Email"}</Label>
-                        <Input id="invite-email" type="email" name="email" required placeholder="membre@exemple.com" />
+                        <Input id="invite-email" type="email" name="email" required placeholder={translations.profile?.inviteEmailPlaceholder ?? "membre@exemple.com"} />
                         <Label htmlFor="invite-role">{translations.auth?.admin ?? "Rôle"}</Label>
                         <Select id="invite-role" name="role">
-                          <option value="member">Membre</option>
-                          <option value="admin">Admin</option>
-                          <option value="owner">Propriétaire</option>
+                          <option value="member">{translations.profile?.roleMember ?? "Membre"}</option>
+                          <option value="admin">{translations.profile?.roleAdmin ?? "Admin"}</option>
+                          <option value="owner">{translations.profile?.roleOwner ?? "Propriétaire"}</option>
                         </Select>
                         <Checkbox id="invite-resend" name="resend">
                           {translations.auth?.resendInvite ?? "Renvoyer si déjà invité"}
                         </Checkbox>
                         <DialogFooter>
                           <Button type="submit" variant="modern" color="primary">
-                            Envoyer l'invitation
+                            {translations.profile?.sendInvitation ?? "Envoyer l'invitation"}
                           </Button>
                         </DialogFooter>
                       </form>
@@ -142,7 +141,7 @@ const hasOrganizations = organizations.length > 0;
               </Flex>
 
               {members.length === 0 ? (
-                <p class="profile-org__no-members">Aucun membre à afficher.</p>
+                <p class="profile-org__no-members">{translations.profile?.noMembers ?? "Aucun membre à afficher."}</p>
               ) : (
                 <div class="profile-org__member-list">
                   {members.map((member) => (
@@ -169,7 +168,7 @@ const hasOrganizations = organizations.length > 0;
                   <input type="hidden" name="intent" value="leave-organization" />
                   <input type="hidden" name="organizationId" value={activeOrganizationId} />
                   <Button type="submit" variant="modern" color="error" icon={{ name: "mdi:logout", side: "left" }}>
-                    Quitter l'organisation
+                    {translations.profile?.leaveOrg ?? "Quitter l'organisation"}
                   </Button>
                 </form>
               </div>

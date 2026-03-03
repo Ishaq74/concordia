@@ -3,11 +3,12 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import Button from "@components/ui/Button.astro";
 import Card from "@components/ui/Card/Card.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
-import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
+import { getTranslations } from "@i18n/translations";
 const currentLocale = Astro.currentLocale || "fr";
-const translations = await import(`../i18n/${currentLocale}.json`);
-const t = translations.default.errors || {
+const translationsData = getTranslations(currentLocale);
+const t = translationsData.errors || {
     serverError: {
         title: "Erreur serveur",
         subtitle: "Erreur 500",
@@ -77,7 +78,7 @@ const error = t.serverError;
                             </li>
                             <li>
                                 <a
-                                    href={getRelativeLocaleUrl(
+                                    href={getLocalizedUrl(
                                         currentLocale,
                                         "contact",
                                     ) || '#'}
@@ -91,7 +92,7 @@ const error = t.serverError;
                     <!-- Actions -->
                     <div class="error-actions">
                         <Button
-                            href={getRelativeLocaleUrl(currentLocale, "") || '#'}
+                            href={getLocalizedUrl(currentLocale, "") || '#'}
                             variant="modern"
                             color="primary"
                             size="large"
@@ -99,7 +100,7 @@ const error = t.serverError;
                             {error.returnHome}
                         </Button>
                         <Button
-                            href={getRelativeLocaleUrl(
+                            href={getLocalizedUrl(
                                 currentLocale,
                                 "contact",
                             ) || '#'}

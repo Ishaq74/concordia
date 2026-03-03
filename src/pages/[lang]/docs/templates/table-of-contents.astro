@@ -1,0 +1,243 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import TOC from "@components/templates/docs/TableOfContents.astro";
+import Alert from "@components/ui/Alert.astro";
+import Badge from "@components/ui/Badge.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardHeader from "@components/ui/Card/CardHeader.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import { getTranslations } from "@i18n/translations";
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const d = t.docs?.common ?? {};
+const p = t.docs?.pages?.tocTemplate ?? {};
+
+const sampleItems = [
+  { label: d.demoIntroduction ?? "Introduction", href: "#introduction" },
+  { label: d.installation ?? "Installation", href: "#installation" },
+  { label: d.usage ?? "Usage", href: "#usage" },
+  { label: d.props ?? "Props", href: "#props" },
+  { label: d.examples ?? "Examples", href: "#examples" },
+];
+---
+
+<DocLayout
+  title={p.title ?? "TableOfContents Template"}
+  description={p.description ?? "Navigation component for documentation pages"}
+  variant="initial"
+>
+  <h1 id="table-of-contents">{p.title ?? "TableOfContents"}</h1>
+
+  <p set:html={p.intro ?? `The <code class="inline-code">TableOfContents</code> component provides consistent and accessible  navigation for documentation pages. It displays a list of links to page sections with a design  adapted to each variant.`} />
+
+  <TOC
+    items={[
+      { label: d.usage ?? "Usage", href: "#usage" },
+      { label: d.variants ?? "Variants", href: "#variants" },
+      { label: d.props ?? "Props", href: "#props" },
+      { label: d.examples ?? "Examples", href: "#examples" },
+      { label: d.accessibility ?? "Accessibility", href: "#accessibility" },
+    ]}
+    title={d.tableOfContents ?? "Table of Contents"}
+  />
+
+  <h2 id="usage">{d.usage ?? "Usage"}</h2>
+
+  <Code lang="astro" code={`---
+import TableOfContents from '@components/templates/docs/TableOfContents.astro';
+
+const tocItems = [
+  { label: d.demoIntroduction ?? "Introduction", href: "#introduction" },
+  { label: d.installation ?? "Installation", href: "#installation" },
+  { label: d.demoApi ?? "API", href: "#api" },
+];
+---
+
+<TableOfContents items={tocItems} />`} />
+
+  <Alert variant="initial" status="info">
+    <strong>✅ Automatic:</strong> The component automatically generates navigation with appropriate anchors.
+  </Alert>
+
+  <h2 id="props">{d.props ?? "Props"}</h2>
+
+  <Table variant="initial">
+    <TableHead>
+      <TableRow>
+        <TableHeader>Prop</TableHeader>
+        <TableHeader>Type</TableHeader>
+        <TableHeader>Default</TableHeader>
+        <TableHeader>Description</TableHeader>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      <TableRow>
+        <TableCell><code>items</code></TableCell>
+        <TableCell><code>Array&lt;{'{'}label: string, href: string{'}'}&gt;</code></TableCell>
+        <TableCell><code>[]</code></TableCell>
+        <TableCell>{d.descNavItems ?? "List of navigation items"}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>title</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>'Table of Contents'</code></TableCell>
+        <TableCell>{d.descComponentTitle ?? "Component title"}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>variant</code></TableCell>
+        <TableCell><code>'initial' | 'retro' | 'modern' | 'futuristic'</code></TableCell>
+        <TableCell><code>'initial'</code></TableCell>
+        <TableCell>{d.descVisualStyle ?? "Visual style of the component"}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell><code>className</code></TableCell>
+        <TableCell><code>string</code></TableCell>
+        <TableCell><code>''</code></TableCell>
+        <TableCell>{d.descAdditionalCss ?? "Additional CSS classes"}</TableCell>
+      </TableRow>
+    </TableBody>
+  </Table>
+
+  <h2 id="variants">{d.variants ?? "Variants"}</h2>
+
+  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+    <Badge>initial</Badge>
+    <Badge>retro</Badge>
+    <Badge>modern</Badge>
+    <Badge>futuristic</Badge>
+  </div>
+
+  <h3>{d.variantInitial ?? "Initial"}</h3>
+  <p>Clean design with subtle shadows.</p>
+
+  <div style="max-width: 600px;">
+    <TOC
+      variant="initial"
+      items={sampleItems}
+      title={d.tableOfContents ?? "Table of Contents"}
+    />
+  </div>
+
+  <h3>{d.variantRetro ?? "Retro"}</h3>
+  <p>Retro style with thick borders and monospace typography.</p>
+
+  <div style="max-width: 600px;">
+    <TOC
+      variant="retro"
+      items={sampleItems}
+      title={d.tableOfContents ?? "Table of Contents"}
+    />
+  </div>
+
+  <h3>{d.variantModern ?? "Modern"}</h3>
+  <p>Modern design with gradients and glassmorphism effects.</p>
+
+  <div style="max-width: 600px;">
+    <TOC
+      variant="modern"
+      items={sampleItems}
+      title={d.tableOfContents ?? "Table of Contents"}
+    />
+  </div>
+
+  <h3>{d.variantFuturistic ?? "Futuristic"}</h3>
+  <p>Futuristic design with neon lights and animated effects.</p>
+
+  <div style="max-width: 600px;">
+    <TOC
+      variant="futuristic"
+      items={sampleItems}
+      title={d.tableOfContents ?? "Table of Contents"}
+    />
+  </div>
+
+  <h2 id="examples">{d.examples ?? "Examples"}</h2>
+
+  <h3>{d.longToc ?? "Long Table of Contents"}</h3>
+
+  <Card>
+    <CardHeader>
+      <h4 style="margin: 0;">Complete Documentation</h4>
+    </CardHeader>
+    <CardContent>
+      <TOC
+        items={[
+          { label: d.demoIntroduction ?? "Introduction", href: "#intro" },
+          { label: d.installation ?? "Installation", href: "#install" },
+          { label: d.demoConfiguration ?? "Configuration", href: "#config" },
+          { label: d.basicUsage ?? "Basic Usage", href: "#basic" },
+          { label: d.advancedUsage ?? "Advanced Usage", href: "#advanced" },
+          { label: d.apiReference ?? "API Reference", href: "#api" },
+          { label: d.props ?? "Props", href: "#props" },
+          { label: d.demoMethods ?? "Methods", href: "#methods" },
+          { label: d.demoEvents ?? "Events", href: "#events" },
+          { label: d.examples ?? "Examples", href: "#examples" },
+          { label: d.accessibility ?? "Accessibility", href: "#a11y" },
+          { label: d.performance ?? "Performance", href: "#performance" },
+          { label: d.demoFaq ?? "FAQ", href: "#faq" },
+        ]}
+        title="Complete Summary"
+      />
+    </CardContent>
+  </Card>
+
+  <h3>{d.customTitleH3 ?? "Custom Title"}</h3>
+
+  <Code lang="html" code={`<TableOfContents
+  items={tocItems}
+  title="📚 On This Page"
+/>`} />
+
+  <div style="max-width: 600px;">
+    <TOC
+      items={sampleItems.slice(0, 4)}
+      title="📚 On This Page"
+    />
+  </div>
+
+  <h2 id="accessibility">{d.accessibility ?? "Accessibility"}</h2>
+
+  <Alert variant="initial" status="success">
+    <strong>♿ Accessibility:</strong>
+    <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+      <li>Uses semantic <code>&lt;nav&gt;</code> element</li>
+      <li><code>aria-label</code> attribute for screen readers</li>
+      <li>{p.ui1 ?? "Visible focus on all links"}</li>
+      <li>{p.ui2 ?? "Full keyboard navigation"}</li>
+      <li>{p.ui3 ?? "Sufficient contrast for all variants"}</li>
+    </ul>
+  </Alert>
+
+  <h3>{d.sliderFeatures ?? "Features"}</h3>
+  <ul>
+    <li>✅ Semantic navigation with <code>&lt;nav&gt;</code></li>
+    <li>{p.ui4 ?? "✅ Decorative icon with emoji"}</li>
+    <li>{p.ui5 ?? "✅ Hover states with smooth transitions"}</li>
+    <li>{p.ui6 ?? "✅ Accessible focus states"}</li>
+    <li>{p.ui7 ?? "✅ Responsive adaptive design"}</li>
+    <li>{p.ui8 ?? "✅ Dark mode support"}</li>
+    <li>{p.ui9 ?? "✅ 4 unique visual variants"}</li>
+    <li>{p.ui10 ?? "✅ Custom animations per variant"}</li>
+    <li>{p.ui11 ?? "✅ Flexible structure for any content"}</li>
+  </ul>
+
+  <h3>{d.bestPractices ?? "Best Practices"}</h3>
+
+  <Alert variant="initial" status="warning">
+    <strong>💡 Tips:</strong>
+    <ul style="margin: 0.5rem 0 0 0; padding-left: 1.5rem;">
+      <li>{p.ui12 ?? "Place the table of contents at the beginning of content"}</li>
+      <li>{p.ui13 ?? "Use short and descriptive labels"}</li>
+      <li>{p.ui14 ?? "Ensure anchors exist in the page"}</li>
+      <li>{p.ui15 ?? "Limit to 8-10 items for better readability"}</li>
+      <li>{p.ui16 ?? "Use the same variant as the documentation page"}</li>
+    </ul>
+  </Alert>
+</DocLayout>

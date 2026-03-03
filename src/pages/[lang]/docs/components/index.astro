@@ -1,0 +1,81 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { getTranslations } from "@i18n/translations";
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const d = t.docs?.common ?? {};
+const p = t.docs?.pages ?? {};
+---
+
+<DocLayout 
+  title={p.componentsIndexTitle ?? "Composants"}
+  description={p.componentsIndexDesc ?? "Composants UI complexes"}
+  variant="initial"
+>
+  <h1 id="components">{p.componentsIndexTitle ?? "Composants"}</h1>
+  
+  <p>{p.componentsIndexDesc ?? "Composants UI complexes composés de plusieurs éléments — accordéons, avatars, galeries, et plus."}</p>
+
+  <div class="components-grid">
+    <a href={`/${lang}/docs/components/accordion`} class="component-card">
+      <h3>{t.docsSidebar?.accordion ?? "Accordéon"}</h3>
+      <p>{p.accordion?.description ?? "Sections dépliables"}</p>
+    </a>
+    <a href={`/${lang}/docs/components/avatar`} class="component-card">
+      <h3>{t.docsSidebar?.avatar ?? "Avatar"}</h3>
+      <p>{p.avatar?.description ?? "Photos de profil"}</p>
+    </a>
+    <a href={`/${lang}/docs/components/breadcrumb`} class="component-card">
+      <h3>{t.docsSidebar?.breadcrumb ?? "Fil d'Ariane"}</h3>
+      <p>{p.breadcrumb?.description ?? "Navigation par fil d'Ariane"}</p>
+    </a>
+    <a href={`/${lang}/docs/components/gallery`} class="component-card">
+      <h3>{t.docsSidebar?.gallery ?? "Galerie"}</h3>
+      <p>{p.gallery?.description ?? "Galeries d'images"}</p>
+    </a>
+    <a href={`/${lang}/docs/components/pagination`} class="component-card">
+      <h3>{t.docsSidebar?.pagination ?? "Pagination"}</h3>
+      <p>{p.pagination?.description ?? "Navigation par pages"}</p>
+    </a>
+    <a href={`/${lang}/docs/components/progressbar`} class="component-card">
+      <h3>{t.docsSidebar?.progressbar ?? "Barre de progression"}</h3>
+      <p>{p.progressbar?.description ?? "Barres de progression"}</p>
+    </a>
+    <a href={`/${lang}/docs/components/skeleton`} class="component-card">
+      <h3>{t.docsSidebar?.skeleton ?? "Squelette"}</h3>
+      <p>{p.skeleton?.description ?? "Indicateurs de chargement"}</p>
+    </a>
+    <a href={`/${lang}/docs/components/slider`} class="component-card">
+      <h3>{t.docsSidebar?.slider ?? "Slider"}</h3>
+      <p>{p.slider?.description ?? "Carrousels"}</p>
+    </a>
+    <a href={`/${lang}/docs/components/timeline`} class="component-card">
+      <h3>{t.docsSidebar?.timeline ?? "Chronologie"}</h3>
+      <p>{p.timeline?.description ?? "Chronologies"}</p>
+    </a>
+  </div>
+</DocLayout>
+
+<style>
+  .components-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .component-card {
+    display: block;
+    padding: 1.25rem;
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .component-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .component-card h3 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+  .component-card p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
+</style>

@@ -1,5 +1,6 @@
 ---
 import { Icon } from 'astro-icon/components';
+import { getTranslations } from "@i18n/translations";
 
 interface Props {
   variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
@@ -11,6 +12,8 @@ const {
   class: className = '',
 } = Astro.props;
 
+const t = getTranslations(Astro.currentLocale || "fr");
+
 const buttonClass = [
   'theme-switch',
   variant !== 'initial' && variant,
@@ -21,7 +24,7 @@ const buttonClass = [
 <button 
   class={buttonClass}
   id="theme-switch"
-  aria-label="Changer le thème"
+  aria-label={t.header?.changeTheme ?? "Changer le thème"}
   type="button"
 >
   <Icon name="mdi:white-balance-sunny" class="icon-light" />

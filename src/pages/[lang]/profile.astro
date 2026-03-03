@@ -1,0 +1,7 @@
+---
+export const prerender = false;
+
+const lang = Astro.params.lang as string;
+// Redirect to auth/profile within the same lang
+return Astro.redirect(`/${lang}/auth/profile`);
+---

@@ -5,7 +5,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import Link from "@components/ui/Link.astro";
 import Badge from "@components/ui/Badge.astro";
 import { Icon } from "astro-icon/components";
-import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 import { isAdminUser } from "@lib/admin/permissions";
 import AdminToast from "@components/admin/AdminToast.astro";
 
@@ -16,8 +16,9 @@ interface Props {
 }
 
 const { title, description, activeSection } = Astro.props;
+import { getTranslations } from "@i18n/translations";
 const currentLocale = Astro.currentLocale || "fr";
-const t = (await import(`../i18n/${currentLocale}.json`)).default;
+const t = getTranslations(currentLocale);
 
 const user = Astro.locals.user;
 
@@ -30,7 +31,7 @@ if (!user) {
 }
 
 if (!isAdminUser(user)) {
-  return Astro.redirect(getRelativeLocaleUrl(currentLocale, "/") || "/", 302);
+  return Astro.redirect(getLocalizedUrl(currentLocale, "/") || "/", 302);
 }
 
 const adminBase = `/${currentLocale}/admin`;
@@ -88,31 +89,31 @@ const navGroups: AdminNavGroup[] = [
     items: [
       {
         key: "blog-articles",
-        label: "Articles",
+        label: t.adminPanel?.navArticles ?? "Articles",
         href: `${adminBase}/blog/articles`,
         icon: "mdi:newspaper-variant-outline",
       },
       {
         key: "blog-categories",
-        label: "Catégories",
+        label: t.adminPanel?.navCategories ?? "Catégories",
         href: `${adminBase}/blog/categories`,
         icon: "mdi:folder-outline",
       },
       {
         key: "blog-authors",
-        label: "Auteurs",
+        label: t.adminPanel?.navAuthors ?? "Auteurs",
         href: `${adminBase}/blog/authors`,
         icon: "mdi:account-edit",
       },
       {
         key: "blog-media",
-        label: "Médias",
+        label: t.adminPanel?.navMedia ?? "Médias",
         href: `${adminBase}/blog/media`,
         icon: "mdi:image-multiple",
       },
       {
         key: "blog-comments",
-        label: "Commentaires",
+        label: t.adminPanel?.navComments ?? "Commentaires",
         href: `${adminBase}/blog/comments`,
         icon: "mdi:comment-text-multiple-outline",
       },
@@ -125,7 +126,7 @@ const navGroups: AdminNavGroup[] = [
   <div class="admin-layout">
     <!-- Mobile top bar -->
     <div class="admin-mobile-bar">
-      <button type="button" class="admin-hamburger" id="admin-hamburger" aria-label="Menu admin" aria-expanded="false">
+      <button type="button" class="admin-hamburger" id="admin-hamburger" aria-label={t.adminPanel?.menuAdmin ?? "Menu admin"} aria-expanded="false">
         <Icon name="mdi:menu" class="hamburger-icon" />
       </button>
       <div class="admin-mobile-bar-title">
@@ -141,7 +142,7 @@ const navGroups: AdminNavGroup[] = [
       <div class="admin-sidebar-header">
         <Badge color="error" text="Admin" />
         <span class="admin-sidebar-title">{t.adminPanel?.title ?? "Administration"}</span>
-        <button type="button" class="admin-sidebar-close" id="admin-sidebar-close" aria-label="Fermer le menu">
+        <button type="button" class="admin-sidebar-close" id="admin-sidebar-close" aria-label={t.adminPanel?.closeMenu ?? "Fermer le menu"}>
           <Icon name="mdi:close" />
         </button>
       </div>
@@ -168,7 +169,7 @@ const navGroups: AdminNavGroup[] = [
 
       <div class="admin-sidebar-footer">
         <Link
-          href={getRelativeLocaleUrl(currentLocale, "/") || "/"}
+          href={getLocalizedUrl(currentLocale, "/") || "/"}
           style="link"
           className="admin-back-link"
         >

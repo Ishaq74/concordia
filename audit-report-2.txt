@@ -1,0 +1,574 @@
+﻿­ƒöì COMPREHENSIVE I18N AUDIT
+
+================================================================================
+
+Scanning 69 .astro files...
+
+
+­ƒôä src/pages/[lang]/admin/blog/articles/[id]/edit.astro (5 issues)
+------------------------------------------------------------
+  ­ƒÅÀ´©Å  placeholder="5 min"
+  ­ƒÅÀ´©Å  placeholder="CC-BY-4.0"
+  ­ƒôæ label: "Fran├ºais"
+  ­ƒôæ label: "Espa├▒ol"
+  ­ƒôæ label: "Ïº┘äÏ╣Ï▒Ï¿┘èÏ®"
+
+­ƒôä src/pages/[lang]/admin/blog/articles/new.astro (5 issues)
+------------------------------------------------------------
+  ­ƒÅÀ´©Å  placeholder="5 min"
+  ­ƒÅÀ´©Å  placeholder="CC-BY-4.0"
+  ­ƒôæ label: "Fran├ºais"
+  ­ƒôæ label: "Espa├▒ol"
+  ­ƒôæ label: "Ïº┘äÏ╣Ï▒Ï¿┘èÏ®"
+
+­ƒôä src/pages/[lang]/admin/blog/authors/[id]/edit.astro (3 issues)
+------------------------------------------------------------
+  ­ƒôæ label: "Fran├ºais"
+  ­ƒôæ label: "Espa├▒ol"
+  ­ƒôæ label: "Ïº┘äÏ╣Ï▒Ï¿┘èÏ®"
+
+­ƒôä src/pages/[lang]/admin/blog/authors/new.astro (3 issues)
+------------------------------------------------------------
+  ­ƒôæ label: "Fran├ºais"
+  ­ƒôæ label: "Espa├▒ol"
+  ­ƒôæ label: "Ïº┘äÏ╣Ï▒Ï¿┘èÏ®"
+
+­ƒôä src/pages/[lang]/admin/blog/categories/[id]/edit.astro (3 issues)
+------------------------------------------------------------
+  ­ƒôæ label: "Fran├ºais"
+  ­ƒôæ label: "Espa├▒ol"
+  ­ƒôæ label: "Ïº┘äÏ╣Ï▒Ï¿┘èÏ®"
+
+­ƒôä src/pages/[lang]/admin/blog/categories/new.astro (3 issues)
+------------------------------------------------------------
+  ­ƒôæ label: "Fran├ºais"
+  ­ƒôæ label: "Espa├▒ol"
+  ­ƒôæ label: "Ïº┘äÏ╣Ï▒Ï¿┘èÏ®"
+
+­ƒôä src/pages/[lang]/admin/blog/media/index.astro (12 issues)
+------------------------------------------------------------
+  ­ƒôØ <p> "${i18n.noMedia ?? "Aucun m├®dia trouv├®."}"
+  ­ƒôØ <p> "${i18n.loadError ?? "Erreur de chargement."}"
+  ­ƒôØ <span> ".jpg"
+  ­ƒôØ <span> "${filename}"
+  ­ƒôØ <span> "${dateStr}"
+  ­ƒôØ <span> "${mediaCountText}"
+  ­ƒôØ <span> "${mediaCountText}"
+  ­ƒôØ <button> "${i18n.prevPage ?? "ÔÇ╣ Pr├®c├®dent"}"
+  ­ƒôØ <button> "${i}"
+  ­ƒôØ <button> "= data.totalPages ? "disabled" : ""}>${i18n.nextPage ?? "Suivant ÔÇ║"}"
+  ­ƒÅÀ´©Å  title="${filename}"
+  ­ƒÅÀ´©Å  alt="${filename}"
+
+­ƒôä src/pages/[lang]/admin/users/index.astro (1 issues)
+------------------------------------------------------------
+  ­ƒôØ <span> "@{u.displayUsername || u.username}"
+
+­ƒôä src/pages/[lang]/auth/legal.astro (3 issues)
+------------------------------------------------------------
+  ­ƒÅÀ´©Å  alt="plus graphic"
+  ­ƒÅÀ´©Å  alt="plus graphic"
+  ­ƒÅÀ´©Å  alt="plus graphic"
+
+­ƒôä src/pages/[lang]/docs/components/accordion.astro (64 issues)
+------------------------------------------------------------
+  ­ƒôØ <p> "Answer..."
+  ­ƒôØ <p> "Another answer..."
+  ­ƒôØ <p> "Rounded corners, soft border. The background becomes slightly blue when open."
+  ­ƒôØ <p> "Animation via grid-template-rows."
+  ­ƒôØ <p> "Open me to see the primary color applied."
+  ­ƒôØ <p> "Square border + stepped shadow. The background and title become purple when open."
+  ­ƒôØ <p> "Open me to see the retro purple effect."
+  ­ƒôØ <p> "Subtle background with pink gradient, light colored shadow."
+  ­ƒôØ <p> "Open me to see the modern pink gradient."
+  ­ƒôØ <p> "Cut angles with yellow glow, diagonal gradient and text-shadow."
+  ­ƒôØ <p> "Tightened typography with neon effect."
+  ­ƒôØ <p> "Open me to see the outer glow and gradient."
+  ­ƒôØ <p> "ÔùÅ Primary (Yellow)"
+  ­ƒôØ <p> "Open me to see the yellow style."
+  ­ƒôØ <p> "ÔùÅ Secondary (Purple)"
+  ­ƒôØ <p> "Open me to see the purple style."
+  ­ƒôØ <p> "ÔùÅ Accent (Pink)"
+  ­ƒôØ <p> "Open me to see the pink style."
+  ­ƒôØ <p> "Primary Retro"
+  ­ƒôØ <p> "Pixelated yellow background with thick yellow border and stepped shadow."
+  ­ƒôØ <p> "Secondary Retro"
+  ­ƒôØ <p> "Pixelated purple background with thick purple border."
+  ­ƒôØ <p> "Primary Modern"
+  ­ƒôØ <p> "Accent Modern"
+  ­ƒôØ <p> "Primary Futuristic"
+  ­ƒôØ <p> "Diagonal yellow gradient + yellow outer glow + yellow text-shadow."
+  ­ƒôØ <p> "Secondary Futuristic"
+  ­ƒôØ <p> "Diagonal purple gradient + purple outer glow + purple text-shadow."
+  ­ƒôØ <p> "This step is open on load."
+  ­ƒôØ <p> "Closes as soon as another step opens."
+  ­ƒôØ <p> "Pure CSS, no script."
+  ­ƒôØ <p> "This item is interactive."
+  ­ƒôØ <p> "The cursor changes and clicks are ignored."
+  ­ƒÅÀ´©Å  title="What is the UI kit?"
+  ­ƒÅÀ´©Å  title="Is the component 100% CSS?"
+  ­ƒÅÀ´©Å  title="Can I customize the colors?"
+  ­ƒÅÀ´©Å  title="Une autre question"
+  ­ƒÅÀ´©Å  title="Default style"
+  ­ƒÅÀ´©Å  title="Transitions soft"
+  ­ƒÅÀ´©Å  title="Third item"
+  ­ƒÅÀ´©Å  title="PIXELATED LOOK"
+  ­ƒÅÀ´©Å  title="STRONG ACCENTS"
+  ­ƒÅÀ´©Å  title="8-BIT STYLE"
+  ­ƒÅÀ´©Å  title="Elegant rounded"
+  ­ƒÅÀ´©Å  title="Thin separators"
+  ­ƒÅÀ´©Å  title="Clean design"
+  ­ƒÅÀ´©Å  title="CLIP-PATH SCI-FI"
+  ­ƒÅÀ´©Å  title="UPPERCASE NEON"
+  ­ƒÅÀ´©Å  title="CYBER DESIGN"
+  ­ƒÅÀ´©Å  title="Primary accent"
+  ­ƒÅÀ´©Å  title="Closed item"
+  ­ƒÅÀ´©Å  title="Secondary accent"
+  ­ƒÅÀ´©Å  title="Closed item"
+  ­ƒÅÀ´©Å  title="Custom accent"
+  ­ƒÅÀ´©Å  title="Closed item"
+  ­ƒÅÀ´©Å  title="8-BIT YELLOW STYLE"
+  ­ƒÅÀ´©Å  title="8-BIT PURPLE STYLE"
+  ­ƒÅÀ´©Å  title="Elegant yellow gradient"
+  ­ƒÅÀ´©Å  title="Elegant pink gradient"
+  ­ƒÅÀ´©Å  title="CYBER YELLOW GLOW"
+  ­ƒÅÀ´©Å  title="CYBER PURPLE GLOW"
+  ­ƒÅÀ´©Å  title="Step 1"
+  ­ƒÅÀ´©Å  title="Step 2"
+  ­ƒÅÀ´©Å  title="Step 3"
+
+­ƒôä src/pages/[lang]/docs/components/avatar.astro (11 issues)
+------------------------------------------------------------
+  ­ƒôØ <h4> "John Doe"
+  ­ƒôØ <h4> "John Doe"
+  ­ƒôØ <p> "Excellent travail !"
+  ­ƒôØ <span> "Alice Johnson"
+  ­ƒôØ <span> "Bob Smith"
+  ­ƒôØ <span> "Charlie Brown"
+  ­ƒôØ <span> "Alice Johnson"
+  ­ƒÅÀ´©Å  alt="User 1"
+  ­ƒÅÀ´©Å  alt="User 2"
+  ­ƒÅÀ´©Å  alt="User 3"
+  ­ƒÅÀ´©Å  alt="User 1"
+
+­ƒôä src/pages/[lang]/docs/components/breadcrumb.astro (7 issues)
+------------------------------------------------------------
+  ­ƒôØ <span> "ÔÇ║"
+  ­ƒôØ <span> "┬╗"
+  ­ƒôØ <span> "ÔÇó"
+  ­ƒôØ <span> "ÔÇó"
+  ­ƒôØ <span> "ÔÇ║"
+  ­ƒôØ <span> "┬╗"
+  ­ƒôØ <span> "ÔÇó"
+
+­ƒôä src/pages/[lang]/docs/components/gallery.astro (3 issues)
+------------------------------------------------------------
+  ­ƒôØ <h4> "Retro Product"
+  ­ƒôØ <h4> "Modern Product"
+  ­ƒôØ <h4> "Futuristic Product"
+
+­ƒôä src/pages/[lang]/docs/components/pagination.astro (12 issues)
+------------------------------------------------------------
+  ­ƒôØ <p> "Simple example with 10 pages, page 5 active:"
+  ­ƒôØ <p> "Page 1 (no previous button):"
+  ­ƒôØ <p> "Page 10 (no next button):"
+  ­ƒôØ <p> "Single page (no navigation):"
+  ­ƒôØ <p> "Medium (default)"
+  ­ƒôØ <p> "siblingCount={1} (default)"
+  ­ƒôØ <p> "siblingCount={2}"
+  ­ƒôØ <p> "siblingCount={3}"
+  ­ƒôØ <p> "The component automatically displays "..." when there are many pages:"
+  ­ƒôØ <p> "Start (page 2)"
+  ­ƒôØ <p> "Middle (page 25)"
+  ­ƒôØ <p> "End (page 49)"
+
+­ƒôä src/pages/[lang]/docs/components/skeleton.astro (1 issues)
+------------------------------------------------------------
+  ­ƒÅÀ´©Å  aria-label="Loading..."
+
+­ƒôä src/pages/[lang]/docs/components/slider.astro (11 issues)
+------------------------------------------------------------
+  ­ƒôØ <p> "Simple slider with product cards."
+  ­ƒôØ <p> "Clean and minimalist design."
+  ­ƒôØ <p> ""{testimonial.text}""
+  ­ƒôØ <p> "Retro style with thick borders and drop shadows."
+  ­ƒôØ <p> ""{testimonial.text}""
+  ­ƒôØ <p> "Modern design with glassmorphism and gradients."
+  ­ƒôØ <p> "Futuristic design with neon lights and glowing effects."
+  ­ƒôØ <p> ""{testimonial.text}""
+  ­ƒôØ <li> "Native browser scrolling"
+  ­ƒôØ <li> "Lazy loading images recommended"
+  ­ƒôØ <li> "No external dependencies"
+
+­ƒôä src/pages/[lang]/docs/components/timeline.astro (3 issues)
+------------------------------------------------------------
+  ­ƒôØ <h4> "Retro alternate"
+  ­ƒôØ <h4> "Modern alternate"
+  ­ƒôØ <h4> "Futuristic alternate"
+
+­ƒôä src/pages/[lang]/docs/design/alert.astro (10 issues)
+------------------------------------------------------------
+  ­ƒôØ <li> "The close button has a "Close alert" label"
+  ­ƒÅÀ´©Å  title="Success!"
+  ­ƒÅÀ´©Å  title="Registration successful"
+  ­ƒÅÀ´©Å  title="Registration successful"
+  ­ƒÅÀ´©Å  title="Connection error"
+  ­ƒÅÀ´©Å  title="Connection error"
+  ­ƒÅÀ´©Å  title="Action required"
+  ­ƒÅÀ´©Å  title="Action required"
+  ­ƒÅÀ´©Å  title="Update available"
+  ­ƒÅÀ´©Å  title="Update available"
+
+­ƒôä src/pages/[lang]/docs/design/badge.astro (1 issues)
+------------------------------------------------------------
+  ­ƒôØ <li> "The close button has a default label "Close""
+
+­ƒôä src/pages/[lang]/docs/design/button.astro (4 issues)
+------------------------------------------------------------
+  ­ƒôØ <li> "And more..."
+  ­ƒôØ <TableHead> "Use Case"
+  ­ƒôØ <TableHead> "Component to Use"
+  ­ƒÅÀ´©Å  placeholder="ÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇó"
+
+­ƒôä src/pages/[lang]/docs/design/card.astro (23 issues)
+------------------------------------------------------------
+  ­ƒôØ <h4> "Extra Large"
+  ­ƒôØ <h4> "16:9"
+  ­ƒôØ <h4> "4:3"
+  ­ƒôØ <h4> "1:1"
+  ­ƒôØ <p> "No shadow"
+  ­ƒôØ <p> "Light shadow"
+  ­ƒôØ <p> "Medium shadow"
+  ­ƒôØ <p> "Strong shadow"
+  ­ƒôØ <p> "Very strong shadow"
+  ­ƒôØ <span> "ÔÅ░ 5 min read"
+  ­ƒôØ <span> "­ƒæñ Jane Smith"
+  ­ƒôØ <span> "­ƒÆ¼ 12 comments"
+  ­ƒôØ <span> "ÔÅ░ 5 min read"
+  ­ƒôØ <span> "­ƒæñ Jane Smith"
+  ­ƒôØ <span> "­ƒÆ¼ 12 comments"
+  ­ƒÅÀ´©Å  alt="Developer workspace"
+  ­ƒÅÀ´©Å  alt="Developer workspace"
+  ­ƒÅÀ´©Å  alt="Business analytics"
+  ­ƒÅÀ´©Å  alt="Business analytics"
+  ­ƒÅÀ´©Å  alt="Code editor"
+  ­ƒÅÀ´©Å  alt="16:9 ratio"
+  ­ƒÅÀ´©Å  alt="4:3 ratio"
+  ­ƒÅÀ´©Å  alt="1:1 ratio"
+
+­ƒôä src/pages/[lang]/docs/design/code.astro (4 issues)
+------------------------------------------------------------
+  ­ƒôØ <h1> "Code Component"
+  ­ƒôØ <h4> "GitHub Dark (default)"
+  ­ƒôØ <h4> "GitHub Light"
+  ­ƒôØ <TableCell> "github-dark"
+
+­ƒôä src/pages/[lang]/docs/design/dialog.astro (9 issues)
+------------------------------------------------------------
+  ­ƒôØ <p> "Your dialog content goes here."
+  ­ƒôØ <p> "Dialog content with the initial variant."
+  ­ƒôØ <p> "Dialog content with the retro variant."
+  ­ƒôØ <p> "Dialog content with the modern variant."
+  ­ƒôØ <p> "Dialog content with the futuristic variant."
+  ­ƒôØ <p> "Small size dialog."
+  ­ƒôØ <p> "Large size dialog."
+  ­ƒôØ <p> "Dialog title and description."
+  ­ƒÅÀ´©Å  placeholder="John Doe"
+
+­ƒôä src/pages/[lang]/docs/design/dropdown.astro (6 issues)
+------------------------------------------------------------
+  ­ƒôØ <h4> "Bottom Left (default)"
+  ­ƒôØ <h4> "Bottom Right"
+  ­ƒôØ <h4> "Top Left"
+  ­ƒôØ <h4> "Top Right"
+  ­ƒôØ <label> "Products ÔûÂ"
+  ­ƒôØ <label> "All Products"
+
+­ƒôä src/pages/[lang]/docs/design/form.astro (22 issues)
+------------------------------------------------------------
+  ­ƒôØ <h4> "Validation messages - Initial"
+  ­ƒôØ <h4> "Success - Retro"
+  ­ƒôØ <h4> "Warning - Modern"
+  ­ƒôØ <h4> "Information - Futuristic"
+  ­ƒÅÀ´©Å  title="Sign Up"
+  ­ƒÅÀ´©Å  title="Sign up successful"
+  ­ƒÅÀ´©Å  title="Edit profile"
+  ­ƒÅÀ´©Å  title="Accessible form"
+  ­ƒÅÀ´©Å  placeholder="John Doe"
+  ­ƒÅÀ´©Å  placeholder="Your message..."
+  ­ƒÅÀ´©Å  placeholder="CyberUser_2026"
+  ­ƒÅÀ´©Å  placeholder="Tell us about yourself..."
+  ­ƒÅÀ´©Å  placeholder="Search..."
+  ­ƒÅÀ´©Å  placeholder="+1 555 123 4567"
+  ­ƒÅÀ´©Å  placeholder="Your message..."
+  ­ƒÅÀ´©Å  placeholder="Describe your project..."
+  ­ƒÅÀ´©Å  placeholder="Leave a comment..."
+  ­ƒÅÀ´©Å  placeholder="Your notes..."
+  ­ƒÅÀ´©Å  placeholder="Your message..."
+  ­ƒÅÀ´©Å  placeholder="John Doe"
+  ­ƒÅÀ´©Å  aria-label="Enter your full name"
+  ­ƒÅÀ´©Å  aria-label="Enter your email"
+
+­ƒôä src/pages/[lang]/docs/design/kbd.astro (10 issues)
+------------------------------------------------------------
+  ­ƒôØ <h4> "Initial (default)"
+  ­ƒôØ <h4> "Variants + Colors (Retro Primary)"
+  ­ƒôØ <h4> "Modern Secondary"
+  ­ƒôØ <h4> "Futuristic Accent"
+  ­ƒôØ <h4> "Editor shortcuts"
+  ­ƒôØ <h4> "Global search"
+  ­ƒôØ <p> "Search all files"
+  ­ƒôØ <span> "Open search"
+  ­ƒôØ <span> "New file"
+  ­ƒôØ <span> "Select all"
+
+­ƒôä src/pages/[lang]/docs/design/menudropdown.astro (1 issues)
+------------------------------------------------------------
+  ­ƒôØ <TableCell> "bottom-left"
+
+­ƒôä src/pages/[lang]/docs/design/sheet.astro (14 issues)
+------------------------------------------------------------
+  ­ƒôØ <p> "Votre contenu va ici..."
+  ­ƒôØ <p> "Votre contenu va ici..."
+  ­ƒôØ <p> "Contenu avec le style initial..."
+  ­ƒôØ <p> "Contenu avec le style retro..."
+  ­ƒôØ <p> "Contenu avec le style modern..."
+  ­ƒôØ <p> "Contenu avec le style futuristic..."
+  ­ƒôØ <p> "Contenu..."
+  ­ƒôØ <p> "Contenu..."
+  ­ƒôØ <p> "Contenu..."
+  ­ƒôØ <p> "Contenu..."
+  ­ƒôØ <p> "Contenu depuis la droite..."
+  ­ƒôØ <p> "Contenu depuis la gauche..."
+  ­ƒôØ <p> "Contenu depuis le haut..."
+  ­ƒôØ <p> "Contenu depuis le bas..."
+
+­ƒôä src/pages/[lang]/docs/design/table.astro (64 issues)
+------------------------------------------------------------
+  ­ƒôØ <p> "Simple table with headers and data:"
+  ­ƒôØ <td> "Additional CSS classes"
+  ­ƒôØ <TableCell> "89.99Ôé¼"
+  ­ƒôØ <TableCell> "29.99Ôé¼"
+  ­ƒôØ <TableCell> "299.99Ôé¼"
+  ­ƒôØ <TableCell> "89.99Ôé¼"
+  ­ƒôØ <TableCell> "29.99Ôé¼"
+  ­ƒôØ <TableCell> "1,234.56Ôé¼"
+  ­ƒôØ <TableCell> "Company A"
+  ­ƒôØ <TableCell> "2,567.89Ôé¼"
+  ­ƒôØ <TableCell> "Company B"
+  ­ƒôØ <TableCell> "890.12Ôé¼"
+  ­ƒôØ <TableCell> "Company C"
+  ­ƒôØ <TableCell> "Web development"
+  ­ƒôØ <TableCell> "40h"
+  ­ƒôØ <TableCell> "80Ôé¼"
+  ­ƒôØ <TableCell> "3,200Ôé¼"
+  ­ƒôØ <TableCell> "UI/UX design"
+  ­ƒôØ <TableCell> "20h"
+  ­ƒôØ <TableCell> "90Ôé¼"
+  ­ƒôØ <TableCell> "1,800Ôé¼"
+  ­ƒôØ <TableCell> "50Ôé¼"
+  ­ƒôØ <TableCell> "50Ôé¼"
+  ­ƒôØ <TableCell> "D├®veloppement"
+  ­ƒôØ <TableCell> "3,200Ôé¼"
+  ­ƒôØ <TableCell> "45,000Ôé¼"
+  ­ƒôØ <TableCell> "48,000Ôé¼"
+  ­ƒôØ <TableCell> "52,000Ôé¼"
+  ­ƒôØ <TableCell> "42,000Ôé¼"
+  ­ƒôØ <TableCell> "55,000Ôé¼"
+  ­ƒôØ <TableCell> "Data 1"
+  ­ƒôØ <TableCell> "Data 2"
+  ­ƒôØ <TableCell> "Data 3"
+  ­ƒôØ <TableCell> "Data 4"
+  ­ƒôØ <TableCell> "Data 5"
+  ­ƒôØ <TableCell> "Data 6"
+  ­ƒôØ <TableCell> "Data 7"
+  ­ƒôØ <TableCell> "Data 8"
+  ­ƒôØ <TableCell> "Data 1"
+  ­ƒôØ <TableCell> "Data 2"
+  ­ƒôØ <TableCell> "Data 3"
+  ­ƒôØ <TableCell> "Data 4"
+  ­ƒôØ <TableCell> "Data 5"
+  ­ƒôØ <TableCell> "Data 6"
+  ­ƒôØ <TableCell> "Data 7"
+  ­ƒôØ <TableCell> "Data 8"
+  ­ƒôØ <TableCell> "Pok├®mon"
+  ­ƒôØ <TableCell> "9Ôé¼/month"
+  ­ƒôØ <TableCell> "29Ôé¼/month"
+  ­ƒôØ <TableCell> "49Ôé¼/month"
+  ­ƒôØ <TableCell> "99Ôé¼/month"
+  ­ƒôØ <TableCell> "AI Engine"
+  ­ƒôØ <TableCell> "9am-11am"
+  ­ƒôØ <TableCell> "11am-1pm"
+  ­ƒôØ <TableCell> "2pm-4pm"
+  ­ƒôØ <TableHead> "Unit price"
+  ­ƒôØ <TableHead> "Column 1"
+  ­ƒôØ <TableHead> "Column 2"
+  ­ƒôØ <TableHead> "Column 3"
+  ­ƒôØ <TableHead> "Column 4"
+  ­ƒôØ <TableHead> "Column 5"
+  ­ƒôØ <TableHead> "Column 6"
+  ­ƒôØ <TableHead> "Column 7"
+  ­ƒôØ <TableHead> "Column 8"
+
+­ƒôä src/pages/[lang]/docs/design/tabs.astro (33 issues)
+------------------------------------------------------------
+  ­ƒôØ <h4> "Free Plan"
+  ­ƒôØ <p> "The API ÔÇö simple and composable:"
+  ­ƒôØ <p> "First tab content..."
+  ­ƒôØ <p> "Second tab content..."
+  ­ƒôØ <p> "Third tab content..."
+  ­ƒôØ <p> "Manage your personal profile and public information."
+  ­ƒôØ <p> "Configure your account settings and preferences."
+  ­ƒôØ <p> "Control your notifications and email alerts."
+  ­ƒôØ <p> "Access all your documents and text files."
+  ­ƒôØ <p> "Browse your photo and image gallery."
+  ­ƒôØ <p> "View and manage your video content."
+  ­ƒôØ <p> "Dashboard with an overview of your key metrics."
+  ­ƒôØ <p> "Generate and download your custom reports."
+  ­ƒôØ <p> "Explore cyberspace and the metaverse."
+  ­ƒôØ <p> "Welcome to your personalized home page."
+  ­ƒôØ <p> "Manage your personal information and avatar."
+  ­ƒôØ <p> "Configure your account and system preferences."
+  ­ƒôØ <p> "Check your recent alerts and messages."
+  ­ƒôØ <p> "Real-time metrics and performance analytics."
+  ­ƒôØ <p> "Team management and collaboration."
+  ­ƒôØ <p> "Deployment and production release."
+  ­ƒôØ <p> "Artificial intelligence and machine learning."
+  ­ƒôØ <p> "Neural processors and quantum chips."
+  ­ƒôØ <p> "Computer vision systems."
+  ­ƒôØ <li> "Intuitive and elegant interface"
+  ­ƒôØ <li> "Ready-to-use code examples"
+  ­ƒôØ <li> "Best practices"
+  ­ƒôØ <li> "Intuitive and modern interface"
+  ­ƒôØ <li> "Optimized performance"
+  ­ƒôØ <li> "Cross-platform support"
+  ­ƒôØ <li> "Basic features"
+  ­ƒôØ <li> "Community support"
+  ­ƒôØ <li> "1 GB storage"
+
+­ƒôä src/pages/[lang]/docs/design/tooltip.astro (2 issues)
+------------------------------------------------------------
+  ­ƒôØ <span> "Hover me"
+  ­ƒôØ <span> "Hover me"
+
+­ƒôä src/pages/[lang]/docs/layouts/base.astro (6 issues)
+------------------------------------------------------------
+  ­ƒôØ <h1> "Contenu de la page"
+  ­ƒôØ <h1> "Mon Article"
+  ­ƒôØ <p> "Votre contenu ici..."
+  ­ƒôØ <p> "Contenu de l'article..."
+  ­ƒÅÀ´©Å  title="Ma Page"
+  ­ƒÅÀ´©Å  title="Mon Article"
+
+­ƒôä src/pages/[lang]/docs/layouts/doc.astro (7 issues)
+------------------------------------------------------------
+  ­ƒôØ <h1> "My Component"
+  ­ƒôØ <h1> "Button Component"
+  ­ƒôØ <p> "Content..."
+  ­ƒôØ <p> "More content..."
+  ­ƒôØ <p> "Usage example..."
+  ­ƒÅÀ´©Å  title="My Component"
+  ­ƒÅÀ´©Å  title="Button Component"
+
+­ƒôä src/pages/[lang]/docs/templates/footer.astro (1 issues)
+------------------------------------------------------------
+  ­ƒôØ <p> "┬® {currentYear} - Copyright"
+
+­ƒôä src/pages/[lang]/docs/templates/table-of-contents.astro (8 issues)
+------------------------------------------------------------
+  ­ƒôØ <h4> "Complete Documentation"
+  ­ƒôØ <p> "Clean design with subtle shadows."
+  ­ƒôØ <p> "Retro style with thick borders and monospace typography."
+  ­ƒôØ <p> "Modern design with gradients and glassmorphism effects."
+  ­ƒôØ <p> "Futuristic design with neon lights and animated effects."
+  ­ƒÅÀ´©Å  title="Complete Summary"
+  ­ƒÅÀ´©Å  title="­ƒôÜ On This Page"
+  ­ƒÅÀ´©Å  title="­ƒôÜ On This Page"
+
+­ƒôä src/pages/[lang]/index.astro (11 issues)
+------------------------------------------------------------
+  ­ƒôØ <span> "­ƒôì"
+  ­ƒôØ <span> "­ƒôà"
+  ­ƒôØ <span> "­ƒô░"
+  ­ƒôØ <span> "­ƒÆ¼"
+  ­ƒôØ <span> "­ƒñØ"
+  ­ƒôØ <span> "­ƒÄô"
+  ­ƒôØ <span> "­ƒÑ¥"
+  ­ƒôØ <span> "­ƒÆ░"
+  ­ƒôØ <span> "150+"
+  ­ƒôØ <span> "2,000+"
+  ­ƒôØ <span> "30+"
+
+­ƒôä src/pages/[lang]/organizations/[slug].astro (2 issues)
+------------------------------------------------------------
+  ­ƒôØ <p> ""{slogan}""
+  ­ƒôØ <span> "┬À {post.readingTime}"
+
+­ƒôä src/pages/[lang]/profile.astro (1 issues)
+------------------------------------------------------------
+  ÔØî Missing getTranslations import
+
+
+================================================================================
+­ƒôè SUMMARY
+================================================================================
+
+Total files scanned: 69
+Files with issues: 38
+Files clean: 31
+Total issues: 389
+
+By type:
+  Missing i18n import: 1
+  Hardcoded tag text: 281
+  Hardcoded attributes: 89
+  Hardcoded TOC labels: 18
+
+By tag:
+  <p>: 119
+  <TableCell>: 55
+  <span>: 40
+  <h4>: 30
+  <li>: 15
+  <TableHead>: 11
+  <h1>: 5
+  <button>: 3
+  <label>: 2
+  <td>: 1
+
+Ô£à Clean files (31):
+  src/pages/[lang]/about.astro
+  src/pages/[lang]/admin/audit/index.astro
+  src/pages/[lang]/admin/blog/articles/index.astro
+  src/pages/[lang]/admin/blog/authors/index.astro
+  src/pages/[lang]/admin/blog/categories/index.astro
+  src/pages/[lang]/admin/blog/comments/index.astro
+  src/pages/[lang]/admin/config/index.astro
+  src/pages/[lang]/admin/index.astro
+  src/pages/[lang]/admin/moderation/index.astro
+  src/pages/[lang]/auth/forgot-password.astro
+  src/pages/[lang]/auth/invitations.astro
+  src/pages/[lang]/auth/profile.astro
+  src/pages/[lang]/auth/reset-password.astro
+  src/pages/[lang]/auth/sign-in.astro
+  src/pages/[lang]/auth/sign-up.astro
+  src/pages/[lang]/auth/verify-email.astro
+  src/pages/[lang]/blog/[category].astro
+  src/pages/[lang]/blog/[category]/[slug].astro
+  src/pages/[lang]/blog/author/[slug].astro
+  src/pages/[lang]/blog/index.astro
+  src/pages/[lang]/contact.astro
+  src/pages/[lang]/docs/components/index.astro
+  src/pages/[lang]/docs/components/progressbar.astro
+  src/pages/[lang]/docs/design/index.astro
+  src/pages/[lang]/docs/design/link.astro
+  src/pages/[lang]/docs/design/switch.astro
+  src/pages/[lang]/docs/design/video.astro
+  src/pages/[lang]/docs/layouts/index.astro
+  src/pages/[lang]/docs/templates/header.astro
+  src/pages/[lang]/docs/templates/index.astro
+  src/pages/[lang]/organizations/index.astro
+
+================================================================================
+
+ÔÜá´©Å 389 issues to fix

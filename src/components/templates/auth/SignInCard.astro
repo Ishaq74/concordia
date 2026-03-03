@@ -9,15 +9,18 @@ import PasswordInput from "@components/ui/Form/PasswordInput.astro";
 import Button from "@components/ui/Button.astro";
 import Alert from "@components/ui/Alert.astro";
 import Link from "@components/ui/Link.astro";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
 interface Props {
   translations?: Record<string, any>;
   title?: string;
   status?: { type: "success" | "error"; message: string } | null;
   lastEmail?: string;
+  lang?: string;
 }
 
 const props = Astro.props as Props;
+const lang = props.lang ?? Astro.currentLocale ?? "fr";
 const translations = props.translations ?? {};
 const t = (translations?.auth ?? translations) as Record<string, any>;
 const title = props.title ?? t.loginTitle ?? t.signIn ?? "Connexion";
@@ -30,7 +33,7 @@ const resolveRoute = (value: unknown, fallback: string) => {
 
 const registerUrl = resolveRoute(
   t.registerPageUrl ?? t.registerUrl ?? translations.registerPageUrl,
-  "/fr/auth/inscription",
+  getLocalizedUrl(lang, "auth/sign-up"),
 );
 const noAccountPrompt =
   t.noAccountPrompt ?? translations.noAccountPrompt ?? "Pas encore de compte ?";
@@ -41,7 +44,7 @@ const registerLinkLabel =
   "Inscrivez-vous";
 const forgotPasswordUrl = resolveRoute(
   t.forgotPasswordUrl ?? t.forgotPasswordLink ?? translations.forgotPasswordUrl,
-  "/fr/auth/mot-de-passe-oublie",
+  getLocalizedUrl(lang, "auth/forgot-password"),
 );
 const forgotPasswordLabel =
   t.forgotPassword ??

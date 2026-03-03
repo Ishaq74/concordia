@@ -13,7 +13,6 @@ export const getDocNavConfig = (locale: string, t: any) => [
       { label: t.docsSidebar.alert, href: `/${locale}/docs/design/alert` },
       { label: t.docsSidebar.badge, href: `/${locale}/docs/design/badge` },
       { label: t.docsSidebar.button, href: `/${locale}/docs/design/button` },
-      { label: t.docsSidebar.input, href: `/${locale}/docs/design/input` },
       { label: t.docsSidebar.kbd, href: `/${locale}/docs/design/kbd` },
       { label: t.docsSidebar.link, href: `/${locale}/docs/design/link` },
       { label: t.docsSidebar.switch, href: `/${locale}/docs/design/switch` },
@@ -31,8 +30,6 @@ export const getDocNavConfig = (locale: string, t: any) => [
       { label: t.docsSidebar.dropdown, href: `/${locale}/docs/design/menudropdown` },
       { label: t.docsSidebar.form, href: `/${locale}/docs/design/form` },
       { label: t.docsSidebar.tabs, href: `/${locale}/docs/design/tabs` },
-      { label: t.docsSidebar.newtab, href: `/${locale}/docs/design/newtab` },
-      { label: t.docsSidebar.toast, href: `/${locale}/docs/design/toast` },
       { label: t.docsSidebar.video, href: `/${locale}/docs/design/video` },
     ]
   },
@@ -54,15 +51,6 @@ export const getDocNavConfig = (locale: string, t: any) => [
       { label: t.docsSidebar.gallery, href: `/${locale}/docs/components/gallery` },
       { label: t.docsSidebar.dropdown, href: `/${locale}/docs/design/dropdown` },
       { label: t.docsSidebar.slider, href: `/${locale}/docs/components/slider` },
-    ]
-  },
-  {
-    title: t.docsSidebar.variants,
-    items: [
-      { label: t.docsSidebar.initial, href: `/${locale}/docs/variants/initial` },
-      { label: t.docsSidebar.retro, href: `/${locale}/docs/variants/retro` },
-      { label: t.docsSidebar.modern, href: `/${locale}/docs/variants/modern` },
-      { label: t.docsSidebar.futuristic, href: `/${locale}/docs/variants/futuristic` },
     ]
   },
   {

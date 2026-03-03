@@ -5,6 +5,7 @@ import ThemeSwitch from "./ThemeSwitch.astro";
 import LangChooser from "./LangChooser.astro";
 import User from "./User.astro";
 import Sheet from "@components/ui/Sheet.astro";
+import { getTranslations } from "@i18n/translations";
 
 interface Props {
   variant?: "initial" | "retro" | "modern" | "futuristic";
@@ -19,6 +20,9 @@ const {
   class: className = "",
   lang,
 } = Astro.props;
+
+const currentLocale = Astro.currentLocale || "fr";
+const t = getTranslations(currentLocale);
 
 const headerClass = [
   "header",
@@ -56,7 +60,7 @@ const headerClass = [
         </span>
 
         <div slot="header">
-          <h2 class="mobile-menu-title">Menu</h2>
+          <h2 class="mobile-menu-title">{t.header?.menu ?? "Menu"}</h2>
         </div>
 
         <!-- Mobile Navigation + Actions stacked -->

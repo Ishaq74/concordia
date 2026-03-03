@@ -1,5 +1,5 @@
 ---
-import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 import { Icon } from 'astro-icon/components';
 
 interface Props {
@@ -31,8 +31,8 @@ const {
 const currentLocale = Astro.currentLocale || "fr";
 
 // Import translations
-const translations = await import(`../../../i18n/${currentLocale}.json`);
-const t = translations.default;
+import { getTranslations } from "@i18n/translations";
+const t = getTranslations(currentLocale);
 
 const footerClass = [
   'footer',
@@ -43,7 +43,6 @@ const footerClass = [
 const currentYear = new Date().getFullYear();
 
 const lang: string = Astro.currentLocale || 'fr';
-const isFr = lang === 'fr';
 
 // Social links
 const socialLinks = [
@@ -54,24 +53,24 @@ const socialLinks = [
 
 // Footer nav columns
 const discoverLinks = [
-  { label: t.nav.places, href: getRelativeLocaleUrl(lang as string, 'places') || '#' },
-  { label: t.nav.events, href: getRelativeLocaleUrl(lang as string, isFr ? 'evenements' : 'events') || '#' },
-  { label: t.nav.trails, href: getRelativeLocaleUrl(lang as string, isFr ? 'sentiers' : 'trails') || '#' },
-  { label: t.nav.blog, href: getRelativeLocaleUrl(lang as string, isFr ? 'blog' : 'blog') || '#' },
+  { label: t.nav.places, href: getLocalizedUrl(lang, 'places') || '#' },
+  { label: t.nav.events, href: getLocalizedUrl(lang, 'events') || '#' },
+  { label: t.nav.trails, href: getLocalizedUrl(lang, 'trails') || '#' },
+  { label: t.nav.blog, href: getLocalizedUrl(lang, 'blog') || '#' },
 ];
 
 const communityLinks = [
-  { label: t.nav.forum, href: getRelativeLocaleUrl(lang as string, 'forum') || '#' },
-  { label: t.nav.groups, href: getRelativeLocaleUrl(lang as string, isFr ? 'groupes' : 'groups') || '#' },
-  { label: t.nav.classifieds, href: getRelativeLocaleUrl(lang as string, isFr ? 'annonces' : 'classifieds') || '#' },
-  { label: t.nav.services, href: getRelativeLocaleUrl(lang as string, 'services') || '#' },
+  { label: t.nav.forum, href: getLocalizedUrl(lang, 'forum') || '#' },
+  { label: t.nav.groups, href: getLocalizedUrl(lang, 'groups') || '#' },
+  { label: t.nav.classifieds, href: getLocalizedUrl(lang, 'classifieds') || '#' },
+  { label: t.nav.services, href: getLocalizedUrl(lang, 'services') || '#' },
 ];
 
 const engageLinks = [
-  { label: t.nav.volunteer, href: getRelativeLocaleUrl(lang as string, isFr ? 'benevolat' : 'volunteer') || '#' },
-  { label: t.nav.education, href: getRelativeLocaleUrl(lang as string, 'education') || '#' },
-  { label: t.nav.funding, href: getRelativeLocaleUrl(lang as string, isFr ? 'financement' : 'funding') || '#' },
-  { label: t.nav.transparency, href: getRelativeLocaleUrl(lang as string, isFr ? 'transparence' : 'transparency') || '#' },
+  { label: t.nav.volunteer, href: getLocalizedUrl(lang, 'volunteer') || '#' },
+  { label: t.nav.education, href: getLocalizedUrl(lang, 'education') || '#' },
+  { label: t.nav.funding, href: getLocalizedUrl(lang, 'funding') || '#' },
+  { label: t.nav.transparency, href: getLocalizedUrl(lang, 'transparency') || '#' },
 ];
 ---
 
@@ -172,11 +171,11 @@ const engageLinks = [
       <!-- Legal Links -->
       {config.showLegalInfo && (
         <div class="footer-legal">
-          <a href={getRelativeLocaleUrl(lang as string, 'legal') || '#'} class="footer-link">{t.footer.legal}</a>
+          <a href={getLocalizedUrl(lang, 'legal') || '#'} class="footer-link">{t.footer.legal}</a>
           <span class="footer-separator">•</span>
-          <a href={getRelativeLocaleUrl(lang as string, 'privacy') || '#'} class="footer-link">{t.footer.privacy}</a>
+          <a href={getLocalizedUrl(lang, 'privacy') || '#'} class="footer-link">{t.footer.privacy}</a>
           <span class="footer-separator">•</span>
-          <a href={getRelativeLocaleUrl(lang as string, 'terms') || '#'} class="footer-link">{t.footer.terms}</a>
+          <a href={getLocalizedUrl(lang, 'terms') || '#'} class="footer-link">{t.footer.terms}</a>
         </div>
       )}
       

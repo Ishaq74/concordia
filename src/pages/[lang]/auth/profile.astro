@@ -1,0 +1,677 @@
+---
+// src/pages/[lang]/auth/profile.astro — Wireframe-faithful profile page
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getTranslations } from "@i18n/translations";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
+import Grid from "@components/Tools/Grid.astro";
+import Flex from "@components/Tools/Flex.astro";
+import Tabs from "@components/ui/Tabs/Tabs.astro";
+import Tab from "@components/ui/Tabs/Tab.astro";
+import Avatar from "@components/ui/Avatar/Avatar.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import Card from "@components/ui/Card/Card.astro";
+import Alert from "@components/ui/Alert.astro";
+import ProfileForm from "@components/templates/auth/profile/ProfileForm.astro";
+import ProfileOrganization from "@components/templates/auth/profile/ProfileOrganization.astro";
+import ProfileInvitations from "@components/templates/auth/profile/ProfileInvitations.astro";
+import { Icon } from "astro-icon/components";
+
+// DB
+import { getDrizzle } from "@database/drizzle";
+import { profile } from "@database/schemas";
+import { eq } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
+
+// Utils — shared types (no duplication)
+import {
+  type OrganizationRecord,
+  type OrganizationMember,
+  type InvitationRecord,
+} from "@lib/auth/profile/utils";
+
+const lang = Astro.params.lang as string;
+const translations = getTranslations(lang);
+
+const LOCALE_DATE_MAP: Record<string, string> = { fr: "fr-FR", en: "en-US", es: "es-ES", ar: "ar-SA" };
+const dateLocale = LOCALE_DATE_MAP[lang] ?? "fr-FR";
+
+const { user, session } = Astro.locals;
+
+if (!user) return Astro.redirect(getLocalizedUrl(lang, "auth/sign-in"));
+
+// --- Extended profile from DB (auto-create if missing)
+const db = await getDrizzle();
+let profileRows = await db
+  .select()
+  .from(profile)
+  .where(eq(profile.userId, user.id))
+  .limit(1);
+
+if (profileRows.length === 0) {
+  profileRows = await db
+    .insert(profile)
+    .values({
+      id: randomUUID(),
+      userId: user.id,
+      fullName: user.name ?? null,
+      preferredLanguage: lang,
+    })
+    .returning();
+}
+
+const userProfile = profileRows[0] ?? null;
+
+// --- Consolidated profile data
+const displayName = user.name ?? user.email;
+const bio = userProfile?.bio ?? null;
+const location = userProfile?.location ?? null;
+const avatarUrl = typeof user.image === "string" ? user.image : userProfile?.avatarUrl ?? undefined;
+const memberSince = user.createdAt
+  ? new Date(user.createdAt).toLocaleDateString(dateLocale, { year: "numeric", month: "long" })
+  : null;
+const emailVerified = (user as any).emailVerified ?? false;
+
+// --- Organizations (TODO: branch to real API when ready)
+const organizations: OrganizationRecord[] = [];
+const activeOrganizationId = null;
+let members: OrganizationMember[] = [];
+
+const memberRole = members.find((m) => m.userId === user.id)?.role ?? null;
+const canManageOrganization = memberRole === "owner" || memberRole === "admin";
+const isOwner = memberRole === "owner";
+
+let invitations: InvitationRecord[] = [];
+
+// --- Status message (query param)
+const statusParam = Astro.url.searchParams.get("status");
+const statusMessage = statusParam === "updated"
+  ? (translations.auth?.profileUpdated ?? "Profil mis à jour avec succès.")
+  : null;
+---
+
+<BaseLayout lang={lang} title={translations.auth?.profile ?? "Profil"}>
+  <div class="profile-page">
+
+    {/* --- STATUS ALERT --- */}
+    {statusMessage && (
+      <Alert variant="modern" status="success" dismissible>
+        {statusMessage}
+      </Alert>
+    )}
+
+    {/* ============================================= */}
+    {/* HERO HEADER — Cover + Avatar + Identity       */}
+    {/* ============================================= */}
+    <section class="profile-hero" aria-label={translations.auth?.profileHeader ?? "En-tête du profil"}>
+      <div class="profile-hero__cover" aria-hidden="true"></div>
+
+      <div class="profile-hero__body">
+        <div class="profile-hero__avatar-wrapper">
+          <Avatar
+            variant="modern"
+            src={avatarUrl}
+            alt={displayName}
+            fallback={displayName}
+            size="xl"
+          />
+        </div>
+
+        <div class="profile-hero__info">
+          <div class="profile-hero__identity">
+            <div class="profile-hero__name-row">
+              <h1 class="profile-hero__name">{displayName}</h1>
+              {emailVerified && (
+                <Badge variant="modern" color="success" icon={{ name: "mdi:check-decagram", side: "left" }}>
+                  {translations.auth?.verified ?? "Vérifié"}
+                </Badge>
+              )}
+            </div>
+
+            {location && (
+              <p class="profile-hero__location">
+                <Icon name="mdi:map-marker-outline" />
+                {location}
+              </p>
+            )}
+
+            {bio && (
+              <p class="profile-hero__bio">{bio}</p>
+            )}
+
+            <div class="profile-hero__badges">
+              {memberSince && (
+                <Badge variant="modern" color="secondary" icon={{ name: "mdi:calendar-outline", side: "left" }}>
+                  {translations.auth?.memberSince ?? "Membre depuis"} {memberSince}
+                </Badge>
+              )}
+              {(user as any).role && (
+                <Badge variant="modern" color="primary" icon={{ name: "mdi:shield-account", side: "left" }}>
+                  {(user as any).role}
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          <div class="profile-hero__actions">
+            <Button variant="modern" color="secondary" icon={{ name: "mdi:share-variant", side: "left" }}>
+              {translations.auth?.share ?? "Partager"}
+            </Button>
+            <Button variant="modern" color="primary" icon={{ name: "mdi:email-outline", side: "left" }}>
+              {translations.auth?.contact ?? "Contacter"}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* ============================================= */}
+    {/* TABS                                          */}
+    {/* ============================================= */}
+    <Tabs name="profil-tabs" variant="modern">
+
+      {/* ---- TAB ACTIVITÉ ---- */}
+      <Tab name="profil-tabs" label={translations.auth?.activityTab ?? "Activité"} icon="mdi:history" open>
+        <div class="profile-grid">
+          <div class="profile-grid__main">
+            <Card variant="modern" elevation="sm">
+              <div class="profile-section">
+                <div class="profile-section__header">
+                  <h2 class="profile-section__title">
+                    <Icon name="mdi:timeline-text" />
+                    {translations.auth?.recentActivity ?? "Activité récente"}
+                  </h2>
+                </div>
+                <div class="profile-empty-state">
+                  <Icon name="mdi:clock-outline" />
+                  <p class="profile-empty-state__text">{translations.auth?.noActivity ?? "Aucune activité récente"}</p>
+                  <p class="profile-empty-state__hint">{translations.auth?.noActivityHint ?? "Vos actions et interactions apparaîtront ici."}</p>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          <div class="profile-grid__sidebar">
+            {/* Statistics */}
+            <Card variant="modern" elevation="sm">
+              <div class="profile-section">
+                <h3 class="profile-section__subtitle">{translations.auth?.statistics ?? "Statistiques"}</h3>
+                <div class="profile-stats">
+                  <div class="profile-stat">
+                    <div class="profile-stat__icon profile-stat__icon--primary">
+                      <Icon name="mdi:handshake-outline" />
+                    </div>
+                    <span class="profile-stat__label">{translations.auth?.servicesUsed ?? "Services utilisés"}</span>
+                    <span class="profile-stat__value">0</span>
+                  </div>
+                  <div class="profile-stat">
+                    <div class="profile-stat__icon profile-stat__icon--accent">
+                      <Icon name="mdi:book-open-page-variant-outline" />
+                    </div>
+                    <span class="profile-stat__label">{translations.auth?.articlesRead ?? "Articles lus"}</span>
+                    <span class="profile-stat__value">0</span>
+                  </div>
+                  <div class="profile-stat">
+                    <div class="profile-stat__icon profile-stat__icon--error">
+                      <Icon name="mdi:heart-outline" />
+                    </div>
+                    <span class="profile-stat__label">{translations.auth?.likesGiven ?? "Likes donnés"}</span>
+                    <span class="profile-stat__value">0</span>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* Organizations */}
+            <Card variant="modern" elevation="sm">
+              <div class="profile-section">
+                <h3 class="profile-section__subtitle">{translations.auth?.organizations ?? "Organisations"}</h3>
+                {organizations.length > 0 ? (
+                  <Flex direction="column" gap="sm">
+                    {organizations.map((org) => (
+                      <div class="profile-org-item">
+                        <div class="profile-org-item__avatar">
+                          {org.name?.charAt(0)?.toUpperCase() ?? "O"}
+                        </div>
+                        <div class="profile-org-item__info">
+                          <span class="profile-org-item__name">{org.name}</span>
+                          {org.role && <span class="profile-org-item__role">{org.role}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </Flex>
+                ) : (
+                  <div class="profile-empty-state profile-empty-state--compact">
+                    <Icon name="mdi:account-group-outline" />
+                    <p class="profile-empty-state__text">{translations.auth?.noOrganizations ?? "Aucune organisation"}</p>
+                  </div>
+                )}
+              </div>
+            </Card>
+
+            {/* Invitations */}
+            <ProfileInvitations count={invitations.length} translations={translations} lang={lang} />
+          </div>
+        </div>
+      </Tab>
+
+      {/* ---- TAB SERVICES FAVORIS ---- */}
+      <Tab name="profil-tabs" label={translations.auth?.favoritesTab ?? "Services favoris"} icon="mdi:heart">
+        <Card variant="modern" elevation="sm">
+          <div class="profile-empty-state profile-empty-state--large">
+            <Icon name="mdi:heart-outline" />
+            <p class="profile-empty-state__text">{translations.auth?.noFavorites ?? "Aucun service favori"}</p>
+            <p class="profile-empty-state__hint">{translations.auth?.noFavoritesHint ?? "Les services que vous ajoutez en favoris apparaîtront ici."}</p>
+            <Button variant="modern" color="primary" icon={{ name: "mdi:compass-outline", side: "left" }}>
+              {translations.auth?.discoverServices ?? "Découvrir les services"}
+            </Button>
+          </div>
+        </Card>
+      </Tab>
+
+      {/* ---- TAB ARTICLES ---- */}
+      <Tab name="profil-tabs" label={translations.auth?.articlesTab ?? "Articles"} icon="mdi:newspaper-variant-outline">
+        <Card variant="modern" elevation="sm">
+          <div class="profile-empty-state profile-empty-state--large">
+            <Icon name="mdi:newspaper-variant-outline" />
+            <p class="profile-empty-state__text">{translations.auth?.noArticles ?? "Aucun article publié"}</p>
+            <p class="profile-empty-state__hint">{translations.auth?.noArticlesHint ?? "Vos articles de blog seront listés ici."}</p>
+            <a href={`/${lang}/admin/blog/articles/new`} class="profile-cta-link">
+              <Button variant="modern" color="primary" icon={{ name: "mdi:pencil-plus-outline", side: "left" }}>
+                {translations.auth?.writeArticle ?? "Écrire un article"}
+              </Button>
+            </a>
+          </div>
+        </Card>
+      </Tab>
+
+      {/* ---- TAB ÉDITION ---- */}
+      <Tab name="profil-tabs" label={translations.auth?.editTab ?? "Éditer mon profil"} icon="mdi:pencil">
+        <Grid cols="1" gap="xl">
+          <ProfileForm user={user} profile={userProfile} />
+          <ProfileOrganization
+            organizations={organizations}
+            activeOrganizationId={activeOrganizationId}
+            members={members}
+            canManageOrganization={canManageOrganization}
+            isOwner={isOwner}
+            session={session}
+            translations={translations}
+          />
+          <ProfileInvitations count={invitations.length} translations={translations} lang={lang} />
+        </Grid>
+      </Tab>
+
+    </Tabs>
+  </div>
+</BaseLayout>
+
+<style>
+/* ========================================
+   PROFILE PAGE — Production-Ready Styles
+   ======================================== */
+
+.profile-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ---------- HERO HEADER ---------- */
+.profile-hero {
+  position: relative;
+  background: var(--card-bg, #fff);
+  border-radius: var(--radius-lg, 1rem);
+  overflow: hidden;
+  border: 1px solid var(--border-color, #e2e8f0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.profile-hero__cover {
+  height: 200px;
+  background: linear-gradient(135deg, var(--color-primary, #1978e5) 0%, #6366f1 50%, #a855f7 100%);
+}
+
+.profile-hero__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 2rem 2rem;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .profile-hero__body {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+}
+
+.profile-hero__avatar-wrapper {
+  margin-top: -4rem;
+  flex-shrink: 0;
+}
+
+.profile-hero__avatar-wrapper :global(.avatar) {
+  width: 8rem;
+  height: 8rem;
+  border: 4px solid var(--card-bg, #fff);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  font-size: 2rem;
+}
+
+.profile-hero__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 0.5rem;
+  text-align: center;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .profile-hero__info {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+.profile-hero__identity {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.profile-hero__name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .profile-hero__name-row {
+    justify-content: flex-start;
+  }
+}
+
+.profile-hero__name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--heading-color, #1e293b);
+  margin: 0;
+}
+
+.profile-hero__location {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--text-muted, #64748b);
+  font-size: 0.875rem;
+  margin: 0;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .profile-hero__location {
+    justify-content: flex-start;
+  }
+}
+
+.profile-hero__location :global(svg) {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.profile-hero__bio {
+  color: var(--text-secondary, #475569);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  max-width: 36rem;
+  margin: 0.25rem 0 0;
+}
+
+.profile-hero__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.25rem;
+}
+
+@media (min-width: 768px) {
+  .profile-hero__badges {
+    justify-content: flex-start;
+  }
+}
+
+.profile-hero__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .profile-hero__actions {
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+  }
+}
+
+/* ---------- GRID LAYOUT (Activity tab) ---------- */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .profile-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.profile-grid__main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.profile-grid__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ---------- SECTIONS ---------- */
+.profile-section {
+  padding: 1.25rem;
+}
+
+.profile-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.profile-section__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--heading-color, #1e293b);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.profile-section__title :global(svg) {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-primary, #1978e5);
+}
+
+.profile-section__subtitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--heading-color, #1e293b);
+  margin: 0 0 1rem;
+}
+
+/* ---------- STATS ---------- */
+.profile-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.profile-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--bg-subtle, #f8fafc);
+  border-radius: var(--radius, 0.5rem);
+}
+
+.profile-stat__icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-stat__icon :global(svg) {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.profile-stat__icon--primary {
+  background: rgba(25, 120, 229, 0.1);
+  color: var(--color-primary, #1978e5);
+}
+
+.profile-stat__icon--accent {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
+.profile-stat__icon--error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.profile-stat__label {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary, #475569);
+}
+
+.profile-stat__value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--heading-color, #1e293b);
+}
+
+/* ---------- ORG ITEMS ---------- */
+.profile-org-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.profile-org-item__avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background: var(--bg-subtle, #f1f5f9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--color-primary, #1978e5);
+  flex-shrink: 0;
+}
+
+.profile-org-item__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-org-item__name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--heading-color, #1e293b);
+}
+
+.profile-org-item__role {
+  font-size: 0.75rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+/* ---------- EMPTY STATES ---------- */
+.profile-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1rem;
+  gap: 0.75rem;
+}
+
+.profile-empty-state--compact {
+  padding: 1rem;
+  gap: 0.5rem;
+}
+
+.profile-empty-state--large {
+  padding: 3rem 1.5rem;
+}
+
+.profile-empty-state :global(svg) {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.profile-empty-state--compact :global(svg) {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.profile-empty-state__text {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+  margin: 0;
+}
+
+.profile-empty-state__hint {
+  font-size: 0.8125rem;
+  color: var(--text-muted, #94a3b8);
+  margin: 0;
+  max-width: 24rem;
+}
+
+.profile-cta-link {
+  text-decoration: none;
+}
+</style>

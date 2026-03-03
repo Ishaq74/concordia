@@ -35,24 +35,9 @@ const {
 
 if (hide) return null;
 
-// load translations dynamically (TS may complain about json modules)
-// @ts-ignore: JSON imports
-const translationsFr = (await import('../i18n/fr.json')).default;
-// @ts-ignore: JSON imports
-const translationsEn = (await import('../i18n/en.json')).default;
-// @ts-ignore: JSON imports
-const translationsEs = (await import('../i18n/es.json')).default;
-// @ts-ignore: JSON imports
-const translationsAr = (await import('../i18n/ar.json')).default;
-
-const translationsMap: Record<string, any> = {
-    fr: translationsFr,
-    en: translationsEn,
-    es: translationsEs,
-    ar: translationsAr,
-};
-
-const t = translationsMap[lang] ?? translationsFr;
+// Load translations dynamically based on current lang
+import { getTranslations } from "@i18n/translations";
+const t = getTranslations(lang);
 
 // Get current path
 const pathname = Astro.url.pathname;

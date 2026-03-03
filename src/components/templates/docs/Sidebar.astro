@@ -13,8 +13,8 @@ const { currentPath, variant = 'initial' } = Astro.props;
 const currentLocale = Astro.currentLocale || 'fr';
 
 // Import translations
-const translations = await import(`../../../i18n/${currentLocale}.json`);
-const t = translations.default;
+import { getTranslations } from "@i18n/translations";
+const t = getTranslations(currentLocale);
 
 // Generate navigation with current locale
 const navigation = getDocNavConfig(currentLocale, t) || [];

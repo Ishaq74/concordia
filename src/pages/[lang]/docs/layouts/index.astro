@@ -1,0 +1,52 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { getTranslations } from "@i18n/translations";
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const p = t.docs?.pages ?? {};
+---
+
+<DocLayout 
+  title={p.layoutsIndexTitle ?? "Layouts"}
+  description={p.layoutsIndexDesc ?? "Layouts structurels"}
+  variant="initial"
+>
+  <h1 id="layouts">{p.layoutsIndexTitle ?? "Layouts"}</h1>
+  
+  <p>{p.layoutsIndexDesc ?? "Layouts structurels pour organiser les pages — layout de base et layout de documentation."}</p>
+
+  <div class="layouts-grid">
+    <a href={`/${lang}/docs/layouts/base`} class="layout-card">
+      <h3>{t.docsSidebar?.baseLayout ?? "Layout de base"}</h3>
+      <p>{p.baseLayout?.description ?? "Structure HTML de base avec thème, polices, SEO et métadonnées"}</p>
+    </a>
+    <a href={`/${lang}/docs/layouts/doc`} class="layout-card">
+      <h3>{t.docsSidebar?.docLayout ?? "Layout de documentation"}</h3>
+      <p>{p.docLayout?.description ?? "Grille 3 colonnes avec sidebar, contenu principal et table des matières"}</p>
+    </a>
+  </div>
+</DocLayout>
+
+<style>
+  .layouts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .layout-card {
+    display: block;
+    padding: 1.5rem;
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .layout-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .layout-card h3 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+  .layout-card p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
+</style>

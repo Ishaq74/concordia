@@ -1,6 +1,6 @@
 ---
 import Dropdown from "@components/ui/Dropdown.astro";
-import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
 interface Props {
   variant?: "initial" | "retro" | "modern" | "futuristic";
@@ -19,51 +19,41 @@ const {
 const currentLocale = Astro.currentLocale || "fr";
 console.log("Navigation currentLocale=", currentLocale);
 const currentPath = Astro.url.pathname;
-const isFr = currentLocale === "fr";
 
-let t;
-try {
-  const translations = await import(`../../../i18n/${currentLocale}.json`);
-  t = translations.default;
-} catch (err) {
-  console.error("Failed to load translations for locale", currentLocale, err);
-  // Fallback to French translations in case of error
-  const translations = await import(`../../../i18n/fr.json`);
-  t = translations.default;
-}
+import { getTranslations } from "@i18n/translations";
+const t = getTranslations(currentLocale);
 
 const navClass = ["nav", variant !== "initial" && variant, className]
   .filter(Boolean)
   .join(" ");
 
-// Navigation sections with locale-aware slugs. `isFr` only affects paths
-// where the French version differs from the English slug.
+// Navigation sections with locale-aware slugs resolved via slug-map
 const discoverItems = [
-  { label: t.nav.places, href: getRelativeLocaleUrl(currentLocale, isFr ? "places" : "places") || "#" },
-  { label: t.nav.trails, href: getRelativeLocaleUrl(currentLocale, isFr ? "sentiers" : "trails") || "#" },
-  { label: t.nav.blog, href: getRelativeLocaleUrl(currentLocale, isFr ? "blog" : "blog") || "#" },
-  { label: t.nav.events, href: getRelativeLocaleUrl(currentLocale, isFr ? "evenements" : "events") || "#" },
+  { label: t.nav.places, href: getLocalizedUrl(currentLocale, "places") || "#" },
+  { label: t.nav.trails, href: getLocalizedUrl(currentLocale, "trails") || "#" },
+  { label: t.nav.blog, href: getLocalizedUrl(currentLocale, "blog") || "#" },
+  { label: t.nav.events, href: getLocalizedUrl(currentLocale, "events") || "#" },
 ];
 
 const communityItems = [
-  { label: t.nav.forum, href: getRelativeLocaleUrl(currentLocale, "forum") || "#" },
-  { label: t.nav.groups, href: getRelativeLocaleUrl(currentLocale, isFr ? "groupes" : "groups") || "#" },
-  { label: t.nav.classifieds, href: getRelativeLocaleUrl(currentLocale, isFr ? "annonces" : "classifieds") || "#" },
-  { label: t.nav.services, href: getRelativeLocaleUrl(currentLocale, "services") || "#" },
+  { label: t.nav.forum, href: getLocalizedUrl(currentLocale, "forum") || "#" },
+  { label: t.nav.groups, href: getLocalizedUrl(currentLocale, "groups") || "#" },
+  { label: t.nav.classifieds, href: getLocalizedUrl(currentLocale, "classifieds") || "#" },
+  { label: t.nav.services, href: getLocalizedUrl(currentLocale, "services") || "#" },
 ];
 
 const engageItems = [
-  { label: t.nav.volunteer, href: getRelativeLocaleUrl(currentLocale, isFr ? "benevolat" : "volunteer") || "#" },
-  { label: t.nav.education, href: getRelativeLocaleUrl(currentLocale, "education") || "#" },
-  { label: t.nav.funding, href: getRelativeLocaleUrl(currentLocale, isFr ? "financement" : "funding") || "#" },
-  { label: t.nav.transparency, href: getRelativeLocaleUrl(currentLocale, isFr ? "transparence" : "transparency") || "#" },
+  { label: t.nav.volunteer, href: getLocalizedUrl(currentLocale, "volunteer") || "#" },
+  { label: t.nav.education, href: getLocalizedUrl(currentLocale, "education") || "#" },
+  { label: t.nav.funding, href: getLocalizedUrl(currentLocale, "funding") || "#" },
+  { label: t.nav.transparency, href: getLocalizedUrl(currentLocale, "transparency") || "#" },
 ];
 ---
 
 <nav class={navClass}>
   <a
-    href={getRelativeLocaleUrl(currentLocale, "")}
-    class:list={["nav-link", { active: currentPath === getRelativeLocaleUrl(currentLocale, "") }]}>
+    href={getLocalizedUrl(currentLocale, "")}
+    class:list={["nav-link", { active: currentPath === getLocalizedUrl(currentLocale, "") }]}>
     {t.nav.home}
   </a>
 
@@ -104,8 +94,8 @@ const engageItems = [
   </div>
 
   <a
-    href={getRelativeLocaleUrl(currentLocale, "docs")}
-    class:list={["nav-link", { active: currentPath.startsWith(getRelativeLocaleUrl(currentLocale, "docs")) }]}> 
+    href={getLocalizedUrl(currentLocale, "docs")}
+    class:list={["nav-link", { active: currentPath.startsWith(getLocalizedUrl(currentLocale, "docs")) }]}> 
     {t.nav.docs}
   </a>
 </nav>

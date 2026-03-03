@@ -1,0 +1,357 @@
+﻿
+=== src\pages\[lang]\docs\components\accordion.astro ===
+L155: <p>A collection of consistent Astro components, styled via CSS variants.</p>
+L158: <p>Yes, no JS dependency. Opening relies on the native <code class="inline-code">details</code> element.</p>
+L161: <p>Use the <strong>color</strong> prop on the container: <code class="inline-code">primary</code>, <code class="inline-code">secondary</code>, or <code class="inline-code">accent</code>.</p>
+L170: <p>Answer...</p>
+L173: <p>Another answer...</p>
+L184: <p>Rounded corners, soft border. The background becomes slightly blue when open.</p>
+L187: <p>Animation via grid-template-rows.</p>
+L190: <p>Open me to see the primary color applied.</p>
+L199: <p>Square border + stepped shadow. The background and title become purple when open.</p>
+L202: <p>Uses the accent defined on the container.</p>
+L205: <p>Open me to see the retro purple effect.</p>
+L214: <p>Subtle background with pink gradient, light colored shadow.</p>
+L217: <p>Refined top border with accent color.</p>
+L220: <p>Open me to see the modern pink gradient.</p>
+L229: <p>Cut angles with yellow glow, diagonal gradient and text-shadow.</p>
+L232: <p>Tightened typography with neon effect.</p>
+L235: <p>Open me to see the outer glow and gradient.</p>
+L242: <p>Colors apply to <strong>open items</strong>: borders, backgrounds, text and icons take the chosen color.</p>
+L248: <p style="margin-bottom: 0.5rem; font-weight: 600; color: var(--color-primary);">● Primary (Yellow)</p>
+L251: <p>The background becomes pale yellow, border yellow, title yellow and icon yellow.</p>
+L254: <p>Open me to see the yellow style.</p>
+L260: <p style="margin-bottom: 0.5rem; font-weight: 600; color: var(--color-secondary);">● Secondary (Purple)</p>
+L263: <p>The background becomes pale purple, border purple, title purple and icon purple.</p>
+L266: <p>Open me to see the purple style.</p>
+L272: <p style="margin-bottom: 0.5rem; font-weight: 600; color: var(--color-accent);">● Accent (Pink)</p>
+L275: <p>The background becomes pale pink, border pink, title pink and icon pink.</p>
+L278: <p>Open me to see the pink style.</p>
+L289: <p style="margin-bottom: 0.5rem; font-weight: 600;">Primary Retro</p>
+L292: <p>Pixelated yellow background with thick yellow border and stepped shadow.</p>
+L298: <p style="margin-bottom: 0.5rem; font-weight: 600;">Secondary Retro</p>
+L301: <p>Pixelated purple background with thick purple border.</p>
+L312: <p style="margin-bottom: 0.5rem; font-weight: 600;">Primary Modern</p>
+L315: <p>Yellow gradient from top to bottom + soft yellow shadow.</p>
+L321: <p style="margin-bottom: 0.5rem; font-weight: 600;">Accent Modern</p>
+L324: <p>Pink gradient from top to bottom + soft pink shadow.</p>
+L335: <p style="margin-bottom: 0.5rem; font-weight: 600;">Primary Futuristic</p>
+L338: <p>Diagonal yellow gradient + yellow outer glow + yellow text-shadow.</p>
+L344: <p style="margin-bottom: 0.5rem; font-weight: 600;">Secondary Futuristic</p>
+L347: <p>Diagonal purple gradient + purple outer glow + purple text-shadow.</p>
+L368: <p>
+L375: <p>This step is open on load.</p>
+L378: <p>Closes as soon as another step opens.</p>
+L381: <p>Pure CSS, no script.</p>
+L391: <p>This item is interactive.</p>
+L394: <p>The cursor changes and clicks are ignored.</p>
+
+=== src\pages\[lang]\docs\components\avatar.astro ===
+L125: <p>Four sizes are available: <code class="inline-code">sm</code>, <code class="inline-code">md</code> (default), <code class="inline-code">lg</code>, and <code class="inline-code">xl</code>.</p>
+L198: <p>Use <code class="inline-code">AvatarGroup</code> to display overlapping avatars (modern 2025 style).</p>
+L221: <p><strong>retro</strong> variant</p>
+L229: <p><strong>modern</strong> variant</p>
+L237: <p><strong>futuristic</strong> variant</p>
+L255: <p>Use <code class="inline-code">AvatarCard</code> to create elegant profile cards.</p>
+L303: <p style="margin: 0; opacity: 0.7;">john.doe@example.com</p>
+L313: <p>john.doe@example.com</p>
+L350: <p style="margin: 0.25rem 0 0 0; opacity: 0.8;">
+L363: <p>Excellent travail !</p>
+
+=== src\pages\[lang]\docs\components\breadcrumb.astro ===
+L71: <p>The root navigation component that contains all breadcrumb elements.</p>
+L107: <p>A container that displays an ordered list for breadcrumb items.</p>
+L110: <p>A component representing each item in the breadcrumb navigation.</p>
+L113: <p>A component for clickable links that navigate to previous levels.</p>
+L140: <p>Represents the current page in the breadcrumb (last element).</p>
+L143: <p>Visual separator between breadcrumb items.</p>
+L146: <p>Indicates truncated items, used when there are many levels.</p>
+L275: <p>Colors apply to the current page:</p>
+L280: <p style="margin-bottom: 0.5rem; font-weight: 600;">Default</p>
+L295: <p style="margin-bottom: 0.5rem; font-weight: 600;">Primary</p>
+L310: <p style="margin-bottom: 0.5rem; font-weight: 600;">Secondary</p>
+L325: <p style="margin-bottom: 0.5rem; font-weight: 600;">Accent</p>
+L407: <p>The <code class="inline-code">BreadcrumbSeparator</code> component can contain any content:</p>
+L532: <p>Use <code class="inline-code">BreadcrumbEllipsis</code> to indicate hidden levels:</p>
+
+=== src\pages\[lang]\docs\components\gallery.astro ===
+L92: <p>Classic grid with equal columns and uniform aspect ratio.</p>
+L116: <p>Column layout with variable heights (like Pinterest).</p>
+L138: <p>
+L159: <p>Grid with hover overlay showing a zoom icon and caption.</p>
+L351: <p>
+
+=== src\pages\[lang]\docs\components\pagination.astro ===
+L129: <p>Simple example with 10 pages, page 5 active:</p>
+L142: <p>Page 1 (no previous button):</p>
+L147: <p>Page 10 (no next button):</p>
+L152: <p>Single page (no navigation):</p>
+L197: <p>Colors apply to the active page:</p>
+L202: <p style="margin-bottom: 0.5rem; font-weight: 600;">Default</p>
+L207: <p style="margin-bottom: 0.5rem; font-weight: 600;">Primary</p>
+L212: <p style="margin-bottom: 0.5rem; font-weight: 600;">Secondary</p>
+L217: <p style="margin-bottom: 0.5rem; font-weight: 600;">Accent</p>
+L236: <p style="margin-bottom: 0.5rem; font-weight: 600;">Small</p>
+L241: <p style="margin-bottom: 0.5rem; font-weight: 600;">Medium (default)</p>
+L246: <p style="margin-bottom: 0.5rem; font-weight: 600;">Large</p>
+L285: <p style="margin-bottom: 0.5rem; font-weight: 600;">siblingCount={1} (default)</p>
+L290: <p style="margin-bottom: 0.5rem; font-weight: 600;">siblingCount={2}</p>
+L295: <p style="margin-bottom: 0.5rem; font-weight: 600;">siblingCount={3}</p>
+L309: <p>The component automatically displays "..." when there are many pages:</p>
+L314: <p style="margin-bottom: 0.5rem; font-weight: 600;">Start (page 2)</p>
+L319: <p style="margin-bottom: 0.5rem; font-weight: 600;">Middle (page 25)</p>
+L324: <p style="margin-bottom: 0.5rem; font-weight: 600;">End (page 49)</p>
+
+=== src\pages\[lang]\docs\components\progressbar.astro ===
+L311: <p>
+
+=== src\pages\[lang]\docs\components\skeleton.astro ===
+L227: <p>
+L336: <p>
+L349: <p>
+
+=== src\pages\[lang]\docs\components\slider.astro ===
+L73: <p>Simple slider with product cards.</p>
+L85: <p style="margin: 0; color: var(--color-primary); font-weight: bold; font-size: 1.25rem;">{product.price}</p>
+L104: <p>{product.price}</p>
+L126: <p>Clean and minimalist design.</p>
+L137: <p style="margin: 0; color: var(--text-muted); font-size: 0.875rem;">{testimonial.role}</p>
+L140: <p style="margin: 0; font-style: italic;">"{testimonial.text}"</p>
+L155: <p>Retro style with thick borders and drop shadows.</p>
+L166: <p style="margin: 0; font-size: 0.875rem;">{testimonial.role}</p>
+L169: <p style="margin: 0; font-style: italic;">"{testimonial.text}"</p>
+L184: <p>Modern design with glassmorphism and gradients.</p>
+L193: <p style="margin: 0; color: var(--color-primary); font-weight: bold; font-size: 1.25rem;">{product.price}</p>
+L208: <p>Futuristic design with neon lights and glowing effects.</p>
+L217: <p style="margin: 0; color: #8b5cf6; font-weight: bold; font-size: 1.25rem;">{product.price}</p>
+L342: <p style="margin: 0; color: var(--text-muted); font-size: 0.8rem;">{testimonial.role}</p>
+L345: <p style="margin: 0; font-size: 0.875rem; font-style: italic;">"{testimonial.text}"</p>
+L360: <p>Slider without navigation buttons (touch navigation only).</p>
+
+=== src\pages\[lang]\docs\components\timeline.astro ===
+L87: <p>Classic vertical timeline with line on the left.</p>
+L107: <p>Horizontal timeline with scroll (perfect for mobile).</p>
+L127: <p>Zigzag timeline with alternating left/right elements.</p>
+L342: <p>
+
+=== src\pages\[lang]\docs\design\alert.astro ===
+L255: <p>Alerts can be closed by the user with the <code class="inline-code">dismissible</code> prop.</p>
+
+=== src\pages\[lang]\docs\design\badge.astro ===
+L246: <p>Badges can be closed by the user with the <code class="inline-code">dismissible</code> prop.</p>
+
+=== src\pages\[lang]\docs\design\button.astro ===
+L460: <p>
+L478: <p>
+
+=== src\pages\[lang]\docs\design\card.astro ===
+L425: <p>No shadow</p>
+L431: <p>Light shadow</p>
+L437: <p>Medium shadow</p>
+L443: <p>Strong shadow</p>
+L449: <p>Very strong shadow</p>
+
+=== src\pages\[lang]\docs\design\code.astro ===
+L63: <p>
+L69: <p>The component is available directly from <code class="inline-code">astro:components</code>:</p>
+L161: <p>
+
+=== src\pages\[lang]\docs\design\dialog.astro ===
+L75: <p>Your dialog content goes here.</p>
+L126: <p>Dialog content with the initial variant.</p>
+L151: <p>Dialog content with the retro variant.</p>
+L176: <p>Dialog content with the modern variant.</p>
+L201: <p>Dialog content with the futuristic variant.</p>
+L237: <p>Small size dialog.</p>
+L257: <p>Large size dialog.</p>
+L354: <p>
+L372: <p>You opened this dialog with one of the two triggers.</p>
+L407: <p>Root component that contains all other dialog components.</p>
+L415: <p>Button that opens the dialog.</p>
+L423: <p>Container for the dialog content.</p>
+L432: <p>Containers for the dialog header and footer.</p>
+L438: <p>Dialog title and description.</p>
+L444: <p>Button that closes the dialog.</p>
+
+=== src\pages\[lang]\docs\design\dropdown.astro ===
+L142: <p>
+L203: <p>The dropdown can be positioned in 4 different ways relative to the trigger.</p>
+L313: <p>Items can have <code class="inline-code">href</code> attributes to create links.</p>
+L354: <p>Long menus have automatic scrolling with a max height of 400px.</p>
+L434: <p>The dropdown automatically handles:</p>
+L447: <p>Clear and logical HTML structure for a dropdown menu with submenus:</p>
+
+=== src\pages\[lang]\docs\design\form.astro ===
+L59: <p>
+L222: <p>
+L329: <p>
+L433: <p>
+L482: <p>
+L540: <p>
+L596: <p>
+L636: <p>
+L703: <p>
+L734: <p>
+L793: <p>
+
+=== src\pages\[lang]\docs\design\kbd.astro ===
+L33: <p>
+L36: <p>
+L39: <p>
+L70: <p>Simply display a keyboard key:</p>
+L94: <p>3 sizes available: <code class="inline-code">sm</code>, <code class="inline-code">md</code> (default), <code class="inline-code">lg</code></p>
+L113: <p>Combine several keys to display shortcuts:</p>
+L169: <p>Use Unicode symbols for special keys:</p>
+L232: <p>The Kbd component supports the 4 design system variants:</p>
+L268: <p>The Kbd component supports 4 colors: <code class="inline-code">default</code>, <code class="inline-code">primary</code>, <code class="inline-code">secondary</code>, <code class="inline-code">accent</code></p>
+L406: <p style="margin-bottom: 1rem;">
+L409: <p style="margin-bottom: 1rem;">
+L424: <p style="margin: 0; color: var(--text-muted);">Search all files</p>
+
+=== src\pages\[lang]\docs\design\link.astro ===
+L30: <p>
+L320: <p>Use the <code>external</code> prop for links that open in a new tab.</p>
+L350: <p>
+L417: <p>The Link component follows accessibility best practices:</p>
+
+=== src\pages\[lang]\docs\design\menudropdown.astro ===
+L32: <p>
+L193: <p>
+L240: <p>The menu can open automatically on hover:</p>
+
+=== src\pages\[lang]\docs\design\sheet.astro ===
+L87: <p>Votre contenu va ici...</p>
+L112: <p>Votre contenu va ici...</p>
+L135: <p>Contenu avec le style initial...</p>
+L166: <p>Contenu avec le style retro...</p>
+L197: <p>Contenu avec le style modern...</p>
+L228: <p>Contenu avec le style futuristic...</p>
+L258: <div style="padding: var(--space-4);"><p>Contenu...</p></div>
+L272: <div style="padding: var(--space-4);"><p>Contenu...</p></div>
+L286: <div style="padding: var(--space-4);"><p>Contenu...</p></div>
+L300: <div style="padding: var(--space-4);"><p>Contenu...</p></div>
+L328: <div style="padding: var(--space-4);"><p>Contenu depuis la droite...</p></div>
+L345: <div style="padding: var(--space-4);"><p>Contenu depuis la gauche...</p></div>
+L362: <div style="padding: var(--space-4);"><p>Contenu depuis le haut...</p></div>
+L379: <div style="padding: var(--space-4);"><p>Contenu depuis le bas...</p></div>
+L516: <p>Le Sheet Panel utilise une technique CSS pure ingénieuse :</p>
+
+=== src\pages\[lang]\docs\design\switch.astro ===
+L302: <p>
+
+=== src\pages\[lang]\docs\design\table.astro ===
+L100: <p>Simple table with headers and data:</p>
+L158: <p>Use <code class="inline-code">TableCaption</code> to add a table description:</p>
+L192: <p>Use <code class="inline-code">TableFoot</code> to add totals or summaries:</p>
+L269: <p>Add the <code class="inline-code">striped</code> prop to enable alternate row coloring for better readability:</p>
+L333: <p>Wide tables automatically scroll horizontally on small screens:</p>
+L520: <p>Root component that contains the table in a scrollable container.</p>
+L555: <p>Wraps <code class="inline-code">&lt;thead&gt;</code> for column headers.</p>
+L558: <p>Wraps <code class="inline-code">&lt;tbody&gt;</code> for data rows.</p>
+L561: <p>Wraps <code class="inline-code">&lt;tfoot&gt;</code> for totals/summaries.</p>
+L564: <p>Wraps <code class="inline-code">&lt;tr&gt;</code> for each row.</p>
+L567: <p>Wraps <code class="inline-code">&lt;th&gt;</code> for header cells.</p>
+L570: <p>Wraps <code class="inline-code">&lt;td&gt;</code> for data cells.</p>
+L571: <p><strong>Specific props:</strong></p>
+L578: <p>Wraps <code class="inline-code">&lt;caption&gt;</code> for the table description.</p>
+
+=== src\pages\[lang]\docs\design\tabs.astro ===
+L40: <p>
+L55: <p>The API — simple and composable:</p>
+L88: <p>Keep scrolling to explore!</p>
+L108: <p>Components are located in <code class="inline-code">src/components/ui/Tabs/</code></p>
+L119: <p>
+L131: <p>General introduction to our product and its main capabilities.</p>
+L152: <p><strong>$0/month</strong> — Ideal to get started</p>
+L169: <p>First tab content...</p>
+L172: <p>Second tab content...</p>
+L175: <p>Third tab content...</p>
+L186: <p>Manage your personal profile and public information.</p>
+L189: <p>Configure your account settings and preferences.</p>
+L192: <p>Control your notifications and email alerts.</p>
+L201: <p>Access all your documents and text files.</p>
+L204: <p>Browse your photo and image gallery.</p>
+L207: <p>View and manage your video content.</p>
+L216: <p>Dashboard with an overview of your key metrics.</p>
+L219: <p>Detailed analytics and performance statistics.</p>
+L222: <p>Generate and download your custom reports.</p>
+L231: <p>Configure neural networks and advanced AI.</p>
+L234: <p>Access quantum systems and parallel computing.</p>
+L237: <p>Explore cyberspace and the metaverse.</p>
+L267: <p>Welcome to your personalized home page.</p>
+L271: <p>Manage your personal information and avatar.</p>
+L275: <p>Configure your account and system preferences.</p>
+L279: <p>Check your recent alerts and messages.</p>
+L288: <p>Real-time metrics and performance analytics.</p>
+L291: <p>Team management and collaboration.</p>
+L294: <p>Deployment and production release.</p>
+L303: <p>Artificial intelligence and machine learning.</p>
+L306: <p>Neural processors and quantum chips.</p>
+L309: <p>Computer vision systems.</p>
+L413: <p>The component relies on <strong>native radio inputs</strong> — zero JavaScript:</p>
+L438: <p>
+
+=== src\pages\[lang]\docs\design\tooltip.astro ===
+L100: <p>Wrap any content in a Tooltip to display a tooltip on hover:</p>
+L131: <p>The tooltip can be positioned at the top, bottom, left, or right of the element:</p>
+L223: <p>Tooltips can have different colors to indicate the type of information:</p>
+L266: <p>The Tooltip works with all components of the design system:</p>
+L339: <p style="margin: 0;">
+L345: <p style="margin: 0.5rem 0 0 0;">
+L367: <p>
+
+=== src\pages\[lang]\docs\design\video.astro ===
+L316: <p>
+L337: <p>
+L363: <p>
+
+=== src\pages\[lang]\docs\layouts\base.astro ===
+L58: <p>Votre contenu ici...</p>
+L175: <p>Switch automatique light/dark avec persistence localStorage et détection des préférences système.</p>
+L184: <p>Support natif de 4 langues (FR, EN, ES, AR) avec direction RTL automatique pour l'arabe.</p>
+L193: <p>Métadonnées complètes, Open Graph, Twitter Cards, canonical URLs et structured data.</p>
+L202: <p>Préchargement DNS, prefetch de ressources, fonts optimisées avec AstroFont.</p>
+L211: <p>HTML sémantique, attributs ARIA, skip links, et navigation au clavier.</p>
+L220: <p>Design entièrement responsive avec viewport optimisé et touch-friendly.</p>
+L247: <p>Contenu de l'article...</p>
+L255: <p>Le BaseLayout génère automatiquement :</p>
+L276: <p>Le thème est géré via un script inline exécuté immédiatement pour éviter le flash :</p>
+L286: <p>L'attribut <code class="inline-code">data-theme</code> sur <code class="inline-code">&lt;html&gt;</code> permet de cibler les styles :</p>
+L303: <p>Le BaseLayout génère la structure suivante :</p>
+L331: <p>Le layout charge automatiquement 2 familles de polices via AstroFont :</p>
+
+=== src\pages\[lang]\docs\layouts\doc.astro ===
+L60: <p>Content...</p>
+L62: <p>More content...</p>
+L111: <p>Contextual navigation with page hierarchy, active state and search.</p>
+L120: <p>TOC generated automatically from the page's H2 and H3 headings.</p>
+L129: <p>Full support for the 4 visual variants (initial, retro, modern, futuristic).</p>
+L138: <p>Collapsible sidebar on mobile with hamburger menu.</p>
+L147: <p>Optimal content width (max-width), line-height and readable typography.</p>
+L156: <p>Automatic highlight of the active page and scroll spy for the TOC.</p>
+L178: <p>
+L186: <p>Usage example...</p>
+L189: <p>List of available properties...</p>
+L199: <p>The sidebar is generated automatically from the configuration file:</p>
+L213: <p>The DocLayout automatically generates a table of contents from the headings:</p>
+L260: <p>The DocLayout uses CSS Grid for a flexible layout:</p>
+L270: <p>The DocLayout supports the 4 variants:</p>
+
+=== src\pages\[lang]\docs\templates\footer.astro ===
+L68: <p>© {currentYear} - Copyright</p>
+L75: <p>Pour personnaliser le footer, modifiez les traductions dans les fichiers i18n :</p>
+
+=== src\pages\[lang]\docs\templates\header.astro ===
+L43: <p>Le Header est composé de plusieurs sous-composants :</p>
+L103: <p>Le Header supporte les 4 variants visuels :</p>
+L113: <p>Design épuré avec background subtle et border légère.</p>
+L116: <p>Style rétro avec bordures épaisses et ombres portées.</p>
+L119: <p>Design moderne avec glassmorphism et backdrop blur.</p>
+L122: <p>Style futuriste avec gradients néon et effets lumineux.</p>
+L126: <p>Le Header s'adapte automatiquement aux différentes tailles d'écran :</p>
+
+=== src\pages\[lang]\docs\templates\table-of-contents.astro ===
+L120: <p>Clean design with subtle shadows.</p>
+L131: <p>Retro style with thick borders and monospace typography.</p>
+L142: <p>Modern design with gradients and glassmorphism effects.</p>
+L153: <p>Futuristic design with neon lights and animated effects.</p>

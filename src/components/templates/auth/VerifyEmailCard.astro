@@ -5,6 +5,7 @@ import CardContent from "@components/ui/Card/CardContent.astro";
 import CardFooter from "@components/ui/Card/CardFooter.astro";
 import Button from "@components/ui/Button.astro";
 import Link from "@components/ui/Link.astro";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
 interface Props {
     translations?: Record<string, any>;
@@ -17,10 +18,13 @@ interface Props {
     callbackURL?: string;
     pageTitle?: string;
     clientStrings?: Record<string, string>;
+    lang?: string;
 }
 
 const props = Astro.props;
-const t = props.translations?.auth ?? props.translations ?? {};
+const lang = props.lang ?? Astro.currentLocale ?? "fr";
+const translations = props.translations ?? {};
+const t = translations.auth ?? translations ?? {};
 const {
     pendingEmail: _pendingEmail,
     maskedEmail,
@@ -60,7 +64,7 @@ const {
     </CardContent>
 
     <CardFooter className="auth-footer">
-        <Link href="/fr/auth/connexion" class="back-link">
+        <Link href={getLocalizedUrl(lang, "auth/sign-in")} class="back-link">
             {t.backToLogin ?? "Retour à la connexion"}
         </Link>
     </CardFooter>
@@ -176,19 +180,28 @@ const {
     }
 </style>
 
+<div id="verify-i18n" hidden
+  data-sending={translations.auth?.sendingEmail ?? "Envoi en cours..."}
+  data-email-not-found={translations.auth?.emailNotFound ?? "Email introuvable. Veuillez vous reconnecter."}
+  data-send-error={translations.auth?.sendError ?? "Erreur lors de l'envoi."}
+  data-success={translations.auth?.emailSentSuccess ?? "Email envoyé avec succès !"}
+  data-unexpected={translations.auth?.unexpectedError ?? "Erreur inattendue."}
+></div>
+
 <script>
     import { authClient } from "@lib/auth/auth-client";
 
     // derive current language from URL path (client-side)
     const detectedLang = (window.location.pathname.split("/")[1] || "fr").toLowerCase();
 
+    const i18n = document.getElementById('verify-i18n')?.dataset ?? {};
     const btn = document.getElementById("resend-btn");
     const status = document.getElementById("resend-status");
 
     if (btn && status) {
         btn.addEventListener("click", async () => {
             btn.setAttribute("disabled", "true");
-            status.textContent = "H Envoi en cours..."; // Simple loader
+            status.textContent = i18n.sending ?? "Envoi en cours...";
 
             const email = document.cookie
                 .split("; ")
@@ -197,7 +210,7 @@ const {
 
             if (!email) {
                 status.textContent =
-                    "Email introuvable. Veuillez vous reconnecter.";
+                    i18n.emailNotFound ?? "Email introuvable. Veuillez vous reconnecter.";
                 status.className = "text-sm text-center text-red-600";
                 return;
             }
@@ -210,11 +223,11 @@ const {
 
                 if (error) {
                     status.textContent =
-                        error.message || "Erreur lors de l'envoi.";
+                        error.message || (i18n.sendError ?? "Erreur lors de l'envoi.");
                     status.className = "text-sm text-center text-red-600";
                     btn.removeAttribute("disabled");
                 } else {
-                    status.textContent = "Email envoyé avec succès !";
+                    status.textContent = i18n.success ?? "Email envoyé avec succès !";
                     status.className = "text-sm text-center text-green-600";
                     setTimeout(() => {
                         btn.removeAttribute("disabled");
@@ -222,7 +235,7 @@ const {
                     }, 30000);
                 }
             } catch (e) {
-                status.textContent = "Erreur inattendue.";
+                status.textContent = i18n.unexpected ?? "Erreur inattendue.";
                 status.className = "text-sm text-center text-red-600";
                 btn.removeAttribute("disabled");
             }

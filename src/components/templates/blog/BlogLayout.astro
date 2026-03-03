@@ -2,6 +2,7 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Sidebar from "@components/templates/blog/Sidebar.astro";
 import MainBlog from "@components/templates/blog/MainBlog.astro";
+import { getTranslations } from "@i18n/translations";
 
 export interface Props {
   title: string;
@@ -10,6 +11,7 @@ export interface Props {
 }
 
 const { title, description, variant = 'initial' } = Astro.props;
+const t = getTranslations(Astro.currentLocale || "fr");
 
 // Extract headings from the rendered slot for an inline TOC
 let headings: Array<{depth: number, slug: string, text: string}> = [];
@@ -34,7 +36,7 @@ try {
     {headings.length > 0 && (
       <aside class="blog-toc">
         <div class="blog-toc-content">
-          <h2 class="blog-toc-title">Sur cette page</h2>
+          <h2 class="blog-toc-title">{t.blog?.onThisPage ?? "Sur cette page"}</h2>
           <nav class="blog-toc-nav">
             <ul class="blog-toc-list">
               {headings.map(heading => (

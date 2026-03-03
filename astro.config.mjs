@@ -33,6 +33,9 @@ export default defineConfig({
       prefixDefaultLocale: true
     }
   },
+  experimental: {
+    failOnPrerenderConflict: true
+  },
   devToolbar: {
     enabled: true
   },

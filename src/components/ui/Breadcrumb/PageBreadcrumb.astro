@@ -30,7 +30,7 @@ import BreadcrumbLink from './BreadcrumbLink.astro';
 import BreadcrumbSeparator from './BreadcrumbSeparator.astro';
 import BreadcrumbPage from './BreadcrumbPage.astro';
 import { Icon } from 'astro-icon/components';
-import { getRelativeLocaleUrl } from '@lib/i18n/locale-url';
+import { getLocalizedUrl } from '@lib/i18n/route-helpers';
 
 interface BreadcrumbEntry {
   /** Label affiché */
@@ -75,7 +75,7 @@ const t = translations[`../../../../i18n/${currentLocale}.json`]?.default
 
 const bc = t?.breadcrumb ?? {};
 const homeLabel = bc.home || 'Accueil';
-const homeHref = getRelativeLocaleUrl(currentLocale, '/');
+const homeHref = getLocalizedUrl(currentLocale, '/');
 
 // Build JSON-LD BreadcrumbList (Schema.org)
 const origin = Astro.url.origin;
@@ -85,7 +85,7 @@ const jsonLdItems = [
     "@type": "ListItem",
     "position": i + 2,
     "name": item.label,
-    "item": `${origin}${getRelativeLocaleUrl(currentLocale, item.href)}`,
+    "item": `${origin}${getLocalizedUrl(currentLocale, item.href)}`,
   })),
   ...(current ? [{
     "@type": "ListItem",
@@ -124,7 +124,7 @@ const classes = [className, invertedClass].filter(Boolean).join(' ');
           <Icon name="mdi:chevron-right" class="breadcrumb-chevron" />
         </BreadcrumbSeparator>
         <BreadcrumbItem>
-          <BreadcrumbLink href={getRelativeLocaleUrl(currentLocale, item.href)}>
+          <BreadcrumbLink href={getLocalizedUrl(currentLocale, item.href)}>
             {item.label}
           </BreadcrumbLink>
         </BreadcrumbItem>

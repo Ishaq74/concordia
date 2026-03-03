@@ -1,0 +1,87 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { Code } from "astro:components";
+import Alert from "@components/ui/Alert.astro";
+import { getTranslations } from "@i18n/translations";
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const d = t.docs?.common ?? {};
+const p = t.docs?.pages?.footerTemplate ?? {};
+---
+
+<DocLayout 
+  title={p.title ?? "Footer Template"} 
+  description={p.description ?? "Footer template with legal information, links and social networks"} 
+  variant="initial"
+>
+  <h1 id="footer">{p.title ?? "Footer Template"}</h1>
+
+  <p set:html={p.intro ?? `The <code class="inline-code">Footer</code> template is the site footer.  It contains company information, useful links, legal notices and social networks.`} />
+
+  <h2>{d.usage ?? "Utilisation"}</h2>
+
+  <Code
+    lang="astro"
+    code={`---
+import Footer from '@components/templates/Footer/Footer.astro';
+---
+
+<Footer />`}
+  />
+
+  <Alert variant="initial" status="info">
+    <strong>✅ Auto-inclus :</strong> Le Footer est automatiquement inclus dans le BaseLayout.
+  </Alert>
+
+  <h2>{d.content ?? "Contenu"}</h2>
+
+  <ul>
+    <li>{p.ui1 ?? "✅ Informations entreprise (nom, description, SIRET)"}</li>
+    <li>{p.ui2 ?? "✅ Coordonnées de contact (email, téléphone, adresse)"}</li>
+    <li>{p.ui3 ?? "✅ Liens légaux (mentions légales, politique de confidenti..."}</li>
+    <li>{p.ui4 ?? "✅ Liens réseaux sociaux"}</li>
+    <li>{p.ui5 ?? "✅ Copyright automatique avec année"}</li>
+    <li>{p.ui6 ?? "✅ Multilingue avec traductions i18n"}</li>
+  </ul>
+
+  <h2>{d.structure ?? "Structure"}</h2>
+
+  <Code
+    lang="html"
+    code={`<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-section">
+      <!-- Entreprise -->
+    </div>
+    <div class="footer-section">
+      <!-- Contact -->
+    </div>
+    <div class="footer-section">
+      <!-- Légal -->
+    </div>
+    <div class="footer-section">
+      <!-- Réseaux sociaux -->
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© {currentYear} - Copyright</p>
+  </div>
+</footer>`}
+  />
+
+  <h2>{d.customization ?? "Personnalisation"}</h2>
+
+  <p>{p.ui7 ?? "Pour personnaliser le footer, modifiez les traductions da..."}</p>
+
+  <Code
+    lang="json"
+    code={`{
+  "footer": {
+    "company": "Nom de l'entreprise",
+    "description": "Description",
+    "email": "contact@example.com",
+    "phone": "+33 1 23 45 67 89"
+  }
+}`}
+  />
+</DocLayout>

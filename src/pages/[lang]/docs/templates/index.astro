@@ -1,0 +1,56 @@
+---
+import DocLayout from "@layouts/DocLayout.astro";
+import { getTranslations } from "@i18n/translations";
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const p = t.docs?.pages ?? {};
+---
+
+<DocLayout 
+  title={p.templatesIndexTitle ?? "Templates"}
+  description={p.templatesIndexDesc ?? "Templates de page préfabriqués"}
+  variant="initial"
+>
+  <h1 id="templates">{p.templatesIndexTitle ?? "Templates"}</h1>
+  
+  <p>{p.templatesIndexDesc ?? "Templates de page préfabriqués — en-tête, pied de page et table des matières."}</p>
+
+  <div class="templates-grid">
+    <a href={`/${lang}/docs/templates/header`} class="template-card">
+      <h3>{t.docsSidebar?.header ?? "En-tête"}</h3>
+      <p>{p.headerTemplate?.description ?? "Navigation, sélecteur de langue, changeur de thème et menu utilisateur"}</p>
+    </a>
+    <a href={`/${lang}/docs/templates/footer`} class="template-card">
+      <h3>{t.docsSidebar?.footer ?? "Pied de page"}</h3>
+      <p>{p.footerTemplate?.description ?? "Informations de l'entreprise et liens de navigation"}</p>
+    </a>
+    <a href={`/${lang}/docs/templates/table-of-contents`} class="template-card">
+      <h3>{t.docsSidebar?.tableOfContents ?? "Table des matières"}</h3>
+      <p>{p.tocTemplate?.description ?? "Navigation par ancres dans un panneau latéral"}</p>
+    </a>
+  </div>
+</DocLayout>
+
+<style>
+  .templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .template-card {
+    display: block;
+    padding: 1.5rem;
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .template-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .template-card h3 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+  .template-card p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
+</style>

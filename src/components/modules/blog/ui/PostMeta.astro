@@ -2,7 +2,7 @@
 import Flex from "@components/Tools/Flex.astro";
 import Link from "@components/ui/Link.astro";
 import { Icon } from 'astro-icon/components';
-import { getRelativeLocaleUrl } from "@lib/i18n/locale-url";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 import Avatar from '@components/ui/Avatar/Avatar.astro';
 
 interface Props {
@@ -14,9 +14,9 @@ interface Props {
 }
 
 const { readingTime, authors = [], lang } = Astro.props;
+import { getTranslations } from "@i18n/translations";
 const currentLocale = Astro.currentLocale || "fr";
-const translations = await import(`../../../../i18n/${currentLocale}.json`);
-const t = translations.default;
+const t = getTranslations(currentLocale);
 
 ---
 <Flex
@@ -46,7 +46,7 @@ const t = translations.default;
         <>
           {index > 0 && <span>, </span>}
           <Link
-            href={getRelativeLocaleUrl(lang, `blog/auteur/${author.slug}`) || '#'}
+            href={getLocalizedUrl(lang, `blog/author/${author.slug}`) || '#'}
             className="author-link"
             style="link"
             transition:name="author"

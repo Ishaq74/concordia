@@ -7,9 +7,9 @@ interface Props {
 }
 
 const { currentPath, variant = 'initial' } = Astro.props;
+import { getTranslations } from "@i18n/translations";
 const currentLocale = Astro.currentLocale;
-const translations = await import(`../../../i18n/${currentLocale}.json`);
-const t = translations.default;
+const t = getTranslations(currentLocale || "fr");
 ---
 
 <aside class={`blog-sidebar variant-${variant}`}>
@@ -19,8 +19,8 @@ const t = translations.default;
       <ul class="nav-list">
         <li class="nav-item"><Link href={`/${currentLocale}/blog`} variant={variant} style="link" className={currentPath === `/${currentLocale}/blog` ? 'active' : ''}>{t.nav.blog}</Link></li>
         <li class="nav-item"><Link href={`/${currentLocale}/blog/categorie`} variant={variant} style="link" className={currentPath?.startsWith(`/${currentLocale}/blog/categorie`) ? 'active' : ''}>{t.blog?.categories ?? 'Categories'}</Link></li>
-        <li class="nav-item"><Link href={`/${currentLocale}/blog/auteur`} variant={variant} style="link" className={currentPath?.startsWith(`/${currentLocale}/blog/auteur`) ? 'active' : ''}>{'Auteurs'}</Link></li>
-        <li class="nav-item"><Link href={`/${currentLocale}/blog/archives`} variant={variant} style="link" className={currentPath?.startsWith(`/${currentLocale}/blog/archives`) ? 'active' : ''}>{'Archives'}</Link></li>
+        <li class="nav-item"><Link href={`/${currentLocale}/blog/auteur`} variant={variant} style="link" className={currentPath?.startsWith(`/${currentLocale}/blog/auteur`) ? 'active' : ''}>{t.blog?.authors ?? 'Auteurs'}</Link></li>
+        <li class="nav-item"><Link href={`/${currentLocale}/blog/archives`} variant={variant} style="link" className={currentPath?.startsWith(`/${currentLocale}/blog/archives`) ? 'active' : ''}>{t.blog?.archives ?? 'Archives'}</Link></li>
       </ul>
     </div>
   </nav>
