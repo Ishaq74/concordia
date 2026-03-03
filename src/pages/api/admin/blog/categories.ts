@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { isAdminUser } from "@lib/admin/permissions";
+import { json, guardAdmin, generateId, slugify } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import {
   blogCategories,
@@ -9,29 +9,6 @@ import {
   auditLog,
 } from "@database/schemas";
 import { eq, desc, ilike, count, inArray, and } from "drizzle-orm";
-
-const json = (status: number, payload: unknown) =>
-  new Response(JSON.stringify(payload), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-const guardAdmin = (locals: App.Locals) => {
-  if (!isAdminUser(locals.user)) {
-    return json(403, { error: "forbidden" });
-  }
-  return null;
-};
-
-const generateId = () => crypto.randomUUID();
-
-const slugify = (text: string): string =>
-  text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 
 /**
  * GET /api/admin/blog/categories

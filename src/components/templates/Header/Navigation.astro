@@ -17,7 +17,6 @@ const {
 // Astro.currentLocale can occasionally be undefined during some page renders
 // so we fall back to French and log the value for debugging purposes.
 const currentLocale = Astro.currentLocale || "fr";
-console.log("Navigation currentLocale=", currentLocale);
 const currentPath = Astro.url.pathname;
 
 import { getTranslations } from "@i18n/translations";

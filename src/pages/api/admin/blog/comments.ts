@@ -1,25 +1,10 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { isAdminUser } from "@lib/admin/permissions";
+import { json, guardAdmin, generateId } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import { blogComments, auditLog } from "@database/schemas";
 import { eq, desc, ilike, count, and, or } from "drizzle-orm";
-
-const json = (status: number, payload: unknown) =>
-  new Response(JSON.stringify(payload), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-const guardAdmin = (locals: App.Locals) => {
-  if (!isAdminUser(locals.user)) {
-    return json(403, { error: "forbidden" });
-  }
-  return null;
-};
-
-const generateId = () => crypto.randomUUID();
 
 /**
  * GET /api/admin/blog/comments

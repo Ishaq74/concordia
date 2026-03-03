@@ -36,10 +36,8 @@ export function createTranslationLoader<
       for (const entity of rawEntities) {
         const { translations, ...entityData } = entity;
 
-        // DEBUG: Vérifier les relations
         if (!translations || !Array.isArray(translations)) {
           logger.error(`❌ Entity ${entity.slug} has no 'translations' property (or it is not an array). Check your drizzle relations!`);
-          console.log("Structure reçue pour", entity.slug, ":", Object.keys(entity));
           continue;
         }
 
@@ -51,10 +49,8 @@ export function createTranslationLoader<
         for (const translation of translations) {
           const lang = (translation as any)[langKey] as string;
           
-          // DEBUG: Vérifier le champ langue
           if (!lang) {
             logger.error(`❌ Missing language key '${String(langKey)}' in translation object.`);
-            console.log("Translation object keys:", Object.keys(translation as any));
             continue;
           }
 

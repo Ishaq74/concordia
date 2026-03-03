@@ -1,4 +1,4 @@
-export const LANGUAGES = ['fr', 'en', 'es', 'de', 'ar', 'zh'] as const;
+export const LANGUAGES = ['fr', 'en', 'es', 'ar'] as const;
 
 export const BLOG_RESOURCES = {
   authors: {

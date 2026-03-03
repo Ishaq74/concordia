@@ -32,7 +32,7 @@ export const commentActions = {
                 authorEmail: user.email || "",
                 content: { [lang]: input.content },
                 rating: input.rating || 0,
-                status: "approved", // Auto-approve for now as requested by "marchaient parfaitement"
+                status: "pending",
                 inLanguage: lang,
             });
 

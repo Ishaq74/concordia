@@ -349,8 +349,6 @@ export async function checkPermission(
   permission: AppPermission,
   context?: ABACContext,
 ): Promise<boolean> {
-  // DEBUG: list configured RBAC roles at runtime (temporary)
-  console.debug('[RBAC] configured roles:', Object.keys(appRbacMatrix));
   // Normalize role aliases from legacy/tests (user/member -> citizen)
   const normalize = (r: string) => {
     if (r === 'user' || r === 'member') return 'citizen' as AppRole;

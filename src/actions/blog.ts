@@ -7,7 +7,7 @@ import { nanoid } from "nanoid";
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const LANGUAGES = ['fr', 'en', 'es', 'de'];
+const LANGUAGES = ['fr', 'en', 'es', 'ar'];
 
 export const blogActions = {
   savePost: defineAction({
