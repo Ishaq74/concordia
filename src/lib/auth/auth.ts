@@ -137,10 +137,12 @@ const sharedConfig = {
 // global blacklist used to invalidate bearer tokens after sign-out. The
 // set lives at module scope so it survives repeated calls to `getAuth()` in
 // tests where a fresh instance is constructed each time.
+// TODO: Move to persistent storage (e.g., Redis) to avoid loss on server restart/deploy.
 const invalidatedTokens = new Set<string>();
 
 // in-memory rate-limit map shared across all auth instances. Keys are
 // lowercase email addresses. Values track count/windows for tests.
+// TODO: Move to persistent storage (e.g., Redis) to avoid loss on server restart/deploy.
 const emailFailureMap: Map<string, { count: number; first: number }> = new Map();
 
 export async function getAuth() {

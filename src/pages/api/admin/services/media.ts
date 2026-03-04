@@ -33,7 +33,8 @@ export const GET: APIRoute = async ({ request, locals }) => {
   if (search) conditions.push(ilike(servicesMedia.url, `%${search}%`));
 
   const whereClause = conditions.length > 0
-    ? conditions.reduce((a, b) => a && b ? a : a || b)
+    // Refactored: combine all conditions using drizzle-orm and()
+    ? conditions.reduce((a, b) => and(a, b))
     : undefined;
 
   const [totalResult] = whereClause

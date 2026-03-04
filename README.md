@@ -143,6 +143,7 @@ npm install
 - README.fr.md
 - README.md
 - **reports**
+  - blog-admin-audit.md
   - i18n-audit-report.md
   - i18n-doc-pages-audit.md
   - sonda-report.html
@@ -228,6 +229,21 @@ npm install
           - PostMeta.astro
           - ShareButtons.astro
           - StarRating.astro
+      - **services**
+        - **cards**
+          - ServiceCard.astro
+        - **lists**
+          - CategoryGrid.astro
+          - ServiceGrid.astro
+        - **single**
+          - AvailabilityCalendar.astro
+          - ProviderCard.astro
+          - ServiceBooking.astro
+          - ServiceHeader.astro
+        - **ui**
+          - CategoryBadge.astro
+          - PriceBadge.astro
+          - ServiceMeta.astro
     - **templates**
       - **auth**
         - AuthLayout.astro
@@ -387,18 +403,29 @@ npm install
       - 10-blog_translations.data.ts
       - 11-blog_comments.data.ts
       - 11-notification.data.ts
+      - 20-services_media.data.ts
+      - 21-services_categories.data.ts
+      - 22-services_listings.data.ts
+      - 23-services_translations.data.ts
+      - 24-services_media_links.data.ts
+      - 25-services_availability.data.ts
+      - 26-services_reviews.data.ts
+      - 27-services_bookings.data.ts
     - drizzle.ts
     - **loaders**
       - blog.ts
       - factory.ts
+      - services.ts
     - **migrations**
       - 0002_narrow_silver_samurai.sql
       - 0003_calm_chat.sql
       - 0004_tricky_captain_flint.sql
+      - 0005_harsh_metal_master.sql
       - **meta**
         - 0002_snapshot.json
         - 0003_snapshot.json
         - 0004_snapshot.json
+        - 0005_snapshot.json
         - _journal.json
     - **schemas**
       - audit-log.schema.ts
@@ -412,6 +439,13 @@ npm install
       - blog_translations.schema.ts
       - notification.schema.ts
       - profile.schema.ts
+      - services_availability.schema.ts
+      - services_bookings.schema.ts
+      - services_categories.schema.ts
+      - services_listings.schema.ts
+      - services_media.schema.ts
+      - services_reviews.schema.ts
+      - services_translations.schema.ts
     - schemas.ts
   - env.d.ts
   - **i18n**
@@ -474,8 +508,17 @@ npm install
           - comments.ts
           - media.ts
         - moderate.ts
+        - **organizations**
+          - members.ts
+          - profile.ts
         - organizations.ts
         - roles.ts
+        - **services**
+          - availability.ts
+          - bookings.ts
+          - categories.ts
+          - media.ts
+          - services.ts
         - users.ts
       - **auth**
         - [...all].ts
@@ -484,6 +527,8 @@ npm install
         - verification.ts
       - **profile**
         - index.ts
+      - **services**
+        - bookings.ts
     - **[lang]**
       - about.astro
       - **admin**
@@ -514,6 +559,27 @@ npm install
         - index.astro
         - **moderation**
           - index.astro
+        - **organizations**
+          - blog.astro
+          - bookings.astro
+          - dashboard.astro
+          - index.astro
+          - members.astro
+          - new.astro
+          - profile.astro
+          - services.astro
+          - [id].astro
+        - **services**
+          - **bookings**
+            - index.astro
+            - [id].astro
+          - **categories**
+            - index.astro
+            - new.astro
+          - index.astro
+          - new.astro
+          - **[id]**
+            - edit.astro
         - **users**
           - index.astro
       - **auth**
@@ -577,8 +643,15 @@ npm install
       - index.astro
       - **organizations**
         - index.astro
+        - **[slug]**
+          - services.astro
         - [slug].astro
       - profile.astro
+      - **services**
+        - index.astro
+        - **[category]**
+          - [slug].astro
+        - [category].astro
   - **styles**
     - base.css
     - **components**
@@ -593,18 +666,6 @@ npm install
       - spacing.css
       - typography.css
 - **test-results**
-  - **ui-newtab-NewTabComponent--9ea60-e-loads-and-demo-is-present-chromium**
-    - test-failed-1.png
-    - trace.zip
-    - video.webm
-  - **ui-newtab-NewTabComponent--9ea60-e-loads-and-demo-is-present-chromium-retry1**
-    - test-failed-1.png
-    - trace.zip
-    - video.webm
-  - **ui-newtab-NewTabComponent--9ea60-e-loads-and-demo-is-present-chromium-retry2**
-    - test-failed-1.png
-    - trace.zip
-    - video.webm
 - **tests**
   - **a11y**
     - a11y-performance.test.ts
@@ -614,6 +675,8 @@ npm install
     - test-env.ts
   - **e2e**
     - critical-flows.test.ts
+    - org-admin.test.ts
+    - services-admin.test.ts
     - **ui**
       - alert.test.ts
       - badge.test.ts
@@ -643,9 +706,13 @@ npm install
   - **integration**
     - auth-emails.test.ts
     - auth-flow.test.ts
+    - blog-crud.test.ts
     - comments.test.ts
     - **loaders**
       - blog-loader.test.ts
+    - notifications.test.ts
+    - org-admin.test.ts
+    - services-admin.test.ts
   - **pages**
     - public-pages.test.ts
   - README.md
@@ -1202,6 +1269,148 @@ Better Auth is configured with plugins for OAuth, session management, and more.
     - readAt: timestamp
     - createdAt: timestamp
     - updatedAt: timestamp
+- **services_media.schema.ts**
+  - services_media (const: servicesMedia)
+    - id: text
+    - url: text
+    - contentUrl: text
+    - type: text
+    - encodingFormat: text
+    - width: text
+    - height: text
+    - duration: text
+    - license: text
+    - copyrightHolder: text
+    - caption: jsonb
+    - description: jsonb
+    - alt: jsonb
+    - thumbnailUrl: text
+    - createdAt: timestamp
+    - updatedAt: timestamp
+- **services_categories.schema.ts**
+  - services_categories (const: servicesCategories)
+    - id: text
+    - slug: text
+    - name: jsonb
+    - description: jsonb
+    - icon: text
+    - featuredImageId: text
+    - parentId: text
+    - sortOrder: integer
+    - displayInHome: boolean
+    - displayInMenu: boolean
+    - isActive: boolean
+    - isFeatured: boolean
+    - seoTitle: jsonb
+    - seoDescription: jsonb
+    - createdAt: timestamp
+    - updatedAt: timestamp
+    - Relations:
+      - featuredImage: one
+- **services_listings.schema.ts**
+  - services_listings (const: servicesListings)
+    - id: text
+    - slug: text
+    - categoryId: text
+    - providerId: text
+    - organizationId: text
+    - status: text
+    - basePrice: text
+    - priceType: text
+    - currency: text
+    - durationMinutes: integer
+    - isMobile: boolean
+    - maxParticipants: integer
+    - bookingAdvanceHours: integer
+    - cancellationHours: integer
+    - isActive: boolean
+    - isFeatured: boolean
+    - displayInHome: boolean
+    - allowReviews: boolean
+    - inLanguage: text
+    - createdAt: timestamp
+    - updatedAt: timestamp
+    - Relations:
+      - category: one
+      - organization: one
+      - translations: many
+      - media: many
+      - reviews: many
+      - availability: many
+      - bookings: many
+  - services_media_links (const: servicesMediaLinks)
+    - serviceId: text
+    - mediaId: text
+    - type: text
+    - position: text
+    - Relations:
+      - service: one
+      - media: one
+- **services_translations.schema.ts**
+  - services_translations (const: servicesTranslations)
+    - id: text
+    - serviceId: text
+    - inLanguage: text
+    - title: jsonb
+    - description: jsonb
+    - shortDescription: jsonb
+    - seoTitle: jsonb
+    - seoDescription: jsonb
+    - seoKeywords: jsonb
+    - canonicalUrl: jsonb
+    - createdAt: timestamp
+    - updatedAt: timestamp
+    - Relations:
+      - service: one
+- **services_reviews.schema.ts**
+  - services_reviews (const: servicesReviews)
+    - id: text
+    - serviceId: text
+    - parentId: text
+    - authorName: text
+    - authorEmail: text
+    - authorId: text
+    - content: jsonb
+    - rating: integer
+    - status: text
+    - inLanguage: text
+    - createdAt: timestamp
+    - updatedAt: timestamp
+    - Relations:
+      - service: one
+      - parent: one
+      - replies: many
+- **services_availability.schema.ts**
+  - services_availability (const: servicesAvailability)
+    - id: text
+    - serviceId: text
+    - dayOfWeek: integer
+    - startTime: text
+    - endTime: text
+    - isAvailable: boolean
+    - createdAt: timestamp
+    - Relations:
+      - service: one
+- **services_bookings.schema.ts**
+  - services_bookings (const: servicesBookings)
+    - id: text
+    - serviceId: text
+    - customerId: text
+    - providerId: text
+    - bookingDate: text
+    - bookingTime: text
+    - durationMinutes: integer
+    - totalPrice: text
+    - currency: text
+    - status: text
+    - customerMessage: text
+    - providerResponse: text
+    - cancelledAt: timestamp
+    - completedAt: timestamp
+    - createdAt: timestamp
+    - updatedAt: timestamp
+    - Relations:
+      - service: one
 
 ### Bonus: Schema files not exported
 
@@ -1307,6 +1516,8 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - test-env.ts
 - **e2e**
   - critical-flows.test.ts
+  - org-admin.test.ts
+  - services-admin.test.ts
   - **ui**
     - alert.test.ts
     - badge.test.ts
@@ -1336,9 +1547,13 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
 - **integration**
   - auth-emails.test.ts
   - auth-flow.test.ts
+  - blog-crud.test.ts
   - comments.test.ts
   - **loaders**
     - blog-loader.test.ts
+  - notifications.test.ts
+  - org-admin.test.ts
+  - services-admin.test.ts
 - **pages**
   - public-pages.test.ts
 - README.md
@@ -1408,18 +1623,29 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - 10-blog_translations.data.ts
   - 11-blog_comments.data.ts
   - 11-notification.data.ts
+  - 20-services_media.data.ts
+  - 21-services_categories.data.ts
+  - 22-services_listings.data.ts
+  - 23-services_translations.data.ts
+  - 24-services_media_links.data.ts
+  - 25-services_availability.data.ts
+  - 26-services_reviews.data.ts
+  - 27-services_bookings.data.ts
 - drizzle.ts
 - **loaders**
   - blog.ts
   - factory.ts
+  - services.ts
 - **migrations**
   - 0002_narrow_silver_samurai.sql
   - 0003_calm_chat.sql
   - 0004_tricky_captain_flint.sql
+  - 0005_harsh_metal_master.sql
   - **meta**
     - 0002_snapshot.json
     - 0003_snapshot.json
     - 0004_snapshot.json
+    - 0005_snapshot.json
     - _journal.json
 - **schemas**
   - audit-log.schema.ts
@@ -1433,6 +1659,13 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - blog_translations.schema.ts
   - notification.schema.ts
   - profile.schema.ts
+  - services_availability.schema.ts
+  - services_bookings.schema.ts
+  - services_categories.schema.ts
+  - services_listings.schema.ts
+  - services_media.schema.ts
+  - services_reviews.schema.ts
+  - services_translations.schema.ts
 - schemas.ts
 - **src/pages/api**
 - **admin**
@@ -1443,8 +1676,17 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
     - comments.ts
     - media.ts
   - moderate.ts
+  - **organizations**
+    - members.ts
+    - profile.ts
   - organizations.ts
   - roles.ts
+  - **services**
+    - availability.ts
+    - bookings.ts
+    - categories.ts
+    - media.ts
+    - services.ts
   - users.ts
 - **auth**
   - [...all].ts
@@ -1453,6 +1695,8 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - verification.ts
 - **profile**
   - index.ts
+- **services**
+  - bookings.ts
 
 #### Test file summaries
 
@@ -1519,6 +1763,24 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - **Parcours critique - Inscription**
   - **Parcours critique - Multi-variant**
   - **Parcours critique - Erreurs serveur**
+
+- `tests\e2e\org-admin.test.ts`
+  - **Org Admin — Auth guard (unauthenticated)**
+  - **Org Admin — Super admin list page structure**
+  - **Org Admin — API guard (unauthenticated)**
+  - **Org Admin — API input validation (profile)**
+  - **Org Admin — API input validation (members)**
+  - **Org Admin — All page routes respond without 500**
+  - **Org Admin — i18n pages render in all locales**
+
+- `tests\e2e\services-admin.test.ts`
+  - **Services Admin — All page routes respond without 500**
+  - **Services Admin — Auth guard (unauthenticated)**
+  - **Services API — Auth guard (unauthenticated)**
+  - **Services API — No 500 on bad input**
+  - **Public Services — Pages respond**
+  - **Public Services — Index page content**
+  - **Services Admin — Booking detail page**
 
 - `tests\e2e\ui\alert.test.ts`
   - **AlertComponent – Page de documentation complète**
@@ -1642,6 +1904,13 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
     - sign-in with invalid password logs login_failed
     - duplicate sign-up is rejected
 
+- `tests\integration\blog-crud.test.ts`
+  - **Blog Article CRUD Integration**
+    - should create a blog article
+    - should update the blog article
+    - should fetch the blog article by slug
+    - should delete the blog article
+
 - `tests\integration\comments.test.ts`
   - **Comments actions (createComment)**
     - throws UNAUTHORIZED when no user in context
@@ -1655,6 +1924,54 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
     - logs error and continues if transformer throws
     - logs error on missing lang key in translation
     - logs error if two translations produce same id
+
+- `tests\integration\notifications.test.ts`
+  - **Notifications Integration**
+    - should create a notification
+    - should fetch notifications for user
+    - should delete the notification
+
+- `tests\integration\org-admin.test.ts`
+  - **Org Admin — Profile API logic**
+    - blogOrganizations can be queried by id
+    - blogOrganizations can be listed
+    - blogOrganizations can be updated
+    - blogOrganizations can be toggled active/inactive
+    - blogOrganizations can be deleted
+  - **Org Admin — Members & Roles**
+    - createTestOrganization creates org + owner membership
+    - member role can be updated
+    - member can be removed from organization
+    - invitation can be created and cancelled
+    - multiple members can be listed for an organization
+  - **Org Admin — Org ID resolution logic**
+    - resolves orgId from member table when user has membership
+    - resolves orgId from blogOrganizations when member table is empty for user
+    - query param ?org= takes priority
+    - session orgId is used when no query param
+  - **Org Admin — Permission checks**
+    - isAdminUser accepts admin role
+    - isAdminUser rejects non-admin roles
+    - isSuperAdminUser distinguishes super from admin
+
+- `tests\integration\services-admin.test.ts`
+  - **Services — Listings CRUD**
+    - service listing can be created with org
+    - service listing can be filtered by org
+    - service listing can be updated
+    - service listing can be deleted
+  - **Services — Categories CRUD**
+    - category can be created
+    - category can be updated
+  - **Services — Bookings CRUD**
+    - booking can be created
+    - booking status can be updated (confirm → completed)
+    - booking provider response can be set
+    - booking can be cancelled
+  - **Services — Media CRUD**
+    - media record can be created
+  - **Services — Org scoping isolation**
+    - services from different orgs are properly isolated
 
 - `tests\pages\public-pages.test.ts`
   - **Public pages — localized URL generation**

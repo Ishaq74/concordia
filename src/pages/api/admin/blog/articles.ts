@@ -203,6 +203,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
       const organizationId = payload.organizationId ? String(payload.organizationId) : null;
 
+      // Slug uniqueness check
+      const existing = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+      if (existing.length > 0) {
+        return json(400, { error: "duplicate_slug", message: "Slug already exists." });
+      }
+
       await db.insert(blogPosts).values({
         id,
         slug,

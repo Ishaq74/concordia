@@ -52,8 +52,8 @@ if (roleFilter) {
 }
 
 const whereClause = conditions.length > 0 ? conditions.reduce((a, b) => {
-  if (!a || !b) return a || b;
-  return a;
+  // Refactored: combine all conditions using drizzle-orm and()
+  return and(a, b);
 }) : undefined;
 
 // Total count
