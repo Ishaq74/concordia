@@ -2,7 +2,9 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import type { ComponentProps } from 'astro/types';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import Button from '../../../src/components/ui/Button.astro';
-import { axe } from 'vitest-axe';
+// ❌ Remplacer vitest-axe par axe-core directement
+// import { axe } from 'vitest-axe';
+import axe from 'axe-core'; // ✅ Import direct d'axe-core
 import { JSDOM } from 'jsdom';
 
 type LocalTestContext = {
@@ -148,7 +150,16 @@ describe('ui/Button', () => {
   // ----------------------
   async function expectNoA11yViolations(html: string) {
     const { window } = new JSDOM(html);
-    const results = await axe(window.document.body); // <- axe accepts HTMLElement
+    
+    // ✅ Utiliser axe.run() au lieu de axe()
+    // ✅ Passer explicitement le contexte et désactiver les règles incompatibles JSDOM
+    const results = await axe.run(window.document.body, {
+      rules: {
+        'color-contrast': { enabled: false },        // JSDOM n'a pas de moteur de rendu CSS
+        'link-in-text-block': { enabled: false },    // Nécessite des infos de layout navigateur
+      },
+    });
+    
     expect(results.violations).toHaveLength(0);
   }
 
