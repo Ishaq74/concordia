@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <!-- Fond -->
+  <rect width="400" height="400" fill="#fefcf7"/>
+
+  <!-- Cercle central représentant l’unité -->
+  <circle cx="200" cy="200" r="120" fill="#d1e8ff" stroke="#7faed4" stroke-width="4"/>
+
+  <!-- Deux mains stylisées se rejoignant -->
+  <path d="M150,200 C150,180 180,180 180,200 C180,220 150,220 150,200 Z" fill="#f4d4b0" stroke="#d1a77d" stroke-width="2"/>
+  <path d="M250,200 C250,180 220,180 220,200 C220,220 250,220 250,200 Z" fill="#f4d4b0" stroke="#d1a77d" stroke-width="2"/>
+  <path d="M180,200 C180,205 220,205 220,200" stroke="#d1a77d" stroke-width="2" fill="none"/>
+
+  <!-- Arc supérieur symbolisant l’harmonie -->
+  <path d="M120,150 C200,50 280,150 280,150" stroke="#7faed4" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  <!-- Arc inférieur pour équilibre -->
+  <path d="M120,250 C200,350 280,250 280,250" stroke="#7faed4" stroke-width="6" fill="none" stroke-linecap="round"/>
+</svg>

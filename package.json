@@ -21,7 +21,7 @@
     "db:seed": "tsx scripts/db/db.seed.ts",
     "smtp:check": "tsx src/lib/smtp/smtp.check.ts",
     "test": "vitest",
-    "test:unit": "vitest run --include tests/unit/**/*.test.ts src/lib/**/*.test.ts",
+    "test:unit": "vitest run tests/unit/**/*.test.ts src/lib/**/*.test.ts",
     "test:integration": "vitest run --include tests/integration/**/*.test.ts",
     "test:components": "vitest run --include src/components/**/*.test.ts",
     "test:e2e": "playwright test",
@@ -71,6 +71,7 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/user-event": "^14.6.1",
+    "@types/jsdom": "^28.0.0",
     "@types/leaflet": "^1.9.21",
     "@types/markdown-it": "^14.1.2",
     "@types/nodemailer": "^7.0.11",
@@ -79,6 +80,7 @@
     "@vitest/coverage-v8": "^4.0.18",
     "@vitest/ui": "^4.0.18",
     "astro-content-viewer": "^0.1.2",
+    "axe-core": "^4.11.1",
     "drizzle-kit": "^0.31.9",
     "eslint": "^10.0.2",
     "eslint-plugin-astro": "^1.6.0",
@@ -90,6 +92,7 @@
     "sonda": "^0.10.2",
     "tsx": "^4.21.0",
     "typescript-eslint": "^8.56.1",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "vitest-axe": "^0.1.0"
   }
 }

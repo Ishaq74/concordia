@@ -1,7 +1,12 @@
-import { afterEach, beforeAll, beforeEach, afterAll, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, afterAll, vi, expect } from 'vitest'
+import * as axeMatchers from 'vitest-axe/matchers';
 import { cleanupTestData } from './utils/cleanup'
 export { cleanupTestData };
 import { TEST_ENV } from './config/test-env'
+
+// add axe matchers globally
+expect.extend(axeMatchers);
+
 
 // Only essential test environment setup remains
 
