@@ -81,7 +81,7 @@ npm install
 - `npm run db:seed`: tsx scripts/db/db.seed.ts
 - `npm run smtp:check`: tsx src/lib/smtp/smtp.check.ts
 - `npm run test`: vitest
-- `npm run test:unit`: vitest run --include tests/unit/**/*.test.ts src/lib/**/*.test.ts
+- `npm run test:unit`: vitest run tests/unit/**/*.test.ts src/lib/**/*.test.ts
 - `npm run test:integration`: vitest run --include tests/integration/**/*.test.ts
 - `npm run test:components`: vitest run --include src/components/**/*.test.ts
 - `npm run test:e2e`: playwright test
@@ -442,6 +442,8 @@ npm install
     - fr.json
     - slug-map.ts
     - translations.ts
+  - **icons**
+    - concordia.svg
   - **layouts**
     - AdminLayout.astro
     - BaseLayout.astro
@@ -709,6 +711,8 @@ npm install
   - setup.integration.ts
   - setup.ts
   - **unit**
+    - **components**
+      - Button.test.ts
     - **loaders**
       - factory.test.ts
     - smtp.test.ts
@@ -1541,6 +1545,8 @@ _جميع ملفات المخطط تم تصديرها._
 - setup.integration.ts
 - setup.ts
 - **unit**
+  - **components**
+    - Button.test.ts
   - **loaders**
     - factory.test.ts
   - smtp.test.ts
@@ -1934,6 +1940,26 @@ _جميع ملفات المخطط تم تصديرها._
     - rejette payload NoSQLi
   - **Escalade**
     - refuse modification de rôle sans autorisation
+
+- `tests\unit\components\Button.test.ts`
+  - **ui/Button**
+    - renders a <button> with its children by default
+    - applies variant and color classes
+    - forwards aria-label and disabled attribute
+    - renders an icon when provided
+    - defaults type attribute to "button" and allows overriding
+    - forwards arbitrary HTML attributes and custom className
+    - does not render an <svg> when no icon prop is provided
+    - renders the icon on the correct side
+    - omits default variant/color classes entirely
+    - accepts error color and appends it to classes
+    - does not render disabled or aria-label when falsy/undefined
+    - does nothing when icon side is missing or invalid
+    - className is always appended after variant/color and wins over raw class attr
+    - explicit type prop is respected
+    - renders well-formed markup and disabled appears only once
+    - has no accessibility violations with default content
+    - has no accessibility violations when icon is provided
 
 - `tests\unit\loaders\factory.test.ts`
   - **createTranslationLoader (unit)**
