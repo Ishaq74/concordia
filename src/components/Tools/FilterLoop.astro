@@ -1,0 +1,459 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import type { DataEntryMap } from 'astro:content';
+import Input from '@components/ui/Form/Input.astro';
+import Select from '@components/ui/Form/Select.astro';
+import Checkbox from '@components/ui/Form/Checkbox.astro';
+import Range from '@components/ui/Form/Range.astro';
+import Button from '@components/ui/Button.astro';
+import Grid from '@components/Tools/Grid.astro';
+
+type FilterOptionType =
+  | 'search'
+  | 'select'
+  | 'checkbox'
+  | 'range'
+  | 'date'
+  | 'sort'
+  | 'layout'
+  | 'categories';
+
+interface FilterOption {
+  type: FilterOptionType;
+  name: string;
+  label: string;
+  options?: string[];
+  min?: number;
+  max?: number;
+  reference?: {
+    collection: keyof DataEntryMap;
+    valueField: string;
+    labelField: string;
+  };
+
+}
+
+interface Props<C extends keyof DataEntryMap = keyof DataEntryMap> {
+  collection: C;
+  filters: FilterOption[];
+  CardComponent: any;
+  columns?: number;
+  entryPropName?: string;
+  fixedFilters?: Record<string, any>;
+  sort?: { field: string; order?: 'asc' | 'desc' };
+  limit?: number;
+  [key: string]: any;
+}
+
+const {
+  collection,
+  filters,
+  CardComponent,
+  columns = 3,
+  entryPropName = 'entry',
+  fixedFilters = {},
+  sort,
+  limit,
+  ...extraProps
+} = Astro.props as Props<keyof DataEntryMap>;
+let layout = '';
+let items = await getCollection(collection as keyof DataEntryMap);
+
+// apply static filters (e.g. lang) before anything else
+if (fixedFilters && Object.keys(fixedFilters).length) {
+  items = items.filter(entry => {
+    for (const [k, v] of Object.entries(fixedFilters)) {
+      if ((entry.data as any)[k] !== v) return false;
+    }
+    return true;
+  });
+}
+
+if (sort && sort.field) {
+  const dir = sort.order === 'desc' ? -1 : 1;
+  items.sort((a, b) => {
+    const va = (a.data as any)[sort.field];
+    const vb = (b.data as any)[sort.field];
+    if (va === vb) return 0;
+    return va > vb ? dir : -dir;
+  });
+}
+
+if (limit && typeof limit === 'number') {
+  items = items.slice(0, limit);
+}
+
+let priceMin = Infinity;
+let priceMax = -Infinity;
+
+items.forEach((item) => {
+  const value = parseFloat((item.data as any).price);
+  if (!isNaN(value)) {
+    if (value < priceMin) priceMin = value;
+    if (value > priceMax) priceMax = value;
+  }
+});
+
+filters.forEach((f) => {
+  if (f.type === 'range' && f.name === 'price') {
+    if (priceMin !== Infinity) f.min = priceMin;
+    if (priceMax !== -Infinity) f.max = priceMax;
+  }
+});
+
+async function getUniqueValues(filter: FilterOption) {
+  const values = new Set<string>();
+  for (const item of items) {
+    let val: any = (item.data as any)[filter.name];
+
+    if (filter.reference && val != null) {
+      const refEntry = await getEntry(filter.reference.collection as keyof DataEntryMap, val);
+      if (refEntry) {
+        val = (refEntry as any).data[filter.reference.labelField];
+      }
+    }
+
+    if (Array.isArray(val)) {
+      val.forEach(v => values.add(String(v)));
+    } else if (val != null) {
+      values.add(String(val));
+    }
+  }
+  return Array.from(values).sort();
+}
+
+const filterOptions = await Promise.all(
+  filters
+    .filter(f => (f.type === 'select' || f.type === 'checkbox') && !f.options)
+    .map(async f => ({ filter: f, options: await getUniqueValues(f) }))
+);
+
+const itemsData = await Promise.all(
+  items.map(async (item) => {
+    const data = { ...item.data } as any;
+
+    for (const f of filters) {
+      if (f.reference && data[f.name] != null) {
+        if (Array.isArray(data[f.name])) {
+          data[`${f.name}Labels`] = await Promise.all(
+            data[f.name].map(async (id: string) => {
+              const refEntry = await getEntry(f.reference!.collection as keyof DataEntryMap, id);
+              return refEntry ? (refEntry as any).data[f.reference!.labelField] : undefined;
+            })
+          );
+        } else {
+          const refEntry = await getEntry(f.reference!.collection as keyof DataEntryMap, data[f.name]);
+          if (refEntry) {
+            data[`${f.name}Label`] = (refEntry as any).data[f.reference!.labelField];
+          }
+        }
+      }
+    }
+
+    return { id: item.id, data };
+  })
+);
+---
+
+<div class="filter-container grid grid-cols-1 lg:grid-cols-12 gap-10">
+  <aside class="filter-sidebar lg:col-span-4 sticky top-20">
+    <h2 class="text-xl font-bold mb-4">Filtres</h2>
+    <form id="filter-form">
+      {filters.map((filter) => (
+        <div class="sidebar-section">
+          <h3 class="sidebar-title">{filter.label}</h3>
+
+          {filter.type === 'search' && (
+            <Input
+              id={filter.name}
+              name={filter.name}
+              placeholder="Rechercher..."
+              variant="modern"
+              icon="mdi:magnify"
+              iconPosition="left"
+              className="mt-1 w-full"
+            />
+          )}
+
+          {filter.type === 'select' && (
+            <Select id={filter.name} name={filter.name} className="mt-1 w-full" variant="modern">
+              <option value="">Tous</option>
+              {(filter.options || filterOptions.find(fo => fo.filter.name === filter.name)?.options || []).map((opt) => (
+                <option value={opt}>{opt}</option>
+              ))}
+            </Select>
+          )}
+
+          {filter.type === 'checkbox' && (
+            <div class="mt-1 space-y-2">
+              {(filter.options || filterOptions.find(fo => fo.filter.name === filter.name)?.options || []).map((opt) => (
+                <Checkbox
+                  id={`${filter.name}-${opt}`}
+                  name={filter.name}
+                  value={opt}
+                  variant="modern"
+                >
+                  {opt}
+                </Checkbox>
+              ))}
+            </div>
+          )}
+
+          {filter.type === 'range' && (
+            <div class="mt-1 flex space-x-2 items-center">
+              <Range
+                id={`${filter.name}-min`}
+                min={filter.min}
+                max={filter.max}
+                value={filter.min}
+                variant="modern"
+                onchange="_updateRangeValue('${filter.name}', 'min')"
+              />
+              <span id={`${filter.name}-min-label`}>{filter.min}</span>
+
+              <Range
+                id={`${filter.name}-max`}
+                min={filter.min}
+                max={filter.max}
+                value={filter.max}
+                variant="modern"
+                onchange="_updateRangeValue('${filter.name}', 'max')"
+              />
+              <span id={`${filter.name}-max-label`}>{filter.max}</span>
+            </div>
+          )}
+
+          {filter.type === 'date' && (
+            <Select id={filter.name} name={filter.name} className="mt-1 w-full" variant="modern">
+              <option value="">Tous</option>
+              {(filter.options || []).map(opt => <option value={opt}>{opt}</option>)}
+            </Select>
+          )}
+
+          {filter.type === 'sort' && (
+            <Select id={filter.name} name={filter.name} className="mt-1 w-full" variant="modern">
+              <option value="">Pertinence</option>
+              <option value="newest">Plus récent</option>
+              <option value="oldest">Le plus ancien</option>
+            </Select>
+          )}
+
+          {filter.type === 'layout' && (
+            <div class="mt-1 flex gap-2">
+              <label class="cursor-pointer">
+                <input type="radio" name={filter.name} value="grid" class="sr-only" checked={layout !== 'list'} />
+                <span class="material-symbols-outlined">grid_view</span>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name={filter.name} value="list" class="sr-only" checked={layout === 'list'} />
+                <span class="material-symbols-outlined">view_list</span>
+              </label>
+            </div>
+          )}
+
+          {filter.type === 'categories' && (
+            <nav class="sidebar-cats">
+              <a href="#" class="sidebar-cat-link">Toutes<span class="sidebar-count"></span></a>
+              {(filter.options || []).map(opt => {
+                const [slug,name,count] = opt.split('|');
+                return (
+                  <a href="#" class="sidebar-cat-link" data-slug={slug}>
+                    {name} <span class="sidebar-count">({count})</span>
+                  </a>
+                );
+              })}
+            </nav>
+          )}
+
+        </div>
+      ))}
+      <Button type="reset" variant="initial" className="w-full">Réinitialiser</Button>
+    </form>
+  </aside>
+
+  <main class="lg:col-span-8 w-full p-4">
+    <div id="no-results-message" class="text-center text-lg text-red-500 hidden">
+      Aucun résultat ne correspond à votre recherche.
+    </div>
+    <Grid id="results" tag="div" display="grid" cols={columns} className="gap-4">
+      {itemsData.map((item) => (
+        <div class="item" data-item={JSON.stringify(item.data)}>
+          <CardComponent {...extraProps} {...{ [entryPropName]: item }} />
+        </div>
+      ))}
+    </Grid>
+  </main>
+</div>
+
+<script type="module" is:inline define:vars={{ filters, itemsData }}>
+  let layout = '';
+
+  function _updateRangeValue(filterName, rangeType) {
+    const minRange = document.getElementById(`${filterName}-min`);
+    const maxRange = document.getElementById(`${filterName}-max`);
+    const minLabel = document.getElementById(`${filterName}-min-label`);
+    const maxLabel = document.getElementById(`${filterName}-max-label`);
+    if (!minRange || !maxRange || !minLabel || !maxLabel) return;
+
+    if (rangeType === 'min') {
+      minLabel.textContent = minRange.value + '€';
+    } else {
+      maxLabel.textContent = maxRange.value + '€';
+    }
+    filterItems();
+  }
+
+  void _updateRangeValue;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('filter-form');
+    const results = document.getElementById('results');
+    const noResults = document.getElementById('no-results-message');
+    const items = Array.from(results.getElementsByClassName('item'));
+
+    if (results && results.dataset) {
+      results.dataset.layout = layout || '';
+      items.forEach(el => { el.dataset.layout = layout || ''; });
+    }
+
+    function filterItems() {
+      const formData = new FormData(form);
+      const vals = Object.fromEntries(formData);
+      let visibleCount = 0;
+
+      const sortVal = vals['__sort'] || '';
+
+      const layoutVal = vals['__layout'] || '';
+      if (layoutVal) {
+        results.dataset.layout = layoutVal;
+        items.forEach(el => { el.dataset.layout = layoutVal; });
+      }
+
+      if (sortVal) {
+        const container = results;
+        const nodes = Array.from(container.children);
+        nodes.sort((a, b) => {
+          const da = new Date(a.dataset.item && JSON.parse(a.dataset.item).publishedAt).getTime();
+          const db = new Date(b.dataset.item && JSON.parse(b.dataset.item).publishedAt).getTime();
+          return sortVal === 'newest' ? db - da : da - db;
+        });
+        nodes.forEach(n => container.appendChild(n));
+      }
+
+      items.forEach((el, i) => {
+        const data = itemsData[i].data;
+        const visible = filters.every(f => {
+          const v = vals[f.name];
+          if (!v) return true;
+          let fieldVal = data[f.name];
+          if (f.reference) {
+            fieldVal = data[`${f.name}Label`] || data[`${f.name}Labels`];
+          }
+          switch (f.type) {
+            case 'search':
+              return String(fieldVal).toLowerCase().includes(String(v).toLowerCase());
+            case 'select':
+              return fieldVal === v;
+            case 'checkbox': {
+              const checks = formData.getAll(f.name);
+              if (checks.length === 0) return true;
+              return checks.some(val => Array.isArray(fieldVal) ? fieldVal.includes(val) : fieldVal === val);
+            }
+            case 'range': {
+              const min = vals[`${f.name}-min`] ? parseFloat(vals[`${f.name}-min`]) : f.min;
+              const max = vals[`${f.name}-max`] ? parseFloat(vals[`${f.name}-max`]) : f.max;
+              const num = parseFloat(fieldVal);
+              return (!isNaN(min) ? num >= min : true) && (!isNaN(max) ? num <= max : true);
+            }
+            case 'date': {
+              const when = v;
+              const pd = new Date(data.publishedAt);
+              const now = new Date();
+              if (when === 'today') {
+                return pd.toDateString() === now.toDateString();
+              } else if (when === 'week') {
+                const oneWeekAgo = new Date(now);
+                oneWeekAgo.setDate(now.getDate() - 7);
+                return pd >= oneWeekAgo;
+              } else if (when === 'month') {
+                const oneMonthAgo = new Date(now);
+                oneMonthAgo.setMonth(now.getMonth() - 1);
+                return pd >= oneMonthAgo;
+              }
+              return true;
+            }
+            case 'categories': {
+              const slug = v;
+              if (!slug) return true;
+              const entryCats = data.categories || [];
+              return entryCats.some(c => c.slug === slug);
+            }
+            default:
+              return true;
+          }
+        });
+        el.style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
+      });
+
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    form.addEventListener('input', filterItems);
+    form.addEventListener('reset', () => setTimeout(filterItems, 0));
+
+    filterItems();
+  });
+</script>
+
+<style>
+.filter-container { display: grid; grid-template-columns: 1fr; gap: var(--space-6, 1.5rem); }
+@media (min-width: 1024px) {
+  .filter-container { grid-template-columns: 260px 1fr; }
+}
+
+.filter-sidebar {
+  position: sticky;
+  top: var(--space-6, 1.5rem);
+  background: var(--bg-surface, white);
+  border: 1px solid var(--border-default, #e2e8f0);
+  border-radius: var(--radius-lg, 0.5rem);
+  padding: var(--space-4, 1rem);
+}
+
+.sidebar-section {
+  margin-bottom: var(--space-4, 1rem);
+  padding-bottom: var(--space-4, 1rem);
+  border-bottom: 1px solid var(--border-default, #e2e8f0);
+}
+.sidebar-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: var(--space-2, 0.5rem);
+  padding-bottom: 0;
+}
+
+.sidebar-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-2, 0.5rem);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #64748b);
+}
+
+.sidebar-cats { display: flex; flex-direction: column; gap: 2px; }
+.sidebar-cat-link {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  border-radius: var(--radius-sm, 4px); text-decoration: none;
+  color: var(--text-default, #334155); font-size: 0.875rem; transition: background 0.15s;
+}
+.sidebar-cat-link:hover { background: var(--bg-inset, #f1f5f9); }
+.sidebar-cat-link.active { background: var(--color-primary, #eab308); color: white; font-weight: 600; }
+.sidebar-count { opacity: 0.6; font-size: 0.75rem; }
+
+#results[data-layout="list"] .variant-grid { display: none !important; }
+#results[data-layout="list"] .variant-list { display: block !important; }
+#results[data-layout="grid"] .variant-list { display: none !important; }
+#results[data-layout="grid"] .variant-grid { display: block !important; }
+</style>

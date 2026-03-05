@@ -50,7 +50,7 @@ const loc = (val: any, fallback = "") => {
 };
 
 const address = (org.address ?? {}) as Record<string, string>;
-const contactPoints = (org.contactPoint ?? []) as { contactType: string; telephone?: string; email?: string; hoursAvailable?: string }[];
+// const contactPoints = (org.contactPoint ?? []) as { contactType: string; telephone?: string; email?: string; hoursAvailable?: string }[]; // unused
 const sameAs = (org.sameAs ?? []) as string[];
 const knowsAbout = (org.knowsAbout ?? []) as string[];
 const knowsLanguage = (org.knowsLanguage ?? []) as string[];
@@ -297,7 +297,7 @@ const makesOffer = (org.makesOffer ?? []) as string[];
   </div>
 </AdminLayout>
 
-<script define:vars={{ orgId: activeOrgId }}>
+<script type="module" is:inline define:vars={{ orgId: activeOrgId }}>
   document.addEventListener("DOMContentLoaded", () => {
     // Char counter for description
     const descEl = document.getElementById("p-desc");

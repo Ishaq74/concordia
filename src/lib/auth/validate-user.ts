@@ -20,7 +20,7 @@ const dangerousPatterns = [
   /\u202e|\u202d|\u202c|\u202b|\u202a/, // unicode spoofing
 ];
 
-const COMBINED_DANGEROUS = new RegExp(
+export const COMBINED_DANGEROUS = new RegExp(
   dangerousPatterns.map(p => `(${p.source})`).join('|'),
   'i'
 );

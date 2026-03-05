@@ -1,4 +1,14 @@
-export const API_BASE = process.env.TEST_BASE_URL || 'http://localhost:4321/api/auth'
+/**
+ * compute base URL at call time. setup.ts will update TEST_BASE_URL once the
+ * dev server chooses a port, and this getter ensures the most up-to-date value
+ * is used even if this module was imported earlier.
+ */
+export function getApiBase() {
+  // ensure we only return the host portion; callers will add `/api` prefix
+  let base = process.env.TEST_BASE_URL || 'http://localhost:4321';
+  base = base.replace(/\/api(\/auth)?$/, '');
+  return base;
+}
 
 export interface ApiCallOptions {
   token?: string
@@ -26,7 +36,11 @@ export async function apiCall(
       headers['Authorization'] = `Bearer ${opts.token}`
     }
 
-    const response = await fetch(`${API_BASE}${path}`, {
+    // ensure path is under /api so tests can use short names like '/admin'.
+    const prefix = path.startsWith('/api') ? '' : '/api';
+    const finalUrl = `${getApiBase()}${prefix}${path}`;
+    console.log('[apiCall] ', method, finalUrl);
+    const response = await fetch(finalUrl, {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,

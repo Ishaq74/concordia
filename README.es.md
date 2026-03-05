@@ -38,13 +38,14 @@ Este proyecto demuestra una aplicación web full-stack usando tecnologías moder
 - **@astrojs/node**: `^9.5.4`
 - **@astrojs/vercel**: `^9.0.4`
 - **@babel/preset-typescript**: `^7.28.5`
+- **@better-auth/drizzle-adapter**: `^1.5.3`
 - **@iconify-json/circle-flags**: `^1.2.10`
 - **@iconify-json/mdi**: `^1.2.3`
 - **@iconify-json/openmoji**: `^1.2.22`
 - **astro**: `^5.18.0`
 - **astro-font**: `^1.1.0`
 - **astro-icon**: `^1.1.5`
-- **better-auth**: `^1.4.18`
+- **better-auth**: `^1.5.3`
 - **dotenv**: `^17.3.1`
 - **drizzle-orm**: `^0.45.1`
 - **easymde**: `^2.20.0`
@@ -80,17 +81,20 @@ npm install
 - `npm run db:seed`: tsx scripts/db/db.seed.ts
 - `npm run smtp:check`: tsx src/lib/smtp/smtp.check.ts
 - `npm run test`: vitest
-- `npm run test:watch`: vitest --watch
-- `npm run test:coverage`: vitest --coverage
-- `npm run test:unit`: vitest run tests/unit
-- `npm run test:integration`: vitest run tests/integration --maxWorkers 1 --no-file-parallelism
-- `npm run test:e2e`: vitest run tests/e2e/critical-flows.test.ts
-- `npm run test:ui`: pnpm exec playwright test tests/e2e/ui
-- `npm run test:security`: vitest run tests/security/security.test.ts
-- `npm run test:api`: vitest run tests/integration/auth-flow.test.ts
-- `npm run test:all`: vitest run
-- `npm run test:debug`: vitest --inspect-brk --inspect --single-thread
-- `npm run test:ci`: vitest run --coverage
+- `npm run test:unit`: vitest run --include tests/unit/**/*.test.ts src/lib/**/*.test.ts
+- `npm run test:integration`: vitest run --include tests/integration/**/*.test.ts
+- `npm run test:components`: vitest run --include src/components/**/*.test.ts
+- `npm run test:e2e`: playwright test
+- `npm run test:e2e:ui`: playwright test --ui
+- `npm run test:e2e:debug`: playwright test --debug
+- `npm run test:e2e:headed`: playwright test --headed
+- `npm run test:all`: npm run test:unit && npm run test:integration && npm run test:components && npm run test:e2e
+- `npm run storybook`: storybook dev -p 6006
+- `npm run storybook:build`: storybook build -o ./dist/storybook
+- `npm run storybook:test`: test-storybook --coverage
+- `npm run test:coverage`: vitest run --coverage
+- `npm run test:report`: vitest run --reporter=html && open ./reports/vitest/index.html
+- `npm run test:ci`: vitest run --coverage && playwright test
 ```
 
 ## Estructura del proyecto
@@ -125,6 +129,7 @@ npm install
       - camille-dupond.png
       - lucas-martin.png
       - sarah-leroy.png
+    - fond-orange.jpg
     - placeholder.jpg
   - **uploads**
     - **blog**
@@ -142,21 +147,7 @@ npm install
 - README.es.md
 - README.fr.md
 - README.md
-- **reports**
-  - blog-admin-audit.md
-  - i18n-audit-report.md
-  - i18n-doc-pages-audit.md
-  - sonda-report.html
 - **scripts**
-  - add-admin-i18n-keys.mjs
-  - add-client-i18n-keys.mjs
-  - add-component-i18n-keys.mjs
-  - add-docs-i18n-keys.mjs
-  - add-final-i18n-keys.mjs
-  - add-i18n-keys.mjs
-  - audit-doc-headings.mjs
-  - audit-i18n-complete.mjs
-  - audit-tablecell-remaining.mjs
   - **contextai**
     - injectScope.ts
   - **db**
@@ -166,23 +157,6 @@ npm install
     - db.migrate.ts
     - db.seed.ts
     - db.sync.ts
-  - debug-auth-api.ts
-  - debug-auth-login.ts
-  - debug-check-permission.ts
-  - debug-rate-limit.ts
-  - fix-legal-i18n.mjs
-  - fix-quote-errors.mjs
-  - fix-remaining-ui.mjs
-  - fix-todo-translate-2.mjs
-  - fix-todo-translate.mjs
-  - i18n-doc-pages.mjs
-  - i18n-docs-complete.mjs
-  - i18n-docs-phase3.mjs
-  - i18n-docs-phase4-toc.mjs
-  - i18n-docs-phase4b-toc.mjs
-  - i18n-docs-phase5-tablecell.mjs
-  - i18n-docs-phase5b-tablecell.mjs
-  - i18n-docs-ui-text.mjs
   - **readme**
     - generateDatabase.ts
     - generateDeps.ts
@@ -195,7 +169,6 @@ npm install
     - utils.ts
   - readme-generate.ts
   - run-sonda.mjs
-  - sync-translations.cjs
 - **src**
   - **actions**
     - blog.ts
@@ -284,8 +257,16 @@ npm install
         - ThemeSwitch.astro
         - User.astro
     - **Tools**
+      - FilterLoop.astro
       - Flex.astro
+      - FormattedDate.astro
       - Grid.astro
+      - **QueryLoop**
+        - **Cards**
+          - PostCard.astro
+          - PostCardFixed.astro
+          - UserCard.astro
+        - QueryLoop.astro
       - SmartBreadcrumb.astro
     - **ui**
       - **Accordion**
@@ -296,11 +277,13 @@ npm install
       - ArticleCard.astro
       - **Avatar**
         - Avatar.astro
+        - avatar.css
         - AvatarCard.astro
         - AvatarGroup.astro
       - Badge.astro
       - **Breadcrumb**
         - Breadcrumb.astro
+        - breadcrumb.css
         - BreadcrumbEllipsis.astro
         - BreadcrumbItem.astro
         - BreadcrumbLink.astro
@@ -320,6 +303,7 @@ npm install
         - CardMeta.astro
       - **Dialog**
         - Dialog.astro
+        - dialog.css
         - DialogClose.astro
         - DialogContent.astro
         - DialogDescription.astro
@@ -338,6 +322,7 @@ npm install
         - Label.astro
         - PasswordInput.astro
         - Radio.astro
+        - Range.astro
         - Select.astro
         - Switch.astro
         - Textarea.astro
@@ -371,6 +356,7 @@ npm install
         - SliderItem.astro
       - **Table**
         - Table.astro
+        - table.css
         - TableBody.astro
         - TableCaption.astro
         - TableCell.astro
@@ -380,8 +366,8 @@ npm install
         - TableRow.astro
       - **Tabs**
         - Tab.astro
-        - TabPanel.astro
         - Tabs.astro
+        - tabs.css
       - ThreadCard.astro
       - Timeline.astro
       - Tooltip.astro
@@ -391,6 +377,7 @@ npm install
   - **database**
     - **admin**
       - loaders.ts
+    - blog.ts
     - **data**
       - 01-profile.data.ts
       - 01-user.data.ts
@@ -492,6 +479,7 @@ npm install
     - **smtp**
       - smtp.check.ts
       - smtp.ts
+      - store.ts
     - theme.ts
     - types.ts
     - **wallet**
@@ -599,6 +587,11 @@ npm install
         - **[category]**
           - [slug].astro
         - [category].astro
+      - **blog2**
+        - index.astro
+        - **[category]**
+          - [slug].astro
+        - [category].astro
       - contact.astro
       - **docs**
         - **components**
@@ -609,6 +602,7 @@ npm install
           - index.astro
           - pagination.astro
           - progressbar.astro
+          - range.astro
           - skeleton.astro
           - slider.astro
           - timeline.astro
@@ -652,6 +646,8 @@ npm install
         - **[category]**
           - [slug].astro
         - [category].astro
+    - **__mocks__**
+      - emails.ts
   - **styles**
     - base.css
     - **components**
@@ -674,27 +670,13 @@ npm install
     - test-db.ts
     - test-env.ts
   - **e2e**
+    - **a11y**
+    - booking-flow.test.ts
+    - **critical**
     - critical-flows.test.ts
+    - mailbox.test.ts
     - org-admin.test.ts
     - services-admin.test.ts
-    - **ui**
-      - alert.test.ts
-      - badge.test.ts
-      - button.test.ts
-      - card.test.ts
-      - code.test.ts
-      - dialog.test.ts
-      - dropdown.test.ts
-      - form.test.ts
-      - kbd.test.ts
-      - link.test.ts
-      - menudropdown.test.ts
-      - sheet.test.ts
-      - switch.test.ts
-      - table.test.ts
-      - tabs.test.ts
-      - tooltip.test.ts
-      - video.test.ts
   - **fixtures**
     - auth-fixtures.ts
     - security-payloads.ts
@@ -704,24 +686,28 @@ npm install
     - slug-map.test.ts
     - translation-coverage.test.ts
   - **integration**
+    - **api**
+    - **auth**
     - auth-emails.test.ts
     - auth-flow.test.ts
     - blog-crud.test.ts
     - comments.test.ts
+    - **database**
     - **loaders**
       - blog-loader.test.ts
     - notifications.test.ts
     - org-admin.test.ts
+    - org-switch.test.ts
     - services-admin.test.ts
   - **pages**
     - public-pages.test.ts
+  - README-mocking.md
   - README.md
+  - sanity.test.ts
   - **security**
     - security.test.ts
+  - setup.integration.ts
   - setup.ts
-  - **ssr**
-    - ssr-hydration-errors.test.ts
-    - ssr-utils.ts
   - **unit**
     - **loaders**
       - factory.test.ts
@@ -730,8 +716,8 @@ npm install
     - validation.test.ts
   - **utils**
     - api-helpers.ts
-    - auth-test-utils.ts
     - cleanup.ts
+    - transaction.ts
 - **tests-results**
 - tsconfig.json
 - vitest.config.ts
@@ -921,11 +907,12 @@ npm install
 
 ### Alias TypeScript (tsconfig.json)
 
-- `@/*` → `src/*`
+- `@*` → `src/*`
 - `@database/*` → `src/database/*`
 - `@components/*` → `src/components/*`
 - `@layouts/*` → `src/layouts/*`
 - `@lib/*` → `src/lib/*`
+- `@actions/*` → `src/actions/*`
 - `@styles/*` → `src/styles/*`
 - `@templates/*` → `src/components/templates/*`
 - `@assets/*` → `src/assets/*`
@@ -1515,27 +1502,13 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - test-db.ts
   - test-env.ts
 - **e2e**
+  - **a11y**
+  - booking-flow.test.ts
+  - **critical**
   - critical-flows.test.ts
+  - mailbox.test.ts
   - org-admin.test.ts
   - services-admin.test.ts
-  - **ui**
-    - alert.test.ts
-    - badge.test.ts
-    - button.test.ts
-    - card.test.ts
-    - code.test.ts
-    - dialog.test.ts
-    - dropdown.test.ts
-    - form.test.ts
-    - kbd.test.ts
-    - link.test.ts
-    - menudropdown.test.ts
-    - sheet.test.ts
-    - switch.test.ts
-    - table.test.ts
-    - tabs.test.ts
-    - tooltip.test.ts
-    - video.test.ts
 - **fixtures**
   - auth-fixtures.ts
   - security-payloads.ts
@@ -1545,24 +1518,28 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - slug-map.test.ts
   - translation-coverage.test.ts
 - **integration**
+  - **api**
+  - **auth**
   - auth-emails.test.ts
   - auth-flow.test.ts
   - blog-crud.test.ts
   - comments.test.ts
+  - **database**
   - **loaders**
     - blog-loader.test.ts
   - notifications.test.ts
   - org-admin.test.ts
+  - org-switch.test.ts
   - services-admin.test.ts
 - **pages**
   - public-pages.test.ts
+- README-mocking.md
 - README.md
+- sanity.test.ts
 - **security**
   - security.test.ts
+- setup.integration.ts
 - setup.ts
-- **ssr**
-  - ssr-hydration-errors.test.ts
-  - ssr-utils.ts
 - **unit**
   - **loaders**
     - factory.test.ts
@@ -1571,8 +1548,8 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - validation.test.ts
 - **utils**
   - api-helpers.ts
-  - auth-test-utils.ts
   - cleanup.ts
+  - transaction.ts
 - **src/lib**
 - **admin**
   - api-helpers.ts
@@ -1605,12 +1582,14 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 - **smtp**
   - smtp.check.ts
   - smtp.ts
+  - store.ts
 - theme.ts
 - types.ts
 - **wallet**
 - **src/database**
 - **admin**
   - loaders.ts
+- blog.ts
 - **data**
   - 01-profile.data.ts
   - 01-user.data.ts
@@ -1706,7 +1685,6 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - crée utilisateur avec password fort
     - rejète email homograph attack
     - limite longueur champs
-  - **Password Security**
     - hash password différent pour même password
   - **Connexion Sécurisée**
     - JWT a claims sécurisés
@@ -1716,7 +1694,6 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
         expect(payload.sub ?? payload.userId ?? login.user.id).toBeDefined();
         expect(payload.iat ?? payload.issuedAt).toBeDefined();
       } else {
-        // Session-based token (not JWT) — verify token and user exist
         expect(login.token).toBeDefined();
         expect(login.user.id).toBeDefined();
       }
@@ -1758,11 +1735,17 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - **Accessibilité**
   - **Performance**
 
+- `tests\e2e\booking-flow.test.ts`
+  - **Public booking flow**
+
 - `tests\e2e\critical-flows.test.ts`
   - **Parcours critique - Connexion**
   - **Parcours critique - Inscription**
   - **Parcours critique - Multi-variant**
   - **Parcours critique - Erreurs serveur**
+
+- `tests\e2e\mailbox.test.ts`
+  - **SMTP mock mailbox**
 
 - `tests\e2e\org-admin.test.ts`
   - **Org Admin — Auth guard (unauthenticated)**
@@ -1781,57 +1764,6 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - **Public Services — Pages respond**
   - **Public Services — Index page content**
   - **Services Admin — Booking detail page**
-
-- `tests\e2e\ui\alert.test.ts`
-  - **AlertComponent – Page de documentation complète**
-
-- `tests\e2e\ui\badge.test.ts`
-  - **BadgeComponent – Page de documentation complète**
-
-- `tests\e2e\ui\button.test.ts`
-  - **ButtonComponent – Page de documentation complète**
-
-- `tests\e2e\ui\card.test.ts`
-  - **CardComponent – documentation page (couverture totale)**
-
-- `tests\e2e\ui\code.test.ts`
-  - **CodeComponent – documentation page**
-
-- `tests\e2e\ui\dialog.test.ts`
-  - **DialogComponent – documentation page (couverture totale)**
-
-- `tests\e2e\ui\dropdown.test.ts`
-  - **DropdownComponent – documentation page (couverture totale)**
-
-- `tests\e2e\ui\form.test.ts`
-  - **FormComponents – documentation page (couverture totale)**
-
-- `tests\e2e\ui\kbd.test.ts`
-  - **KbdComponent – documentation page (couverture totale)**
-
-- `tests\e2e\ui\link.test.ts`
-  - **LinkComponent – documentation page**
-
-- `tests\e2e\ui\menudropdown.test.ts`
-  - **MenuDropdown – documentation page**
-
-- `tests\e2e\ui\sheet.test.ts`
-  - **SheetComponent – documentation page**
-
-- `tests\e2e\ui\switch.test.ts`
-  - **SwitchComponent – documentation page (couverture totale)**
-
-- `tests\e2e\ui\table.test.ts`
-  - **TableComponent – documentation page (couverture totale)**
-
-- `tests\e2e\ui\tabs.test.ts`
-  - **TabsComponent – documentation page**
-
-- `tests\e2e\ui\tooltip.test.ts`
-  - **TooltipComponent – documentation page**
-
-- `tests\e2e\ui\video.test.ts`
-  - **VideoComponent – documentation page**
 
 - `tests\i18n\routing.test.ts`
   - **route-helpers**
@@ -1890,8 +1822,8 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - **BetterAuth Email Functions**
   - **Email Verification**
     - should have email verification config
-    - should call sendVerificationEmail without error
-    - should log mock SMTP when email verification is called
+    - should send verification email when a user signs up
+    - should log mock SMTP when email verification is called directly
   - **Password Reset**
     - should have sendResetPassword config
     - should call sendResetPassword without error
@@ -1907,7 +1839,7 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 - `tests\integration\blog-crud.test.ts`
   - **Blog Article CRUD Integration**
     - should create a blog article
-    - should update the blog article
+    - should update the blog article status
     - should fetch the blog article by slug
     - should delete the blog article
 
@@ -1954,6 +1886,10 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - isAdminUser rejects non-admin roles
     - isSuperAdminUser distinguishes super from admin
 
+- `tests\integration\org-switch.test.ts`
+  - **Org switching API**
+    - allows a user to switch active organization via API
+
 - `tests\integration\services-admin.test.ts`
   - **Services — Listings CRUD**
     - service listing can be created with org
@@ -1984,6 +1920,8 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - organizations/my-org resolves to localized prefix
     - blog/author/john-doe resolves to localized prefix
 
+- `tests\sanity.test.ts`
+
 - `tests\security\security.test.ts`
   - **RBAC/ABAC**
     - refuse accès admin sans rôle
@@ -1996,11 +1934,6 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - rejette payload NoSQLi
   - **Escalade**
     - refuse modification de rôle sans autorisation
-
-- `tests\ssr\ssr-hydration-errors.test.ts`
-  - **SSR rendering**
-    - renders homepage for all locales
-    - returns 404 for unknown routes
 
 - `tests\unit\loaders\factory.test.ts`
   - **createTranslationLoader (unit)**

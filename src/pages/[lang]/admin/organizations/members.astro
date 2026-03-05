@@ -297,7 +297,7 @@ const roleBadgeColor: Record<string, string> = {
   </div>
 </AdminLayout>
 
-<script define:vars={{ orgId: activeOrgId }}>
+<script is:inline define:vars={{ orgId: activeOrgId }}>
   document.addEventListener("DOMContentLoaded", () => {
     const API = "/api/admin/organizations/members";
     const modal = document.getElementById("invite-modal");

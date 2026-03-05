@@ -1,0 +1,175 @@
+---
+import BlogCard from './Cards/PostCard.astro';
+import UserCard from './Cards/UserCard.astro';
+import { getCollection, getEntry } from 'astro:content';
+import Grid from '@components/Tools/Grid.astro';
+
+// map collection keys to the card component used for each entry
+const CardComponents: Record<string, any> = { blog: BlogCard, users: UserCard };
+
+const {
+  collection,
+  filters = {},
+  sort,
+  limit,
+  references = [],
+  categoryFilter,
+  currentId,
+  // relatedContent and siblingsContent props are unused by this component
+  relatedTo,
+  columns = 3,
+  statsMap, // optional map of entry.id -> { count, avgRating }
+} = Astro.props;
+
+const currentEntry = currentId ? await getEntry(collection, currentId) : null;
+
+/**
+ * renvoie le(s) slug(s) de catégorie d'une entrée
+ * – peut être `undefined`, `string` ou `string[]`
+ */
+function getCategoryField(entry: any): string | string[] | undefined {
+  return entry.data.category ?? entry.data.categories;
+}
+
+/**
+ * test si `entry` correspond à `categoryFilter`
+ * (le filtre peut être une chaîne ou un tableau)
+ */
+function checkCategory(entry: any, categoryFilter: string | string[]) {
+  const field = getCategoryField(entry);
+  if (!field) return false;
+  const values = Array.isArray(field) ? field : [field];
+  const filterValues = Array.isArray(categoryFilter)
+    ? categoryFilter
+    : [categoryFilter];
+  return values.some(v => {
+    if (v == null) return false;
+    // direct string match
+    if (typeof v === 'string') {
+      return filterValues.includes(v);
+    }
+    // object with slug or name
+    if (typeof v === 'object') {
+      if ('slug' in v && filterValues.includes((v as any).slug)) return true;
+      if ('name' in v && filterValues.includes((v as any).name)) return true;
+    }
+    return false;
+  });
+}
+
+console.log('[QueryLoop] start', { collection, filters, categoryFilter, currentId });
+const startTime = performance.now();
+let entries: any[] = [];
+if (Astro.props.entriesOverride) {
+  entries = Astro.props.entriesOverride;
+} else {
+  entries = await getCollection(collection);
+}
+
+// filtrage statique par frontmatter
+if (filters && Object.keys(filters).length) {
+  entries = entries.filter(entry => {
+    for (const [k, v] of Object.entries(filters)) {
+      if ((entry.data as any)[k] !== v) return false;
+    }
+    return true;
+  });
+}
+
+// filtre par catégorie si demandé
+if (categoryFilter) {
+  entries = entries.filter(e => checkCategory(e, categoryFilter));
+}
+
+// exclus l'entrée courante si on a un currentId (utile pour related posts, etc.)
+if (currentEntry) {
+  entries = entries.filter(e => e.id !== currentEntry.id);
+}
+
+// relatedTo : recherche les entrées qui référencent une autre collection
+if (relatedTo) {
+  const relatedField =
+    `related${relatedTo.collection.charAt(0).toUpperCase() + relatedTo.collection.slice(1)}`;
+  entries = entries.filter(entry => {
+    const relatedItems = (entry.data as any)[relatedField];
+    return Array.isArray(relatedItems) &&
+      relatedItems.some((item: any) => item.id === relatedTo.id);
+  });
+}
+
+// tri
+if (sort) {
+  let field: string | undefined;
+  let dir: 'asc' | 'desc' = 'asc';
+  if (typeof sort === 'string') {
+    [field, dir = 'asc'] = sort.split(',') as [string, 'asc' | 'desc'];
+  } else if (typeof sort === 'object' && sort.field) {
+    field = sort.field;
+    if (sort.order === 'desc') dir = 'desc';
+  }
+  if (field) {
+    entries.sort((a, b) => {
+      const va = (a.data as any)[field];
+      const vb = (b.data as any)[field];
+      if (va === vb) return 0;
+      return dir === 'asc' ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+    });
+  }
+}
+
+// limite
+if (limit && typeof limit === 'number') {
+  entries = entries.slice(0, limit);
+}
+
+// résolution des références demandées
+const resolvedEntries = await Promise.all(
+  entries.map(async entry => {
+    const resolvedReferences: Record<string, any> = {};
+    for (const ref of references) {
+      const refData = (entry.data as any)[ref];
+      if (Array.isArray(refData)) {
+        resolvedReferences[ref] = await Promise.all(
+          refData.map((id: string) => getEntry(collection, id))
+        );
+      } else if (refData) {
+        resolvedReferences[ref] = await getEntry(collection, refData);
+      }
+    }
+    // attach stats if provided
+    const extra: any = {};
+    if (statsMap && typeof statsMap.get === 'function') {
+      const stats = statsMap.get(entry.id);
+      if (stats) {
+        extra.commentCount = stats.count ?? 0;
+        extra.avgRating = stats.avgRating;
+      }
+    }
+    return { ...entry, ...extra, resolvedReferences };
+  })
+);
+
+const CardComponent = CardComponents[collection as keyof typeof CardComponents];
+if (!CardComponent) {
+  console.error(`No card component registered for collection "${collection}"`);
+  return null;
+}
+const endTime = performance.now();
+console.log(`[QueryLoop] done ${collection}: ${(endTime - startTime).toFixed(2)}ms / ${entries.length || 0} entries`);
+---
+
+{Astro.props.layout === 'list' ? (
+  <ul class="query-loop-list">
+    {resolvedEntries.map((entry: any) => (
+      <li class="query-loop-list-item">
+        <CardComponent entry={entry} {...entry.resolvedReferences} layout="list" />
+      </li>
+    ))}
+  </ul>
+) : (
+  <Grid tag="section" display="grid" cols={columns}>
+    {resolvedEntries.map((entry: any) => (
+      <CardComponent entry={entry} {...entry.resolvedReferences} layout={Astro.props.layout} />
+    ))}
+  </Grid>
+)}

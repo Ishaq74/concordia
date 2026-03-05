@@ -4,7 +4,7 @@ import type { APIRoute } from "astro";
 import { json, guardAdmin, generateId } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import { servicesAvailability } from "@database/schemas";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 /**
  * GET /api/admin/services/availability?serviceId=xxx

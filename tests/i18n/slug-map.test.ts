@@ -2,8 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   slugMap,
   reverseSlugMap,
-  SUPPORTED_LOCALES,
-  type SupportedLocale,
+  SUPPORTED_LOCALES
 } from "@i18n/slug-map";
 
 describe("slug-map", () => {
@@ -28,7 +27,7 @@ describe("slug-map", () => {
   });
 
   it("AR slug matches EN slug (per mapping table)", () => {
-    for (const [canonical, locales] of Object.entries(slugMap)) {
+    for (const locales of Object.values(slugMap)) {
       // AR uses the same slug as EN for all 13 types per the spec
       expect(locales.ar).toBe(locales.en);
     }

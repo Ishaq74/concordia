@@ -114,4 +114,130 @@ const classes = [
   box-shadow: 0 2px 0 0 color-mix(in srgb, var(--button-accent-bg) 80%, #000),
               0 3px 0 0 color-mix(in srgb, var(--button-accent-bg) 40%, transparent);
 }
+
+/* KBD RETRO */
+.kbd-retro {
+  border-radius: 0;
+  border: var(--retro-border-width) solid var(--text-default);
+  background: var(--retro-button-bg);
+  color: var(--retro-button-color);
+  box-shadow: 3px 3px 0 0 var(--retro-shadow-color);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.kbd-retro:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+.kbd-retro.primary {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-color);
+  border-color: var(--text-default);
+  box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--button-primary-bg) 60%, #000);
+}
+
+.kbd-retro.secondary {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+  border-color: var(--text-default);
+  box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--button-secondary-bg) 60%, #000);
+}
+
+.kbd-retro.accent {
+  background: var(--button-accent-bg);
+  color: var(--button-accent-color);
+  border-color: var(--text-default);
+  box-shadow: 3px 3px 0 0 color-mix(in srgb, var(--button-accent-bg) 60%, #000);
+}
+
+/* KBD MODERN */
+.kbd-modern {
+  border-radius: var(--modern-radius);
+  border: 1px solid var(--modern-input-border-color);
+  background: var(--modern-input-bg);
+  color: var(--modern-input-text-color);
+  box-shadow: 0 1px 2px 0 color-mix(in srgb, var(--border-default) 30%, transparent),
+              0 2px 0 0 var(--modern-input-border-color);
+  font-weight: 500;
+}
+
+.kbd-modern:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 1px 0 color-mix(in srgb, var(--border-default) 20%, transparent);
+}
+
+.kbd-modern.primary {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-color);
+  border-color: var(--button-primary-bg);
+  box-shadow: 0 1px 2px 0 color-mix(in srgb, var(--button-primary-bg) 40%, transparent),
+              0 2px 0 0 color-mix(in srgb, var(--button-primary-bg) 80%, #000);
+}
+
+.kbd-modern.secondary {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+  border-color: var(--button-secondary-bg);
+  box-shadow: 0 1px 2px 0 color-mix(in srgb, var(--button-secondary-bg) 40%, transparent),
+              0 2px 0 0 color-mix(in srgb, var(--button-secondary-bg) 80%, #000);
+}
+
+.kbd-modern.accent {
+  background: var(--button-accent-bg);
+  color: var(--button-accent-color);
+  border-color: var(--button-accent-bg);
+  box-shadow: 0 1px 2px 0 color-mix(in srgb, var(--button-accent-bg) 40%, transparent),
+              0 2px 0 0 color-mix(in srgb, var(--button-accent-bg) 80%, #000);
+}
+
+/* KBD FUTURISTIC */
+.kbd-futuristic {
+  border-radius: 0;
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+  border: 1px solid var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-primary);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-primary) 30%, transparent),
+              inset 0 0 10px color-mix(in srgb, var(--color-primary) 10%, transparent);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: 0 0 5px var(--color-primary);
+}
+
+.kbd-futuristic:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 5px color-mix(in srgb, var(--color-primary) 50%, transparent);
+}
+
+.kbd-futuristic.primary {
+  border-color: var(--button-primary-bg);
+  background: color-mix(in srgb, var(--button-primary-bg) 15%, transparent);
+  color: var(--button-primary-bg);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--button-primary-bg) 40%, transparent),
+              inset 0 0 10px color-mix(in srgb, var(--button-primary-bg) 15%, transparent);
+  text-shadow: 0 0 5px var(--button-primary-bg);
+}
+
+.kbd-futuristic.secondary {
+  border-color: var(--button-secondary-bg);
+  background: color-mix(in srgb, var(--button-secondary-bg) 15%, transparent);
+  color: var(--button-secondary-bg);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--button-secondary-bg) 40%, transparent),
+              inset 0 0 10px color-mix(in srgb, var(--button-secondary-bg) 15%, transparent);
+  text-shadow: 0 0 5px var(--button-secondary-bg);
+}
+
+.kbd-futuristic.accent {
+  border-color: var(--button-accent-bg);
+  background: color-mix(in srgb, var(--button-accent-bg) 15%, transparent);
+  color: var(--button-accent-bg);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--button-accent-bg) 40%, transparent),
+              inset 0 0 10px color-mix(in srgb, var(--button-accent-bg) 15%, transparent);
+  text-shadow: 0 0 5px var(--button-accent-bg);
+}
 </style>

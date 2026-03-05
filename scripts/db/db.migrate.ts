@@ -28,7 +28,7 @@ async function main() {
 
         // Affiche la DB cible (masquée) et avertissement PROD si nécessaire
         const targetDbUrl = USE_PROD_DB ? (process.env.DATABASE_URL_PROD || process.env.DATABASE_URL) : (process.env.DATABASE_URL_LOCAL || process.env.DATABASE_URL);
-        const maskUrl = (u?: string) => u ? u.replace(/:\/\/[^@]+@/, '://***@') : 'N/A';
+        const maskUrl = (u?: string) => u ? u.replace(/:\/\/[^@]+@, '://***@') : 'N/A';
         const dbNameFromUrl = (u?: string) => {
           try { return u ? new URL(u).pathname.replace(/^\//, '') : 'unknown'; } catch { return (u || '').split('/').pop() || 'unknown'; }
         };

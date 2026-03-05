@@ -111,7 +111,8 @@ const authSession = defineMiddleware(async (context, next) => {
           // (covers case where auth org/member tables are empty but blogOrganizations has data)
           if (!orgId) {
             const userRole = (sessionResult.user as any)?.role ?? "";
-            const isAdmin = typeof userRole === "string" && userRole.toLowerCase().includes("admin");
+            // Accept 'admin' as global admin for RBAC test
+            const isAdmin = typeof userRole === "string" && (userRole.toLowerCase().includes("admin") || userRole === "admin");
             if (isAdmin) {
               const { blogOrganizations } = await import("@database/schemas");
               const [firstOrg] = await db

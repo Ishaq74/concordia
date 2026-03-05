@@ -127,3 +127,475 @@ const galleryClass = [
     </div>
   )}
 </div>
+
+
+<style>
+/* ===========================================
+   GALLERY - Initial Variant
+   =========================================== */
+
+.gallery {
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Grid Layout */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--gallery-columns, 3), 1fr);
+  gap: var(--gallery-gap, 1rem);
+}
+
+.gallery-item {
+  margin: 0;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: var(--gallery-item-bg);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: var(--gallery-aspect-ratio, 1/1);
+  display: block;
+  border: none;
+}
+
+.gallery-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.gallery-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: 1rem;
+  font-size: 0.875rem;
+  margin: 0;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.gallery-item:hover .gallery-caption {
+  transform: translateY(0);
+}
+
+/* Masonry Layout */
+.gallery-masonry {
+  columns: var(--gallery-columns, 3);
+  column-gap: var(--gallery-gap, 1rem);
+}
+
+.gallery-masonry .gallery-item {
+  break-inside: avoid;
+  margin-bottom: var(--gallery-gap, 1rem);
+  display: inline-block;
+  width: 100%;
+}
+
+.gallery-masonry .gallery-item img {
+  aspect-ratio: auto;
+  height: auto;
+}
+
+/* Product Thumbnail Gallery (CSS ONLY - Checkbox Hack) */
+.gallery-product {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.gallery-radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.main-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: var(--color-background);
+}
+
+.main-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.gallery-radio:nth-of-type(1):checked ~ .main-image .main-img-0,
+.gallery-radio:nth-of-type(2):checked ~ .main-image .main-img-1,
+.gallery-radio:nth-of-type(3):checked ~ .main-image .main-img-2,
+.gallery-radio:nth-of-type(4):checked ~ .main-image .main-img-3,
+.gallery-radio:nth-of-type(5):checked ~ .main-image .main-img-4,
+.gallery-radio:nth-of-type(6):checked ~ .main-image .main-img-5,
+.gallery-radio:nth-of-type(7):checked ~ .main-image .main-img-6,
+.gallery-radio:nth-of-type(8):checked ~ .main-image .main-img-7 {
+  opacity: 1;
+}
+
+.thumbnails {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.5rem;
+}
+
+.thumb-label {
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 3px solid transparent;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+  display: block;
+  background: var(--gallery-thumb-bg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.thumb-label:hover {
+  transform: scale(1.05);
+}
+
+.thumb-label img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-radio:nth-of-type(1):checked ~ .thumbnails .thumb-label:nth-of-type(1),
+.gallery-radio:nth-of-type(2):checked ~ .thumbnails .thumb-label:nth-of-type(2),
+.gallery-radio:nth-of-type(3):checked ~ .thumbnails .thumb-label:nth-of-type(3),
+.gallery-radio:nth-of-type(4):checked ~ .thumbnails .thumb-label:nth-of-type(4),
+.gallery-radio:nth-of-type(5):checked ~ .thumbnails .thumb-label:nth-of-type(5),
+.gallery-radio:nth-of-type(6):checked ~ .thumbnails .thumb-label:nth-of-type(6),
+.gallery-radio:nth-of-type(7):checked ~ .thumbnails .thumb-label:nth-of-type(7),
+.gallery-radio:nth-of-type(8):checked ~ .thumbnails .thumb-label:nth-of-type(8) {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced Gallery avec Overlay */
+.gallery-item-enhanced .image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gallery-item-enhanced:hover .image-overlay {
+  opacity: 1;
+}
+
+.overlay-content {
+  text-align: center;
+  color: white;
+}
+
+.zoom-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.overlay-caption {
+  font-size: 0.875rem;
+  margin: 0;
+  padding: 0 1rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .gallery-grid {
+    grid-template-columns: repeat(min(var(--gallery-columns, 3), 3), 1fr);
+  }
+  
+  .gallery-masonry {
+    columns: min(var(--gallery-columns, 3), 3);
+  }
+}
+
+@media (max-width: 768px) {
+  .gallery-grid {
+    grid-template-columns: repeat(min(var(--gallery-columns, 3), 2), 1fr);
+  }
+  
+  .gallery-masonry {
+    columns: min(var(--gallery-columns, 3), 2);
+  }
+
+  .thumbnails {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .gallery-masonry {
+    columns: 1;
+  }
+
+  .gallery-product {
+    gap: 0.75rem;
+  }
+
+  .thumbnails {
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+    gap: 0.25rem;
+  }
+}
+
+/* ===========================================
+   GALLERY - Retro Variant
+   =========================================== */
+
+.gallery.retro .gallery-item {
+  border-radius: 0;
+  border: 4px solid var(--color-text);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+}
+
+.gallery.retro .gallery-item:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.4);
+}
+
+.gallery.retro .gallery-caption {
+  background: var(--color-text);
+  color: var(--color-background);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gallery.retro .main-image {
+  border-radius: 0;
+  border: 4px solid var(--color-text);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+}
+
+.gallery.retro .thumb-label {
+  border-radius: 0;
+  border: 3px solid var(--color-text);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.gallery.retro .thumb-label:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+.gallery.retro .gallery-radio:checked ~ .thumbnails .thumb-label {
+  border-color: var(--color-text);
+}
+
+.gallery.retro .gallery-radio:nth-of-type(1):checked ~ .thumbnails .thumb-label:nth-of-type(1),
+.gallery.retro .gallery-radio:nth-of-type(2):checked ~ .thumbnails .thumb-label:nth-of-type(2),
+.gallery.retro .gallery-radio:nth-of-type(3):checked ~ .thumbnails .thumb-label:nth-of-type(3),
+.gallery.retro .gallery-radio:nth-of-type(4):checked ~ .thumbnails .thumb-label:nth-of-type(4),
+.gallery.retro .gallery-radio:nth-of-type(5):checked ~ .thumbnails .thumb-label:nth-of-type(5),
+.gallery.retro .gallery-radio:nth-of-type(6):checked ~ .thumbnails .thumb-label:nth-of-type(6),
+.gallery.retro .gallery-radio:nth-of-type(7):checked ~ .thumbnails .thumb-label:nth-of-type(7),
+.gallery.retro .gallery-radio:nth-of-type(8):checked ~ .thumbnails .thumb-label:nth-of-type(8) {
+  background: var(--color-accent);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+.gallery.retro .image-overlay {
+  background: var(--color-accent);
+}
+
+/* ===========================================
+   GALLERY - Modern Variant
+   =========================================== */
+
+.gallery.modern .gallery-item {
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.gallery.modern .gallery-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.gallery.modern .gallery-caption {
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+  backdrop-filter: blur(10px);
+}
+
+.gallery.modern .main-image {
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.gallery.modern .thumb-label {
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.gallery.modern .thumb-label:hover {
+  transform: scale(1.08);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.gallery.modern .gallery-radio:nth-of-type(1):checked ~ .thumbnails .thumb-label:nth-of-type(1),
+.gallery.modern .gallery-radio:nth-of-type(2):checked ~ .thumbnails .thumb-label:nth-of-type(2),
+.gallery.modern .gallery-radio:nth-of-type(3):checked ~ .thumbnails .thumb-label:nth-of-type(3),
+.gallery.modern .gallery-radio:nth-of-type(4):checked ~ .thumbnails .thumb-label:nth-of-type(4),
+.gallery.modern .gallery-radio:nth-of-type(5):checked ~ .thumbnails .thumb-label:nth-of-type(5),
+.gallery.modern .gallery-radio:nth-of-type(6):checked ~ .thumbnails .thumb-label:nth-of-type(6),
+.gallery.modern .gallery-radio:nth-of-type(7):checked ~ .thumbnails .thumb-label:nth-of-type(7),
+.gallery.modern .gallery-radio:nth-of-type(8):checked ~ .thumbnails .thumb-label:nth-of-type(8) {
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.gallery.modern .image-overlay {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9));
+  backdrop-filter: blur(10px);
+}
+
+/* ===========================================
+   GALLERY - Futuristic Variant
+   =========================================== */
+
+.gallery.futuristic .gallery-item {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+  border: 2px solid var(--color-accent);
+  box-shadow: 
+    0 0 20px rgba(0, 255, 255, 0.3),
+    inset 0 0 20px rgba(255, 0, 255, 0.2);
+}
+
+.gallery.futuristic .gallery-item:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 
+    0 0 40px rgba(0, 255, 255, 0.5),
+    0 0 60px rgba(255, 0, 255, 0.3),
+    inset 0 0 30px rgba(255, 0, 255, 0.3);
+  animation: neon-pulse 1.5s infinite alternate;
+}
+
+@keyframes neon-pulse {
+  from {
+    border-color: rgba(0, 255, 255, 0.8);
+  }
+  to {
+    border-color: rgba(255, 0, 255, 0.8);
+  }
+}
+
+.gallery.futuristic .gallery-caption {
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.95));
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+}
+
+.gallery.futuristic .main-image {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+  border: 2px solid var(--color-accent);
+  box-shadow: 
+    0 0 30px rgba(0, 255, 255, 0.4),
+    inset 0 0 30px rgba(255, 0, 255, 0.2);
+}
+
+.gallery.futuristic .thumb-label {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+  border: 2px solid rgba(0, 255, 255, 0.3);
+  box-shadow: 
+    0 0 15px rgba(0, 255, 255, 0.2),
+    inset 0 0 15px rgba(255, 0, 255, 0.1);
+}
+
+.gallery.futuristic .thumb-label:hover {
+  transform: scale(1.1);
+  border-color: rgba(0, 255, 255, 0.6);
+  box-shadow: 
+    0 0 25px rgba(0, 255, 255, 0.4),
+    inset 0 0 20px rgba(255, 0, 255, 0.2);
+}
+
+.gallery.futuristic .gallery-radio:nth-of-type(1):checked ~ .thumbnails .thumb-label:nth-of-type(1),
+.gallery.futuristic .gallery-radio:nth-of-type(2):checked ~ .thumbnails .thumb-label:nth-of-type(2),
+.gallery.futuristic .gallery-radio:nth-of-type(3):checked ~ .thumbnails .thumb-label:nth-of-type(3),
+.gallery.futuristic .gallery-radio:nth-of-type(4):checked ~ .thumbnails .thumb-label:nth-of-type(4),
+.gallery.futuristic .gallery-radio:nth-of-type(5):checked ~ .thumbnails .thumb-label:nth-of-type(5),
+.gallery.futuristic .gallery-radio:nth-of-type(6):checked ~ .thumbnails .thumb-label:nth-of-type(6),
+.gallery.futuristic .gallery-radio:nth-of-type(7):checked ~ .thumbnails .thumb-label:nth-of-type(7),
+.gallery.futuristic .gallery-radio:nth-of-type(8):checked ~ .thumbnails .thumb-label:nth-of-type(8) {
+  border-color: rgba(255, 0, 255, 0.8);
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+  box-shadow: 
+    0 0 40px rgba(255, 0, 255, 0.6),
+    inset 0 0 30px rgba(0, 255, 255, 0.3);
+  animation: neon-pulse 1s infinite alternate;
+}
+
+.gallery.futuristic .image-overlay {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.8), rgba(255, 0, 255, 0.8));
+  backdrop-filter: blur(5px);
+}
+
+.gallery.futuristic .zoom-icon {
+  text-shadow: 0 0 20px rgba(0, 255, 255, 1);
+  animation: icon-glow 2s infinite alternate;
+}
+
+@keyframes icon-glow {
+  from {
+    text-shadow: 0 0 20px rgba(0, 255, 255, 1);
+  }
+  to {
+    text-shadow: 0 0 40px rgba(255, 0, 255, 1);
+  }
+}
+</style>

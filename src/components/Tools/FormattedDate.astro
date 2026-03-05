@@ -1,0 +1,24 @@
+---
+const { date } = Astro.props;
+
+// retourne une `Date` valide ou `null`
+function asDate(v: unknown): Date | null {
+  if (v == null) return null;
+  const d = new Date(v as any);
+  return isNaN(d.valueOf()) ? null : d;
+}
+
+const d = asDate(date);
+if (!d) {
+  // on n’affiche rien si la valeur fournie n’est pas une date
+  return null;
+}
+
+const iso = d.toISOString();
+const formatted = d.toLocaleDateString('fr-FR', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+<time datetime={iso}>{formatted}</time>

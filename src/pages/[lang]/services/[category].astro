@@ -7,6 +7,7 @@ import ServiceGrid from "@components/modules/services/lists/ServiceGrid.astro";
 import ServiceCard from "@components/modules/services/cards/ServiceCard.astro";
 import { Icon } from "astro-icon/components";
 import { getTranslations } from "@i18n/translations";
+import Range from "@components/ui/Form/Range.astro";
 
 export const prerender = true;
 
@@ -89,6 +90,7 @@ const serviceData = services.map((s) => ({
     <div class="cat-layout">
       <!-- ===== SIDEBAR FILTERS ===== -->
       <aside class="cat-sidebar" id="sidebar-filters">
+
         <div class="sidebar-section">
           <h3 class="sidebar-title">{ts.categories ?? "Catégories"}</h3>
           <nav class="sidebar-cats">
@@ -104,11 +106,13 @@ const serviceData = services.map((s) => ({
         <div class="sidebar-section">
           <h3 class="sidebar-title">{ts.priceRange ?? "Fourchette de prix"}</h3>
           <div class="price-range">
-            <input type="range" id="price-min" min={minPrice} max={maxPrice} value={minPrice} />
-            <input type="range" id="price-max" min={minPrice} max={maxPrice} value={maxPrice} />
-            <div class="price-labels">
-              <span id="price-min-label">{minPrice} €</span>
-              <span id="price-max-label">{maxPrice} €</span>
+            <div class="range-group">
+              <Range id="price-min" min={minPrice} max={maxPrice} value={minPrice} variant="modern" />
+              <span class="price-label" id="price-min-label">{minPrice} €</span>
+            </div>
+            <div class="range-group">
+              <Range id="price-max" min={minPrice} max={maxPrice} value={maxPrice} variant="modern" />
+              <span class="price-label" id="price-max-label">{maxPrice} €</span>
             </div>
           </div>
         </div>
@@ -328,9 +332,23 @@ const serviceData = services.map((s) => ({
   .sidebar-count { opacity: 0.6; font-size: 0.75rem; }
 
   /* Price range */
-  .price-range { display: flex; flex-direction: column; gap: var(--space-2, 0.5rem); }
+  .price-range {
+    display: flex;
+    gap: var(--space-2, 0.5rem);
+  }
+  .price-range .range-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1, 0.25rem);
+  }
+  .price-range .price-label {
+    font-size: 0.8125rem;
+    color: var(--text-muted, #64748b);
+    text-align: center;
+  }
+  /* avoid leftover rule */
   .price-range input[type="range"] { width: 100%; accent-color: var(--color-primary, #eab308); }
-  .price-labels { display: flex; justify-content: space-between; font-size: 0.8125rem; color: var(--text-muted, #64748b); }
 
   /* Rating filter */
   .rating-filter { display: flex; align-items: center; gap: 4px; }

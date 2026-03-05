@@ -3,7 +3,6 @@ import DocLayout from "@layouts/DocLayout.astro";
 import { getTranslations } from "@i18n/translations";
 const lang = Astro.params.lang as string;
 const t = getTranslations(lang);
-const d = t.docs?.common ?? {};
 const p = t.docs?.pages ?? {};
 ---
 
@@ -48,6 +47,10 @@ const p = t.docs?.pages ?? {};
     <a href={`/${lang}/docs/components/slider`} class="component-card">
       <h3>{t.docsSidebar?.slider ?? "Slider"}</h3>
       <p>{p.slider?.description ?? "Carrousels"}</p>
+    </a>
+    <a href={`/${lang}/docs/components/range`} class="component-card">
+      <h3>{t.docsSidebar?.range ?? "Range"}</h3>
+      <p>{p.range?.description ?? "Curseur"}</p>
     </a>
     <a href={`/${lang}/docs/components/timeline`} class="component-card">
       <h3>{t.docsSidebar?.timeline ?? "Chronologie"}</h3>

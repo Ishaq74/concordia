@@ -15,7 +15,7 @@ interface Props {
   lang: string;
 }
 
-const { serviceId, providerId, basePrice, priceType, currency = "EUR", durationMinutes, lang } = Astro.props;
+const { serviceId, providerId, basePrice, /* priceType, */ currency = "EUR", durationMinutes, lang } = Astro.props;
 const t = getTranslations(lang);
 ---
 

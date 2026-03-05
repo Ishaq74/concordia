@@ -1,0 +1,223 @@
+---
+/**
+ * Range - curseur de formulaire (input[type="range"]) avec support des variants
+ *
+ * les propriétés habituelles des inputs sont acceptées et transférées via
+ * `...rest` (min, max, step, value, etc.).
+ *
+ * @param {string} id
+ * @param {string} name
+ * @param {number|string} value
+ * @param {number} min
+ * @param {number} max
+ * @param {number} step
+ * @param {boolean} disabled
+ * @param {boolean} required
+ * @param {string} variant (initial|retro|modern|futuristic)
+ * @param {string} className classes supplémentaires
+ */
+
+interface Props {
+  id?: string;
+  name?: string;
+  value?: number | string;
+  min?: number;
+  max?: number;
+  step?: number;
+  disabled?: boolean;
+  required?: boolean;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic';
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  id,
+  name,
+  value,
+  min,
+  max,
+  step,
+  disabled = false,
+  required = false,
+  variant = 'initial',
+  className = '',
+  ...rest
+} = Astro.props;
+
+const variantClass = variant !== 'initial' ? variant : '';
+const classes = ['range', variantClass, className].filter(Boolean).join(' ');
+---
+
+<input
+  type="range"
+  id={id}
+  name={name}
+  value={value}
+  min={min}
+  max={max}
+  step={step}
+  disabled={disabled}
+  required={required}
+  class={classes}
+  {...rest}
+/>
+
+<style>
+/* Sliders */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  cursor: pointer;
+}
+/* WebKit track/thumb */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: var(--slider-track-height);
+  background: var(--slider-track-bg);
+  border-radius: 99px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: var(--slider-thumb-size);
+  width: var(--slider-thumb-size);
+  border-radius: 50%;
+  background: var(--slider-thumb-color);
+  margin-top: calc((var(--slider-track-height) - var(--slider-thumb-size)) / 2);
+  box-shadow: var(--shadow-sm);
+}
+/* Gecko */
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: var(--slider-track-height);
+  background: var(--slider-track-bg);
+  border-radius: 99px;
+}
+input[type="range"]::-moz-range-thumb {
+  height: var(--slider-thumb-size);
+  width: var(--slider-thumb-size);
+  border-radius: 50%;
+  background: var(--slider-thumb-color);
+  box-shadow: var(--shadow-sm);
+  border: none;
+}
+/* IE/Edge */
+input[type="range"]::-ms-track {
+  width: 100%;
+  height: var(--slider-track-height);
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type="range"]::-ms-fill-lower,
+input[type="range"]::-ms-fill-upper {
+  background: var(--slider-track-bg);
+  border-radius: 99px;
+}
+input[type="range"]::-ms-thumb {
+  height: var(--slider-thumb-size);
+  width: var(--slider-thumb-size);
+  border-radius: 50%;
+  background: var(--slider-thumb-color);
+  box-shadow: var(--shadow-sm);
+  margin-top: 0; /* doesn't behave like WebKit */
+}
+
+/* SLIDER RETRO */
+input[type="range"].retro::-webkit-slider-runnable-track {
+  background: var(--retro-slider-track-bg);
+  border: var(--retro-border-width) solid var(--text-default);
+  border-radius: 0;
+  height: calc(var(--slider-track-height) * 2);
+}
+input[type="range"].retro::-webkit-slider-thumb {
+  border-radius: 0;
+  background: var(--retro-slider-thumb-color);
+  border: var(--retro-border-width) solid var(--text-default);
+  box-shadow: 2px 2px 0 var(--retro-shadow-color);
+  width: calc(var(--slider-thumb-size) * 0.8);
+  height: calc(var(--slider-thumb-size) * 1.2);
+  margin-top: -6px;
+}
+input[type="range"].retro::-moz-range-track {
+  background: var(--retro-slider-track-bg);
+  border: var(--retro-border-width) solid var(--text-default);
+  border-radius: 0;
+  height: calc(var(--slider-track-height) * 2);
+}
+input[type="range"].retro::-moz-range-thumb {
+  border-radius: 0;
+  background: var(--retro-slider-thumb-color);
+  border: var(--retro-border-width) solid var(--text-default);
+  box-shadow: 2px 2px 0 var(--retro-shadow-color);
+  width: calc(var(--slider-thumb-size) * 0.8);
+  height: calc(var(--slider-thumb-size) * 1.2);
+  margin-top: -6px;
+}
+
+/* SLIDER MODERN */
+input[type="range"].modern::-webkit-slider-runnable-track {
+  height: 4px;
+}
+input[type="range"].modern::-moz-range-track {
+  height: 4px;
+}
+input[type="range"].modern::-ms-track {
+  height: 4px;
+}
+input[type="range"].modern::-webkit-slider-thumb { 
+  box-shadow: 0 0 0 4px var(--bg-default), var(--shadow-md);
+}
+input[type="range"].modern::-moz-range-thumb { 
+  box-shadow: 0 0 0 4px var(--bg-default), var(--shadow-md);
+}
+input[type="range"].modern::-ms-thumb {
+  box-shadow: 0 0 0 4px var(--bg-default), var(--shadow-md);
+}
+
+/* SLIDER FUTURISTIC */
+input[type="range"].futuristic::-webkit-slider-runnable-track {
+  background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  border: 1px solid var(--color-primary);
+  border-radius: 0;
+}
+input[type="range"].futuristic::-webkit-slider-thumb {
+  background: var(--bg-default);
+  border: 2px solid var(--color-primary);
+  box-shadow: 0 0 10px var(--futuristic-slider-glow);
+  border-radius: 0;
+  transform: rotate(45deg) scale(0.8);
+}
+input[type="range"].futuristic::-moz-range-track {
+  background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  border: 1px solid var(--color-primary);
+  border-radius: 0;
+}
+input[type="range"].futuristic::-moz-range-thumb {
+  background: var(--bg-default);
+  border: 2px solid var(--color-primary);
+  box-shadow: 0 0 10px var(--futuristic-slider-glow);
+  border-radius: 0;
+  transform: rotate(45deg) scale(0.8);
+}
+input[type="range"].futuristic::-ms-track {
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type="range"].futuristic::-ms-fill-lower,
+input[type="range"].futuristic::-ms-fill-upper {
+  background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  border: 1px solid var(--color-primary);
+  border-radius: 0;
+}
+input[type="range"].futuristic::-ms-thumb {
+  background: var(--bg-default);
+  border: 2px solid var(--color-primary);
+  box-shadow: 0 0 10px var(--futuristic-slider-glow);
+  border-radius: 0;
+  transform: rotate(45deg) scale(0.8);
+}
+</style>

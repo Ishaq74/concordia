@@ -286,70 +286,120 @@ const getPageUrl = (page: number) => {
 )}
 
 <style>
-  .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+  padding: 0;
+}
 
-  .pagination-list {
-    display: flex;
-    gap: 0.5rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    align-items: center;
-  }
+.pagination-item { 
+  width: var(--pagination-item-size); 
+  height: var(--pagination-item-size); 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  border-radius: var(--pagination-item-border-radius); 
+  color: var(--pagination-item-color); 
+  cursor: pointer; 
+  transition: all 0.2s; 
+}
+.pagination-item:hover { background-color: var(--pagination-item-hover-bg); }
+.pagination-item.active { background-color: var(--pagination-item-active-bg); color: var(--pagination-item-active-color); }
 
-  /* Ajustements pour la taille */
-  .pagination.sm .pagination-list {
-    gap: 0.25rem;
-  }
+.pagination-list {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  align-items: center;
+}
 
-  .pagination.sm :global(button),
-  .pagination.sm :global(a) {
-    min-width: 2rem;
-    height: 2rem;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-  }
+/* Ajustements pour la taille */
+.pagination.sm .pagination-list {
+  gap: 0.25rem;
+}
 
-  .pagination.lg .pagination-list {
-    gap: 0.75rem;
-  }
+.pagination.sm :global(button),
+.pagination.sm :global(a) {
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
 
-  .pagination.lg :global(button),
-  .pagination.lg :global(a) {
-    min-width: 3rem;
-    height: 3rem;
-    padding: 0.75rem 1rem;
-    font-size: 1.125rem;
-  }
+.pagination.lg .pagination-list {
+  gap: 0.75rem;
+}
 
-  /* Bouton actif (page courante) */
-  .pagination :global(.active) {
-    pointer-events: none;
-  }
+.pagination.lg :global(button),
+.pagination.lg :global(a) {
+  min-width: 3rem;
+  height: 3rem;
+  padding: 0.75rem 1rem;
+  font-size: 1.125rem;
+}
 
-  /* Dots */
-  .pagination-dots {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 2rem;
-    color: var(--text-muted);
-    user-select: none;
-  }
+/* Bouton actif (page courante) */
+.pagination :global(.active) {
+  pointer-events: none;
+}
 
-  /* Texte Précédent/Suivant caché sur mobile */
-  .pagination-text {
-    display: none;
-  }
+/* Dots */
+.pagination-dots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  color: var(--text-muted);
+  user-select: none;
+}
 
-  @media (min-width: 640px) {
-    .pagination-prev .pagination-text,
-    .pagination-next .pagination-text {
-      display: inline;
-    }
+/* Texte Précédent/Suivant caché sur mobile */
+.pagination-text {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .pagination-prev .pagination-text,
+  .pagination-next .pagination-text {
+    display: inline;
   }
+}
+
+/* PAGINATION RETRO */
+.pagination.retro .pagination-item { 
+  border-radius: 0; 
+  border: var(--retro-border-width) solid transparent; 
+}
+.pagination.retro .pagination-item.active { 
+  background-color: var(--retro-pagination-active-bg); 
+  color: var(--retro-pagination-bg); 
+  border-color: currentColor; 
+  box-shadow: 2px 2px 0 var(--retro-shadow-color); 
+}
+
+/* PAGINATION MODERN */
+.pagination.modern .pagination-item.active { 
+  background-color: transparent; 
+  color: var(--modern-pagination-active-color); 
+  font-weight: bold; 
+  border-bottom: 2px solid currentColor; 
+  border-radius: 0; 
+}
+
+/* PAGINATION FUTURISTIC */
+.pagination.futuristic .pagination-item { 
+  border: 1px solid transparent; 
+}
+.pagination.futuristic .pagination-item.active { 
+  border-color: var(--color-primary); 
+  box-shadow: 0 0 10px var(--futuristic-pagination-glow); 
+  text-shadow: 0 0 5px currentColor; 
+  color: var(--color-primary); 
+  background: transparent; 
+}
 </style>

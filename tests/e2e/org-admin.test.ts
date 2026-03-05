@@ -19,6 +19,9 @@ test.describe('Org Admin — Auth guard (unauthenticated)', () => {
     for (const page of orgPages) {
       test(`${locale}/${page} redirects unauthenticated user to login`, async ({ page: p }) => {
         const response = await p.goto(`/${locale}/admin/${page}`, { waitUntil: 'domcontentloaded' });
+        // ensure we got a page back
+        expect(response).toBeTruthy();
+        expect(response!.status()).toBeLessThan(500);
 
         // Should redirect to login page (either 302 or show login form)
         const url = p.url();

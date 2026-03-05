@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
+import { sentEmails } from './store';
 
 // ==================== TYPES ====================
 
@@ -164,6 +165,10 @@ export class SmtpService {
       // receive the sendMail calls via the mocked transporter.
       this.transporter = nodemailer.createTransport({ jsonTransport: true } as any) as any;
 
+      // record every email in the shared store so the `/__mocks__/emails`
+      // page can serve them during E2E runs.
+      sentEmails.length = 0; // reset when a new service is constructed
+
       if (process.env.NODE_ENV !== 'production') {
         console.log('[SMTP] Mode MOCK activé - pas de vrais emails envoyés');
       }
@@ -239,6 +244,11 @@ export class SmtpService {
           setTimeout(() => reject(new Error('TIMEOUT')), timeoutMs)
         )
       ]);
+
+      // if mock mode is active also append the record to the shared store
+      if (this.isMocked) {
+        sentEmails.push({ messageId: result.messageId, ...payload });
+      }
 
       return {
         success: true,

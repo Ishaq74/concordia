@@ -22,7 +22,7 @@ async function seed() {
   // Safety: show target DB and require confirmation when running against production
   if (isProd) {
     const prodUrl = process.env.DATABASE_URL_PROD || process.env.DATABASE_URL;
-    const mask = (u?: string) => u ? u.replace(/:\/\/[^@]+@/, '://***@') : 'N/A';
+    const mask = (u?: string) => u ? u.replace(/:\/\/[^@]+@, '://***@') : 'N/A';
     const dbName = (() => { try { return new URL(prodUrl!).pathname.replace(/^\//, '') } catch { return (prodUrl || '').split('/').pop() || 'unknown' } })();
     console.log(`\x1b[41m\x1b[97m PROD ATTENTION !! Vous ciblez la base de production : ${dbName} (${mask(prodUrl)}) \x1b[0m`);
     if (process.env.CONFIRM_PROD !== 'oui') {

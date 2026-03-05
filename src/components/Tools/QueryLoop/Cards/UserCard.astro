@@ -1,0 +1,65 @@
+---
+// This card is used by QueryLoop when collection="users".
+// It mirrors the structure of the AuthorCard used elsewhere but
+// lives inside the QueryLoop/Cards folder so that the loop can import it
+// with a relative path.  The entry passed by QueryLoop will have the
+// `data` property containing the user fields (name, slug, avatar, bio, etc.).
+
+const { entry, layout = 'grid' } = Astro.props;
+if (!entry) return null;
+
+const user = entry.data;
+// `lang` may be propagated via the loop if needed; default to empty string.
+const lang = Astro.props.lang || '';
+
+// we permit `avatar` to be null/undefined
+const avatar = user.avatar ?? undefined;
+const profileUrl = `/${lang}/blog2/auteur/${user.slug}`;
+---
+
+<article class={layout === 'list' ? 'user-card-list flex items-center gap-3' : 'user-card'}>
+  {layout === 'list' ? (
+    <>
+      <img class="user-card__avatar" src={avatar} alt={user.name} />
+      <div>
+        <h3 class="user-card__name"><a href={profileUrl}>{user.name}</a></h3>
+        {user.bio && <p class="user-card__bio">{user.bio}</p>}
+      </div>
+    </>
+  ) : (
+    <>
+      <img class="user-card__avatar" src={avatar} alt={user.name} />
+      <h3 class="user-card__name">
+        <a href={profileUrl}>{user.name}</a>
+      </h3>
+      {user.bio && <p class="user-card__bio">{user.bio}</p>}
+    </>
+  )}
+</article>
+
+<style>
+.user-card {
+  text-align: center;
+  padding: var(--space-4);
+}
+.user-card__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto var(--space-2);
+}
+.user-card__name {
+  margin: 0 var(--space-2);
+  font-size: 1rem;
+}
+.user-card__name a {
+  color: inherit;
+  text-decoration: none;
+}
+.user-card__bio {
+  margin-top: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+</style>

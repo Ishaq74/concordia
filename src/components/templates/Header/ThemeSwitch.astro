@@ -68,3 +68,99 @@ const buttonClass = [
 
   document.addEventListener('astro:after-swap', initTheme);
 </script>
+
+
+<style>
+/* THEME SWITCH */
+.theme-switch {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-full);
+  border: 1px solid var(--border-default);
+  background: var(--bg-default);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0;
+}
+.theme-switch:hover {
+  background: var(--bg-inset);
+  border-color: var(--color-primary);
+}
+.theme-switch .icon-light,
+.theme-switch .icon-dark {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.theme-switch .icon-light {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+.theme-switch .icon-dark {
+  opacity: 0;
+  transform: rotate(-180deg) scale(0);
+}
+.theme-switch[data-theme="dark"] .icon-light {
+  opacity: 0;
+  transform: rotate(180deg) scale(0);
+}
+.theme-switch[data-theme="dark"] .icon-dark {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* THEME SWITCH RETRO */
+.theme-switch.retro {
+  border: 2px solid var(--text-default);
+  border-radius: 0;
+  box-shadow: 4px 4px 0 var(--retro-shadow-color);
+}
+.theme-switch.retro:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0 var(--retro-shadow-color);
+}
+.theme-switch.retro:active {
+  transform: translateY(0);
+  box-shadow: 2px 2px 0 var(--retro-shadow-color);
+}
+
+/* THEME SWITCH MODERN */
+.theme-switch.modern {
+  backdrop-filter: blur(10px);
+  background: rgba(var(--bg-default-rgb, 255, 255, 255), 0.8);
+  border-color: rgba(var(--border-default-rgb, 226, 232, 240), 0.3);
+}
+.theme-switch.modern:hover {
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb, 234, 179, 8), 0.2);
+}
+
+/* THEME SWITCH FUTURISTIC */
+.theme-switch.futuristic {
+  background: linear-gradient(135deg, rgba(var(--color-primary-rgb, 234, 179, 8), 0.1), rgba(var(--color-accent-rgb, 236, 72, 153), 0.1));
+  border-width: 2px;
+  position: relative;
+}
+.theme-switch.futuristic::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.theme-switch.futuristic:hover::before {
+  opacity: 1;
+}
+.theme-switch.futuristic:hover {
+  box-shadow: 0 0 20px rgba(var(--color-primary-rgb, 234, 179, 8), 0.4);
+}
+</style>

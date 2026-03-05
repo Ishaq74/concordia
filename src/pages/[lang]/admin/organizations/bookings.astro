@@ -107,7 +107,7 @@ const bookings = allBookings.slice((page - 1) * perPage, page * perPage);
 const pending = allBookings.filter(b => b.status === "pending").length;
 const confirmed = allBookings.filter(b => b.status === "confirmed").length;
 const completed = allBookings.filter(b => b.status === "completed").length;
-const cancelled = allBookings.filter(b => b.status === "cancelled").length;
+110 // const cancelled = allBookings.filter(b => b.status === "cancelled").length; // unused
 
 const loc = (val: any) => {
   if (!val) return "";

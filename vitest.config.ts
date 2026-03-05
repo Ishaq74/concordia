@@ -1,9 +1,9 @@
-import { defineConfig } from 'vitest/config'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import { defineConfig } from 'vitest/config';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   test: {
@@ -27,9 +27,10 @@ export default defineConfig({
     env: {
       NODE_ENV: 'test',
       SMTP_MOCK: '1',
-      BETTER_AUTH_URL: 'http://localhost:3000',
+      BETTER_AUTH_URL: 'http://localhost:4321',
       DATABASE_URL: 'postgresql://test:test@localhost/test_db',
     },
+    exclude: ['node_modules/**', 'packages/**', 'dist/**', 'tests/e2e/**', 'tests/a11y/**'],
   },
   resolve: {
     alias: {
@@ -46,6 +47,7 @@ export default defineConfig({
       '@smtp': path.resolve(__dirname, './src/lib/smtp'),
       '@i18n': path.resolve(__dirname, './src/i18n'),
       '@tests': path.resolve(__dirname, './tests'),
+      '@actions': path.resolve(__dirname, './.src/actions'),
     },
   },
-})
+});

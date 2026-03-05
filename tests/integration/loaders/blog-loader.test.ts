@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { loadBlogPosts } from '@/database/loaders/blog'
+import { loadBlogPosts } from '@database/loaders/blog'
 import * as schema from '@database/schemas'
 
 describe('loadBlogPosts (integration via mocked DB)', () => {
@@ -125,7 +125,7 @@ describe('loadBlogPosts (integration via mocked DB)', () => {
 
   it('logs error and continues if transformer throws', async () => {
     // On crée un loader dédié avec un transformer qui throw
-    const { createTranslationLoader } = await import('@/database/loaders/factory')
+    const { createTranslationLoader } = await import('@database/loaders/factory')
     const sample = {
       id: 'post-err',
       slug: 'err',

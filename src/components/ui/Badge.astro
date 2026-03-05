@@ -69,4 +69,50 @@ const classes = [
 .badge.primary { background: var(--badge-primary-bg); color: var(--badge-primary-color); }
 .badge.secondary { background: var(--badge-secondary-bg); color: var(--badge-secondary-color); }
 .badge.accent { background: var(--badge-accent-bg); color: var(--badge-accent-color); }
+
+/* BADGE RETRO */
+.badge.retro { 
+  border-radius: 0; 
+  border: 1px solid currentColor; 
+  background: var(--retro-badge-bg); 
+  box-shadow: 2px 2px 0 var(--retro-shadow-color); 
+}
+.badge.retro.primary { color: var(--badge-primary-bg); border-color: var(--badge-primary-bg); }
+.badge.retro.secondary { color: var(--badge-secondary-bg); border-color: var(--badge-secondary-bg); }
+.badge.retro.accent { color: var(--badge-accent-bg); border-color: var(--badge-accent-bg); }
+
+/* BADGE MODERN */
+.badge.modern { 
+  border-radius: 99px; 
+  background: var(--modern-badge-bg); 
+  border: 1px solid transparent; 
+}
+.badge.modern.primary { 
+  background: color-mix(in srgb, var(--badge-primary-bg) 15%, transparent); 
+  color: var(--badge-primary-bg); 
+  border-color: color-mix(in srgb, var(--badge-primary-bg) 20%, transparent); 
+}
+.badge.modern.secondary { 
+  background: color-mix(in srgb, var(--badge-secondary-bg) 15%, transparent); 
+  color: var(--badge-secondary-bg); 
+  border-color: color-mix(in srgb, var(--badge-secondary-bg) 20%, transparent); 
+}
+.badge.modern.accent { 
+  background: color-mix(in srgb, var(--badge-accent-bg) 15%, transparent); 
+  color: var(--badge-accent-bg); 
+  border-color: color-mix(in srgb, var(--badge-accent-bg) 20%, transparent); 
+}
+
+/* BADGE FUTURISTIC */
+.badge.futuristic { 
+  border-radius: 0; 
+  border: 1px solid currentColor; 
+  background: var(--futuristic-badge-bg); 
+  text-shadow: 0 0 5px currentColor; 
+  box-shadow: 0 0 5px currentColor; 
+  letter-spacing: 0.1em; 
+}
+.badge.futuristic.primary { color: var(--badge-primary-bg); }
+.badge.futuristic.secondary { color: var(--badge-secondary-bg); }
+.badge.futuristic.accent { color: var(--badge-accent-bg); }
 </style>

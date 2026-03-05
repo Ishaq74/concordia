@@ -68,3 +68,385 @@ const classes = [
     </div>
   </div>
 </div>
+
+<style>
+.progress-bar {
+  --progress-height: 1rem;
+  --progress-border-radius: var(--radius-md);
+  --progress-bg: var(--color-surface);
+  --progress-fill-bg: var(--color-primary);
+  --progress-border: 1px solid var(--color-border);
+  
+  width: 100%;
+  position: relative;
+}
+
+.progress-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-default);
+}
+
+.progress-track {
+  width: 100%;
+  height: var(--progress-height);
+  background: var(--progress-bg);
+  border: var(--progress-border);
+  border-radius: var(--progress-border-radius);
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--progress-fill-bg);
+  transition: width 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.progress-label-inner {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  mix-blend-mode: difference;
+}
+
+/* Tailles */
+.progress-bar.size-sm {
+  --progress-height: 0.5rem;
+}
+
+.progress-bar.size-sm .progress-label-inner {
+  font-size: 0.625rem;
+}
+
+.progress-bar.size-lg {
+  --progress-height: 1.5rem;
+}
+
+.progress-bar.size-lg .progress-label-inner {
+  font-size: 0.875rem;
+}
+
+/* Couleurs */
+.progress-bar.primary {
+  --progress-fill-bg: var(--color-primary);
+}
+
+.progress-bar.secondary {
+  --progress-fill-bg: var(--color-secondary);
+}
+
+.progress-bar.accent {
+  --progress-fill-bg: var(--color-accent);
+}
+
+/* Rayures */
+.progress-bar.striped .progress-fill {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 1rem 1rem;
+}
+
+/* Animation */
+.progress-bar.animated .progress-fill {
+  animation: progress-stripes 1s linear infinite;
+}
+
+@keyframes progress-stripes {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 1rem 0;
+  }
+}
+
+/* PROGRESSBAR RETRO */
+.progress-bar.retro {
+  --progress-border-radius: 0;
+  --progress-border: var(--retro-border-width) solid var(--text-default);
+}
+
+.progress-bar.retro .progress-track {
+  box-shadow: var(--retro-shadow-offset) var(--retro-shadow-offset) 0 0 var(--retro-shadow-color);
+  background: var(--retro-card-bg);
+}
+
+.progress-bar.retro .progress-fill {
+  background: var(--color-primary);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.progress-bar.retro.primary .progress-fill {
+  background: var(--color-primary);
+}
+
+.progress-bar.retro.secondary .progress-fill {
+  background: var(--color-secondary);
+}
+
+.progress-bar.retro.accent .progress-fill {
+  background: var(--color-accent);
+}
+
+.progress-bar.retro .progress-label {
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+}
+
+.progress-bar.retro .progress-label-inner {
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+}
+
+/* PROGRESSBAR MODERN */
+.progress-bar.modern {
+  --progress-border-radius: var(--radius-full);
+  --progress-border: none;
+}
+
+.progress-bar.modern .progress-track {
+  background: var(--modern-glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--modern-glass-border);
+  box-shadow: var(--modern-shadow-md);
+}
+
+.progress-bar.modern .progress-fill {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light, var(--color-primary)));
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 20px rgba(var(--color-primary-rgb, 99, 102, 241), 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar.modern .progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.progress-bar.modern.primary .progress-fill {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light, var(--color-primary)));
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+}
+
+.progress-bar.modern.secondary .progress-fill {
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-secondary-light, var(--color-secondary)));
+  box-shadow: 0 0 20px rgba(var(--color-secondary-rgb, 139, 92, 246), 0.5);
+}
+
+.progress-bar.modern.accent .progress-fill {
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light, var(--color-accent)));
+  box-shadow: 0 0 20px rgba(var(--color-accent-rgb, 236, 72, 153), 0.5);
+}
+
+.progress-bar.modern .progress-label {
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.progress-bar.modern .progress-label-inner {
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* PROGRESSBAR FUTURISTIC */
+.progress-bar.futuristic {
+  --progress-border-radius: var(--radius-md);
+  --progress-border: 1px solid var(--futuristic-border-color);
+}
+
+.progress-bar.futuristic .progress-track {
+  background: var(--futuristic-glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--futuristic-border-color);
+  box-shadow: 
+    0 0 20px rgba(var(--color-primary-rgb, 99, 102, 241), 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar.futuristic .progress-track::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+  animation: scan 3s linear infinite;
+}
+
+@keyframes scan {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.progress-bar.futuristic .progress-fill {
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-primary-light, var(--color-primary)),
+    var(--color-primary)
+  );
+  box-shadow: 
+    0 0 30px rgba(99, 102, 241, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  position: relative;
+  border-right: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.progress-bar.futuristic .progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* PROGRESSBAR FUTURISTIC */
+.progress-bar.futuristic {
+  --progress-border-radius: var(--radius-md);
+  --progress-border: 1px solid var(--futuristic-border-color);
+}
+
+.progress-bar.futuristic .progress-track {
+  background: var(--futuristic-glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--futuristic-border-color);
+  box-shadow: 
+    0 0 20px rgba(var(--color-primary-rgb, 99, 102, 241), 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar.futuristic .progress-track::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+  animation: scan 3s linear infinite;
+}
+
+@keyframes scan {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.progress-bar.futuristic .progress-fill {
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-primary-light, var(--color-primary)),
+    var(--color-primary)
+  );
+  box-shadow: 
+    0 0 30px rgba(99, 102, 241, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  position: relative;
+  border-right: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.progress-bar.futuristic .progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.progress-bar.futuristic.primary .progress-fill {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light, var(--color-primary)), var(--color-primary));
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.progress-bar.futuristic.primary .progress-track::before {
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+}
+
+.progress-bar.futuristic.secondary .progress-fill {
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-secondary-light, var(--color-secondary)), var(--color-secondary));
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.progress-bar.futuristic.secondary .progress-track::before {
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+}
+
+.progress-bar.futuristic.accent .progress-fill {
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light, var(--color-accent)), var(--color-accent));
+  box-shadow: 0 0 30px rgba(236, 72, 153, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.progress-bar.futuristic.accent .progress-track::before {
+  background: linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.1), transparent);
+}
+
+.progress-bar.futuristic .progress-label {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+.progress-bar.futuristic .progress-label-inner {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+}
+</style>

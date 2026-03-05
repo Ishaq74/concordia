@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createTranslationLoader } from '@/database/loaders/factory'
+import { createTranslationLoader } from '@database/loaders/factory'
 
 describe('createTranslationLoader (unit)', () => {
   it('stores translated entries with id "slug-lang" and includes slug/lang in data', async () => {

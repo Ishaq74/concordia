@@ -98,6 +98,10 @@
 - [Migrating from WorkOS to Better Auth](https://www.better-auth.com/llms.txt/docs/guides/workos-migration-guide.md): A step-by-step guide to transitioning from WorkOS to Better Auth.
 - [Create your first plugin](https://www.better-auth.com/llms.txt/docs/guides/your-first-plugin.md): A step-by-step guide to creating your first Better Auth plugin.
 
+### Testing
+
+- [Test Utils Plugin](https://www.better-auth.com/llms.txt/docs/test-utils.md): Helpers for integration and E2E tests (test‑only plugin).
+
 ### Installation
 
 - [Installation](https://www.better-auth.com/llms.txt/docs/installation.md): Learn how to configure Better Auth in your project.

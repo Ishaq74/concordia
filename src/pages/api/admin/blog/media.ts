@@ -4,7 +4,7 @@ import type { APIRoute } from "astro";
 import { json, guardAdmin, generateId } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import { blogMedia, auditLog } from "@database/schemas";
-import { eq, desc, count, ilike } from "drizzle-orm";
+import { eq, desc, count, ilike, and } from "drizzle-orm";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -18,6 +18,8 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
  * List media with optional type filter
  */
 export const GET: APIRoute = async ({ request, locals }) => {
+  // guardAdmin may return a Response when access is denied; ensuring the
+  // handler always returns a Response satisfies the APIRoute signature.
   const guard = guardAdmin(locals);
   if (guard) return guard;
 
@@ -32,21 +34,45 @@ export const GET: APIRoute = async ({ request, locals }) => {
   if (typeFilter) conditions.push(eq(blogMedia.type, typeFilter));
   if (search) conditions.push(ilike(blogMedia.url, `%${search}%`));
 
-  const whereClause = conditions.length > 0
-    // Refactored: combine all conditions using drizzle-orm and()
-    ? conditions.reduce((a, b) => and(a, b))
-    : undefined;
+  let total: number;
+  let media;
 
-  const [totalResult] = whereClause
-    ? await db.select({ value: count() }).from(blogMedia).where(whereClause)
-    : await db.select({ value: count() }).from(blogMedia);
+  if (conditions.length === 0) {
+    const [totalResult] = await db
+      .select({ value: count() })
+      .from(blogMedia);
 
-  const total = totalResult.value;
+    total = totalResult.value;
+
+    media = await db
+      .select()
+      .from(blogMedia)
+      .orderBy(desc(blogMedia.createdAt))
+      .limit(perPage)
+      .offset((page - 1) * perPage);
+  } else {
+    const whereExpr =
+      conditions.length === 1
+        ? conditions[0]
+        : and(...conditions);
+
+    const [totalResult] = await db
+      .select({ value: count() })
+      .from(blogMedia)
+      .where(whereExpr);
+
+    total = totalResult.value;
+
+    media = await db
+      .select()
+      .from(blogMedia)
+      .where(whereExpr)
+      .orderBy(desc(blogMedia.createdAt))
+      .limit(perPage)
+      .offset((page - 1) * perPage);
+  }
+
   const totalPages = Math.max(1, Math.ceil(total / perPage));
-
-  const media = whereClause
-    ? await db.select().from(blogMedia).where(whereClause).orderBy(desc(blogMedia.createdAt)).limit(perPage).offset((page - 1) * perPage)
-    : await db.select().from(blogMedia).orderBy(desc(blogMedia.createdAt)).limit(perPage).offset((page - 1) * perPage);
 
   return json(200, { media, total, page, perPage, totalPages });
 };

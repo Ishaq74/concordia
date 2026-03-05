@@ -54,7 +54,7 @@ if (orgIds.length > 0) {
   userOrgs.push(...orgs);
 }
 const activeOrgId = Astro.locals.organizationId ?? null;
-const activeOrg = activeOrgId ? userOrgs.find((o) => o.id === activeOrgId) : null;
+// const activeOrg = activeOrgId ? userOrgs.find((o) => o.id === activeOrgId) : null; // unused
 
 interface AdminNavGroup {
   label: string;

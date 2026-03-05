@@ -1,7 +1,7 @@
 ---
 import DocLayout from "@layouts/DocLayout.astro";
 import { Code } from "astro:components";
-import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import TableOfContents from "@components/templates/docs/TableOfContents.astro";
 import SheetComponent from "@components/ui/Sheet/Sheet.astro";
 import SheetTrigger from "@components/ui/Sheet/SheetTrigger.astro";
 import SheetContent from "@components/ui/Sheet/SheetContent.astro";
@@ -31,7 +31,9 @@ const p = t.docs?.pages?.sheet ?? {};
 >
   <h1 id="sheet-component">{p.title ?? "Sheet Panel Component"}</h1>
 
-  <p set:html={p.intro ?? `Le composant <code class="inline-code">Sheet</code> crée un panneau coulissant accessible  en <strong>pur CSS</strong>, sans JavaScript. Il utilise un checkbox caché et la pseudo-classe  <code class="inline-code">:has()</code> pour gérer l'état ouvert/fermé.`} />
+  <p set:html={p.intro ?? `Le composant <code class="inline-code">Sheet</code> crée un panneau coulissant accessible 
+ en <strong>pur CSS</strong>, sans JavaScript. Il utilise un checkbox caché et la pseudo-classe 
+ <code class="inline-code">:has()</code> pour gérer l'état ouvert/fermé.`} />
 
   <Alert status="success">
     🎉 <strong>Zero JavaScript !</strong> Tout fonctionne avec CSS moderne uniquement. 

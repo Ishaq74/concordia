@@ -7,6 +7,7 @@ import BannerPage from "@templates/BannerPage.astro";
 import ServiceGrid from "@components/modules/services/lists/ServiceGrid.astro";
 import ServiceCard from "@components/modules/services/cards/ServiceCard.astro";
 import { Icon } from "astro-icon/components";
+import Range from "@components/ui/Form/Range.astro";
 import { getTranslations } from "@i18n/translations";
 import { getCollection } from "astro:content";
 import { getDrizzle } from "@database/drizzle";
@@ -99,8 +100,10 @@ const serviceData = services.map((s) => ({
           <div class="filter-section">
             <h3 class="filter-title">{ts.budget ?? "Budget"}</h3>
             <div class="budget-range">
-              <input type="range" id="budget-max" min={minPrice} max={maxPrice} value={maxPrice} />
-              <div class="budget-label">{ts.upTo ?? "Jusqu'à"} <span id="budget-label">{maxPrice}</span> €</div>
+              <div class="range-group">
+                <Range id="budget-max" min={minPrice} max={maxPrice} value={maxPrice} variant="modern" />
+                <span class="budget-label">{ts.upTo ?? "Jusqu'à"} <span id="budget-label">{maxPrice}</span> €</span>
+              </div>
             </div>
           </div>
         )}
@@ -246,7 +249,21 @@ const serviceData = services.map((s) => ({
   .fpill [data-icon] { width: 0.875rem; height: 0.875rem; }
   .fpill:hover, .fpill.active { background: var(--color-primary, #eab308); color: white; border-color: var(--color-primary, #eab308); }
   .fpill-count { opacity: 0.7; font-size: 0.75rem; }
-  .budget-range { display: flex; flex-direction: column; gap: var(--space-2, 0.5rem); }
+  .budget-range {
+    display: flex;
+    gap: var(--space-2, 0.5rem);
+  }
+  .budget-range .range-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1, 0.25rem);
+  }
+  .budget-range .budget-label {
+    font-size: 0.8125rem;
+    color: var(--text-muted, #64748b);
+    text-align: center;
+  }
   .budget-range input[type="range"] { width: 100%; accent-color: var(--color-primary, #eab308); }
   .budget-label { font-size: 0.8125rem; color: var(--text-muted, #64748b); }
   .reset-btn {

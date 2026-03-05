@@ -19,15 +19,14 @@ import Pagination from "@components/ui/Pagination.astro";
 import { Icon } from "astro-icon/components";
 import { getDrizzle } from "@database/drizzle";
 import { user } from "@database/schemas";
-import { count, ilike, eq, desc, or } from "drizzle-orm";
+import { count, ilike, eq, desc, or, and } from "drizzle-orm";
 import { getTranslations } from "@i18n/translations";
-const lang = Astro.params.lang as string;
 
+const lang = Astro.params.lang as string;
 const tData = getTranslations(lang);
 const currentLocale = lang;
 const t = tData;
 
-// Pagination and filtering parameters
 const url = new URL(Astro.request.url);
 const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));
 const perPage = 20;
@@ -36,51 +35,53 @@ const roleFilter = url.searchParams.get("role")?.trim() ?? "";
 
 const db = await getDrizzle();
 
-// Filtering conditions
+// Conditions de filtre
 const conditions = [];
 if (search) {
   conditions.push(
     or(
       ilike(user.name, `%${search}%`),
       ilike(user.email, `%${search}%`),
-      ilike(user.username, `%${search}%`),
-    ),
+      ilike(user.username, `%${search}%`)
+    )
   );
 }
 if (roleFilter) {
   conditions.push(eq(user.role, roleFilter));
 }
 
-const whereClause = conditions.length > 0 ? conditions.reduce((a, b) => {
-  // Refactored: combine all conditions using drizzle-orm and()
-  return and(a, b);
-}) : undefined;
+let whereClause: ReturnType<typeof and> | undefined;
+if (conditions.length === 1) {
+  whereClause = conditions[0];
+} else if (conditions.length > 1) {
+  whereClause = and(...conditions);
+}
 
-// Total count
-const [totalResult] = whereClause
-  ? await db.select({ value: count() }).from(user).where(whereClause)
-  : await db.select({ value: count() }).from(user);
-const totalUsers = totalResult.value;
+// --- Total Users
+const totalUsersQuery = await db
+  .select({
+    value: count().as("value")  // <- Drizzle a besoin d'un alias
+  })
+  .from(user)
+  .where(whereClause ?? undefined);
+
+const totalUsers = totalUsersQuery[0]?.value ?? 0;
 const totalPages = Math.max(1, Math.ceil(totalUsers / perPage));
 
-// Fetch users
-const usersQuery = db
+// --- Fetch Users
+const users = await db
   .select()
   .from(user)
+  .where(whereClause ?? undefined) // safe pour optional
   .orderBy(desc(user.createdAt))
   .limit(perPage)
   .offset((page - 1) * perPage);
 
-const users = whereClause
-  ? await usersQuery.where(whereClause)
-  : await usersQuery;
-
-// Distinct roles for the filter
+// --- Distinct Roles
 const allRoles = await db.selectDistinct({ role: user.role }).from(user);
-const roleOptions = allRoles
-  .map((r) => r.role)
-  .filter((r): r is string => !!r);
+const roleOptions = allRoles.map(r => r.role).filter((r): r is string => !!r);
 
+// --- Badge Color
 const badgeColor = (role: string | null) => {
   if (!role) return "default" as const;
   if (role.includes("admin")) return "error" as const;

@@ -9,11 +9,12 @@
     "allowSyntheticDefaultImports": true,
     "verbatimModuleSyntax": true,
     "paths": {
-      "@/*": ["src/*"],
+      "@*": ["src/*"],
       "@database/*": ["src/database/*"],
       "@components/*": ["src/components/*"],
       "@layouts/*": ["src/layouts/*"],
       "@lib/*": ["src/lib/*"],
+      "@actions/*": ["src/actions/*"],
       "@styles/*": ["src/styles/*"],
       "@templates/*": ["src/components/templates/*"],
       "@assets/*": ["src/assets/*"],

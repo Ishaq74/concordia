@@ -24,3 +24,66 @@ const brandClass = [
   {logoUrl && <img src={logoUrl} alt={siteName} class="brand-logo" />}
   <span class="brand-name">{siteName}</span>
 </a>
+
+<style>
+/* BRAND */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: var(--text-default);
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+}
+.brand:hover {
+  color: var(--color-primary);
+}
+.brand-logo {
+  height: 32px;
+  width: auto;
+}
+
+/* BRAND RETRO */
+.brand.retro {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: 'Courier New', monospace;
+}
+.brand.retro:hover {
+  transform: scale(1.05);
+}
+
+/* BRAND MODERN */
+.brand.modern {
+  font-family: var(--font-heading, sans-serif);
+}
+.brand.modern .brand-name {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.brand.modern:hover {
+  transform: translateY(-2px);
+}
+
+/* BRAND FUTURISTIC */
+.brand.futuristic .brand-name {
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent), var(--color-primary));
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+.brand.futuristic:hover {
+  filter: drop-shadow(0 0 10px var(--color-primary));
+}
+</style>

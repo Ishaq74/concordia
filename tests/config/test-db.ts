@@ -15,7 +15,24 @@ export async function getTestDb() {
     if (!connectionString) {
       // Fallback to pg‑mem in-memory DB when no TEST URL provided
       const mem = newDb()
-      // register minimal pg functions used by migrations (if any)
+      // register minimal pg functions used by migrations or triggers
+      const pgm: any = mem.public;
+      if (pgm && typeof pgm.registerFunction === 'function') {
+        pgm.registerFunction({
+          name: 'replace',
+          returns: 'text',
+          args: ['text','text','text'],
+          implementation: (str: string, search: string, repl: string) => {
+            return str.split(search).join(repl);
+          },
+        });
+        pgm.registerFunction({
+          name: 'lower',
+          returns: 'text',
+          args: ['text'],
+          implementation: (s: string) => s.toLowerCase(),
+        });
+      }
       const adapter = mem.adapters.createPg()
       dbClient = new adapter.Client() as unknown as Client;
       await dbClient!.connect()

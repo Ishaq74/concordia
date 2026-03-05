@@ -1,0 +1,115 @@
+---
+import { Icon } from 'astro-icon/components';
+import FormattedDate from '@components/Tools/FormattedDate.astro';
+import Card from '@components/ui/Card/Card.astro';
+import CardContent from '@components/ui/Card/CardContent.astro';
+import CardHeader from '@components/ui/Card/CardHeader.astro';
+import CardFooter from '@components/ui/Card/CardFooter.astro';
+import Badge from '@components/ui/Badge.astro';
+import PostMeta from '@components/modules/blog/ui/PostMeta.astro';
+
+const { entry, categories: catResolved, layout = 'grid' } = Astro.props;
+if (!entry) return null;
+
+const { title, slug, excerpt, cover, publishedAt, categories: rawCategories } = entry.data;
+
+let categoryData = null;
+if (catResolved) {
+  categoryData = Array.isArray(catResolved) ? catResolved[0] : catResolved;
+} else if (Array.isArray(rawCategories) && rawCategories.length) {
+  categoryData = rawCategories[0];
+}
+
+const lang = entry.data.lang || Astro.props.lang || '';
+const site = Astro.site ?? import.meta.env.SITE ?? '';
+---
+
+{layout === 'list' ? (
+  <Card class="post-card-list" role="article">
+    <div class="flex items-start gap-4 p-4 bg-white shadow-sm rounded-lg transition-colors duration-200 hover:bg-gray-50">
+      <a href={`/${lang}/blog2/${categoryData?.slug || ''}/${slug}/`} class="shrink-0 w-20 h-20 overflow-hidden rounded-md">
+        <img class="w-full h-full object-cover" src={cover?.url ?? `${site}/images/fond-orange.jpg`} alt={cover?.alt ?? title} />
+      </a>
+      <div class="flex-1 flex flex-col">
+        <CardHeader class="p-0">
+          <div class="flex items-center gap-2 mb-1">
+            {categoryData && <Badge variant="retro" color="accent">{categoryData.name}</Badge>}
+            {publishedAt && (
+              <span class="text-xs text-gray-600 flex items-center gap-1">
+                <Icon name="mdi:clock" size={14} />
+                <FormattedDate date={publishedAt} />
+              </span>
+            )}
+          </div>
+          <a href={`/${lang}/blog2/${categoryData?.slug || ''}/${slug}/`} class="font-medium text-base text-gray-900 hover:text-indigo-600 transition-colors duration-200">
+            {title}
+          </a>
+        </CardHeader>
+        <CardContent class="p-0 flex-1">
+          {excerpt && <p class="text-gray-500 text-sm">{excerpt}</p>}
+        </CardContent>
+        <CardFooter class="p-0">
+          <PostMeta publishedAt={publishedAt} readingTime={entry.data?.readingTime} authors={entry.data?.authors} lang={lang} className="post-meta text-xs" />
+        </CardFooter>
+      </div>
+    </div>
+  </Card>
+) : (
+  <div class="rounded overflow-hidden shadow-lg flex flex-col h-full bg-white">
+    <div class="relative">
+      <a href={`/${lang}/blog2/${categoryData?.slug || ''}/${slug}/`}>
+        <img class="w-full" src={cover?.url ?? `${site}/images/fond-orange.jpg`} alt={cover?.alt ?? title} />
+        <div class="hover:bg-transparent transition duration-300 absolute inset-0 bg-gray-900 opacity-25" />
+      </a>
+      <a href={categoryData ? `/${lang}/blog2/${categoryData.slug}/` : '#'} class="absolute top-0 left-0">
+        <div class="text-xs absolute top-0 right-0 bg-indigo-600 px-4 py-2 text-white mt-3 mr-3 hover:bg-white hover:text-indigo-600 transition duration-500 ease-in-out">
+          {categoryData?.name || 'Non catégorisé'}
+        </div>
+      </a>
+    </div>
+    <div class="px-6 py-4 mb-auto bg-white">
+      <a href={`/${lang}/blog2/${categoryData?.slug || ''}/${slug}/`} class="font-medium text-lg inline-block hover:text-indigo-600 transition duration-500 ease-in-out mb-2">
+        {title}
+      </a>
+      {excerpt && <p class="text-gray-500 text-sm">{excerpt}</p>}
+    </div>
+    <div class="px-6 py-3 flex items-center justify-between bg-gray-100">
+      <span class="py-1 text-xs text-gray-900 mr-1 flex items-center">
+        <Icon name="mdi:clock" size={15} />
+        <span class="ml-1">
+          <FormattedDate date={publishedAt} />
+        </span>
+      </span>
+      <span class="py-1 text-xs text-gray-900 mr-1 flex items-center">
+        <Icon name="mdi:comment" size={15} />
+        <span class="ml-1">{entry.commentCount ?? 0} commentaires</span>
+      </span>
+    </div>
+  </div>
+)}
+<style>
+.post-card-list {
+  border: 1px solid var(--border-default);
+  border-radius: var(--border-radius-lg);
+  transition: background-color 0.2s;
+}
+.post-card-list:hover {
+  background-color: var(--color-gray-50);
+}
+.post-card-list img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: var(--border-radius-md);
+}
+.post-card-list .font-medium { font-size: 1rem; }
+.post-card-list p { margin: 0.25rem 0; color: var(--text-secondary); }
+
+.query-loop-list { list-style: none; padding: 0; margin: 0; }
+.query-loop-list-item { margin-bottom: var(--space-6); }
+
+@media (max-width: 640px) {
+  .post-card-list { flex-direction: column; align-items: stretch; }
+  .post-card-list img { width: 100%; height: auto; }
+}
+</style>

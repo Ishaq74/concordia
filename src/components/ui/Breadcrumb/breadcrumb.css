@@ -1,0 +1,196 @@
+/* BREADCRUMB */
+
+.breadcrumb {
+  --breadcrumb-font-size: 0.875rem;
+  --breadcrumb-gap: 0.5rem;
+  
+  --breadcrumb-link-color: var(--text-muted);
+  --breadcrumb-link-hover-color: var(--text-default);
+  
+  --breadcrumb-current-color: var(--text-default);
+  --breadcrumb-separator-color: var(--text-subtle);
+  
+  padding: var(--space-3) 0;
+  display: flex;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.breadcrumb-item { display: flex; align-items: center; gap: 0.5rem; }
+.breadcrumb-item::after { content: '/'; color: var(--breadcrumb-separator-color); }
+.breadcrumb-item:last-child::after { content: none; }
+.breadcrumb-item.active { color: var(--breadcrumb-active-color); font-weight: 500; }
+
+.breadcrumb.primary .breadcrumb-page {
+  color: var(--color-primary);
+}
+
+.breadcrumb.secondary .breadcrumb-page {
+  color: var(--color-secondary);
+}
+
+.breadcrumb.accent .breadcrumb-page {
+  color: var(--color-accent);
+}
+
+/* ============================================
+   BREADCRUMB - Variant Retro
+   ============================================ */
+
+.breadcrumb.retro {
+  --breadcrumb-font-size: 0.75rem;
+  --breadcrumb-gap: 0.75rem;
+  
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-inset);
+  border: 2px solid var(--border-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.breadcrumb.retro .breadcrumb-link {
+  font-weight: 700;
+}
+
+.breadcrumb.retro .breadcrumb-separator {
+  font-weight: 900;
+  color: var(--border-strong);
+}
+
+.breadcrumb.retro.primary .breadcrumb-page {
+  color: var(--color-primary);
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+}
+
+.breadcrumb.retro.secondary .breadcrumb-page {
+  color: var(--color-secondary);
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+}
+
+.breadcrumb.retro.accent .breadcrumb-page {
+  color: var(--color-accent);
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+}
+.breadcrumb.retro .breadcrumb-item::after { 
+  content: var(--retro-breadcrumb-separator); 
+}
+
+/* ============================================
+   BREADCRUMB - Variant Modern
+   ============================================ */
+
+.breadcrumb.modern {
+  --breadcrumb-font-size: 0.813rem;
+  --breadcrumb-gap: 0.625rem;
+  
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-subtle);
+  border-radius: var(--border-radius-full);
+  backdrop-filter: blur(10px);
+}
+
+.breadcrumb.modern .breadcrumb-link {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.breadcrumb.modern .breadcrumb-link:hover {
+  transform: translateY(-1px);
+}
+
+.breadcrumb.modern .breadcrumb-separator {
+  opacity: 0.5;
+}
+
+.breadcrumb.modern.primary .breadcrumb-page {
+  color: var(--color-primary);
+}
+
+.breadcrumb.modern.secondary .breadcrumb-page {
+  color: var(--color-secondary);
+}
+
+.breadcrumb.modern.accent .breadcrumb-page {
+  color: var(--color-accent);
+}
+
+.breadcrumb.modern .breadcrumb-item a { 
+  color: var(--modern-breadcrumb-color); 
+  text-decoration: underline; 
+  text-decoration-color: transparent; 
+  transition: all 0.2s; 
+}
+.breadcrumb.modern .breadcrumb-item a:hover { 
+  text-decoration-color: currentColor; 
+}
+
+/* ============================================
+   BREADCRUMB - Variant Futuristic
+   ============================================ */
+
+.breadcrumb.futuristic {
+  --breadcrumb-font-size: 0.75rem;
+  --breadcrumb-gap: 0.75rem;
+  
+  padding: var(--space-2) var(--space-4);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--border-radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: var(--font-mono);
+  box-shadow: 0 0 10px rgba(var(--color-primary-rgb), 0.3);
+}
+
+.breadcrumb.futuristic .breadcrumb-link {
+  color: var(--color-primary);
+  text-shadow: 0 0 5px rgba(var(--color-primary-rgb), 0.5);
+  transition: all 0.3s;
+}
+
+.breadcrumb.futuristic .breadcrumb-link:hover {
+  text-shadow: 0 0 10px rgba(var(--color-primary-rgb), 0.8);
+}
+
+.breadcrumb.futuristic .breadcrumb-separator {
+  color: var(--color-primary);
+  opacity: 0.6;
+}
+
+.breadcrumb.futuristic .breadcrumb-page {
+  color: var(--color-primary);
+  text-shadow: 0 0 10px rgba(var(--color-primary-rgb), 0.6);
+}
+
+.breadcrumb.futuristic.primary {
+  border-color: var(--color-primary);
+}
+
+.breadcrumb.futuristic.primary .breadcrumb-link,
+.breadcrumb.futuristic.primary .breadcrumb-separator,
+.breadcrumb.futuristic.primary .breadcrumb-page {
+  color: var(--color-primary);
+}
+
+.breadcrumb.futuristic.secondary {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 10px rgba(var(--color-secondary-rgb), 0.3);
+}
+
+.breadcrumb.futuristic.secondary .breadcrumb-link,
+.breadcrumb.futuristic.secondary .breadcrumb-separator,
+.breadcrumb.futuristic.secondary .breadcrumb-page {
+  color: var(--color-secondary);
+}
+
+.breadcrumb.futuristic.accent {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 10px rgba(var(--color-accent-rgb), 0.3);
+}
+
+.breadcrumb.futuristic.accent .breadcrumb-link,
+.breadcrumb.futuristic.accent .breadcrumb-separator,
+.breadcrumb.futuristic.accent .breadcrumb-page {
+  color: var(--color-accent);
+}

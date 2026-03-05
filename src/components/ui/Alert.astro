@@ -112,4 +112,55 @@ const displayIcon = icon || defaultIcons[status];
     transform: scaleX(0);
   }
 }
+
+/* ALERT RETRO */
+.alert.retro { 
+  border-radius: 0; 
+  border: var(--retro-border-width) solid currentColor; 
+  background: var(--retro-alert-bg); 
+  box-shadow: 4px 4px 0 var(--retro-shadow-color); 
+}
+.alert.retro[data-status="info"] { color: var(--color-secondary); }
+.alert.retro[data-status="success"] { color: var(--color-success); }
+.alert.retro[data-status="warning"] { color: var(--color-warning); }
+.alert.retro[data-status="danger"] { color: var(--color-danger); }
+.alert.retro[data-status="error"] { color: var(--color-danger); }
+
+/* ALERT MODERN */
+.alert.modern { 
+  border-radius: var(--border-radius-md); 
+  background: var(--modern-alert-bg); 
+  border-left: 4px solid currentColor; 
+  box-shadow: var(--shadow-sm); 
+}
+.alert.modern[data-status="info"] { color: var(--color-secondary); }
+.alert.modern[data-status="success"] { color: var(--color-success); }
+.alert.modern[data-status="warning"] { color: var(--color-warning); }
+.alert.modern[data-status="danger"] { color: var(--color-danger); }
+.alert.modern[data-status="error"] { color: var(--color-danger); }
+
+/* ALERT FUTURISTIC */
+.alert.futuristic { 
+  border-radius: 0; 
+  clip-path: var(--futuristic-clip-path); 
+  border: 1px solid currentColor; 
+  background: var(--futuristic-alert-bg); 
+  backdrop-filter: blur(4px); 
+  position: relative; 
+}
+.alert.futuristic::before { 
+  content: ''; 
+  position: absolute; 
+  left: 0; 
+  top: 0; 
+  width: 4px; 
+  height: 100%; 
+  background: currentColor; 
+  box-shadow: 0 0 10px currentColor; 
+}
+.alert.futuristic[data-status="info"] { color: var(--color-secondary); }
+.alert.futuristic[data-status="success"] { color: var(--color-success); }
+.alert.futuristic[data-status="warning"] { color: var(--color-warning); }
+.alert.futuristic[data-status="danger"] { color: var(--color-danger); }
+.alert.futuristic[data-status="error"] { color: var(--color-danger); }
 </style>

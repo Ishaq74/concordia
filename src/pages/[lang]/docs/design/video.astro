@@ -2,7 +2,7 @@
 import DocLayout from "@layouts/DocLayout.astro";
 import { Code } from "astro:components";
 import VideoComponent from "@components/ui/Video.astro";
-import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import TableOfContents from "@components/templates/docs/TableOfContents.astro";
 import Table from "@components/ui/Table/Table.astro";
 import TableHeader from "@components/ui/Table/TableHeader.astro";
 import TableBody from "@components/ui/Table/TableBody.astro";
@@ -24,7 +24,9 @@ const p = t.docs?.pages?.video ?? {};
 
   <h1 id="video-component">{p.title ?? "Video Component"}</h1>
 
-  <p set:html={p.intro ?? `The <code class="inline-code">Video</code> component is a styled video player that adapts to different design variants. It supports all standard HTML5 video attributes and provides styles consistent with your design system.`} />
+  <p set:html={p.intro ?? `The <code class="inline-code">Video</code> component is a styled video player
+ that adapts to different design variants. It supports all standard HTML5 video attributes
+ and provides styles consistent with your design system.`} />
 
   <TableOfContents
     items={[

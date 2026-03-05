@@ -4,7 +4,10 @@
 
 Complete test suite for BetterAuth + Astro + Vitest with comprehensive security testing and integration tests.
 
+_See[`README-mocking.md`](README-mocking.md) for details on mocks and environment variables._
+
 ## Structure
+
 tests/
 ├── setup.ts                # Global setup & mocks
 ├── config/
@@ -29,6 +32,7 @@ tests/
     └── api-auth.test.ts    # API E2E tests
 
 ## Running Tests
+
 ```bash
 # Run all tests
 npm run test
@@ -44,6 +48,8 @@ npm run test:integration
 npm run test:e2e
 npm run test:security
 npm run test:api
+# Run tests by name pattern (Vitest v4 syntax)
+npm run test -- --testNamePattern="email"
 # Debug tests
 npm run test:debug
 # CI mode (with coverage)
@@ -51,6 +57,7 @@ npm run test:ci
 ```
 
 ## Test Coverage
+
 - Unit Tests (tests/unit/)
   - SMTP Service: Email sending, validation, batch operations, error handling
   - Input Validation: Email, password, username, subject validation; security payload detection
@@ -63,6 +70,7 @@ npm run test:ci
   - API Auth: Sign up, sign in, email verification, password reset, organizations
 
 ## Key Features
+
 - Security Testing
   - ✅ XSS Protection
   - ✅ SQL Injection Protection
@@ -97,14 +105,17 @@ npm run test:ci
   - Test environment is configured in tests/config/test-env.ts
 - Database Setup
   - Tests use isolated PostgreSQL database. Make sure to have:
+
     ```bash
     # Create test database
     createdb test_db
     # Run migrations
     # (if applicable for your setup)
     ```
+
 - Writing New Tests
   - Unit Test Example
+
     ```ts
     import { describe, it, expect } from 'vitest'
     describe('My Feature', () => {
@@ -113,7 +124,9 @@ npm run test:ci
       })
     })
     ```
+
   - Integration Test Example
+
     ```ts
     import { describe, it, expect, beforeEach, afterEach } from 'vitest'
     import { createTestUser, cleanupTestData } from '@tests/utils/auth-test-utils'
@@ -126,7 +139,9 @@ npm run test:ci
       })
     })
     ```
+
   - E2E Test Example
+
     ```ts
     import { describe, it, expect } from 'vitest'
     import { apiCall, signUp } from '@tests/utils/api-helpers'
@@ -137,6 +152,7 @@ npm run test:ci
       })
     })
     ```
+
 - Coverage Thresholds
   - Lines: 85%
   - Functions: 85%
@@ -160,6 +176,7 @@ npm run test:ci
 - Best Practices
   - ✅ Always cleanup after tests
   - ✅ Use unique test data generators
+  - ✅ Use the `withTestTransaction` helper for fast rollback-based isolation (see tests/utils/transaction.ts)
   - ✅ Test both success and failure cases
   - ✅ Use descriptive test names
   - ✅ Group related tests with describe
@@ -168,6 +185,11 @@ npm run test:ci
   - ✅ Keep tests isolated
   - ✅ Use fixtures for common data
   - ✅ Document complex test scenarios
+
+> **Note:** The previous UI component tests located under `tests/e2e/ui`
+> have been removed as they were redundant and not exercising any
+> application logic. Run **`pnpm run test:e2e`** for user-facing E2E flows.
+
 - Contributing
   - Write unit tests first
   - Add integration tests
@@ -177,10 +199,12 @@ npm run test:ci
   - Update this README
 
 ## Resources
+
 - [Vitest Documentation](https://vitest.dev)
 - [Better Auth Documentation](https://better-auth.com)
 - [Astro Documentation](https://docs.astro.build)
 - [Drizzle ORM Documentation](https://orm.drizzle.team)
 
 ## Maintainers
+
 For issues or questions about tests, contact the development team.

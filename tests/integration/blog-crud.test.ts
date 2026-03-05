@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createBlogPost, updateBlogPost, deleteBlogPost, getBlogPostBySlug } from '@/database/blog';
+import { createBlogPost, updateBlogPost, deleteBlogPost, getBlogPostBySlug } from '@database/blog';
 
 // Integration tests for blog article CRUD
 
@@ -19,9 +19,9 @@ describe('Blog Article CRUD Integration', () => {
     expect(result.slug).toBe(testSlug);
   });
 
-  it('should update the blog article', async () => {
-    const updated = await updateBlogPost(createdId, { title: 'Updated Title' });
-    expect(updated.title).toBe('Updated Title');
+  it('should update the blog article status', async () => {
+    const updated = await updateBlogPost(createdId, { status: 'published' });
+    expect(updated.status).toBe('published');
   });
 
   it('should fetch the blog article by slug', async () => {

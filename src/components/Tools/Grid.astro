@@ -9,7 +9,7 @@ interface Props {
   display?: 'block' | 'flex' | 'grid' | 'inline-flex' | 'inline-grid';
   
   // Grid-specific (from Grid)
-  cols?: string;
+  cols?: string | number;
   autoFit?: boolean;
   autoFill?: boolean;
   xAlign?: 'left' | 'center' | 'right' | 'space-between' | 'space-around' | 'space-evenly' | 'normal';
@@ -189,7 +189,7 @@ const getGridTemplateColumns = (): string => {
   if (autoFit) return 'repeat(auto-fit, minmax(250px, 1fr))';
   if (autoFill) return 'repeat(auto-fill, minmax(250px, 1fr))';
   if (cols && !isNaN(Number(cols))) return `repeat(${cols}, 1fr)`;
-  return cols;
+  return String(cols);
 };
 
 // Alignments

@@ -60,3 +60,202 @@ const hasError = !!error;
     {error}
   </span>
 )}
+
+<style>
+/* Switches */
+input[role="switch"] { 
+  width: var(--switch-width); 
+  height: var(--switch-height); 
+  border-radius: 999px; 
+  background: var(--switch-bg-off); 
+  position: relative; 
+  border: 1px solid rgba(0, 0, 0, 0.15); 
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+input[role="switch"]::after { 
+  content: ''; 
+  position: absolute; 
+  top: 3px; 
+  left: 3px; 
+  width: calc(var(--switch-height) - 6px); 
+  height: calc(var(--switch-height) - 6px); 
+  border-radius: 50%; 
+  background: var(--switch-handle-bg); 
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: left 0.3s ease;
+}
+input[role="switch"]:checked { 
+  background: var(--switch-bg-on); 
+  border-color: var(--switch-bg-on);
+}
+input[role="switch"]:checked::after { 
+  left: calc(var(--switch-width) - var(--switch-height) + 3px);
+}
+input[role="switch"]:hover:not(:disabled) {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+input[role="switch"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* SWITCH RETRO */
+input[role="switch"].retro { 
+  border-radius: 0; 
+  border: var(--retro-border-width) solid var(--text-default); 
+  background: var(--retro-switch-bg-off); 
+  box-shadow: var(--retro-shadow-offset) var(--retro-shadow-offset) 0 var(--retro-shadow-color); 
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+input[role="switch"].retro::after { 
+  border-radius: 0; 
+  border: 2px solid black; 
+  background: #fff;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+  transition: left 0.2s ease, box-shadow 0.2s ease;
+  top: 4px;
+  left: 4px;
+  width: calc(var(--switch-height) - 12px);
+  height: calc(var(--switch-height) - 12px);
+  transform: none;
+  clip-path: none;
+}
+input[role="switch"].retro:checked { 
+  background: var(--retro-switch-bg-on); 
+  box-shadow: calc(var(--retro-shadow-offset) + 1px) calc(var(--retro-shadow-offset) + 1px) 0 var(--retro-shadow-color); 
+}
+input[role="switch"].retro:checked::after {
+  left: calc(var(--switch-width) - var(--switch-height) + 8px);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+  transform: none;
+  clip-path: none;
+}
+input[role="switch"].retro:active:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--retro-shadow-color);
+}
+
+/* SWITCH MODERN */
+input[role="switch"].modern { 
+  background: linear-gradient(135deg, var(--modern-switch-bg-off), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    var(--modern-shadow-sm),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+input[role="switch"].modern::after {
+  background: linear-gradient(135deg, #ffffff, #f0f0f0);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  top: 50%;
+  left: 3px;
+  width: calc(var(--switch-height) - 8px);
+  height: calc(var(--switch-height) - 8px);
+  transform: translateY(-50%);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+input[role="switch"].modern:checked { 
+  background: linear-gradient(135deg, var(--modern-switch-bg-on), var(--color-primary-light, var(--color-primary)));
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 
+    var(--modern-shadow-md),
+    0 0 20px rgba(99, 102, 241, 0.4),
+    0 0 40px rgba(99, 102, 241, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+input[role="switch"].modern:checked::after {
+  left: calc(100% - var(--switch-height) + 5px);
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #ffffff, #f8f8ff);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    0 0 16px rgba(255, 255, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+input[role="switch"].modern:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 
+    var(--modern-shadow-lg),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+input[role="switch"].modern:hover:checked:not(:disabled) {
+  box-shadow: 
+    var(--modern-shadow-lg),
+    0 0 25px rgba(99, 102, 241, 0.5),
+    0 0 50px rgba(99, 102, 241, 0.25);
+}
+input[role="switch"].modern:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* SWITCH FUTURISTIC */
+input[role="switch"].futuristic { 
+  border-radius: 2px; 
+  background: rgba(0, 0, 0, 0.3); 
+  border: 2px solid rgba(99, 102, 241, 0.5); 
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 0 10px rgba(99, 102, 241, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+input[role="switch"].futuristic::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 2px,
+    rgba(99, 102, 241, 0.03) 2px,
+    rgba(99, 102, 241, 0.03) 4px
+  );
+  pointer-events: none;
+}
+input[role="switch"].futuristic::after { 
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  border-radius: 1px; 
+  box-shadow: 
+    0 0 10px rgba(99, 102, 241, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 3px;
+  width: calc(var(--switch-height) - 10px);
+  height: calc(var(--switch-height) - 10px);
+}
+input[role="switch"].futuristic:checked { 
+  background: rgba(99, 102, 241, 0.2);
+  border-color: var(--color-primary);
+  box-shadow: 
+    0 0 20px rgba(99, 102, 241, 0.5),
+    0 0 40px rgba(99, 102, 241, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+input[role="switch"].futuristic:checked::after {
+  left: calc(100% - var(--switch-height) + 7px);
+  transform: translateY(-50%);
+  box-shadow: 
+    0 0 15px rgba(99, 102, 241, 0.8),
+    0 0 25px rgba(99, 102, 241, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+input[role="switch"].futuristic:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  box-shadow: 
+    0 0 15px rgba(99, 102, 241, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+</style>

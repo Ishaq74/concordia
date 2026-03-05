@@ -22,7 +22,7 @@ const t = getTranslations(lang);
 
 const currentLocale = lang;
 const adminBase = `/${currentLocale}/admin/blog/articles`;
-const orgId = Astro.url.searchParams.get("orgId") ?? "";
+// const orgId = Astro.url.searchParams.get("orgId") ?? ""; // unused
 
 const db = await getDrizzle();
 

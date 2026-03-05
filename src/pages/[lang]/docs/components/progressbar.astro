@@ -2,7 +2,7 @@
 import DocLayout from "@layouts/DocLayout.astro";
 import { Code } from "astro:components";
 import ProgressBar from "@components/ui/ProgressBar.astro";
-import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import TableOfContents from "@components/templates/docs/TableOfContents.astro";
 import Table from "@components/ui/Table/Table.astro";
 import TableHeader from "@components/ui/Table/TableHeader.astro";
 import TableBody from "@components/ui/Table/TableBody.astro";
@@ -23,7 +23,8 @@ const p = t.docs?.pages?.progressbar ?? {};
 >
   <h1 id="progressbar-component">{p.title ?? "ProgressBar Component"}</h1>
 
-  <p set:html={p.intro ?? `The <code class="inline-code">ProgressBar</code> component displays a progress bar with support for design variants, colors, sizes, and visual effects like stripes and animations.`} />
+  <p set:html={p.intro ?? `The <code class="inline-code">ProgressBar</code> component displays a progress bar
+ with support for design variants, colors, sizes, and visual effects like stripes and animations.`} />
 
   <TableOfContents
     items={[

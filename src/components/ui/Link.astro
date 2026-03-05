@@ -107,4 +107,140 @@ a.button:hover { background-color: var(--link-button-default-bg-hover); text-dec
 a.button.primary { background-color: var(--button-primary-bg); color: var(--button-primary-color); border-color: transparent; }
 a.button.secondary { background-color: var(--button-secondary-bg); color: var(--button-secondary-color); border-color: transparent; }
 a.button.accent { background-color: var(--button-accent-bg); color: var(--button-accent-color); border-color: transparent; }
+
+/* LINK RETRO */
+.link.retro, a.link-retro {
+  color: var(--retro-link-color);
+  text-decoration: none;
+  border-bottom: var(--retro-link-border-width) solid var(--retro-link-border-color);
+  font-weight: var(--retro-link-font-weight);
+  transition: var(--retro-link-transition);
+}
+.link.retro:hover, a.link-retro:hover {
+  color: var(--retro-link-hover-color);
+  transform: translate(var(--retro-link-shadow-offset), calc(-1 * var(--retro-link-shadow-offset)));
+  box-shadow: var(--retro-link-shadow-offset) var(--retro-link-shadow-offset) 0 var(--retro-link-shadow-color);
+}
+
+/* LINK BUTTON RETRO */
+a.button.retro {
+  border-radius: 0;
+  border: var(--retro-link-button-border-width) solid var(--retro-link-button-border-color);
+  background-color: var(--retro-link-button-bg); 
+  color: var(--retro-link-button-color);
+  box-shadow: var(--retro-link-button-shadow-offset) var(--retro-link-button-shadow-offset) 0 0 var(--retro-link-button-shadow-color);
+}
+a.button.retro:hover { 
+  background-color: var(--retro-link-button-hover-bg); 
+  transform: translate(-1px, -1px); 
+  box-shadow: calc(var(--retro-link-button-shadow-offset) + 1px) calc(var(--retro-link-button-shadow-offset) + 1px) 0 0 var(--retro-link-button-shadow-color); 
+}
+a.button.retro.primary { background-color: var(--button-primary-bg); color: var(--button-primary-color); border-color: var(--retro-link-button-border-color); }
+a.button.retro.secondary { background-color: var(--button-secondary-bg); color: var(--button-secondary-color); border-color: var(--retro-link-button-border-color); }
+a.button.retro.accent { background-color: var(--button-accent-bg); color: var(--button-accent-color); border-color: var(--retro-link-button-border-color); }
+
+/* LINK MODERN */
+.link.modern, a.link-modern {
+  color: var(--modern-link-color);
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 2px;
+}
+.link.modern::after, a.link-modern::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: var(--modern-link-underline-height);
+  background: var(--modern-link-underline-color);
+  transition: width var(--modern-link-transition) ease;
+}
+.link.modern:hover, a.link-modern:hover {
+  color: var(--modern-link-hover-color);
+}
+.link.modern:hover::after, a.link-modern:hover::after {
+  width: 100%;
+}
+
+/* LINK BUTTON MODERN */
+a.button.modern {
+  border-radius: var(--modern-link-button-radius);
+  border: 1px solid var(--modern-link-button-border-color);
+  background-color: var(--modern-link-button-bg); 
+  color: var(--modern-link-button-color);
+  box-shadow: var(--shadow-sm);
+}
+a.button.modern:hover { 
+  transform: translateY(-1px); 
+  box-shadow: var(--modern-link-button-hover-shadow); 
+}
+a.button.modern.primary { 
+  background-color: var(--button-primary-bg); 
+  color: var(--button-primary-color); 
+  box-shadow: 0 4px 6px -1px color-mix(in srgb, var(--button-primary-bg) 50%, transparent); 
+}
+a.button.modern.secondary { 
+  background-color: var(--button-secondary-bg); 
+  color: var(--button-secondary-color); 
+}
+a.button.modern.accent { 
+  background-color: var(--button-accent-bg); 
+  color: var(--button-accent-color); 
+}
+
+/* LINK FUTURISTIC */
+.link.futuristic, a.link-futuristic {
+  color: var(--futuristic-link-color);
+  text-decoration: none;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: var(--futuristic-link-letter-spacing);
+  font-size: var(--futuristic-link-font-size);
+}
+.link.futuristic:hover, a.link-futuristic:hover {
+  color: var(--futuristic-link-hover-color);
+  text-shadow: 0 0 8px var(--futuristic-link-glow);
+}
+.link.futuristic::before, a.link-futuristic::before {
+  content: '>';
+  margin-right: 0.25em;
+  opacity: 0;
+  transition: opacity 0.2s, margin-right 0.2s;
+}
+.link.futuristic:hover::before, a.link-futuristic:hover::before {
+  opacity: 1;
+  margin-right: 0.5em;
+}
+
+/* LINK BUTTON FUTURISTIC */
+a.button.futuristic {
+  border-radius: 0; 
+  clip-path: var(--futuristic-link-button-clip-path);
+  border: 1px solid var(--futuristic-link-button-border-color);
+  background-color: var(--futuristic-link-button-bg); 
+  color: var(--futuristic-link-button-color);
+  letter-spacing: 0.05em; 
+  text-transform: uppercase;
+}
+a.button.futuristic:hover { 
+  background-color: var(--futuristic-link-button-hover-bg); 
+  text-shadow: 0 0 8px var(--futuristic-link-button-hover-glow); 
+  box-shadow: 0 0 10px var(--futuristic-link-button-hover-glow); 
+}
+a.button.futuristic.primary { 
+  --futuristic-link-button-border-color: var(--button-primary-bg); 
+  --futuristic-link-button-hover-glow: var(--button-primary-bg); 
+  color: var(--button-primary-bg); 
+}
+a.button.futuristic.secondary { 
+  --futuristic-link-button-border-color: var(--button-secondary-bg); 
+  --futuristic-link-button-hover-glow: var(--button-secondary-bg); 
+  color: var(--button-secondary-bg); 
+}
+a.button.futuristic.accent { 
+  --futuristic-link-button-border-color: var(--button-accent-bg); 
+  --futuristic-link-button-hover-glow: var(--button-accent-bg); 
+  color: var(--button-accent-bg); 
+}
 </style>

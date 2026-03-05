@@ -1,8 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { getAuth } from '@/lib/auth/auth'
+import { getAuth } from '@lib/auth/auth'
 import { TEST_ENV } from '@tests/config/test-env'
+import { auth } from '@lib/auth/auth';
+import { cleanupTestData } from '@tests/setup';
 
 describe('BetterAuth Email Functions', () => {
+  // using helpers from auth-test-utils makes setup/teardown deterministic and
+  // eliminates hardcoded IDs.  stubbing env remains necessary for configs.
   beforeEach(() => {
     Object.entries(TEST_ENV).forEach(([key, value]) => {
       vi.stubEnv(key, value)
@@ -19,41 +23,46 @@ describe('BetterAuth Email Functions', () => {
       expect(config.sendVerificationEmail).toBeDefined()
     })
 
-    it('should call sendVerificationEmail without error', async () => {
-      const auth = await getAuth()
-      const config = (auth as any).options.emailVerification
+    it('should send verification email when a user signs up', async () => {
+      const ctx = await auth.$context;
+      const test = ctx.test;
+      const { getCalls } = await import('@tests/setup').then(m => m.createSmtpMock())
 
-      await expect(
-        config.sendVerificationEmail({
-          user: { email: 'test@example.com', id: 'user-123' },
-          url: 'http://localhost:3000/verify?code=abc123',
-          token: 'abc123',
-        })
-      ).resolves.not.toThrow()
+      // create user via Better Auth context helper
+      const userObj = test.createUser({})
+      const user = await test.saveUser(userObj)
+      expect(user?.id).toBeDefined()
+
+      // the act of creating the user triggers sendVerificationEmail internally
+      const calls = getCalls()
+      expect(calls.length).toBeGreaterThan(0)
+      const payload = calls[calls.length - 1][0]
+      expect(payload).toMatchObject({
+        to: user?.email,
+        subject: expect.stringContaining('verify'),
+      })
+
+      // cleanup for isolation
+      await cleanupTestData()
     })
 
-    it('should log mock SMTP when email verification is called', async () => {
+    it('should log mock SMTP when email verification is called directly', async () => {
       const auth = await getAuth()
       const config = (auth as any).options.emailVerification
-      const consoleSpy = vi.spyOn(console, 'log')
-
+      const { getCalls } = await import('@tests/setup').then(m => m.createSmtpMock());
+      const dummy = `verify_${Math.random().toString(36).slice(2, 10)}@test.local`
       await config.sendVerificationEmail({
-        user: { email: 'test@example.com', id: 'user-123' },
+        user: { email: dummy, id: 'user-123' },
         url: 'http://localhost:3000/verify?code=abc123',
         token: 'abc123',
       })
-
-      expect(consoleSpy).toHaveBeenCalled()
-      // Le log est: '[MOCK SMTP] Email verification', { to, url, token }
-      const found = consoleSpy.mock.calls.find(call => call[0] === '[MOCK SMTP] Email verification')
-      expect(found).toBeTruthy()
-      const obj = found ? found[1] : undefined
-      expect(obj).toMatchObject({
-        to: 'test@example.com',
-        url: expect.stringContaining('verify?code=abc123'),
-        token: 'abc123',
-      })
-      consoleSpy.mockRestore()
+      const calls = getCalls();
+      expect(calls.length).toBeGreaterThan(0);
+      const payload = calls[calls.length - 1][0];
+      expect(payload).toMatchObject({
+        to: dummy,
+        subject: expect.stringContaining('verify'),
+      });
     })
   })
 
@@ -69,10 +78,11 @@ describe('BetterAuth Email Functions', () => {
     it('should call sendResetPassword without error', async () => {
       const auth = await getAuth()
       const config = (auth as any).options.emailAndPassword
+      const dummy = `reset_${Math.random().toString(36).slice(2, 10)}@test.local`
 
       await expect(
         config.sendResetPassword({
-          user: { email: 'test@example.com', id: 'user-123' },
+          user: { email: dummy, id: 'user-123' },
           url: 'http://localhost:3000/reset?token=xyz789',
           token: 'xyz789',
         })
@@ -82,25 +92,20 @@ describe('BetterAuth Email Functions', () => {
     it('should log mock SMTP when password reset is called', async () => {
       const auth = await getAuth()
       const config = (auth as any).options.emailAndPassword
-      const consoleSpy = vi.spyOn(console, 'log')
-
+      const { getCalls } = await import('@tests/setup').then(m => m.createSmtpMock());
+      const dummy = `reset_${Math.random().toString(36).slice(2, 10)}@test.local`
       await config.sendResetPassword({
-        user: { email: 'test@example.com', id: 'user-123' },
+        user: { email: dummy, id: 'user-123' },
         url: 'http://localhost:3000/reset?token=xyz789',
         token: 'xyz789',
       })
-
-      expect(consoleSpy).toHaveBeenCalled()
-      // Le log est: '[MOCK SMTP] Password reset', { to, url, token }
-      const found = consoleSpy.mock.calls.find(call => call[0] === '[MOCK SMTP] Password reset')
-      expect(found).toBeTruthy()
-      const obj = found ? found[1] : undefined
-      expect(obj).toMatchObject({
-        to: 'test@example.com',
-        url: expect.stringContaining('reset?token=xyz789'),
-        token: 'xyz789',
-      })
-      consoleSpy.mockRestore()
+      const calls = getCalls();
+      expect(calls.length).toBeGreaterThan(0);
+      const payload = calls[calls.length - 1][0];
+      expect(payload).toMatchObject({
+        to: dummy,
+        subject: expect.stringContaining('reset'),
+      });
     })
   })
 

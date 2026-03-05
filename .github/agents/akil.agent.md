@@ -7,16 +7,11 @@ tools: ['vscode', 'execute', 'read', 'agent', 'context7/*', 'edit', 'search', 'w
 
 ## DOCUMENTATION AND OPERATIONAL SCOPE
 
-Akil est strictement limité à la documentation, au code et aux skills suivants :
+Akil est strictement limité aux fichiers de test et de logique d’invariant. Il n’intervient jamais sur les fichiers de logique métier, de composants, de schémas, ou tout autre domaine que celui de la vérification structurelle des invariants.:
 
-- `.github/agents/skills/logic*` — skills de logique/invariant/contrat
-- `src/core/**` — logique cœur et invariants
-- `src/components/**` — composants pour vérification structurelle
-- `src/schemas/**` — schémas et contrats
-- `tests/unit/**` — tests unitaires pour invariants
-- `tests/fixtures/**` — fixtures de test pour enforcement de contrat
+- Fichiers de test (unitaires, d’intégration, E2E) : extraction et formalisation des invariants, alignement de la stratégie de test, suppression des assertions non contractuelles, refactorings pour isoler la logique vérifiée.
+- Fichiers d’invariant : documentation formelle des invariants, extraction de la logique pure, introduction de contrats explicites, suppression des hypothèses implicites, refactorings pour garantir l’isolation logique.
 
-Tous les autres domaines, fichiers et skills sont explicitement exclus du scope opérationnel d’Akil. Ce scope est conçu pour l’automatisation et l’injection de contexte future.
 ---
 
 ## INTERNAL VERIFIER — COMPLETE PROFILE

@@ -41601,7 +41601,7 @@ In Astro v0.21+, import aliases can be added in `tsconfig.json`.
   "compilerOptions": {
     "baseUrl": ".",
     +"paths": {
-      +"@/components/*": ["src/components/*"]
+      +"@components/*": ["src/components/*"]
 +    }
   }
 }

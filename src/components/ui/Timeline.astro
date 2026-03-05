@@ -59,3 +59,583 @@ const timelineClass = [
     </div>
   ))}
 </div>
+
+
+<style>
+/* ===========================================
+   TIMELINE - Initial Variant
+   =========================================== */
+
+.timeline {
+  position: relative;
+  width: 100%;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+/* Vertical Timeline */
+.timeline-vertical {
+  padding: 2rem 0;
+}
+
+.timeline-vertical::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--color-primary), var(--color-accent));
+  top: 0;
+  bottom: 0;
+  left: 1.5rem;
+}
+
+.timeline-vertical .timeline-item {
+  position: relative;
+  padding: 0 0 2.5rem 4.5rem;
+}
+
+.timeline-vertical .timeline-item-last {
+  padding-bottom: 0;
+}
+
+.timeline-vertical .timeline-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
+}
+
+/* Horizontal Timeline */
+.timeline-horizontal {
+  display: flex;
+  gap: 2rem;
+  overflow-x: auto;
+  padding: 3rem 0;
+  scroll-snap-type: x mandatory;
+}
+
+.timeline-horizontal::before {
+  content: '';
+  position: absolute;
+  height: 3px;
+  background: linear-gradient(to right, var(--color-primary), var(--color-accent));
+  left: 0;
+  right: 0;
+  top: 1.5rem;
+}
+
+.timeline-horizontal .timeline-item {
+  flex: 0 0 auto;
+  min-width: 250px;
+  max-width: 300px;
+  scroll-snap-align: start;
+  padding-top: 4rem;
+  position: relative;
+}
+
+.timeline-horizontal .timeline-icon {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.timeline-horizontal .timeline-content {
+  text-align: center;
+}
+
+/* Alternate Timeline */
+.timeline-alternate {
+  padding: 2rem 0;
+}
+
+.timeline-alternate::before {
+  content: '';
+  position: absolute;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--color-primary), var(--color-accent));
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.timeline-alternate .timeline-item {
+  position: relative;
+  width: 50%;
+  padding: 0 2.5rem 2.5rem 0;
+}
+
+.timeline-alternate .timeline-item:nth-child(even) {
+  left: 50%;
+  padding: 0 0 2.5rem 2.5rem;
+}
+
+.timeline-alternate .timeline-item-last {
+  padding-bottom: 0;
+}
+
+.timeline-alternate .timeline-icon {
+  position: absolute;
+  top: 0;
+  z-index: 10;
+}
+
+.timeline-alternate .timeline-item:nth-child(odd) .timeline-icon {
+  right: -1.5rem;
+}
+
+.timeline-alternate .timeline-item:nth-child(even) .timeline-icon {
+  left: -1.5rem;
+}
+
+.timeline-alternate .timeline-item:nth-child(even) .timeline-content {
+  text-align: left;
+}
+
+.timeline-alternate .timeline-item:nth-child(odd) .timeline-content {
+  text-align: right;
+}
+
+/* Timeline Icon */
+.timeline-icon {
+  width: 3rem;
+  height: 3rem;
+  background: var(--timeline-icon-bg);
+  border: 3px solid var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.timeline-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 8px rgba(var(--color-primary-rgb), 0.1);
+}
+
+/* Icon Shapes */
+.icon-circle {
+  border-radius: 50%;
+}
+
+.icon-square {
+  border-radius: var(--radius-sm);
+}
+
+.icon-diamond {
+  border-radius: var(--radius-sm);
+  transform: rotate(45deg);
+}
+
+.icon-diamond .icon-content,
+.icon-diamond .icon-dot {
+  transform: rotate(-45deg);
+}
+
+.icon-hexagon {
+  border-radius: 0;
+  clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+}
+
+.icon-content {
+  font-size: 1.25rem;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.icon-dot {
+  width: 12px;
+  height: 12px;
+  background: var(--color-primary);
+  border-radius: 50%;
+}
+
+/* Timeline Content */
+.timeline-content {
+  background: var(--timeline-content-bg);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.timeline-content:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.timeline-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 9999px;
+  margin-bottom: 0.5rem;
+}
+
+.timeline-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  color: var(--color-text);
+}
+
+.timeline-description {
+  font-size: 0.875rem;
+  margin: 0.5rem 0 0 0;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .timeline-alternate {
+    padding: 2rem 0 2rem 2rem;
+  }
+
+  .timeline-alternate::before {
+    left: 1.5rem;
+    transform: none;
+  }
+
+  .timeline-alternate .timeline-item,
+  .timeline-alternate .timeline-item:nth-child(even) {
+    width: 100%;
+    left: 0;
+    padding: 0 0 2.5rem 4.5rem;
+  }
+
+  .timeline-alternate .timeline-icon,
+  .timeline-alternate .timeline-item:nth-child(odd) .timeline-icon,
+  .timeline-alternate .timeline-item:nth-child(even) .timeline-icon {
+    left: 0;
+    right: auto;
+  }
+
+  .timeline-alternate .timeline-content,
+  .timeline-alternate .timeline-item:nth-child(even) .timeline-content,
+  .timeline-alternate .timeline-item:nth-child(odd) .timeline-content {
+    text-align: left;
+  }
+
+  .timeline-horizontal {
+    padding: 2rem 1rem;
+  }
+
+  .timeline-horizontal .timeline-item {
+    min-width: 200px;
+  }
+}
+
+/* ===========================================
+   TIMELINE - Retro Variant
+   =========================================== */
+
+.timeline.retro::before,
+.timeline-vertical.retro::before,
+.timeline-horizontal.retro::before,
+.timeline-alternate.retro::before {
+  background: var(--color-text);
+  width: 4px;
+  height: 4px;
+}
+
+.timeline.retro .timeline-icon {
+  border-radius: 0;
+  border: 4px solid var(--color-text);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+  background: var(--color-accent);
+}
+
+.timeline.retro .icon-circle {
+  border-radius: 0;
+}
+
+.timeline.retro .icon-diamond {
+  border-radius: 0;
+}
+
+.timeline.retro .timeline-icon:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 rgba(0, 0, 0, 0.4);
+}
+
+.timeline.retro .icon-content {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.timeline.retro .icon-dot {
+  background: var(--color-text);
+  border-radius: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.timeline.retro .timeline-content {
+  border-radius: 0;
+  border: 4px solid var(--color-text);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+  background: var(--color-background);
+}
+
+.timeline.retro .timeline-content:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.4);
+}
+
+.timeline.retro .timeline-badge {
+  border-radius: 0;
+  background: var(--color-text);
+  color: var(--color-background);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.375rem 1rem;
+}
+
+.timeline.retro .timeline-title {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.timeline.retro .timeline-description {
+  font-family: var(--font-mono);
+}
+
+/* ===========================================
+   TIMELINE - Modern Variant
+   =========================================== */
+
+.timeline.modern::before,
+.timeline-vertical.modern::before,
+.timeline-horizontal.modern::before,
+.timeline-alternate.modern::before {
+  background: linear-gradient(135deg, 
+    rgba(var(--color-primary-rgb), 0.8), 
+    rgba(var(--color-accent-rgb), 0.8)
+  );
+  backdrop-filter: blur(10px);
+}
+
+.timeline.modern .timeline-icon {
+  border-radius: var(--radius-lg);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.timeline.modern .timeline-icon:hover {
+  transform: scale(1.15);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.timeline.modern .icon-content {
+  color: var(--color-primary);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.timeline.modern .icon-dot {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.4);
+}
+
+.timeline.modern .timeline-content {
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.timeline.modern .timeline-content:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.timeline.modern .timeline-badge {
+  border-radius: 9999px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
+}
+
+.timeline.modern .timeline-title {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===========================================
+   TIMELINE - Futuristic Variant
+   =========================================== */
+
+.timeline.futuristic::before,
+.timeline-vertical.futuristic::before,
+.timeline-alternate.futuristic::before {
+  width: 4px;
+  background: linear-gradient(to bottom, 
+    rgba(0, 255, 255, 0.8), 
+    rgba(255, 0, 255, 0.8)
+  );
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+  animation: line-glow 3s infinite alternate;
+}
+
+.timeline-horizontal.futuristic::before {
+  height: 4px;
+  width: auto;
+  background: linear-gradient(to right, 
+    rgba(0, 255, 255, 0.8), 
+    rgba(255, 0, 255, 0.8)
+  );
+}
+
+@keyframes line-glow {
+  from {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+  }
+  to {
+    box-shadow: 0 0 40px rgba(255, 0, 255, 0.8);
+  }
+}
+
+.timeline.futuristic .timeline-icon {
+  border: 3px solid rgba(0, 255, 255, 0.8);
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+  box-shadow: 
+    0 0 20px rgba(0, 255, 255, 0.4),
+    inset 0 0 20px rgba(255, 0, 255, 0.2);
+  animation: icon-pulse 2s infinite alternate;
+}
+
+@keyframes icon-pulse {
+  from {
+    border-color: rgba(0, 255, 255, 0.8);
+    box-shadow: 
+      0 0 20px rgba(0, 255, 255, 0.4),
+      inset 0 0 20px rgba(255, 0, 255, 0.2);
+  }
+  to {
+    border-color: rgba(255, 0, 255, 0.8);
+    box-shadow: 
+      0 0 40px rgba(255, 0, 255, 0.6),
+      inset 0 0 30px rgba(0, 255, 255, 0.3);
+  }
+}
+
+.timeline.futuristic .icon-circle {
+  border-radius: 50%;
+}
+
+.timeline.futuristic .icon-square {
+  clip-path: polygon(10% 0%, 90% 0%, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0% 90%, 0% 10%);
+}
+
+.timeline.futuristic .icon-diamond {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  transform: none;
+}
+
+.timeline.futuristic .icon-diamond .icon-content,
+.timeline.futuristic .icon-diamond .icon-dot {
+  transform: none;
+}
+
+.timeline.futuristic .timeline-icon:hover {
+  transform: scale(1.2);
+  box-shadow: 
+    0 0 50px rgba(0, 255, 255, 0.8),
+    0 0 80px rgba(255, 0, 255, 0.6),
+    inset 0 0 40px rgba(255, 0, 255, 0.4);
+}
+
+.timeline.futuristic .icon-content {
+  color: rgba(0, 255, 255, 1);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+  animation: text-glow 2s infinite alternate;
+}
+
+@keyframes text-glow {
+  from {
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+    color: rgba(0, 255, 255, 1);
+  }
+  to {
+    text-shadow: 0 0 20px rgba(255, 0, 255, 1);
+    color: rgba(255, 0, 255, 1);
+  }
+}
+
+.timeline.futuristic .icon-dot {
+  background: radial-gradient(circle, rgba(0, 255, 255, 1), rgba(255, 0, 255, 1));
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+  animation: dot-pulse 2s infinite alternate;
+}
+
+@keyframes dot-pulse {
+  from {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+  }
+  to {
+    box-shadow: 0 0 30px rgba(255, 0, 255, 1);
+  }
+}
+
+.timeline.futuristic .timeline-content {
+  clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+  border: 2px solid rgba(0, 255, 255, 0.6);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(20, 20, 40, 0.9));
+  box-shadow: 
+    0 0 30px rgba(0, 255, 255, 0.3),
+    inset 0 0 30px rgba(255, 0, 255, 0.1);
+}
+
+.timeline.futuristic .timeline-content:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: rgba(255, 0, 255, 0.8);
+  box-shadow: 
+    0 0 50px rgba(0, 255, 255, 0.5),
+    0 0 80px rgba(255, 0, 255, 0.4),
+    inset 0 0 40px rgba(255, 0, 255, 0.2);
+}
+
+.timeline.futuristic .timeline-badge {
+  border-radius: 0;
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.8), rgba(255, 0, 255, 0.8));
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  animation: badge-glow 2s infinite alternate;
+}
+
+@keyframes badge-glow {
+  from {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+  }
+  to {
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.8);
+  }
+}
+
+.timeline.futuristic .timeline-title {
+  color: rgba(0, 255, 255, 1);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+.timeline.futuristic .timeline-description {
+  color: rgba(200, 200, 255, 0.9);
+  font-family: var(--font-mono);
+}
+</style>

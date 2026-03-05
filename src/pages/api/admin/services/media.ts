@@ -4,7 +4,7 @@ import type { APIRoute } from "astro";
 import { json, guardAdmin, generateId } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import { servicesMedia, auditLog } from "@database/schemas";
-import { eq, desc, count, ilike } from "drizzle-orm";
+import { eq, desc, count, ilike, and } from "drizzle-orm";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -23,30 +23,65 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   const db = await getDrizzle();
   const url = new URL(request.url);
+
   const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));
-  const perPage = Math.min(100, Math.max(1, parseInt(url.searchParams.get("perPage") ?? "30")));
+  const perPage = Math.min(
+    100,
+    Math.max(1, parseInt(url.searchParams.get("perPage") ?? "30"))
+  );
+
   const typeFilter = url.searchParams.get("type")?.trim() ?? "";
   const search = url.searchParams.get("q")?.trim() ?? "";
 
-  const conditions: ReturnType<typeof eq>[] = [];
-  if (typeFilter) conditions.push(eq(servicesMedia.type, typeFilter));
-  if (search) conditions.push(ilike(servicesMedia.url, `%${search}%`));
+  const conditions = [];
 
-  const whereClause = conditions.length > 0
-    // Refactored: combine all conditions using drizzle-orm and()
-    ? conditions.reduce((a, b) => and(a, b))
-    : undefined;
+  if (typeFilter) {
+    conditions.push(eq(servicesMedia.type, typeFilter));
+  }
 
-  const [totalResult] = whereClause
-    ? await db.select({ value: count() }).from(servicesMedia).where(whereClause)
-    : await db.select({ value: count() }).from(servicesMedia);
+  if (search) {
+    conditions.push(ilike(servicesMedia.url, `%${search}%`));
+  }
 
-  const total = totalResult.value;
+  let total: number;
+  let media;
+
+  if (conditions.length === 0) {
+    const [totalResult] = await db
+      .select({ value: count() })
+      .from(servicesMedia);
+
+    total = totalResult.value;
+
+    media = await db
+      .select()
+      .from(servicesMedia)
+      .orderBy(desc(servicesMedia.createdAt))
+      .limit(perPage)
+      .offset((page - 1) * perPage);
+  } else {
+    const whereExpr =
+      conditions.length === 1
+        ? conditions[0]
+        : and(...conditions);
+
+    const [totalResult] = await db
+      .select({ value: count() })
+      .from(servicesMedia)
+      .where(whereExpr);
+
+    total = totalResult.value;
+
+    media = await db
+      .select()
+      .from(servicesMedia)
+      .where(whereExpr)
+      .orderBy(desc(servicesMedia.createdAt))
+      .limit(perPage)
+      .offset((page - 1) * perPage);
+  }
+
   const totalPages = Math.max(1, Math.ceil(total / perPage));
-
-  const media = whereClause
-    ? await db.select().from(servicesMedia).where(whereClause).orderBy(desc(servicesMedia.createdAt)).limit(perPage).offset((page - 1) * perPage)
-    : await db.select().from(servicesMedia).orderBy(desc(servicesMedia.createdAt)).limit(perPage).offset((page - 1) * perPage);
 
   return json(200, { media, total, page, perPage, totalPages });
 };

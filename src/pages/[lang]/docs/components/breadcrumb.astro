@@ -11,7 +11,7 @@ import {
   BreadcrumbSeparator,
   BreadcrumbEllipsis,
 } from "@components/ui/Breadcrumb";
-import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import TableOfContents from "@components/templates/docs/TableOfContents.astro";
 import Table from "@components/ui/Table/Table.astro";
 import TableHeader from "@components/ui/Table/TableHeader.astro";
 import TableBody from "@components/ui/Table/TableBody.astro";
@@ -32,7 +32,8 @@ const p = t.docs?.pages?.breadcrumb ?? {};
 >
   <h1 id="breadcrumb-component">{p.title ?? "Breadcrumb Component"}</h1>
   
-  <p set:html={p.intro ?? `The <code class="inline-code">Breadcrumb</code> component displays a breadcrumb trail allowing users to understand their position in the site hierarchy and navigate easily.`} />
+  <p set:html={p.intro ?? `The <code class="inline-code">Breadcrumb</code> component displays a breadcrumb trail allowing
+ users to understand their position in the site hierarchy and navigate easily.`} />
 
   <TableOfContents
     items={[

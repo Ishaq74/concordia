@@ -41,7 +41,7 @@ if (!['dev-to-prod', 'prod-to-dev'].includes(direction)) {
   console.error('Usage: npx tsx scripts/syncdb.ts dev-to-prod|prod-to-dev');
   process.exit(1);
 }
-const mask = (u?: string) => u ? u.replace(/:\/\/[^@]+@/, '://***@') : 'N/A';
+const mask = (u?: string) => u ? u.replace(/:\/\/[^@]+@, '://***@') : 'N/A';
 console.log(`Sync direction: ${direction}`);
 console.log(`  - local: ${mask(urlLocal)}  |  prod: ${mask(urlProd)}`);
 if (direction === 'dev-to-prod') {

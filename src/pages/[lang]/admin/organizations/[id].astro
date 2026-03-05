@@ -15,7 +15,7 @@ import { Icon } from "astro-icon/components";
 import { getDrizzle } from "@database/drizzle";
 import { blogOrganizations } from "@database/schemas";
 import { member, user as userTable } from "@database/schemas/auth-schema";
-import { eq, sql, inArray, count } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm"; // removed unused sql, count
 import { getTranslations } from "@i18n/translations";
 
 const lang = Astro.params.lang as string;
@@ -306,7 +306,7 @@ const areaServed = (org.areaServed ?? []) as string[];
   </div>
 </AdminLayout>
 
-<script define:vars={{ orgId: id }}>
+<script is:inline define:vars={{ orgId: id }}>
   document.addEventListener("DOMContentLoaded", () => {
     const saveBtn = document.getElementById("save-btn");
     const deleteBtn = document.getElementById("delete-btn");

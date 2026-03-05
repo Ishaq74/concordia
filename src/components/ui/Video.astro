@@ -61,3 +61,248 @@ const style = [
     Votre navigateur ne supporte pas la balise vidéo.
   </video>
 </div>
+
+
+<style>
+/* ===========================================
+   VIDEO - Initial Variant
+   =========================================== */
+
+.video-player {
+  width: 100%;
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.video-player video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+}
+
+.video-player:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+/* ===========================================
+   VIDEO - Retro Variant
+   =========================================== */
+/* VIDEO RETRO */
+.video-player.retro {
+  border-radius: 0;
+  border: var(--retro-border-width) solid var(--text-default);
+  box-shadow: var(--retro-shadow-offset) var(--retro-shadow-offset) 0 var(--retro-shadow-color);
+  background: black;
+}
+
+.video-player.retro video {
+  border-radius: 0;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+}
+
+.video-player.retro:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: calc(var(--retro-shadow-offset) + 2px) calc(var(--retro-shadow-offset) + 2px) 0 var(--retro-shadow-color);
+  transition: all 0.2s ease;
+}
+
+.video-player.retro::before {
+  content: '▶ VIDEO';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: var(--text-default);
+  color: var(--bg-default);
+  padding: 4px 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: bold;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ===========================================
+   VIDEO - Modern Variant
+   =========================================== */
+
+.video-player.modern {
+  border-radius: var(--radius-xl);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.05),
+    rgba(139, 92, 246, 0.05)
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 2px solid;
+  border-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.05)
+  ) 1;
+  box-shadow: 
+    var(--modern-shadow-xl),
+    0 8px 32px rgba(99, 102, 241, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  position: relative;
+  padding: 8px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.video-player.modern video {
+  border-radius: calc(var(--radius-xl) - 8px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Effet de lumière en haut */
+.video-player.modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  border-radius: var(--radius-xl) var(--radius-xl) 50% 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Effet de reflet animé */
+.video-player.modern::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  animation: modern-shimmer 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+}
+
+@keyframes modern-shimmer {
+  0%, 100% {
+    transform: translate(-100%, -100%) rotate(45deg);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(50%, 50%) rotate(45deg);
+    opacity: 1;
+  }
+}
+
+.video-player.modern:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 
+    var(--modern-shadow-2xl),
+    0 12px 48px rgba(99, 102, 241, 0.25),
+    0 0 40px rgba(99, 102, 241, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border-image: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.4),
+    rgba(139, 92, 246, 0.4)
+  ) 1;
+}
+
+.video-player.modern:hover::after {
+  animation-duration: 3s;
+}
+
+/* ===========================================
+   VIDEO - Futuristic Variant
+   =========================================== */
+/* VIDEO FUTURISTIC */
+.video-player.futuristic {
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  border: 2px solid;
+  border-image: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.6),
+    rgba(139, 92, 246, 0.6),
+    rgba(236, 72, 153, 0.6)
+  ) 1;
+  box-shadow: 
+    0 0 30px rgba(99, 102, 241, 0.4),
+    0 0 60px rgba(99, 102, 241, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.video-player.futuristic video {
+  border-radius: var(--radius-md);
+}
+
+.video-player.futuristic::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(99, 102, 241, 0.03) 2px,
+    rgba(99, 102, 241, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.video-player.futuristic::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(99, 102, 241, 0.2),
+    transparent
+  );
+  animation: video-scan-line 4s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes video-scan-line {
+  0%, 100% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+}
+
+.video-player.futuristic:hover {
+  box-shadow: 
+    0 0 40px rgba(99, 102, 241, 0.6),
+    0 0 80px rgba(99, 102, 241, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+</style>

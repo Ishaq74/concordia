@@ -2,7 +2,7 @@
 import DocLayout from "@layouts/DocLayout.astro";
 import { Code } from "astro:components";
 import SkeletonComponent from "@components/ui/Skeleton.astro";
-import TableOfContents from "@/components/templates/docs/TableOfContents.astro";
+import TableOfContents from "@components/templates/docs/TableOfContents.astro";
 import Table from "@components/ui/Table/Table.astro";
 import TableHeader from "@components/ui/Table/TableHeader.astro";
 import TableBody from "@components/ui/Table/TableBody.astro";
@@ -23,7 +23,9 @@ const p = t.docs?.pages?.skeleton ?? {};
 >
   <h1 id="skeleton-component">{p.title ?? "Skeleton Component"}</h1>
 
-  <p set:html={p.intro ?? `The <code class="inline-code">Skeleton</code> component displays animated placeholders while content is loading. It improves user experience by providing visual feedback and reducing perceived waiting time.`} />
+  <p set:html={p.intro ?? `The <code class="inline-code">Skeleton</code> component displays animated placeholders
+ while content is loading. It improves user experience by providing visual feedback
+ and reducing perceived waiting time.`} />
 
   <TableOfContents
       items={[

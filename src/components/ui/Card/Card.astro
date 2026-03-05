@@ -31,3 +31,63 @@ const classes = [
 <article class={classes} {...htmlAttributes}>
   <slot />
 </article>
+
+<style>
+/* CARD INITIAL */
+.card { 
+  display: grid;
+  padding: var(--card-padding); 
+  gap: 1rem;
+  border-radius: var(--card-border-radius); 
+  background-color: var(--card-bg); 
+  color: var(--card-color);
+  border: var(--card-border-width) solid var(--card-border-color);
+  box-shadow: var(--card-shadow);
+}
+
+/* CARD RETRO */
+.card.retro {
+  border-radius: 0;
+  border: var(--retro-border-width) solid var(--retro-card-border-color);
+  background-color: var(--retro-card-bg); 
+  color: var(--retro-card-color);
+  box-shadow: var(--retro-shadow-offset) var(--retro-shadow-offset) 0 var(--retro-shadow-color);
+}
+
+/* CARD MODERN */
+.card.modern {
+  border-radius: var(--modern-radius);
+  background-color: var(--modern-card-bg); 
+  color: var(--modern-card-color);
+  border: 1px solid var(--modern-card-border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+/* CARD FUTURISTIC */
+.card.futuristic {
+  border-radius: 4px;
+  clip-path: var(--futuristic-clip-path);
+  background-color: var(--futuristic-card-bg); 
+  color: var(--futuristic-card-color);
+  border: 1px solid var(--futuristic-card-border-color);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px -10px var(--futuristic-glow);
+  position: relative;
+  overflow: hidden;
+}
+.card.futuristic::after {
+  content: ''; 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--futuristic-glow), transparent);
+  animation: scanline 3s infinite linear;
+}
+@keyframes scanline { 
+  0% { transform: translateX(-100%); } 
+  100% { transform: translateX(100%); } 
+}
+
+</style>

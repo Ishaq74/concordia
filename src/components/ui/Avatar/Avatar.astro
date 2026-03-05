@@ -19,6 +19,7 @@ const {
   direction = "row",
 } = Astro.props;
 
+  import './avatar.css';
 const classes = [
   "avatar",
   variant !== "initial" && variant,
@@ -42,7 +43,6 @@ const getInitials = (text: string | undefined): string => {
 
 const displayFallback = fallback ? getInitials(fallback) : undefined;
 ---
-
 <div class={classes}>
   {src ? (
     <img src={src} alt={alt} />
