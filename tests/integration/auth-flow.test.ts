@@ -3,7 +3,7 @@ import { getAuth } from '@lib/auth/auth'
 import { getTestDb } from '@tests/config/test-db'
 import { TEST_ENV } from '@tests/config/test-env'
 import { auth } from '@lib/auth/auth';
-import { user, auditLog } from '@database/schemas'
+import { user as userTable, auditLog } from '@database/schemas'
 import { eq } from 'drizzle-orm'
 
 beforeEach(() => {
@@ -33,7 +33,7 @@ describe('Auth — critical integration tests', () => {
     const userObj = test.createUser({ emailVerified: true });
     const user = await test.saveUser(userObj);
     const db = await getTestDb();
-    const users = await db.select().from(user).where(eq(user.email, user.email));
+    const users = await db.select().from(userTable).where(eq(userTable.email, user.email!));
     expect(users.length).toBeGreaterThan(0);
     const result = await test.login({ userId: user.id });
     expect(result.token).toBeDefined();
@@ -64,7 +64,7 @@ describe('Auth — critical integration tests', () => {
     const test = ctx.test;
     const userObj = test.createUser();
     const user = await test.saveUser(userObj);
-    await expect(authInstance.api.signUpEmail({ body: { email: user.email, password: 'SafePass123!', username: user.username, name: user.username } })).resolves.not.toThrow();
-    await expect(auth.api.signUpEmail({ body: { email: user.email, password: 'SafePass123!', username: user.username + '-2', name: user.username } })).rejects.toThrow();
+    await expect(authInstance.api.signUpEmail({ body: { email: user.email!, password: 'SafePass123!', username: user.name, name: user.name } })).resolves.not.toThrow();
+    await expect(auth.api.signUpEmail({ body: { email: user.email!, password: 'SafePass123!', username: user.name + '-2', name: user.name } })).rejects.toThrow();
   })
 })

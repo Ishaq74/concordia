@@ -289,7 +289,7 @@ const statusMessage = statusParam === "updated"
       {/* ---- TAB ÉDITION ---- */}
       <Tab name="profil-tabs" label={translations.auth?.editTab ?? "Éditer mon profil"} icon="mdi:pencil">
         <Grid cols="1" gap="xl">
-          <ProfileForm user={user} profile={userProfile} />
+          <ProfileForm user={{...user, email: user.email ?? ''}} profile={userProfile} />
           <ProfileOrganization
             organizations={organizations}
             activeOrganizationId={activeOrganizationId}

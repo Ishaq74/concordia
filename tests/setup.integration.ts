@@ -2,8 +2,8 @@
 import { beforeAll, afterAll, afterEach } from 'vitest';
 import { auth } from '@/lib/auth/auth';
 import type { TestHelpers } from 'better-auth/plugins';
-import { db } from '@/database/drizzle';
-import { pg } from '@/database/drizzle';
+import { getDrizzle, getPgClient } from '@/database/drizzle';
+import { sql } from 'drizzle-orm';
 
 // Extension du contexte Vitest pour accès helpers
 
@@ -20,15 +20,18 @@ beforeAll(async () => {
   const ctx = await auth.$context;
   testUtils = ctx.test;
   // Nettoyage initial
+  const db = await getDrizzle();
   await db.execute(sql`TRUNCATE TABLE users, organizations, members, sessions CASCADE`);
 });
 
 afterEach(async () => {
   // Cleanup après chaque test pour isolation
+  const db = await getDrizzle();
   await db.execute(sql`TRUNCATE TABLE users, organizations, members, sessions CASCADE`);
 });
 
 afterAll(async () => {
+  const pg = getPgClient();
   await pg.end();
 });
 

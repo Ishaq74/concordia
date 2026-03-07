@@ -73,7 +73,7 @@ async function maybeAddImports() {
   content = content.replace(/^export \{\};?\s*$/gm, '');
   let lastImportIdx = -1;
   const importRegex = /^import .* from .+;$/gm;
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = importRegex.exec(content)) !== null) {
     lastImportIdx = match.index + match[0].length;
   }
@@ -149,7 +149,7 @@ function run(cmd: string, args: string[]): Promise<void> {
   if (useProd) {
     const dbUrl = process.env.DATABASE_URL_PROD || process.env.DATABASE_URL;
     const dbName = (() => { try { return new URL(dbUrl!).pathname.replace(/^\//, '') } catch { return (dbUrl || '').split('/').pop() || 'unknown' } })();
-    console.log(`\x1b[41m\x1b[97m PROD ATTENTION !! Configuration PROD détectée — ${dbName} (${dbUrl ? dbUrl.replace(/:\/\/[^@]+@, '://***@') : 'N/A'}) \x1b[0m`);
+    console.log(`\x1b[41m\x1b[97m PROD ATTENTION !! Configuration PROD détectée — ${dbName} (${dbUrl ? dbUrl.replace(/:\/\/[^@]+@/, '://***@') : 'N/A'}) \x1b[0m`);
   }
   process.env.DRIZZLE_CONFIG_PATH = configPath;
 

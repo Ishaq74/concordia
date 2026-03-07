@@ -1,29 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { experimental_AstroContainer as AstroContainer } from "astro/container"
 import Link from "@components/ui/Link.astro"
-import {
-  expectRegression,
-  expectStability,
-  expectCompatibility,
-  expectSecurity,
-  expectSemantics,
-  expectProduction,
-  expectEdgeCases,
-  expectFocus,
-  expectAria,
-  expectHTML,
-  expectPerformance,
-  expectDocumentationExample,
-  expectAstroIntegration,
-  expectDeterminism,
-  expectIntegrationPW,
-  expectPolymorphicSlot,
-  expectImmutability,
-  expectW3CCompliance,
-  expectHTMLValidity,
-  expectHasCSS,
-  expectHasDataAttr
-} from "@tests/helpers/uiTestHelpers";
 
 async function render(props: any = {}, slots: any = { default: "Documentation" }) {
   const container = await AstroContainer.create();

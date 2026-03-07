@@ -319,7 +319,7 @@ function buildPermissionModules(
       key: resourceKey,
       label: meta.label,
       description: meta.description,
-      actions: actions.map((action) => {
+      actions: actions.map((action: string) => {
         const actionMeta = meta.actions[action] ?? {
           label: formatActionLabel(action),
           description: "Action Better Auth",

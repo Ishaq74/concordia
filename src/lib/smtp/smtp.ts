@@ -223,7 +223,7 @@ export class SmtpService {
         success: false,
         error: {
           code: 'VALIDATION_ERROR',
-          message: validation.error,
+          message: (validation as { valid: false; error: string }).error,
           retryable: false,
           provider: this.config.name
         }

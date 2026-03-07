@@ -32,7 +32,7 @@ export async function generateEnv(): Promise<string> {
 export async function generateTsconfigAliases(): Promise<string> {
   const tsconfigContent = await readFile(PATHS.tsconfig);
   if (!tsconfigContent) return '';
-  let tsconfig;
+  let tsconfig: any;
   try {
     tsconfig = JSON.parse(tsconfigContent);
   } catch {

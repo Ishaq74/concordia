@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest'
 import { getTestDb } from '@tests/config/test-db'
 import { TEST_ENV } from '@tests/config/test-env'
 import { auth } from '@lib/auth/auth'
@@ -8,27 +8,32 @@ import {
   servicesBookings,
   servicesMedia,
 } from '@database/schemas'
-import { blogOrganizations } from '@database/schemas'
 import { eq } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
+
+/** Typed result from test.saveOrganization() */
+type TestOrg = { id: string; [key: string]: unknown }
+
+let test: Awaited<typeof auth.$context>['test']
+
+beforeAll(async () => {
+  const ctx = await auth.$context
+  test = ctx.test
+})
 
 beforeEach(() => {
   Object.entries(TEST_ENV).forEach(([key, value]) => vi.stubEnv(key, value))
 })
 
-// ─── Helpers ────────────────────────────────────────────────────
-
-async function createBlogOrg(db: any, overrides: Record<string, any> = {}) {
-  const id = overrides.id ?? randomUUID()
-  await db.insert(blogOrganizations).values({
-    id,
-    name: overrides.name ?? `Org-${id.slice(0, 6)}`,
-    slug: overrides.slug ?? `org-${id.slice(0, 8)}`,
-    isActive: true,
-    ...overrides,
-  }).onConflictDoNothing()
-  return id
+async function saveOrg(data: Record<string, unknown> = {}): Promise<TestOrg> {
+  return await test.saveOrganization(test.createOrganization(data)) as TestOrg
 }
+
+async function saveUser(overrides: Record<string, unknown> = {}) {
+  return await test.saveUser(test.createUser({ emailVerified: true, ...overrides }))
+}
+
+// ─── Helpers ────────────────────────────────────────────────────
 
 async function createCategory(db: any, overrides: Record<string, any> = {}) {
   const id = overrides.id ?? randomUUID()
@@ -79,13 +84,10 @@ async function createBooking(db: any, serviceId: string, customerId: string, pro
 
 describe('Services — Listings CRUD', () => {
   it('service listing can be created with org', async () => {
-    const db = await getTestDb();
-    const ctx = await auth.$context;
-    const test = ctx.test;
-    const org = await test.saveOrganization(test.createOrganization({ name: 'Test Org' }));
-    const userObj = test.createUser({ emailVerified: true });
-    const user = await test.saveUser(userObj);
-    const providerId = user.id;
+    const db = await getTestDb()
+    const org = await saveOrg({ name: 'Test Org' })
+    const user = await saveUser()
+    const providerId = user.id
     const svcId = await createService(db, providerId, org.id);
     const [found] = await db
       .select()
@@ -99,14 +101,11 @@ describe('Services — Listings CRUD', () => {
   });
 
   it('service listing can be filtered by org', async () => {
-    const db = await getTestDb();
-    const ctx = await auth.$context;
-    const test = ctx.test;
-    const orgA = await test.saveOrganization(test.createOrganization({ name: 'Org A' }));
-    const orgB = await test.saveOrganization(test.createOrganization({ name: 'Org B' }));
-    const providerObj = test.createUser({ emailVerified: true });
-    const provider = await test.saveUser(providerObj);
-    const provId = provider.id;
+    const db = await getTestDb()
+    const orgA = await saveOrg({ name: 'Org A' })
+    const orgB = await saveOrg({ name: 'Org B' })
+    const provider = await saveUser()
+    const provId = provider.id
     await createService(db, provId, orgA.id);
     await createService(db, provId, orgA.id);
     await createService(db, provId, orgB.id);
@@ -123,12 +122,9 @@ describe('Services — Listings CRUD', () => {
   });
 
   it('service listing can be updated', async () => {
-    const db = await getTestDb();
-    const ctx = await auth.$context;
-    const test = ctx.test;
-    const org = await test.saveOrganization(test.createOrganization({ name: 'Update Org' }));
-    const providerObj = test.createUser({ emailVerified: true });
-    const provider = await test.saveUser(providerObj);
+    const db = await getTestDb()
+    const org = await saveOrg({ name: 'Update Org' })
+    const provider = await saveUser()
     const svcId = await createService(db, provider.id, org.id, undefined, {
       basePrice: '25.00',
     });
@@ -145,12 +141,9 @@ describe('Services — Listings CRUD', () => {
   });
 
   it('service listing can be deleted', async () => {
-    const db = await getTestDb();
-    const ctx = await auth.$context;
-    const test = ctx.test;
-    const org = await test.saveOrganization(test.createOrganization({ name: 'Delete Org' }));
-    const providerObj = test.createUser({ emailVerified: true });
-    const provider = await test.saveUser(providerObj);
+    const db = await getTestDb()
+    const org = await saveOrg({ name: 'Delete Org' })
+    const provider = await saveUser()
     const svcId = await createService(db, provider.id, org.id);
     await db.delete(servicesListings).where(eq(servicesListings.id, svcId));
 
@@ -198,16 +191,12 @@ describe('Services — Categories CRUD', () => {
 
 describe('Services — Bookings CRUD', () => {
   it('booking can be created', async () => {
-    const db = await getTestDb();
-    const ctx = await auth.$context;
-    const test = ctx.test;
-    const org = await test.saveOrganization(test.createOrganization({ name: 'Booking Org' }));
-    const providerObj = test.createUser({ emailVerified: true });
-    const provider = await test.saveUser(providerObj);
-    const customerObj = test.createUser({ emailVerified: true });
-    const customer = await test.saveUser(customerObj);
-    const provId = provider.id;
-    const custId = customer.id;
+    const db = await getTestDb()
+    const org = await saveOrg({ name: 'Booking Org' })
+    const provider = await saveUser()
+    const customer = await saveUser()
+    const provId = provider.id
+    const custId = customer.id
     const svcId = await createService(db, provId, org.id);
     const bkId = await createBooking(db, svcId, custId, provId);
     const [found] = await db
@@ -221,14 +210,10 @@ describe('Services — Bookings CRUD', () => {
   });
 
   it('booking status can be updated (confirm → completed)', async () => {
-    const db = await getTestDb();
-    const ctx = await auth.$context;
-    const test = ctx.test;
-    const org = await test.saveOrganization(test.createOrganization({ name: 'Booking Status Org' }));
-    const providerObj = test.createUser({ emailVerified: true });
-    const provider = await test.saveUser(providerObj);
-    const customerObj = test.createUser({ emailVerified: true });
-    const customer = await test.saveUser(customerObj);
+    const db = await getTestDb()
+    const org = await saveOrg({ name: 'Booking Status Org' })
+    const provider = await saveUser()
+    const customer = await saveUser()
     const svcId = await createService(db, provider.id, org.id);
     const bkId = await createBooking(db, svcId, customer.id, provider.id);
     // Confirm
@@ -249,14 +234,10 @@ describe('Services — Bookings CRUD', () => {
   });
 
   it('booking provider response can be set', async () => {
-    const db = await getTestDb();
-    const ctx = await auth.$context;
-    const test = ctx.test;
-    const org = await test.saveOrganization(test.createOrganization({ name: 'Provider Response Org' }));
-    const providerObj = test.createUser({ emailVerified: true });
-    const provider = await test.saveUser(providerObj);
-    const customerObj = test.createUser({ emailVerified: true });
-    const customer = await test.saveUser(customerObj);
+    const db = await getTestDb()
+    const org = await saveOrg({ name: 'Provider Response Org' })
+    const provider = await saveUser()
+    const customer = await saveUser()
     const svcId = await createService(db, provider.id, org.id);
     const bkId = await createBooking(db, svcId, customer.id, provider.id, {
       customerMessage: 'Bonjour, je voudrais réserver',
@@ -271,14 +252,10 @@ describe('Services — Bookings CRUD', () => {
   });
 
   it('booking can be cancelled', async () => {
-    const db = await getTestDb();
-    const ctx = await auth.$context;
-    const test = ctx.test;
-    const org = await test.saveOrganization(test.createOrganization({ name: 'Cancel Booking Org' }));
-    const providerObj = test.createUser({ emailVerified: true });
-    const provider = await test.saveUser(providerObj);
-    const customerObj = test.createUser({ emailVerified: true });
-    const customer = await test.saveUser(customerObj);
+    const db = await getTestDb()
+    const org = await saveOrg({ name: 'Cancel Booking Org' })
+    const provider = await saveUser()
+    const customer = await saveUser()
     const svcId = await createService(db, provider.id, org.id);
     const bkId = await createBooking(db, svcId, customer.id, provider.id);
     await db
@@ -322,14 +299,11 @@ describe('Services — Media CRUD', () => {
 
 describe('Services — Org scoping isolation', () => {
   it('services from different orgs are properly isolated', async () => {
-    const db = await getTestDb();
-    const ctx = await auth.$context;
-    const test = ctx.test;
-    const orgA = await test.saveOrganization(test.createOrganization({ name: 'Isolated A' }));
-    const orgB = await test.saveOrganization(test.createOrganization({ name: 'Isolated B' }));
-    const providerObj = test.createUser({ emailVerified: true });
-    const provider = await test.saveUser(providerObj);
-    const provId = provider.id;
+    const db = await getTestDb()
+    const orgA = await saveOrg({ name: 'Isolated A' })
+    const orgB = await saveOrg({ name: 'Isolated B' })
+    const provider = await saveUser()
+    const provId = provider.id
     const svcA1 = await createService(db, provId, orgA.id);
     await createService(db, provId, orgA.id);
     const svcB1 = await createService(db, provId, orgB.id);

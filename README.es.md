@@ -38,26 +38,26 @@ Este proyecto demuestra una aplicación web full-stack usando tecnologías moder
 - **@astrojs/node**: `^9.5.4`
 - **@astrojs/vercel**: `^9.0.4`
 - **@babel/preset-typescript**: `^7.28.5`
-- **@better-auth/drizzle-adapter**: `^1.5.3`
+- **@better-auth/drizzle-adapter**: `^1.5.4`
 - **@iconify-json/circle-flags**: `^1.2.10`
 - **@iconify-json/mdi**: `^1.2.3`
-- **@iconify-json/openmoji**: `^1.2.22`
+- **@iconify-json/openmoji**: `^1.2.23`
 - **astro**: `^5.18.0`
 - **astro-font**: `^1.1.0`
 - **astro-icon**: `^1.1.5`
-- **better-auth**: `^1.5.3`
+- **better-auth**: `^1.5.4`
 - **dotenv**: `^17.3.1`
 - **drizzle-orm**: `^0.45.1`
 - **easymde**: `^2.20.0`
 - **fast-glob**: `^3.3.3`
-- **jose**: `^6.1.3`
+- **jose**: `^6.2.0`
 - **leaflet**: `^1.9.4`
 - **lighthouse**: `^13.0.3`
 - **markdown-it**: `^14.1.1`
 - **nanoid**: `^5.1.6`
-- **nodemailer**: `^7.0.13`
+- **nodemailer**: `^8.0.1`
 - **pa11y**: `^9.1.1`
-- **pg**: `^8.18.0`
+- **pg**: `^8.20.0`
 - **typescript**: `^5.9.3`
 - **validator**: `^13.15.26`
 
@@ -91,9 +91,6 @@ npm install
 - `npm run test:e2e:debug`: playwright test --debug
 - `npm run test:e2e:headed`: playwright test --headed
 - `npm run test:all`: npm run test:unit && npm run test:integration && npm run test:components && npm run test:e2e
-- `npm run storybook`: storybook dev -p 6006
-- `npm run storybook:build`: storybook build -o ./dist/storybook
-- `npm run storybook:test`: test-storybook --coverage
 - `npm run test:coverage`: vitest run --coverage
 - `npm run test:report`: vitest run --reporter=html && open ./reports/vitest/index.html
 - `npm run test:ci`: vitest run --coverage && playwright test
@@ -112,7 +109,6 @@ npm install
   - copilot.instructions.md
   - think.instructions.md
 - package.json
-- playwright-log.txt
 - playwright.config.ts
 - pnpm-lock.yaml
 - pnpm-workspace.yaml
@@ -159,7 +155,6 @@ npm install
     - db.migrate.ts
     - db.seed.ts
     - db.sync.ts
-  - generate-unit-matrix.ts
   - **readme**
     - generateDatabase.ts
     - generateDeps.ts
@@ -271,6 +266,7 @@ npm install
           - UserCard.astro
         - QueryLoop.astro
       - SmartBreadcrumb.astro
+      - Wrapper.astro
     - **ui**
       - **Accordion**
         - Accordion.astro
@@ -630,6 +626,7 @@ npm install
           - tabs.astro
           - tooltip.astro
           - video.astro
+          - wrapper.astro
         - **layouts**
           - base.astro
           - doc.astro
@@ -666,7 +663,6 @@ npm install
       - components.css
       - spacing.css
       - typography.css
-- temp.js
 - **test-results**
 - **tests**
   - **a11y**
@@ -686,6 +682,9 @@ npm install
   - **fixtures**
     - auth-fixtures.ts
     - security-payloads.ts
+  - **helpers**
+    - astroComponentTestHelpers.ts
+    - uiTestHelpers.ts
   - **i18n**
     - routing.test.ts
     - rtl.test.ts
@@ -716,6 +715,11 @@ npm install
   - setup.ts
   - **unit**
     - **components**
+      - **Accordion**
+        - Accordion.test.ts
+        - AccordionItem.test.ts
+        - **__snapshots__**
+          - AccordionItem.test.ts.snap
       - **Alert**
         - Alert.test.ts
         - **reports**
@@ -723,12 +727,17 @@ npm install
           - pa11y-alert-report.json
         - **__snapshots__**
           - Alert.test.ts.snap
+      - **avatar**
+        - Avatar.test.ts
       - **Badge**
+        - Badge.test.ts
         - **reports**
           - lighthouse-alert-report.html
           - pa11y-alert-report.json
         - **__snapshots__**
           - Badge.test.ts.snap
+      - **breadcrumb**
+        - Breadcrumb.test.ts
       - **Button**
         - Button.test.ts
         - **reports**
@@ -736,8 +745,18 @@ npm install
           - pa11y-report.json
         - **__snapshots__**
           - Button.test.ts.snap
-    - **generated**
-      - Badge.unit.matrix.ts
+      - **kbd**
+        - Kbd.test.ts
+      - **link**
+        - Link.test.ts
+        - **reports**
+          - axe-report-link.json
+        - **__snapshots__**
+          - Link.test.ts.snap
+      - **Tools**
+        - Grid.test.ts
+        - **__snapshots__**
+          - Grid.test.ts.snap
     - **loaders**
       - factory.test.ts
     - smtp.test.ts
@@ -1540,6 +1559,9 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 - **fixtures**
   - auth-fixtures.ts
   - security-payloads.ts
+- **helpers**
+  - astroComponentTestHelpers.ts
+  - uiTestHelpers.ts
 - **i18n**
   - routing.test.ts
   - rtl.test.ts
@@ -1570,6 +1592,11 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 - setup.ts
 - **unit**
   - **components**
+    - **Accordion**
+      - Accordion.test.ts
+      - AccordionItem.test.ts
+      - **__snapshots__**
+        - AccordionItem.test.ts.snap
     - **Alert**
       - Alert.test.ts
       - **reports**
@@ -1577,12 +1604,17 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
         - pa11y-alert-report.json
       - **__snapshots__**
         - Alert.test.ts.snap
+    - **avatar**
+      - Avatar.test.ts
     - **Badge**
+      - Badge.test.ts
       - **reports**
         - lighthouse-alert-report.html
         - pa11y-alert-report.json
       - **__snapshots__**
         - Badge.test.ts.snap
+    - **breadcrumb**
+      - Breadcrumb.test.ts
     - **Button**
       - Button.test.ts
       - **reports**
@@ -1590,8 +1622,18 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
         - pa11y-report.json
       - **__snapshots__**
         - Button.test.ts.snap
-  - **generated**
-    - Badge.unit.matrix.ts
+    - **kbd**
+      - Kbd.test.ts
+    - **link**
+      - Link.test.ts
+      - **reports**
+        - axe-report-link.json
+      - **__snapshots__**
+        - Link.test.ts.snap
+    - **Tools**
+      - Grid.test.ts
+      - **__snapshots__**
+        - Grid.test.ts.snap
   - **loaders**
     - factory.test.ts
   - smtp.test.ts
@@ -1742,12 +1784,13 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - .');
       if (parts.length === 3) {
         const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
-        expect(payload.sub ?? payload.userId ?? login.user.id).toBeDefined();
+        expect(payload.sub ?? payload.userId).toBeDefined();
         expect(payload.iat ?? payload.issuedAt).toBeDefined();
       } else {
-        expect(login.token).toBeDefined();
-        expect(login.user.id).toBeDefined();
+        expect(token).toBeDefined();
       }
+      
+      await test.deleteUser(user.id);
     });
 
     it('rejète timing attack (temps similaire)
@@ -1986,6 +2029,35 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - **Escalade**
     - refuse modification de rôle sans autorisation
 
+- `tests\unit\components\Accordion\Accordion.test.ts`
+  - **Accordion component contract**
+    - HTML validity
+    - Semantics
+    - Security
+    - Regression
+    - Edge cases: variant/color/className
+    - Immutability
+    - Production robustness
+    - Edge case: all props
+
+- `tests\unit\components\Accordion\AccordionItem.test.ts`
+  - **AccordionItem component contract**
+    - HTML validity
+    - Semantics
+    - Accessibility: ARIA, region, summary
+    - Accessibility: disabled
+    - Boundary: long string, unicode, deep object
+    - Stress: 1000 items
+    - Symmetry: toggle open/disabled/type
+    - Isolation: parent pollué
+    - Polymorphism: slot text, HTML, emoji, number, whitespace
+    - CSS/data-attrs: classes, data-*
+    - Compat: HTML5, aria, data-*
+    - Security: XSS, script, eval, inline handlers
+    - Documentation example
+    - Snapshot
+    - Integration: workflow complet
+
 - `tests\unit\components\Alert\Alert.test.ts`
   - **ui/Alert**
     - unit: ${t.name}
@@ -2139,6 +2211,20 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - final: special characters escaped
     - final: component ready for production deployment
 
+- `tests\unit\components\Badge\Badge.test.ts`
+  - **Component: Badge**
+    - should render correctly with default props
+    - should apply variant and color classes
+    - should render the text prop instead of slot
+    - should render a left icon
+    - should render a right icon
+    - should render a dismissible button when enabled
+    - should apply custom className
+    - should apply aria-label correctly
+    - should pass security checks
+    - should pass semantics checks
+    - should handle boundary cases
+
 - `tests\unit\components\Button\Button.test.ts`
   - **ui/Button**
     - unit: ${t.name}
@@ -2264,6 +2350,115 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - final: output is deterministic
     - final: integrates with Astro ecosystem
     - final: documentation example works correctly
+
+- `tests\unit\components\Tools\Grid.test.ts`
+  - **Grid.astro Component**
+    - should render a default div with block display
+    - should render as a grid with specific columns
+    - should handle autoFit and autoFill grid configurations
+    - should render as a flex container with direction and wrap
+    - should apply correct alignment classes and styles
+    - should force stretch alignment when sameHeight is true
+    - should apply spacing utility classes for small integers
+    - should map spacing tokens to CSS variables in styles
+    - should apply variants and colors
+    - should support polymorphic tags
+    - should apply accessibility and state attributes
+    - should render deterministically and be stable
+    - should prevent XSS in custom classes
+
+- `tests\unit\components\avatar\Avatar.test.ts`
+  - **Avatar component contract**
+    - HTML validity: always div.avatar
+    - renders alt default if not provided
+    - renders fallback initials for complex name
+    - renders fallback for unicode name
+    - renders fallback for single word
+    - renders fallback for empty/undefined
+    - renders variant modern
+    - renders variant futuristic
+    - renders all sizes
+    - renders all directions
+    - renders custom className
+    - Immutability: same props same output
+    - Edge case: all props
+    - Performance: renders quickly
+    - Production markup: minimal and valid
+    - Accessibility: alt always present
+    - HTML validity
+    - renders with src and alt
+    - renders fallback initials
+    - renders fallback ? if no name
+    - renders variant retro
+    - renders size xl
+    - renders direction column
+    - renders custom className
+    - Immutability
+    - Edge case: all props
+
+- `tests\unit\components\breadcrumb\Breadcrumb.test.ts`
+  - **Breadcrumb component contract**
+    - renders variant retro
+    - renders variant modern
+    - renders variant futuristic
+    - renders color accent
+    - renders custom className
+    - Immutability
+    - Edge case: empty slot
+    - Accessibility: aria-label present
+    - HTML validity
+    - Semantics
+    - Edge cases: variant/color/className
+    - Immutability
+    - Production robustness
+    - Edge case: empty slot
+
+- `tests\unit\components\kbd\Kbd.test.ts`
+  - **Kbd component contract**
+    - HTML validity
+    - Semantics
+    - Immutability
+    - Slot polymorphism
+    - Edge case: empty slot
+    - Edge case: all props
+    - Production robustness
+    - Performance
+    - Accessibility: slot content explicit
+    - renders default kbd
+    - renders variant retro
+    - renders variant modern
+    - renders variant futuristic
+    - renders color primary
+    - renders color secondary
+    - renders color accent
+    - renders size sm
+    - renders size lg
+    - renders custom className
+    - renders slot content
+
+- `tests\unit\components\link\Link.test.ts`
+  - **Link component contract**
+    - HTML validity
+    - Semantics
+    - Security
+    - ARIA compliance
+    - Focus behavior
+    - Regression
+    - External link security
+    - Button rendering
+    - Variant rendering
+    - Icon rendering
+    - Button disabled rendering
+    - Production robustness
+    - Performance
+    - Documentation parity
+    - Astro integration
+    - Playwright integration
+    - Polymorphic slot
+    - Immutability
+    - W3C compliance
+    - CSS presence
+    - Data attributes
 
 - `tests\unit\loaders\factory.test.ts`
   - **createTranslationLoader (unit)**

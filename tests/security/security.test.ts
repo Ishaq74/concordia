@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
+import type { TestHelpers } from 'better-auth/plugins';
 import { auth } from '@lib/auth/auth';
 import { apiCall } from '@tests/utils/api-helpers';
 import { securityPayloads } from '@tests/fixtures/security-payloads';
@@ -7,7 +8,7 @@ import { securityPayloads } from '@tests/fixtures/security-payloads';
 // instead of hitting a generic "admin" page we exercise an actual admin API
 // endpoint that is guarded by isAdminUser().
 describe('RBAC/ABAC', () => {
-  let test;
+  let test: TestHelpers;
   beforeAll(async () => {
     const ctx = await auth.$context;
     test = ctx.test;
@@ -50,9 +51,8 @@ describe('XSS', () => {
     const ctxTest = await auth.$context;
     const test = ctxTest.test;
     const userObj = test.createUser({ role: 'user' });
-    const user = await test.saveUser(userObj);
-    const ctx: any = { locals: { user: { id: user.id, name: user.name, email: user.email }, lang: 'fr' }, request: { url: 'http://localhost:4321/fr/' } };
-    await expect(handler({ postId: 'x', postType: 'blog', content: securityPayloads.xss[0] }, ctx)).rejects.toThrow();
+    await test.saveUser(userObj);
+    await expect(handler({ postId: 'x', postType: 'blog', content: securityPayloads.xss[0] })).rejects.toThrow();
   });
 });
 
@@ -66,9 +66,8 @@ describe('Injection', () => {
     const ctxTest = await auth.$context;
     const test = ctxTest.test;
     const userObj = test.createUser({ role: 'user' });
-    const user = await test.saveUser(userObj);
-    const ctx: any = { locals: { user: { id: user.id, name: user.name, email: user.email }, lang: 'fr' }, request: { url: 'http://localhost:4321/fr/' } };
-    await expect(handler({ postId: 'x', postType: 'blog', content: securityPayloads.sql[0] }, ctx)).rejects.toThrow();
+    await test.saveUser(userObj);
+    await expect(handler({ postId: 'x', postType: 'blog', content: securityPayloads.sql[0] })).rejects.toThrow();
   });
 
   it('rejette payload NoSQLi', async () => {
@@ -79,9 +78,8 @@ describe('Injection', () => {
     const ctxTest = await auth.$context;
     const test = ctxTest.test;
     const userObj = test.createUser({ role: 'user' });
-    const user = await test.saveUser(userObj);
-    const ctx: any = { locals: { user: { id: user.id, name: user.name, email: user.email }, lang: 'fr' }, request: { url: 'http://localhost:4321/fr/' } };
-    await expect(handler({ postId: 'x', postType: 'blog', content: securityPayloads.nosql[0] }, ctx)).rejects.toThrow();
+    await test.saveUser(userObj);
+    await expect(handler({ postId: 'x', postType: 'blog', content: securityPayloads.nosql[0] })).rejects.toThrow();
   });
 });
 

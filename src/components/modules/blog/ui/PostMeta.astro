@@ -6,7 +6,7 @@ import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 import Avatar from '@components/ui/Avatar/Avatar.astro';
 
 interface Props {
-  publishedAt?: never;
+  publishedAt?: Date | string | null;
   readingTime?: string | null;
   authors?: { name: string; slug: string; avatar?: string | null }[];
   lang: string;

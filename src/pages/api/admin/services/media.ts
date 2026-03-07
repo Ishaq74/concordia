@@ -44,7 +44,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
   }
 
   let total: number;
-  let media;
+  let media: (typeof servicesMedia.$inferSelect)[];
 
   if (conditions.length === 0) {
     const [totalResult] = await db

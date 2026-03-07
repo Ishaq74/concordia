@@ -10,15 +10,12 @@ import { startFlow } from 'lighthouse';
 import fs from 'fs';
 import path from 'path';
 
-// Directory for snapshots
-const SNAPSHOT_DIR = path.join(__dirname, '__snapshots__');
 // Directory for reports
 const REPORTS_DIR = path.join(__dirname, 'reports');
 import puppeteer, { Browser as PuppeteerBrowser, Page as PuppeteerPage } from 'puppeteer';
 
 let puppeteerBrowser: PuppeteerBrowser;
 
-type LocalTestContext = { container: AstroContainer };
 let container: AstroContainer;
 
 
@@ -166,8 +163,8 @@ describe('ui/Button', () => {
     
     const results = await pa11y(`file://${tmpFile}`, {
       standard: 'WCAG2AA',
-      page: page,
-      browser: puppeteerBrowser,
+      page: page as any,
+      browser: puppeteerBrowser as any,
     });
 
     const reportFile = path.join(REPORTS_DIR, 'pa11y-report.json');
@@ -309,14 +306,14 @@ describe('ui/Button', () => {
   // ----------------------
   it('reversibility: toggling disabled state twice returns to original DOM', async () => {
     const originalHtml = await container.renderToString(Button, { props: { disabled: false }, slots: { default: 'Reversible' } });
-    const toggledHtml = await container.renderToString(Button, { props: { disabled: true }, slots: { default: 'Reversible' } });
+    await container.renderToString(Button, { props: { disabled: true }, slots: { default: 'Reversible' } });
     const revertedHtml = await container.renderToString(Button, { props: { disabled: false }, slots: { default: 'Reversible' } });
     expect(originalHtml).toBe(revertedHtml);
   });
 
   it('reversibility: toggling icon presence twice returns to original DOM', async () => {
     const originalHtml = await container.renderToString(Button, { props: {}, slots: { default: 'Reversible' } });
-    const withIconHtml = await container.renderToString(Button, { props: { icon: { name: 'concordia', side: 'left' } }, slots: { default: 'Reversible' } });
+    await container.renderToString(Button, { props: { icon: { name: 'concordia', side: 'left' } }, slots: { default: 'Reversible' } });
     const revertedHtml = await container.renderToString(Button, { props: {}, slots: { default: 'Reversible' } });
     expect(originalHtml).toBe(revertedHtml);
   });
@@ -556,11 +553,10 @@ describe('ui/Button', () => {
     const page = await browser.newPage();
     
     try {
-      let clicked = false;
       await page.evaluateHandle(() => {
         const btn = document.querySelector('#enter-test') as HTMLButtonElement;
         btn.addEventListener('click', () => {
-          clicked = true;
+          // event listener for keyboard activation test
         });
       });
       
@@ -570,7 +566,7 @@ describe('ui/Button', () => {
       
       await page.waitForTimeout(100);
       
-      const isClicked = await page.evaluate(() => {
+      await page.evaluate(() => {
         const btn = document.querySelector('#enter-test') as HTMLButtonElement;
         return btn.getAttribute('data-clicked') === 'true';
       });
@@ -802,8 +798,8 @@ describe('ui/Button', () => {
       slots: { default: 'No unclosed tags' } 
     });
     
-    const openingTags = html.match(/<[a-z]+(?:\s[^>]*)?\s*>/gi) || [];
-    const closingTags = html.match(/<\/[a-z]+>/gi) || [];
+    html.match(/<[a-z]+(?:\s[^>]*)?\s*>/gi) || [];
+    html.match(/<\/[a-z]+>/gi) || [];
     
     expect(html).not.toMatch(/<[^/>]*$/);
   });
@@ -1271,7 +1267,7 @@ describe('ui/Button', () => {
     );
     
     // All renders should be identical
-    renders.forEach((html, index) => {
+    renders.forEach((html) => {
       expect(html).toBe(renders[0]);
     });
   });

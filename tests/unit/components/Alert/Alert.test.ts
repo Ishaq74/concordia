@@ -10,8 +10,6 @@ import { startFlow } from 'lighthouse';
 import fs from 'fs';
 import path from 'path';
 
-// Directory for snapshots
-const SNAPSHOT_DIR = path.join(__dirname, '__snapshots__');
 // Directory for reports
 const REPORTS_DIR = path.join(__dirname, 'reports');
 import puppeteer, { Browser as PuppeteerBrowser, Page as PuppeteerPage } from 'puppeteer';
@@ -19,7 +17,6 @@ import puppeteer, { Browser as PuppeteerBrowser, Page as PuppeteerPage } from 'p
 let puppeteerBrowser: PuppeteerBrowser;
 let playwrightBrowser: Browser;
 
-type LocalTestContext = { container: AstroContainer };
 let container: AstroContainer;
 
 describe('ui/Alert', () => {
@@ -274,8 +271,8 @@ describe('ui/Alert', () => {
       
       const results = await pa11y(`file://${path.resolve(tmpFile)}`, {
         standard: 'WCAG2AA',
-        page: page,
-        browser: puppeteerBrowser,
+        page: page as any,
+        browser: puppeteerBrowser as any,
       });
 
       const reportFile = path.join(REPORTS_DIR, 'pa11y-alert-report.json');
@@ -481,7 +478,7 @@ describe('ui/Alert', () => {
       slots: { default: 'Reversible' } 
     });
     
-    const toggledHtml = await container.renderToString(Alert, { 
+    await container.renderToString(Alert, { 
       props: { dismissible: true }, 
       slots: { default: 'Reversible' } 
     });
@@ -500,7 +497,7 @@ describe('ui/Alert', () => {
       slots: { default: 'Reversible' } 
     });
     
-    const withTitleHtml = await container.renderToString(Alert, { 
+    await container.renderToString(Alert, { 
       props: { title: 'Title' }, 
       slots: { default: 'Reversible' } 
     });
@@ -732,7 +729,7 @@ describe('ui/Alert', () => {
       error: 'mdi:alert-circle'
     };
     
-    for (const [status, icon] of Object.entries(statusIcons)) {
+    for (const [status, _icon] of Object.entries(statusIcons)) {
       const html = await container.renderToString(Alert, { 
         props: { status: status as any }, 
         slots: { default: 'Content' } 
@@ -2262,7 +2259,7 @@ describe('ui/Alert', () => {
       error: 'mdi:alert-circle'
     };
     
-    for (const [status, expectedIcon] of Object.entries(statusIconMap)) {
+    for (const [status, _expectedIcon] of Object.entries(statusIconMap)) {
       const html = await container.renderToString(Alert, { 
         props: { status: status as any }, 
         slots: { default: 'Content' } 

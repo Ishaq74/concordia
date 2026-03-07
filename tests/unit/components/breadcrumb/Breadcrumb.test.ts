@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import Breadcrumb from "@components/ui/Breadcrumb/Breadcrumb.astro";
 import {
-  expectHTML,
   expectSemantics,
   expectEdgeCases,
   expectImmutability,

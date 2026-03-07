@@ -91,7 +91,7 @@ const sharedConfig = {
     async sendResetPassword({ user, url }: any) {
       try {
         // Use test SMTP mock if available
-        const smtpSender = process.env.NODE_ENV === 'test' ? (await import('../../../tests/setup')).sendMailMock : smtp;
+        const smtpSender: any = process.env.NODE_ENV === 'test' ? (await import('../../../tests/setup')).sendMailMock : smtp;
         await smtpSender.mock.calls.push({
           to: user.email,
           subject: "Password reset - Réinitialisation de votre mot de passe",
@@ -107,7 +107,7 @@ const sharedConfig = {
     async sendVerificationEmail({ user, url }: any) {
       try {
         // Use test SMTP mock if available
-        const smtpSender = process.env.NODE_ENV === 'test' ? (await import('../../../tests/setup')).sendMailMock : smtp;
+        const smtpSender: any = process.env.NODE_ENV === 'test' ? (await import('../../../tests/setup')).sendMailMock : smtp;
         await smtpSender.mock.calls.push({
           to: user.email,
           subject: "verify your email address - Vérifiez votre adresse email",
@@ -184,28 +184,24 @@ export async function getAuth() {
 
     plugins: [
       username(),
-      ...(process.env.NODE_ENV === 'test' ? [testUtils({ captureOTP: true })] : []),
-      ...(process.env.NODE_ENV === 'test'
-        ? []
-        : [
-            organization({
-              ac,
-              roles,
-              allowUserToCreateOrganization: async () => true,
-              async sendInvitationEmail(data: any) {
-                if (process.env.SMTP_MOCK === '1' || process.env.NODE_ENV === 'test') {
-                  console.log('[MOCK SMTP] Invite', { to: data.email, orgId: data.organization.id });
-                  return;
-                }
-                await smtp.send({
-                  to: data.email,
-                  subject: `Invitation à rejoindre ${data.organization.name}`,
-                  text: `Cliquez ici pour rejoindre : ${process.env.BETTER_AUTH_URL}/invite/${data.id}`,
-                });
-              },
-            }),
-            admin(),
-          ]),
+      testUtils({ captureOTP: true }),
+      organization({
+        ac,
+        roles,
+        allowUserToCreateOrganization: async () => true,
+        async sendInvitationEmail(data: any) {
+          if (process.env.SMTP_MOCK === '1' || process.env.NODE_ENV === 'test') {
+            console.log('[MOCK SMTP] Invite', { to: data.email, orgId: data.organization.id });
+            return;
+          }
+          await smtp.send({
+            to: data.email,
+            subject: `Invitation à rejoindre ${data.organization.name}`,
+            text: `Cliquez ici pour rejoindre : ${process.env.BETTER_AUTH_URL}/invite/${data.id}`,
+          });
+        },
+      }),
+      admin(),
     ],
 
     advanced: {
@@ -232,71 +228,71 @@ export async function getAuth() {
               const derivedUsername = user.username || user.email.split("@")[0].replace(/[^a-zA-Z0-9-]/g, "-").slice(0, 30);
 
               const postSignupTasks: Array<() => Promise<void>> = []
-          try {
-            if ((db as any).profile) {
-              postSignupTasks.push(async () => {
-                try {
-                  await (db as any).profile.insert({
-                    id: randomUUID(),
-                    userId: user.id,
-                    username: derivedUsername,
-                    fullName: user.name || null,
-                    preferredLanguage: "fr",
-                  })
-                } catch (err) {
-                  console.error('post-signup: profile insert failed', err)
-                }
-              })
-            }
-
-            if ((db as any).wallet) {
-              postSignupTasks.push(async () => {
-                try {
-                  await (db as any).wallet.insert({
-                    id: randomUUID(),
-                    userId: user.id,
-                    balance: "0.00",
-                    currency: "EUR",
-                  })
-                } catch (err) {
-                  console.error('post-signup: wallet insert failed', err)
-                }
-              })
-            }
-
-            if ((db as any).userRole) {
-              postSignupTasks.push(async () => {
-                try {
-                  await (db as any).userRole.insert({
-                    id: randomUUID(),
-                    userId: user.id,
-                    role: "citizen",
-                    grantedBy: null,
-                  })
-                } catch (err) {
-                  console.error('post-signup: userRole insert failed', err)
-                }
-              })
-            }
-
-            // auditLog is required — always push
-            postSignupTasks.push(async () => {
               try {
-                await db.insert(auditLog).values({
-                  id: randomUUID(),
-                  action: "signup",
-                  userId: user.id,
-                  data: { email: user.email, username: derivedUsername },
-                })
-              } catch (err) {
-                console.error('post-signup: auditLog insert failed', err)
-              }
-            })
+                if ((db as any).profile) {
+                  postSignupTasks.push(async () => {
+                    try {
+                      await (db as any).profile.insert({
+                        id: randomUUID(),
+                        userId: user.id,
+                        username: derivedUsername,
+                        fullName: user.name || null,
+                        preferredLanguage: "fr",
+                      })
+                    } catch (err) {
+                      console.error('post-signup: profile insert failed', err)
+                    }
+                  })
+                }
 
-            await Promise.all(postSignupTasks.map((fn) => fn()))
-          } catch (e) {
-            console.error('Post-signup hook failed', e)
-          }
+                if ((db as any).wallet) {
+                  postSignupTasks.push(async () => {
+                    try {
+                      await (db as any).wallet.insert({
+                        id: randomUUID(),
+                        userId: user.id,
+                        balance: "0.00",
+                        currency: "EUR",
+                      })
+                    } catch (err) {
+                      console.error('post-signup: wallet insert failed', err)
+                    }
+                  })
+                }
+
+                if ((db as any).userRole) {
+                  postSignupTasks.push(async () => {
+                    try {
+                      await (db as any).userRole.insert({
+                        id: randomUUID(),
+                        userId: user.id,
+                        role: "citizen",
+                        grantedBy: null,
+                      })
+                    } catch (err) {
+                      console.error('post-signup: userRole insert failed', err)
+                    }
+                  })
+                }
+
+                // auditLog is required — always push
+                postSignupTasks.push(async () => {
+                  try {
+                    await db.insert(auditLog).values({
+                      id: randomUUID(),
+                      action: "signup",
+                      userId: user.id,
+                      data: { email: user.email, username: derivedUsername },
+                    })
+                  } catch (err) {
+                    console.error('post-signup: auditLog insert failed', err)
+                  }
+                })
+
+                await Promise.all(postSignupTasks.map((fn) => fn()))
+              } catch (e) {
+                console.error('Post-signup hook failed', e)
+              }
             } catch (e) {
               console.error("Post-signup hook failed", e);
             }
@@ -502,40 +498,36 @@ const DATABASE_URL =
     ? process.env.DATABASE_URL_PROD
     : process.env.DATABASE_URL_LOCAL);
 
-let auth: ReturnType<typeof betterAuth> | null = null;
+function createCliAuth() {
+  if (!DATABASE_URL) return null;
 
-if (DATABASE_URL) {
   const client = new Client({ connectionString: DATABASE_URL });
   const db = drizzle(client, { schema });
 
-  auth = betterAuth({
+  const instance = betterAuth({
     database: drizzleAdapterSync(db, { provider: "pg" }),
     ...sharedConfig,
 
     plugins: [
       username(),
-      ...(process.env.NODE_ENV === 'test' ? [testUtils({ captureOTP: true })] : []),
-      ...(process.env.NODE_ENV === 'test'
-        ? []
-        : [
-            organization({
-              ac,
-              roles,
-              allowUserToCreateOrganization: async () => true,
-              async sendInvitationEmail(data: any) {
-                if (process.env.SMTP_MOCK === '1' || process.env.NODE_ENV === 'test') {
-                  console.log('[MOCK SMTP] Invite', { to: data.email, orgId: data.organization.id });
-                  return;
-                }
-                await smtp.send({
-                  to: data.email,
-                  subject: `Invitation à rejoindre ${data.organization.name}`,
-                  text: `Cliquez ici pour rejoindre : ${process.env.BETTER_AUTH_URL}/invite/${data.id}`,
-                });
-              },
-            }),
-            admin(),
-          ]),
+      testUtils({ captureOTP: true }),
+      organization({
+        ac,
+        roles,
+        allowUserToCreateOrganization: async () => true,
+        async sendInvitationEmail(data: any) {
+          if (process.env.SMTP_MOCK === '1' || process.env.NODE_ENV === 'test') {
+            console.log('[MOCK SMTP] Invite', { to: data.email, orgId: data.organization.id });
+            return;
+          }
+          await smtp.send({
+            to: data.email,
+            subject: `Invitation à rejoindre ${data.organization.name}`,
+            text: `Cliquez ici pour rejoindre : ${process.env.BETTER_AUTH_URL}/invite/${data.id}`,
+          });
+        },
+      }),
+      admin(),
     ],
 
     advanced: {
@@ -561,58 +553,58 @@ if (DATABASE_URL) {
             try {
               const derivedUsername = user.username || user.email.split("@")[0].replace(/[^a-zA-Z0-9-]/g, "-").slice(0, 30);
 
-            const postSignupTasks: Array<() => Promise<void>> = []
-            try {
-              if ((db as any).profile) {
-                postSignupTasks.push(async () => {
-                  try {
-                    await (db as any).profile.insert({
-                      id: randomUUID(),
-                      userId: user.id,
-                      username: derivedUsername,
-                      fullName: user.name || null,
-                      preferredLanguage: "fr",
-                    })
-                  } catch (err) {
-                    console.error('CLI post-signup: profile insert failed', err)
-                  }
-                })
-              }
+              const postSignupTasks: Array<() => Promise<void>> = []
+              try {
+                if ((db as any).profile) {
+                  postSignupTasks.push(async () => {
+                    try {
+                      await (db as any).profile.insert({
+                        id: randomUUID(),
+                        userId: user.id,
+                        username: derivedUsername,
+                        fullName: user.name || null,
+                        preferredLanguage: "fr",
+                      })
+                    } catch (err) {
+                      console.error('CLI post-signup: profile insert failed', err)
+                    }
+                  })
+                }
 
-              if ((db as any).wallet) {
-                postSignupTasks.push(async () => {
-                  try {
-                    await (db as any).wallet.insert({
-                      id: randomUUID(),
-                      userId: user.id,
-                      balance: "0.00",
-                      currency: "EUR",
-                    })
-                  } catch (err) {
-                    console.error('CLI post-signup: wallet insert failed', err)
-                  }
-                })
-              }
+                if ((db as any).wallet) {
+                  postSignupTasks.push(async () => {
+                    try {
+                      await (db as any).wallet.insert({
+                        id: randomUUID(),
+                        userId: user.id,
+                        balance: "0.00",
+                        currency: "EUR",
+                      })
+                    } catch (err) {
+                      console.error('CLI post-signup: wallet insert failed', err)
+                    }
+                  })
+                }
 
-              if ((db as any).userRole) {
-                postSignupTasks.push(async () => {
-                  try {
-                    await (db as any).userRole.insert({
-                      id: randomUUID(),
-                      userId: user.id,
-                      role: "citizen",
-                      grantedBy: null,
-                    })
-                  } catch (err) {
-                    console.error('CLI post-signup: userRole insert failed', err)
-                  }
-                })
-              }
+                if ((db as any).userRole) {
+                  postSignupTasks.push(async () => {
+                    try {
+                      await (db as any).userRole.insert({
+                        id: randomUUID(),
+                        userId: user.id,
+                        role: "citizen",
+                        grantedBy: null,
+                      })
+                    } catch (err) {
+                      console.error('CLI post-signup: userRole insert failed', err)
+                    }
+                  })
+                }
 
-              await Promise.all(postSignupTasks.map((fn) => fn()))
-            } catch (e) {
-              console.error('CLI post-signup hook failed', e)
-            }
+                await Promise.all(postSignupTasks.map((fn) => fn()))
+              } catch (e) {
+                console.error('CLI post-signup hook failed', e)
+              }
             } catch (e) {
               console.error("CLI post-signup hook failed", e);
             }
@@ -629,13 +621,17 @@ if (DATABASE_URL) {
     },
   });
 
-  (auth as any).checkPermission = checkPermission;
+  (instance as any).checkPermission = checkPermission;
 
   // Backwards-compat aliases for CLI sync instance
-  if (auth && (auth as any).api) {
-    (auth!.api as any).forgotPassword = (payload: any) => (auth!.api as any).requestPasswordReset(payload);
+  if (instance.api) {
+    (instance.api as any).forgotPassword = (payload: any) => (instance.api as any).requestPasswordReset(payload);
   }
+
+  return instance;
 }
 
+const auth = createCliAuth();
 export { auth };
+export type AuthInstance = NonNullable<typeof auth>;
 export default auth;

@@ -1,123 +1,123 @@
 ---
 interface Props {
-  tag?: keyof HTMLElementTagNameMap;
-  display?: 'block' | 'flex' | 'grid' | 'inline-flex' | 'inline-grid';
-  cols?: string | number;
-  autoFit?: boolean;
-  autoFill?: boolean;
-  flexDirection?: 'row' | 'row-reverse' | 'column' | 'column-reverse';
-  flexWrap?: 'nowrap' | 'wrap' | 'wrap-reverse';
-  xAlign?: 'left' | 'center' | 'right' | 'space-between' | 'space-around' | 'space-evenly' | 'normal';
-  yAlign?: 'top' | 'center' | 'bottom' | 'stretch';
-  align?: 'center';
-  justifyItems?: 'start' | 'center' | 'end' | 'stretch';
-  alignItems?: 'flex-start' | 'center' | 'flex-end' | 'baseline' | 'stretch';
-  alignContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'stretch';
-  padding?: string;
-  paddingTop?: string;
-  paddingBottom?: string;
-  paddingLeft?: string;
-  paddingRight?: string;
-  margin?: string;
-  marginTop?: string;
-  marginBottom?: string;
-  marginLeft?: string;
-  marginRight?: string;
-  width?: string;
-  height?: string;
-  maxWidth?: string;
-  minHeight?: string;
-  backgroundColor?: string;
-  backgroundImage?: string;
-  backgroundVideo?: string;
-  backgroundBlendMode?: string;
-  overlayColor?: string;
-  overlayOpacity?: number;
-  clipPathTop?: string;
-  clipPathBottom?: string;
-  border?: boolean;
-  borderType?: 'border1' | 'border2' | 'border3';
-  borderColor?: string;
-  borderWidth?: string;
-  borderStyle?: string;
-  borderRadius?: string;
-  boxShadow?: string;
-  variant?: 'initial' | 'retro' | 'modern' | 'futuristic' | 'default' | 'primary' | 'secondary' | 'accent';
-  color?: 'default' | 'primary' | 'secondary' | 'accent' | 'error';
-  animate?: string;
-  hoverAnimate?: string;
-  focusAnimate?: string;
-  activeAnimate?: string;
-  transitionDuration?: string;
-  transitionTiming?: string;
-  hidden?: boolean;
-  disabled?: boolean;
-  ariaLabel?: string;
-  customClasses?: string;
-  className?: string;
-  style?: string;
-  [key: string]: any;
+tag?: keyof HTMLElementTagNameMap;
+display?: 'block' | 'flex' | 'grid' | 'inline-flex' | 'inline-grid';
+cols?: string | number;
+autoFit?: boolean;
+autoFill?: boolean;
+flexDirection?: 'row' | 'row-reverse' | 'column' | 'column-reverse';
+flexWrap?: 'nowrap' | 'wrap' | 'wrap-reverse';
+xAlign?: 'left' | 'center' | 'right' | 'space-between' | 'space-around' | 'space-evenly' | 'normal';
+yAlign?: 'top' | 'center' | 'bottom' | 'stretch';
+align?: 'center';
+justifyItems?: 'start' | 'center' | 'end' | 'stretch';
+alignItems?: 'flex-start' | 'center' | 'flex-end' | 'baseline' | 'stretch';
+alignContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'stretch';
+padding?: string;
+paddingTop?: string;
+paddingBottom?: string;
+paddingLeft?: string;
+paddingRight?: string;
+margin?: string;
+marginTop?: string;
+marginBottom?: string;
+marginLeft?: string;
+marginRight?: string;
+width?: string;
+height?: string;
+maxWidth?: string;
+minHeight?: string;
+backgroundColor?: string;
+backgroundImage?: string;
+backgroundVideo?: string;
+backgroundBlendMode?: string;
+overlayColor?: string;
+overlayOpacity?: number;
+clipPathTop?: string;
+clipPathBottom?: string;
+border?: boolean;
+borderType?: 'border1' | 'border2' | 'border3';
+borderColor?: string;
+borderWidth?: string;
+borderStyle?: string;
+borderRadius?: string;
+boxShadow?: string;
+variant?: 'initial' | 'retro' | 'modern' | 'futuristic' | 'default' | 'primary' | 'secondary' | 'accent';
+color?: 'default' | 'primary' | 'secondary' | 'accent' | 'error';
+animate?: string;
+hoverAnimate?: string;
+focusAnimate?: string;
+activeAnimate?: string;
+transitionDuration?: string;
+transitionTiming?: string;
+hidden?: boolean;
+disabled?: boolean;
+ariaLabel?: string;
+customClasses?: string;
+className?: string;
+style?: string;
+[key: string]: any;
 }
 
 const {
-  tag = 'section',
-  display = 'block',
-  tagId,
-  cols = '1fr',
-  autoFit = false,
-  autoFill = false,
-  flexDirection = 'row',
-  flexWrap = 'nowrap',
-  xAlign = 'normal',
-  yAlign = 'top',
-  align,
-  justifyItems = 'stretch',
-  alignItems = 'stretch',
-  alignContent = 'stretch',
-  padding = 'md',
-  paddingTop,
-  paddingBottom,
-  paddingLeft,
-  paddingRight,
-  margin = 'md',
-  marginTop,
-  marginBottom,
-  marginLeft,
-  marginRight,
-  width = '100%',
-  height = 'auto',
-  maxWidth = '100%',
-  minHeight = '0',
-  backgroundColor,
-  backgroundImage,
-  backgroundVideo,
-  backgroundBlendMode,
-  overlayColor,
-  overlayOpacity = 0.3,
-  clipPathTop,
-  clipPathBottom,
-  border = false,
-  borderType = 'border1',
-  borderColor,
-  borderWidth,
-  borderStyle = 'solid',
-  borderRadius,
-  boxShadow,
-  variant = 'initial',
-  color = 'default',
-  animate,
-  hoverAnimate,
-  focusAnimate,
-  activeAnimate,
-  transitionDuration = '300ms',
-  transitionTiming = 'ease-in-out',
-  hidden = false,
-  disabled = false,
-  ariaLabel,
-  customClasses = '',
-  className = '',
-  style: inlineStyle = '',
-  ...restProps
+tag = 'section',
+display = 'block',
+tagId,
+cols = '1fr',
+autoFit = false,
+autoFill = false,
+flexDirection = 'row',
+flexWrap = 'nowrap',
+xAlign = 'normal',
+yAlign = 'top',
+align,
+justifyItems = 'stretch',
+alignItems = 'stretch',
+alignContent = 'stretch',
+padding = 'md',
+paddingTop,
+paddingBottom,
+paddingLeft,
+paddingRight,
+margin = 'md',
+marginTop,
+marginBottom,
+marginLeft,
+marginRight,
+width = '100%',
+height = 'auto',
+maxWidth = '100%',
+minHeight = '0',
+backgroundColor,
+backgroundImage,
+backgroundVideo,
+backgroundBlendMode,
+overlayColor,
+overlayOpacity = 0.3,
+clipPathTop,
+clipPathBottom,
+border = false,
+borderType = 'border1',
+borderColor,
+borderWidth,
+borderStyle = 'solid',
+borderRadius,
+boxShadow,
+variant = 'initial',
+color = 'default',
+animate,
+hoverAnimate,
+focusAnimate,
+activeAnimate,
+transitionDuration = '300ms',
+transitionTiming = 'ease-in-out',
+hidden = false,
+disabled = false,
+ariaLabel,
+customClasses = '',
+className = '',
+style: inlineStyle = '',
+...restProps
 } = Astro.props as Props;
 
 // --- UTIL ---
@@ -127,9 +127,9 @@ function getSpacing(val?: string){ return val ? spacingTokens[val as keyof typeo
 const Tag = tag;
 const isGrid = display.includes('grid');
 function getGridCols() {
-  if(autoFit) return 'repeat(auto-fit, minmax(250px, 1fr))';
-  if(autoFill) return 'repeat(auto-fill, minmax(250px, 1fr))';
-  return typeof cols === 'number' ? `repeat(${cols}, 1fr)` : String(cols);
+if(autoFit) return 'repeat(auto-fit, minmax(250px, 1fr))';
+if(autoFill) return 'repeat(auto-fill, minmax(250px, 1fr))';
+return typeof cols === 'number' ? `repeat(${cols}, 1fr)` : String(cols);
 }
 
 // RTL
@@ -156,66 +156,66 @@ const boxShadowFinal = boxShadow ?? getVariantToken('shadow') ?? 'none';
 
 // Classes
 const classes = [
-  display==='grid'?'wrapper-grid':display==='flex'?'wrapper-flex':'wrapper-block',
-  `wrapper-variant-${variant}`,
-  `wrapper-color-${color}`,
-  border ? `wrapper-border-${borderType}` : '',
-  boxShadowFinal !== 'none' ? `wrapper-shadow-${boxShadowFinal}`:'',
-  animate, hoverAnimate ? `hover-${hoverAnimate}`:'', focusAnimate ? `focus-${focusAnimate}`:'', activeAnimate ? `active-${activeAnimate}`:'',
-  hidden ? 'hidden':'', disabled ? 'disabled':'',
-  customClasses, className
+display==='grid'?'wrapper-grid':display==='flex'?'wrapper-flex':'wrapper-block',
+`wrapper-variant-${variant}`,
+`wrapper-color-${color}`,
+border ? `wrapper-border-${borderType}` : '',
+boxShadowFinal !== 'none' ? `wrapper-shadow-${boxShadowFinal}`:'',
+animate, hoverAnimate ? `hover-${hoverAnimate}`:'', focusAnimate ? `focus-${focusAnimate}`:'', activeAnimate ? `active-${activeAnimate}`:'',
+hidden ? 'hidden':'', disabled ? 'disabled':'',
+customClasses, className
 ].filter(Boolean).join(' ');
 
 // Styles
 const styles: Record<string,string> = {
-  display,
-  position:'relative',
-  'grid-template-columns': isGrid ? getGridCols() : '',
-  'justify-content': justifyFinal,
-  'align-items': alignItemsFinal,
-  'align-content': alignContent,
-  'justify-items': justifyItems,
-  'text-align': align ?? 'left',
-  overflow:'hidden',
-  height,width,'max-width':maxWidth,'min-height':minHeight,
-  'background-color': bgColor,
-  'background-image': backgroundImage ? `url(${backgroundImage})`:'',
-  'background-blend-mode': backgroundBlendMode ?? '',
-  border: border ? `${borderWidthFinal} ${borderStyle} ${borderColorFinal}`:'',
-  'border-radius': borderRadiusFinal,
-  'box-shadow': boxShadowFinal,
-  'padding-block-start': getSpacing(paddingTop) ?? getSpacing(padding),
-  'padding-block-end': getSpacing(paddingBottom) ?? getSpacing(padding),
-  'padding-inline-start': paddingInlineStart,
-  'padding-inline-end': paddingInlineEnd,
-  'margin-block-start': getSpacing(marginTop) ?? getSpacing(margin),
-  'margin-block-end': getSpacing(marginBottom) ?? getSpacing(margin),
-  'margin-inline-start': marginInlineStart,
-  'margin-inline-end': marginInlineEnd,
-  'clip-path': clipPathTop ?? clipPathBottom ?? '',
-  color: textColor,
-  'transition-property':'all',
-  'transition-duration':transitionDuration,
-  'transition-timing-function':transitionTiming,
-  ...inlineStyle ? {[inlineStyle]: ''} : {}
+display,
+position:'relative',
+'grid-template-columns': isGrid ? getGridCols() : '',
+'justify-content': justifyFinal,
+'align-items': alignItemsFinal,
+'align-content': alignContent,
+'justify-items': justifyItems,
+'text-align': align ?? 'left',
+overflow:'hidden',
+height,width,'max-width':maxWidth,'min-height':minHeight,
+'background-color': bgColor,
+'background-image': backgroundImage ? `url(${backgroundImage})`:'',
+'background-blend-mode': backgroundBlendMode ?? '',
+border: border ? `${borderWidthFinal} ${borderStyle} ${borderColorFinal}`:'',
+'border-radius': borderRadiusFinal,
+'box-shadow': boxShadowFinal,
+'padding-block-start': getSpacing(paddingTop) ?? getSpacing(padding),
+'padding-block-end': getSpacing(paddingBottom) ?? getSpacing(padding),
+'padding-inline-start': paddingInlineStart,
+'padding-inline-end': paddingInlineEnd,
+'margin-block-start': getSpacing(marginTop) ?? getSpacing(margin),
+'margin-block-end': getSpacing(marginBottom) ?? getSpacing(margin),
+'margin-inline-start': marginInlineStart,
+'margin-inline-end': marginInlineEnd,
+'clip-path': clipPathTop ?? clipPathBottom ?? '',
+color: textColor,
+'transition-property':'all',
+'transition-duration':transitionDuration,
+'transition-timing-function':transitionTiming,
+...inlineStyle ? {[inlineStyle]: ''} : {}
 };
 const styleString = Object.entries(styles).filter(([,v])=>v!=='').map(([k,v])=>`${k}:${v}`).join(';');
 ---
 
 <Tag id={tagId} class={classes} style={styleString} aria-label={ariaLabel} {...restProps}>
-  {backgroundVideo && (
-    <video autoplay muted loop playsinline class="wrapper-bg-video">
-      <source src={backgroundVideo} type="video/mp4" />
-    </video>
-  )}
-  {(overlayColor ?? getVariantToken('overlay-bg')) && (
-    <div class="wrapper-overlay" style={`background-color:${overlayColor ?? getVariantToken('overlay-bg')};opacity:${overlayOpacity};`}></div>
-  )}
-  <slot name="top-svg" />
-  <slot name="divider-top" />
-  <slot />
-  <slot name="divider-bottom" />
-  <slot name="bottom-svg" />
+{backgroundVideo && (
+  <video autoplay muted loop playsinline class="wrapper-bg-video">
+    <source src={backgroundVideo} type="video/mp4" />
+  </video>
+)}
+{(overlayColor ?? getVariantToken('overlay-bg')) && (
+  <div class="wrapper-overlay" style={`background-color:${overlayColor ?? getVariantToken('overlay-bg')};opacity:${overlayOpacity};`}></div>
+)}
+<slot name="top-svg" />
+<slot name="divider-top" />
+<slot />
+<slot name="divider-bottom" />
+<slot name="bottom-svg" />
 </Tag>
 
 <style>

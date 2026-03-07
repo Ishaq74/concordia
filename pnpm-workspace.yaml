@@ -1,6 +1,11 @@
-onlyBuiltDependencies:
-
+ignoredBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
   - better-sqlite3
-  - esbuild
   - msw
+  - prisma
+
+onlyBuiltDependencies:
+  - esbuild
+  - puppeteer
   - sharp

@@ -64,7 +64,7 @@ async function generateReadmeForLang(lang: Lang) {
   const tocTitle = `## ${t.toc[lang]}\n\n`;
   const tocLines = [];
   const headingRegex = /^##\s+(.+)$/gm;
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = headingRegex.exec(mainContent))) {
     const title = match[1].trim();
     const anchor = githubSlug(title);

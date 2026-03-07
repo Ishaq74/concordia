@@ -8,7 +8,7 @@ import pa11y from 'pa11y';
 import { startFlow } from 'lighthouse';
 import fs from 'fs';
 import path from 'path';
-import puppeteer, { Browser as PuppeteerBrowser, Page as PuppeteerPage } from 'puppeteer';
+import puppeteer from 'puppeteer';
 
 
 // Regression
@@ -242,7 +242,7 @@ export function expectEdgeCases(html: string, options?: { selector?: string, cus
   }
   // Edge case : cases (patterns à tester, shouldMatch true/false)
   if (Array.isArray(options.cases)) {
-    options.cases.forEach(({ description, pattern, shouldMatch }) => {
+    options.cases.forEach(({ description: _description, pattern, shouldMatch }) => {
       if (options.strict) {
         if (shouldMatch) {
           if (typeof pattern === 'string') {
@@ -416,7 +416,7 @@ export async function expectPerformance(html: string, options?: { selector?: str
   // Mesure de performance
   const start = performance.now();
   // Simulation : parsing du HTML (peut être remplacé par un vrai rendu)
-  const parsed = target.split('>').length;
+  target.split('>').length;
   const end = performance.now();
   const duration = end - start;
   // Edge case : min/max duration
@@ -668,7 +668,8 @@ export async function expectNoA11yViolations(html: string) {
     },
   };
   const { window } = new JSDOM(html);
-  const results = await axe.run(window.document.body, axeOptions);
+  const axeResult = await (axe.run as Function)(window.document.body, axeOptions);
+  const results = axeResult as { violations: unknown[] };
   // Edge case : violations non nulles
   expect(results.violations).toHaveLength(0);
 }
@@ -676,7 +677,7 @@ export async function expectNoA11yViolations(html: string) {
 // Batch rendering (stress test, générique)
 export async function batchRender(container: AstroContainer, Component: any, props: ComponentProps<any>, count: number, slotLabel: string = 'Item') {
   const options = arguments.length > 5 && typeof arguments[5] === 'object' ? arguments[5] : {};
-  return await Promise.all(
+  return Promise.all(
     Array.from({ length: count }, (_, i) => {
       const slot = options.slots ? options.slots(i) : { default: `${slotLabel} ${i + 1}` };
       const p = options.propsFn ? options.propsFn(i) : props;
@@ -686,7 +687,7 @@ export async function batchRender(container: AstroContainer, Component: any, pro
 }
 
 // Mutation (props illégales)
-export function expectMutationHandled(html: string, key: string) {
+export function expectMutationHandled(html: string, key: string | RegExp) {
   const options = arguments.length > 2 && typeof arguments[2] === 'object' ? arguments[2] : { shouldContain: true };
   if (options.shouldContain) {
     if (key instanceof RegExp) {
@@ -844,7 +845,7 @@ export function expectHasText(html: string, expected: string, options?: any) {
       expect(target).toContain(expected);
     }
   } else {
-    expect(target).not.toContain(text);
+    expect(target).not.toContain(expected);
   }
 }
 
@@ -864,7 +865,7 @@ export function expectHTMLStructure(result: string) {
   expect(result).not.toMatch(/<[^/>]*$/);
 }
 
-export async function expectPa11yNoIssues(page: import('puppeteer').Page, browser: import('puppeteer').Browser, fileUrl: string) {
+export async function expectPa11yNoIssues(_page: import('puppeteer').Page, _browser: import('puppeteer').Browser, _fileUrl: string) {
   const args = Array.from(arguments);
   let htmlOrUrl = args[0];
   let options = args.length > 1 && typeof args[1] === 'object' ? args[1] : {};
@@ -890,7 +891,7 @@ export async function expectPa11yNoIssues(page: import('puppeteer').Page, browse
 }
 
 // Playwright icon
-export async function expectPlaywrightIcon(html: string) {
+export async function expectPlaywrightIcon(_html: string) {
   const args = Array.from(arguments);
   let htmlMarkup = args[0];
   let options = args.length > 1 && typeof args[1] === 'object' ? args[1] : { shouldHaveIcon: true };
@@ -908,7 +909,7 @@ export async function expectPlaywrightIcon(html: string) {
 }
 
 // Playwright disabled
-export async function expectPlaywrightDisabled(html: string) {
+export async function expectPlaywrightDisabled(_html: string) {
   const args = Array.from(arguments);
   let htmlMarkup = args[0];
   let options = args.length > 1 && typeof args[1] === 'object' ? args[1] : { shouldBeDisabled: true };
@@ -926,7 +927,7 @@ export async function expectPlaywrightDisabled(html: string) {
 }
 
 // Playwright text
-export async function expectPlaywrightText(html: string, expected: string) {
+export async function expectPlaywrightText(_html: string, _expected: string) {
   const args = Array.from(arguments);
   let htmlMarkup = args[0];
   let expectedText = args[1];
@@ -953,7 +954,7 @@ export async function expectPlaywrightText(html: string, expected: string) {
 }
 
 // Lighthouse accessibility
-export async function expectLighthouseAccessibility(html: string, reportDir: string) {
+export async function expectLighthouseAccessibility(_html: string, reportDir: string) {
   const args = Array.from(arguments);
   let htmlMarkup = args[0];
   // reportDir déjà déclaré comme paramètre, ne pas redéclarer

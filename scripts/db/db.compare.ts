@@ -12,7 +12,8 @@ config();
 const urlLocal = process.env.DATABASE_URL_LOCAL;
 const urlProd = process.env.DATABASE_URL_PROD;
 
-function mask(u?: string) { return u ? u.replace(/:\/\/[^@]+@, '://***@') : 'N/A'; }
+function mask(u?: string) { return u ? u.replace(/:\/\/[^@]+@/, '://***@') : 'N/A'; }
+  
 function dbName(u?: string) { try { return u ? new URL(u).pathname.replace(/^\//,'') : 'unknown'; } catch { return (u||'').split('/').pop() || 'unknown'; } }
 
 console.log(`Comparaison: local=${dbName(urlLocal)} (${mask(urlLocal)})  ↔  prod=${dbName(urlProd)} (${mask(urlProd)})`);

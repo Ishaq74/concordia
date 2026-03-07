@@ -20,7 +20,7 @@ export async function generateDatabaseSection(lang: Lang = 'en') {
   // Match export * from './schemas/ANYTHING'; (with or without .schema, .ts, quotes)
   const exportRegex = /export\s*\*\s*from\s*['"]\.\/schemas\/([\w.-]+)['"]/g;
   const exportedFiles: string[] = [];
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = exportRegex.exec(barrelContent)) !== null) {
     let file = match[1];
     if (!file.endsWith('.ts')) file += '.ts';
@@ -66,13 +66,13 @@ export async function generateDatabaseSection(lang: Lang = 'en') {
     const allRelations = [];
     // Matches: export const blogPostsRelations = relations(blogPosts, ({ many }) => ({ ... }));
     const relExportRegex = /export\s+const\s+(\w+)Relations\s*=\s*relations\(\s*(\w+)\s*,[^=]*=>\s*\((\{[\s\S]*?\})\)\s*\);/gm;
-    let relMatch;
+    let relMatch: RegExpExecArray | null;
     while ((relMatch = relExportRegex.exec(content)) !== null) {
       // (debug output removed)
       const relBody = relMatch[3];
       const relFieldRegex = /([a-zA-Z0-9_]+)\s*:\s*(one|many)\s*\(/g;
       const rels = [];
-      let relFieldMatch;
+      let relFieldMatch: RegExpExecArray | null;
       while ((relFieldMatch = relFieldRegex.exec(relBody)) !== null) {
         rels.push({
           name: relFieldMatch[1],
@@ -95,7 +95,7 @@ export async function generateDatabaseSection(lang: Lang = 'en') {
       // Match lines like: fieldName: type(...)
       const fieldRegex = /([a-zA-Z0-9_]+)\s*:\s*([a-zA-Z0-9_]+)\s*\(/g;
       const fields = [];
-      let fieldMatch;
+      let fieldMatch: RegExpExecArray | null;
       while ((fieldMatch = fieldRegex.exec(fieldsBlock)) !== null) {
         fields.push({
           name: fieldMatch[1],

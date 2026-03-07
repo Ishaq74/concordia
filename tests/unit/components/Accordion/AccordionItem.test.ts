@@ -4,10 +4,7 @@ import AccordionItem from "@components/ui/Accordion/AccordionItem.astro";
 import {
   expectHTML,
   expectSemantics,
-  expectEdgeCases,
   expectImmutability,
-  expectProduction,
-  expectRegression,
   expectSecurity
 } from "@tests/helpers/uiTestHelpers";
 
@@ -73,11 +70,11 @@ describe("AccordionItem component contract", () => {
   });
   // Polymorphisme
   it("Polymorphism: slot text, HTML, emoji, number, whitespace", async () => {
-    expect((await render({}, { default: "Plain text" })).toString()).toContain("Plain text");
-    expect((await render({}, { default: "<b>HTML</b>" })).toString()).toContain("<b>HTML");
-    expect((await render({}, { default: "🚀" })).toString()).toContain("🚀");
-    expect((await render({}, { default: "42" })).toString()).toContain("42");
-    expect((await render({}, { default: "  Trimmed  " })).toString()).toContain("Trimmed");
+    expect((await render({}, { default: "Plain text", title: "Title" })).toString()).toContain("Plain text");
+    expect((await render({}, { default: "<b>HTML</b>", title: "Title" })).toString()).toContain("<b>HTML");
+    expect((await render({}, { default: "🚀", title: "Title" })).toString()).toContain("🚀");
+    expect((await render({}, { default: "42", title: "Title" })).toString()).toContain("42");
+    expect((await render({}, { default: "  Trimmed  ", title: "Title" })).toString()).toContain("Trimmed");
   });
   // CSS/data-attrs
   it("CSS/data-attrs: classes, data-*", async () => {

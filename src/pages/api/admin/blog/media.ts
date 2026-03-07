@@ -35,7 +35,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
   if (search) conditions.push(ilike(blogMedia.url, `%${search}%`));
 
   let total: number;
-  let media;
+  let media: (typeof blogMedia.$inferSelect)[];
 
   if (conditions.length === 0) {
     const [totalResult] = await db

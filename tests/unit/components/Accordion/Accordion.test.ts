@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it } from "vitest";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import Accordion from "@components/ui/Accordion/Accordion.astro";
 import {
