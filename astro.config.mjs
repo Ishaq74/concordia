@@ -10,6 +10,7 @@ import Icon from 'astro-icon';
 
 import mdx from '@astrojs/mdx';
 
+
 let adapter = vercel();
 if (process.argv && process.argv.includes('--node')) {
   adapter = node({ mode: 'standalone' });

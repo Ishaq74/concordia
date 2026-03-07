@@ -1,0 +1,238 @@
+---
+interface Props {
+  tag?: keyof HTMLElementTagNameMap;
+  display?: 'block' | 'flex' | 'grid' | 'inline-flex' | 'inline-grid';
+  cols?: string | number;
+  autoFit?: boolean;
+  autoFill?: boolean;
+  flexDirection?: 'row' | 'row-reverse' | 'column' | 'column-reverse';
+  flexWrap?: 'nowrap' | 'wrap' | 'wrap-reverse';
+  xAlign?: 'left' | 'center' | 'right' | 'space-between' | 'space-around' | 'space-evenly' | 'normal';
+  yAlign?: 'top' | 'center' | 'bottom' | 'stretch';
+  align?: 'center';
+  justifyItems?: 'start' | 'center' | 'end' | 'stretch';
+  alignItems?: 'flex-start' | 'center' | 'flex-end' | 'baseline' | 'stretch';
+  alignContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'stretch';
+  padding?: string;
+  paddingTop?: string;
+  paddingBottom?: string;
+  paddingLeft?: string;
+  paddingRight?: string;
+  margin?: string;
+  marginTop?: string;
+  marginBottom?: string;
+  marginLeft?: string;
+  marginRight?: string;
+  width?: string;
+  height?: string;
+  maxWidth?: string;
+  minHeight?: string;
+  backgroundColor?: string;
+  backgroundImage?: string;
+  backgroundVideo?: string;
+  backgroundBlendMode?: string;
+  overlayColor?: string;
+  overlayOpacity?: number;
+  clipPathTop?: string;
+  clipPathBottom?: string;
+  border?: boolean;
+  borderType?: 'border1' | 'border2' | 'border3';
+  borderColor?: string;
+  borderWidth?: string;
+  borderStyle?: string;
+  borderRadius?: string;
+  boxShadow?: string;
+  variant?: 'initial' | 'retro' | 'modern' | 'futuristic' | 'default' | 'primary' | 'secondary' | 'accent';
+  color?: 'default' | 'primary' | 'secondary' | 'accent' | 'error';
+  animate?: string;
+  hoverAnimate?: string;
+  focusAnimate?: string;
+  activeAnimate?: string;
+  transitionDuration?: string;
+  transitionTiming?: string;
+  hidden?: boolean;
+  disabled?: boolean;
+  ariaLabel?: string;
+  customClasses?: string;
+  className?: string;
+  style?: string;
+  [key: string]: any;
+}
+
+const {
+  tag = 'section',
+  display = 'block',
+  tagId,
+  cols = '1fr',
+  autoFit = false,
+  autoFill = false,
+  flexDirection = 'row',
+  flexWrap = 'nowrap',
+  xAlign = 'normal',
+  yAlign = 'top',
+  align,
+  justifyItems = 'stretch',
+  alignItems = 'stretch',
+  alignContent = 'stretch',
+  padding = 'md',
+  paddingTop,
+  paddingBottom,
+  paddingLeft,
+  paddingRight,
+  margin = 'md',
+  marginTop,
+  marginBottom,
+  marginLeft,
+  marginRight,
+  width = '100%',
+  height = 'auto',
+  maxWidth = '100%',
+  minHeight = '0',
+  backgroundColor,
+  backgroundImage,
+  backgroundVideo,
+  backgroundBlendMode,
+  overlayColor,
+  overlayOpacity = 0.3,
+  clipPathTop,
+  clipPathBottom,
+  border = false,
+  borderType = 'border1',
+  borderColor,
+  borderWidth,
+  borderStyle = 'solid',
+  borderRadius,
+  boxShadow,
+  variant = 'initial',
+  color = 'default',
+  animate,
+  hoverAnimate,
+  focusAnimate,
+  activeAnimate,
+  transitionDuration = '300ms',
+  transitionTiming = 'ease-in-out',
+  hidden = false,
+  disabled = false,
+  ariaLabel,
+  customClasses = '',
+  className = '',
+  style: inlineStyle = '',
+  ...restProps
+} = Astro.props as Props;
+
+// --- UTIL ---
+const spacingTokens = { none:'0', xsm:'var(--space-1)', sm:'var(--space-2)', md:'var(--space-4)', lg:'var(--space-6)', xl:'var(--space-8)', '2xl':'var(--space-10)' };
+function getSpacing(val?: string){ return val ? spacingTokens[val as keyof typeof spacingTokens] ?? val : ''; }
+
+const Tag = tag;
+const isGrid = display.includes('grid');
+function getGridCols() {
+  if(autoFit) return 'repeat(auto-fit, minmax(250px, 1fr))';
+  if(autoFill) return 'repeat(auto-fill, minmax(250px, 1fr))';
+  return typeof cols === 'number' ? `repeat(${cols}, 1fr)` : String(cols);
+}
+
+// RTL
+const isRTL = typeof document !== 'undefined' ? document.dir === 'rtl' : false;
+const paddingInlineStart = isRTL ? getSpacing(paddingRight) ?? getSpacing(padding) : getSpacing(paddingLeft) ?? getSpacing(padding);
+const paddingInlineEnd = isRTL ? getSpacing(paddingLeft) ?? getSpacing(padding) : getSpacing(paddingRight) ?? getSpacing(padding);
+const marginInlineStart = isRTL ? getSpacing(marginRight) ?? getSpacing(margin) : getSpacing(marginLeft) ?? getSpacing(margin);
+const marginInlineEnd = isRTL ? getSpacing(marginLeft) ?? getSpacing(margin) : getSpacing(marginRight) ?? getSpacing(margin);
+
+// Alignment maps
+const justifyMap = { left:'flex-start', center:'center', right:'flex-end', 'space-between':'space-between','space-around':'space-around','space-evenly':'space-evenly', normal:'normal' };
+const justifyFinal = align==='center'? 'center': justifyMap[xAlign] ?? 'flex-start';
+const alignMap = { top:'flex-start', center:'center', bottom:'flex-end', stretch:'stretch' };
+const alignItemsFinal = align==='center'? 'center': alignMap[yAlign] ?? alignItems;
+
+// Variant token helpers
+function getVariantToken(token: string){ return `var(--${variant}-${token})`; }
+const bgColor = backgroundColor ?? getVariantToken('card-bg');
+const textColor = getVariantToken('card-color');
+const borderColorFinal = borderColor ?? getVariantToken('card-border-color');
+const borderWidthFinal = borderWidth ?? ({border1:'1px',border2:'2px',border3:'4px'}[borderType] || '1px');
+const borderRadiusFinal = borderRadius ?? getVariantToken('border-radius') ?? '0';
+const boxShadowFinal = boxShadow ?? getVariantToken('shadow') ?? 'none';
+
+// Classes
+const classes = [
+  display==='grid'?'wrapper-grid':display==='flex'?'wrapper-flex':'wrapper-block',
+  `wrapper-variant-${variant}`,
+  `wrapper-color-${color}`,
+  border ? `wrapper-border-${borderType}` : '',
+  boxShadowFinal !== 'none' ? `wrapper-shadow-${boxShadowFinal}`:'',
+  animate, hoverAnimate ? `hover-${hoverAnimate}`:'', focusAnimate ? `focus-${focusAnimate}`:'', activeAnimate ? `active-${activeAnimate}`:'',
+  hidden ? 'hidden':'', disabled ? 'disabled':'',
+  customClasses, className
+].filter(Boolean).join(' ');
+
+// Styles
+const styles: Record<string,string> = {
+  display,
+  position:'relative',
+  'grid-template-columns': isGrid ? getGridCols() : '',
+  'justify-content': justifyFinal,
+  'align-items': alignItemsFinal,
+  'align-content': alignContent,
+  'justify-items': justifyItems,
+  'text-align': align ?? 'left',
+  overflow:'hidden',
+  height,width,'max-width':maxWidth,'min-height':minHeight,
+  'background-color': bgColor,
+  'background-image': backgroundImage ? `url(${backgroundImage})`:'',
+  'background-blend-mode': backgroundBlendMode ?? '',
+  border: border ? `${borderWidthFinal} ${borderStyle} ${borderColorFinal}`:'',
+  'border-radius': borderRadiusFinal,
+  'box-shadow': boxShadowFinal,
+  'padding-block-start': getSpacing(paddingTop) ?? getSpacing(padding),
+  'padding-block-end': getSpacing(paddingBottom) ?? getSpacing(padding),
+  'padding-inline-start': paddingInlineStart,
+  'padding-inline-end': paddingInlineEnd,
+  'margin-block-start': getSpacing(marginTop) ?? getSpacing(margin),
+  'margin-block-end': getSpacing(marginBottom) ?? getSpacing(margin),
+  'margin-inline-start': marginInlineStart,
+  'margin-inline-end': marginInlineEnd,
+  'clip-path': clipPathTop ?? clipPathBottom ?? '',
+  color: textColor,
+  'transition-property':'all',
+  'transition-duration':transitionDuration,
+  'transition-timing-function':transitionTiming,
+  ...inlineStyle ? {[inlineStyle]: ''} : {}
+};
+const styleString = Object.entries(styles).filter(([,v])=>v!=='').map(([k,v])=>`${k}:${v}`).join(';');
+---
+
+<Tag id={tagId} class={classes} style={styleString} aria-label={ariaLabel} {...restProps}>
+  {backgroundVideo && (
+    <video autoplay muted loop playsinline class="wrapper-bg-video">
+      <source src={backgroundVideo} type="video/mp4" />
+    </video>
+  )}
+  {(overlayColor ?? getVariantToken('overlay-bg')) && (
+    <div class="wrapper-overlay" style={`background-color:${overlayColor ?? getVariantToken('overlay-bg')};opacity:${overlayOpacity};`}></div>
+  )}
+  <slot name="top-svg" />
+  <slot name="divider-top" />
+  <slot />
+  <slot name="divider-bottom" />
+  <slot name="bottom-svg" />
+</Tag>
+
+<style>
+.wrapper-block,.wrapper-flex,.wrapper-grid{position:relative;overflow:hidden;}
+.wrapper-block{display:block;}.wrapper-flex{display:flex;}.wrapper-grid{display:grid;}
+.wrapper-bg-video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;}
+.wrapper-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;}
+.hidden{display:none!important;}
+.disabled{pointer-events:none;opacity:0.5;}
+/* Borders & Shadows */
+.wrapper-border-border1{border:1px solid currentColor;}
+.wrapper-border-border2{border:2px solid currentColor;}
+.wrapper-border-border3{border:4px solid currentColor;}
+.wrapper-shadow-none{box-shadow:none;}
+.wrapper-shadow-sm{box-shadow:var(--shadow-sm);}
+.wrapper-shadow-md{box-shadow:var(--shadow-md);}
+.wrapper-shadow-lg{box-shadow:var(--shadow-lg);}
+.wrapper-shadow-xl{box-shadow:var(--shadow-xl);}
+/* Variants dynamic handled via tokens in JS */
+</style>
