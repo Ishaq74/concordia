@@ -52,9 +52,11 @@ Este proyecto demuestra una aplicación web full-stack usando tecnologías moder
 - **fast-glob**: `^3.3.3`
 - **jose**: `^6.1.3`
 - **leaflet**: `^1.9.4`
+- **lighthouse**: `^13.0.3`
 - **markdown-it**: `^14.1.1`
 - **nanoid**: `^5.1.6`
 - **nodemailer**: `^7.0.13`
+- **pa11y**: `^9.1.1`
 - **pg**: `^8.18.0`
 - **typescript**: `^5.9.3`
 - **validator**: `^13.15.26`
@@ -157,6 +159,7 @@ npm install
     - db.migrate.ts
     - db.seed.ts
     - db.sync.ts
+  - generate-unit-matrix.ts
   - **readme**
     - generateDatabase.ts
     - generateDeps.ts
@@ -663,6 +666,7 @@ npm install
       - components.css
       - spacing.css
       - typography.css
+- temp.js
 - **test-results**
 - **tests**
   - **a11y**
@@ -712,7 +716,28 @@ npm install
   - setup.ts
   - **unit**
     - **components**
-      - Button.test.ts
+      - **Alert**
+        - Alert.test.ts
+        - **reports**
+          - lighthouse-alert-report.html
+          - pa11y-alert-report.json
+        - **__snapshots__**
+          - Alert.test.ts.snap
+      - **Badge**
+        - **reports**
+          - lighthouse-alert-report.html
+          - pa11y-alert-report.json
+        - **__snapshots__**
+          - Badge.test.ts.snap
+      - **Button**
+        - Button.test.ts
+        - **reports**
+          - lighthouse-report.html
+          - pa11y-report.json
+        - **__snapshots__**
+          - Button.test.ts.snap
+    - **generated**
+      - Badge.unit.matrix.ts
     - **loaders**
       - factory.test.ts
     - smtp.test.ts
@@ -722,7 +747,6 @@ npm install
     - api-helpers.ts
     - cleanup.ts
     - transaction.ts
-- **tests-results**
 - tsconfig.json
 - vitest.config.ts
 - **wireframes**
@@ -1546,7 +1570,28 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 - setup.ts
 - **unit**
   - **components**
-    - Button.test.ts
+    - **Alert**
+      - Alert.test.ts
+      - **reports**
+        - lighthouse-alert-report.html
+        - pa11y-alert-report.json
+      - **__snapshots__**
+        - Alert.test.ts.snap
+    - **Badge**
+      - **reports**
+        - lighthouse-alert-report.html
+        - pa11y-alert-report.json
+      - **__snapshots__**
+        - Badge.test.ts.snap
+    - **Button**
+      - Button.test.ts
+      - **reports**
+        - lighthouse-report.html
+        - pa11y-report.json
+      - **__snapshots__**
+        - Button.test.ts.snap
+  - **generated**
+    - Badge.unit.matrix.ts
   - **loaders**
     - factory.test.ts
   - smtp.test.ts
@@ -1941,25 +1986,284 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - **Escalade**
     - refuse modification de rôle sans autorisation
 
-- `tests\unit\components\Button.test.ts`
+- `tests\unit\components\Alert\Alert.test.ts`
+  - **ui/Alert**
+    - unit: ${t.name}
+    - axe-core: alert with info status is accessible
+    - axe-core: alert with success status is accessible
+    - axe-core: dismissible alert is accessible
+    - axe-core: alert with title is accessible
+    - playwright: renders alert and verifies text content
+    - playwright: close button removes alert when clicked
+    - playwright: icon is rendered correctly
+    - playwright: data-status attribute is correctly set
+    - snapshot: default alert
+    - snapshot: alert with all props
+    - pa11y: accessible default alert
+    - lighthouse: default alert
+    - mutation: handles invalid status gracefully
+    - mutation: handles missing icon gracefully
+    - stress: renders 1000 alerts without performance degradation
+    - symmetry: toggling dismissible state results in expected DOM changes
+    - symmetry: toggling title presence results in expected DOM changes
+    - symmetry: toggling icon presence results in expected DOM changes
+    - reversibility: toggling dismissible state twice returns to original DOM
+    - reversibility: toggling title presence twice returns to original DOM
+    - reversibility: changing status multiple times maintains structure
+    - isolation: renders correctly within a styled parent
+    - isolation: maintains accessibility when nested
+    - isolation: alert class context is independent
+    - boundary: handles extremely long message
+    - boundary: handles unicode characters in content
+    - boundary: handles special HTML characters in title
+    - boundary: handles empty strings gracefully
+    - boundary: handles null/undefined values
+    - boundary: handles deeply nested slot content
+    - boundary: handles very long className
+    - integration: combines multiple props and slots
+    - integration: dismissible alert with all status types
+    - integration: alert with all variant types
+    - integration: message prop takes precedence over slot
+    - integration: default icon based on status
+    - interactive: close button has proper aria-label
+    - interactive: alert role is present and correct
+    - interactive: multiple alerts can coexist
+    - interactive: title is rendered as strong tag
+    - interactive: icon is rendered inside alert
+    - aria: alert has role="alert" attribute
+    - aria: close button has type="button"
+    - aria: title is wrapped in strong tag for semantics
+    - aria: alert has data-status attribute for styling hooks
+    - aria: close button has aria-label for accessibility
+    - performance: renders quickly with simple props
+    - performance: renders quickly with complex props
+    - performance: renders 100 alerts concurrently
+    - performance: renders 1000 alerts sequentially
+    - html: generates valid HTML structure
+    - html: no unclosed tags
+    - html: properly escaped attributes
+    - html: no XSS vulnerabilities
+    - w3c: alert div has role attribute
+    - w3c: data-status attribute values are valid
+    - w3c: close button type is button
+    - w3c: attribute names are lowercase
+    - w3c: no deprecated attributes
+    - w3c: semantic HTML structure
+    - immutability: rendering same props twice produces identical HTML
+    - immutability: props object is not mutated
+    - immutability: different props produce different HTML
+    - polymorphic: slot accepts text content
+    - polymorphic: slot accepts HTML entities
+    - polymorphic: slot accepts numbers
+    - polymorphic: slot accepts emoji
+    - polymorphic: message prop accepts rich content
+    - css: applies variant classes
+    - css: applies status classes
+    - css: combines variant and status classes
+    - css: applies custom className
+    - css: omits initial variant class
+    - css: alert class is always present
+    - css: multiple space-separated classes
+    - css: preserves class order
+    - css: class attribute is not duplicated
+    - data-attrs: has data-status attribute
+    - data-attrs: all status types have data-status
+    - data-attrs: data-status is always lowercase
+    - integration-pw: full alert workflow
+    - integration-pw: alert with all variants
+    - integration-pw: dismissible alert removes on close
+    - regression: alert renders consistently
+    - regression: message prop does not break with special chars
+    - regression: className does not override critical attributes
+    - regression: icon prop does not break without value
+    - regression: title renders correctly when empty string
+    - regression: message takes precedence over slot
+    - regression: slot renders when no message provided
+    - regression: variant initial does not add extra class
+    - regression: null/undefined props handled gracefully
+    - stability: alert is root element
+    - stability: SVG is nested within alert
+    - stability: content div is properly nested
+    - stability: close button is last child when dismissible
+    - stability: no whitespace nodes between elements
+    - compat: uses standard div element
+    - compat: role="alert" is standard ARIA
+    - compat: data-* attributes are HTML5 standard
+    - compat: SVG icons supported in modern browsers
+    - compat: no vendor prefixes needed
+    - compat: no proprietary attributes
+    - compat: uses standard button element for close
+    - security: prevents XSS in slot content
+    - security: prevents XSS in title prop
+    - security: prevents XSS in message prop
+    - security: prevents XSS in className prop
+    - security: sanitizes HTML special characters in all props
+    - security: prevents attribute injection via className
+    - security: no eval or Function constructor usage
+    - security: no inline event handlers
+    - security: onclick in message is escaped
+    - security: no dangerous protocols
+    - semantics: alert role identifies interactive region
+    - semantics: title is semantically strong
+    - semantics: message content is accessible
+    - semantics: close button has descriptive label
+    - semantics: icon is semantic element
+    - final: complete alert with all features
+    - final: minimal alert renders without errors
+    - final: alert with all status types is valid
+    - final: alert with all variant types is valid
+    - final: accessibility audit passes
+    - final: performance acceptable for component library
+    - final: no console errors during render
+    - final: component is tree-shakeable and portable
+    - final: all props combinations work together
+    - final: alert maintains state across re-renders
+    - final: component exports are correct
+    - final: no memory leaks during batch rendering
+    - final: component is production-ready
+    - final: handles edge cases gracefully
+    - final: snapshot test for regression detection
+    - final: output is deterministic
+    - final: integrates with Astro ecosystem
+    - final: documentation example works correctly
+    - final: message prop priority over slot
+    - final: default icon per status renders
+    - final: custom icon overrides default
+    - final: all classes applied correctly
+    - final: data attributes set correctly
+    - final: role attribute always present
+    - final: title and message coexist
+    - final: icon renders as SVG
+    - final: empty alert renders safely
+    - final: very long content handled
+    - final: special characters escaped
+    - final: component ready for production deployment
+
+- `tests\unit\components\Button\Button.test.ts`
   - **ui/Button**
-    - renders a <button> with its children by default
-    - applies variant and color classes
-    - forwards aria-label and disabled attribute
-    - renders an icon when provided
-    - defaults type attribute to "button" and allows overriding
-    - forwards arbitrary HTML attributes and custom className
-    - does not render an <svg> when no icon prop is provided
-    - renders the icon on the correct side
-    - omits default variant/color classes entirely
-    - accepts error color and appends it to classes
-    - does not render disabled or aria-label when falsy/undefined
-    - does nothing when icon side is missing or invalid
-    - className is always appended after variant/color and wins over raw class attr
-    - explicit type prop is respected
-    - renders well-formed markup and disabled appears only once
-    - has no accessibility violations with default content
-    - has no accessibility violations when icon is provided
+    - unit: ${t.name}
+    - axe-core: accessible with default content
+    - axe-core: accessible with icon
+    - playwright: renders text, is clickable, respects disabled
+    - playwright: icon rendered and positioned correctly
+    - playwright: disabled button cannot be clicked
+    - snapshot: default button
+    - pa11y: accessible default button
+    - lighthouse: default button
+    - mutation: handles invalid props gracefully
+    - stress: renders 1000 buttons without performance degradation
+    - symmetry: toggling disabled state results in expected DOM changes
+    - symmetry: toggling icon presence results in expected DOM changes
+    - reversibility: toggling disabled state twice returns to original DOM
+    - reversibility: toggling icon presence twice returns to original DOM
+    - isolation: renders correctly within a styled parent
+    - isolation: maintains accessibility attributes when nested
+    - boundary: handles extremely long string props
+    - boundary: handles unicode characters in props
+    - boundary: handles deeply nested objects in props
+    - interactive: button click events work with Playwright
+    - interactive: disabled button is not clickable
+    - interactive: button type attribute is correctly set
+    - interactive: icon renders with correct side attribute
+    - focus: button is focusable
+    - focus: disabled button is not focusable
+    - focus: tab order is correct with multiple buttons
+    - keyboard: Enter key activates button
+    - keyboard: Space key activates button
+    - keyboard: Escape key does not affect button
+    - aria: aria-label is correctly set
+    - aria: aria-label takes precedence over slot content
+    - aria: button without aria-label still has accessible text
+    - aria: icon with button has proper role
+    - aria: disabled button has aria-disabled attribute
+    - aria: button with icon has descriptive aria-label
+    - performance: renders quickly with simple props
+    - performance: renders quickly with complex props
+    - performance: renders 100 buttons concurrently
+    - performance: renders 1000 buttons sequentially with acceptable time
+    - html: generates valid HTML structure
+    - html: no unclosed tags
+    - html: properly escaped attributes
+    - html: no XSS vulnerabilities in attributes
+    - w3c: button element conforms to HTML spec
+    - w3c: type attribute values are valid
+    - w3c: disabled attribute is boolean
+    - w3c: attribute names are lowercase
+    - w3c: no deprecated attributes used
+    - w3c: semantic HTML structure is correct
+    - immutability: rendering same props twice produces identical HTML
+    - immutability: props object is not mutated
+    - immutability: different props produce different HTML
+    - polymorphic: slot accepts text content
+    - polymorphic: slot accepts HTML entities
+    - polymorphic: slot accepts numbers
+    - polymorphic: slot accepts emoji
+    - polymorphic: slot with whitespace handling
+    - css: applies variant classes
+    - css: applies color classes
+    - css: combines variant and color classes
+    - css: applies custom className prop
+    - css: className is appended after variant/color
+    - css: omits default variant/color when initial/default specified
+    - data-attrs: forwards data-* attributes
+    - data-attrs: handles data attributes with special characters
+    - data-attrs: multiple data attributes coexist
+    - data-attrs: escapes quotes in data attribute values
+    - data-attrs: handles empty data attribute values
+    - data-attrs: preserves data attribute case
+    - integration-pw: full button workflow with Playwright
+    - integration-pw: button with icon workflow
+    - regression: button renders consistently after multiple renders
+    - regression: disabled button does not render onclick
+    - regression: icon prop does not break without side
+    - regression: className does not override critical attributes
+    - regression: slot content preserves formatting
+    - regression: empty string props do not render
+    - regression: null/undefined props are ignored
+    - regression: very long className does not break layout
+    - stability: button element is the only root element
+    - stability: SVG is nested correctly within button
+    - stability: text node is direct child of button
+    - stability: no whitespace nodes between button and content
+    - compat: uses standard HTML button element
+    - compat: type attribute is supported in all browsers
+    - compat: disabled attribute is boolean and widely supported
+    - compat: aria-label is standard and supported
+    - compat: data-* attributes are standard HTML5
+    - compat: SVG icons are supported in modern browsers
+    - compat: no vendor prefixes needed for button styling
+    - compat: no proprietary attributes
+    - security: prevents XSS in slot content
+    - security: prevents XSS in className prop
+    - security: prevents XSS in data attributes
+    - security: sanitizes HTML special characters
+    - security: prevents script injection via ariaLabel
+    - security: escapes quotes in attribute values
+    - security: no eval or Function constructor usage
+    - security: no inline event handlers
+    - security: no dangerous protocols in href (if applicable)
+    - semantics: button is semantic element for interactive control
+    - semantics: default type is button (not submit)
+    - semantics: text content is preserved as-is
+    - semantics: icon is supplementary to text
+    - semantics: button describes its purpose via text or aria-label
+    - final: complete button with all features
+    - final: minimal button renders without errors
+    - final: button with all props is valid HTML
+    - final: accessibility audit passes
+    - final: performance acceptable for component library
+    - final: no console errors or warnings during render
+    - final: component is tree-shakeable and portable
+    - final: all props combinations work together
+    - final: button maintains state across re-renders
+    - final: component exports are correct
+    - final: no memory leaks during batch rendering
+    - final: component is production-ready
+    - final: handles edge cases gracefully
+    - final: snapshot test for regression detection
+    - final: output is deterministic
+    - final: integrates with Astro ecosystem
+    - final: documentation example works correctly
 
 - `tests\unit\loaders\factory.test.ts`
   - **createTranslationLoader (unit)**

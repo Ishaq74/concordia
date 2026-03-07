@@ -1,0 +1,53 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Link Component > should match snapshot > link-basic 1`] = `"<a href="/test" aria-label="Test Link">Test Link</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > anchor matches snapshot (button style) 1`] = `"<a href="/test" aria-label="Test Button" class="button">Test Button</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > anchor matches snapshot (link style) 1`] = `"<a href="/test" aria-label="Test Link" class="link">Test Link</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > anchor matches snapshot disabled (button style) 1`] = `"<a href="/test" aria-label="Disabled Link" class="button" disabled>Disabled Link</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > anchor matches snapshot with left icon 1`] = `"<a href="/icon" aria-label="Icon Link" class="link"><svg class="icon-left"></svg>Icon Link</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > anchor matches snapshot with object text 1`] = `"<a href="/object" aria-label="Object Link" class="link">[object Object]</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > anchor matches snapshot with right icon 1`] = `"<a href="/icon" aria-label="Icon Link" class="link">Icon Link<svg class="icon-right"></svg></a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > anchor matches snapshot with slot 1`] = `"<a href="/slot" aria-label="Slot Link" class="link"><span>Custom Slot</span></a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > anchor matches snapshot with unicode text 1`] = `"<a href="/unicode" aria-label="Unicode Link" class="link">𝕃𝕚𝕟𝕜</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot <a> > link-a 1`] = `"<a href="/test" aria-label="Test Link" class="link">Test Link</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot <a> 1`] = `"<a href="/test" aria-label="Test Link" class="link">Test Link</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot <button> > link-button 1`] = `"<button type="button" aria-label="Test Button" class="button">Test Button</button>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot <button> 1`] = `"<button type="button" aria-label="Test Button" class="button">Test Button</button>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot disabled > link-disabled 1`] = `"<button type="button" aria-label="Disabled Link" class="button" disabled>Disabled Link</button>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot disabled 1`] = `"<button type="button" aria-label="Disabled Link" class="button" disabled>Disabled Link</button>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot icon left > link-icon-left 1`] = `"<a href="/icon" aria-label="Icon Link" class="link"><svg class="icon-left"></svg>Icon Link</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot icon left 1`] = `"<a href="/icon" aria-label="Icon Link" class="link"><svg class="icon-left"></svg>Icon Link</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot icon right > link-icon-right 1`] = `"<a href="/icon" aria-label="Icon Link" class="link">Icon Link<svg class="icon-right"></svg></a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot icon right 1`] = `"<a href="/icon" aria-label="Icon Link" class="link">Icon Link<svg class="icon-right"></svg></a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot object > link-object 1`] = `"<a href="/object" aria-label="Object Link" class="link">[object Object]</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot object 1`] = `"<a href="/object" aria-label="Object Link" class="link">[object Object]</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot slot > link-slot 1`] = `"<a href="/slot" aria-label="Slot Link" class="link"><span>Custom Slot</span></a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot slot 1`] = `"<a href="/slot" aria-label="Slot Link" class="link"><span>Custom Slot</span></a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot unicode > link-unicode 1`] = `"<a href="/unicode" aria-label="Unicode Link" class="link">𝕃𝕚𝕟𝕜</a>"`;
+
+exports[`Link Component AAA+++ (60 tests) > matches snapshot unicode 1`] = `"<a href="/unicode" aria-label="Unicode Link" class="link">𝕃𝕚𝕟𝕜</a>"`;
+
+exports[`ui/Link > snapshot: default link 1`] = `"<a class="link" data-astro-cid-ryvhzzaw="true">Go</a> "`;

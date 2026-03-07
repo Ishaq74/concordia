@@ -216,16 +216,26 @@ const borderWidthComputed = border
 // Build classes
 const classParts: string[] = [display === 'grid' ? 'u-grid' : display === 'flex' ? 'u-flex' : display === 'inline-flex' ? 'u-inline-flex' : 'u-block'];
 
+
+
+
+
+
+
+
+
 if (variant) classParts.push(`u-${variant}`);
 if (color) classParts.push(`u-${color}`);
 if (sameHeight) classParts.push('same-height');
-if (isGrid && cols && typeof cols === 'number') classParts.push(`u-cols-${cols}`);
-if (isGrid && (autoFit || cols === 'auto-fit')) classParts.push('u-cols-auto-fit');
-if (isGrid && (autoFill || cols === 'auto-fill')) classParts.push('u-cols-auto-fill');
+if (isGrid) {
+  if (autoFit || cols === 'auto-fit') classParts.push('u-cols-auto-fit');
+  else if (autoFill || cols === 'auto-fill') classParts.push('u-cols-auto-fill');
+  else if (!isNaN(Number(cols))) classParts.push(`u-cols-${Number(cols)}`);
+}
 
-if (gap) classParts.push(`u-gap-${gap.replace(/[^0-9]/g, '')}`);
-if (rowGap) classParts.push(`u-rowgap-${rowGap.replace(/[^0-9]/g, '')}`);
-if (columnGap) classParts.push(`u-colgap-${columnGap.replace(/[^0-9]/g, '')}`);
+if (gap && spacingTokens[gap]) classParts.push(`u-gap-${gap}`);
+if (rowGap && spacingTokens[rowGap]) classParts.push(`u-rowgap-${rowGap}`);
+if (columnGap && spacingTokens[columnGap]) classParts.push(`u-colgap-${columnGap}`);
 
 if (flexDirection) classParts.push(`u-flex-${flexDirection}`);
 if (flexWrap) classParts.push(`u-flex-${flexWrap}`);
@@ -235,27 +245,42 @@ classParts.push(`u-justify-${justifyContentFinal.replace('flex-', '')}`);
 classParts.push(`u-content-${alignContent.replace('flex-', '')}`);
 if (justifyItems) classParts.push('u-justify-items-center');
 
-// padding/margin utilities: only generate class when value is small integer <=6 and no explicit units
+// padding/margin utilities: tokens ou valeurs numériques
+
 const pushSpacingClass = (prefix: string, val?: string) => {
   if (!val) return;
-  const num = parseFloat(val);
-  const hasUnit = /[a-z%]+$/i.test(val);
-  if (!isNaN(num) && !hasUnit && num <= 6) {
-    classParts.push(`u-${prefix}-${String(num).replace(/[^0-9]/g, '')}`);
+  // Token (sm, md, lg, xl, etc.)
+  if (spacingTokens[val]) {
+    classParts.push(`u-${prefix}-${val}`);
+    return;
+  }
+  // Numérique (1,2,3,4,5,6)
+  if (/^\d+$/.test(val)) {
+    classParts.push(`u-${prefix}-${val}`);
+    return;
+  }
+  // Edge case: token + chiffre (ex: 'xl', '2')
+  if (/^(sm|md|lg|xl|xxl|xs|\d+)$/.test(val)) {
+    classParts.push(`u-${prefix}-${val}`);
+    return;
   }
 };
+// Générer toutes les classes pour chaque prop, sans écrasement
 pushSpacingClass('p', padding);
-pushSpacingClass('pt', paddingTop || yPadding);
+pushSpacingClass('pt', paddingTop);
+pushSpacingClass('pt', yPadding);
 pushSpacingClass('pb', paddingBottom);
-pushSpacingClass('pl', paddingLeft || xPadding);
+pushSpacingClass('pl', paddingLeft);
+pushSpacingClass('pl', xPadding);
 pushSpacingClass('pr', paddingRight);
 
 pushSpacingClass('m', margin);
-pushSpacingClass('mt', marginTop || yMargin);
+pushSpacingClass('mt', marginTop);
+pushSpacingClass('mt', yMargin);
 pushSpacingClass('mb', marginBottom);
-pushSpacingClass('ml', marginLeft || xMargin);
+pushSpacingClass('ml', marginLeft);
+pushSpacingClass('ml', xMargin);
 pushSpacingClass('mr', marginRight);
-
 if (width) classParts.push(`u-w-${width.replace(/[^0-9]/g, '')}`);
 if (height) classParts.push(`u-h-${height.replace(/[^0-9]/g, '')}`);
 if (maxWidth) classParts.push(`u-maxw-${maxWidth.replace(/[^0-9]/g, '')}`);
@@ -263,7 +288,7 @@ if (minHeight) classParts.push(`u-minh-${minHeight.replace(/[^0-9]/g, '')}`);
 
 classParts.push(animate, hoverAnimate ? `hover-${hoverAnimate}` : '', focusAnimate ? `focus-${focusAnimate}` : '', activeAnimate ? `active-${activeAnimate}` : '', hidden ? 'hidden' : '', disabled ? 'disabled' : '');
 
-const classes = [classParts.join(' '), customClasses, className].filter(Boolean).join(' ');
+const classes = [classParts.join(' '), customClasses?.replace(/[^a-zA-Z0-9-_ ]/g, ''), className?.replace(/[^a-zA-Z0-9-_ ]/g, '')].filter(Boolean).join(' ');
 
 // Styles
 const styles: Record<string, string> = {

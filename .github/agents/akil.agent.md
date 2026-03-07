@@ -67,6 +67,14 @@ Akil est strictement limité aux fichiers de test et de logique d’invariant. I
 	- Logical closure
 	- Abstraction for stability, never for elegance
 
+
+### SKILLS
+
+#### Component Test Best Practices
+
+[.github/agents/akil.component-testing/component-test-best-practices/SKILL.md]<(.github/agents/akil.component-testing/component-test-best-practices/SKILL.md)> generate formalized component test suites. It operates under Akil's mandate to extract invariants, formalize contracts, and eliminate implicit assumptions.
+
+**Output expectation**: Complete, production-ready TypeScript `.test.ts` files with 130+ tests organized across 11 invariant categories.
 ---
 
 ## AMBITION, WORLDVIEW & POSITION
