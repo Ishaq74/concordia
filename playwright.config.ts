@@ -13,10 +13,12 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', use: { channel: 'chrome' } },
+    { name: 'firefox', use: { browserName: 'firefox' } },
+    { name: 'webkit', use: { browserName: 'webkit' } },
   ],
   webServer: {
     // on Windows the inline environment variable syntax fails, so use 'env' property
-    command: 'npm run dev',
+    command: 'pnpm run dev',
     url: 'http://localhost:4321',
     timeout: 120000,
     reuseExistingServer: true,

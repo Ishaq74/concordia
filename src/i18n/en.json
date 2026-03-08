@@ -1403,7 +1403,7 @@
     "resetPasswordUrl": "/en/auth/reset-password",
     "emailMissing": "Email address required.",
     "forgotSuccess": "Email sent.",
-    "verifyEmailReminder": "",
+    "verifyEmailReminder": "Don't forget to check your inbox to activate your account.",
     "profileTitle": "Profile",
     "invitationAccepted": "Invitation accepted.",
     "invitationRejected": "Invitation rejected.",

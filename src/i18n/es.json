@@ -1403,7 +1403,7 @@
     "resetPasswordUrl": "/es/auth/restablecer-contrasena",
     "emailMissing": "Correo electrónico requerido.",
     "forgotSuccess": "Correo enviado.",
-    "verifyEmailReminder": "",
+    "verifyEmailReminder": "No olvide revisar su bandeja de entrada para activar su cuenta.",
     "profileTitle": "Perfil",
     "invitationAccepted": "Invitación aceptada.",
     "invitationRejected": "Invitación rechazada.",
