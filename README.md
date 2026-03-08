@@ -840,8 +840,6 @@ npm install
     - cleanup.ts
     - transaction.ts
 - tsconfig.json
-- vitest-output.txt
-- vitest-perm.txt
 - vitest.config.ts
 - **wireframes**
   - **administration_globale_du_blog**

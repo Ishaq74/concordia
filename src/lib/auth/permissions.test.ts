@@ -88,8 +88,8 @@ describe('RBAC/ABAC Security', () => {
       await expect(checkPermission(Role.ADMIN, Permission.ADMIN_ACCESS, night)).resolves.toBe(false);
     });
     it('IP-based restrictions', async () => {
-      const internalIP: ABACContext = { userId: 'u1', ip: '10.0.0.1' };
-      const externalIP: ABACContext = { userId: 'u1', ip: '203.0.113.1' };
+      const internalIP: ABACContext = { userId: 'u1', ip: '10.0.0.1', hour: 14 };
+      const externalIP: ABACContext = { userId: 'u1', ip: '203.0.113.1', hour: 14 };
       await expect(checkPermission(Role.ADMIN, Permission.ADMIN_ACCESS, internalIP)).resolves.toBe(true);
       await expect(checkPermission(Role.ADMIN, Permission.ADMIN_ACCESS, externalIP)).resolves.toBe(false);
     });
