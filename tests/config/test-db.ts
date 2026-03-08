@@ -37,14 +37,15 @@ export async function getTestDb() {
       dbClient = new adapter.Client() as unknown as Client;
       await dbClient!.connect()
 
-      // Wrap query to strip unsupported options (pg-mem doesn't support rowMode)
+      // Wrap query to strip unsupported options (pg-mem doesn't support rowMode or types/getTypeParser)
       const origQuery = (dbClient as any).query.bind(dbClient!)
       ;(dbClient as any).query = (...args: any[]) => {
-        // Strip rowMode from any object-style arg (defensive)
+        // Strip rowMode and types from any object-style arg (defensive)
         for (let i = 0; i < args.length; i++) {
-          if (typeof args[i] === 'object' && args[i] && 'rowMode' in args[i]) {
+          if (typeof args[i] === 'object' && args[i] && ('rowMode' in args[i] || 'types' in args[i])) {
             const opts = { ...args[i] }
             delete opts.rowMode
+            delete opts.types
             args[i] = opts
           }
         }
@@ -52,13 +53,14 @@ export async function getTestDb() {
         try {
           return origQuery(...args)
         } catch (err: any) {
-          // Some driver paths still forward rowMode in nested structures —
-          // retry after removing any rowMode keys if error indicates that.
-          if (err && /rowMode/i.test(String(err.message || err))) {
+          // Some driver paths still forward unsupported options in nested structures —
+          // retry after removing them if error indicates that.
+          if (err && /rowMode|getTypeParser|not supported/i.test(String(err.message || err))) {
             for (let i = 0; i < args.length; i++) {
-              if (typeof args[i] === 'object' && args[i] && 'rowMode' in args[i]) {
+              if (typeof args[i] === 'object' && args[i] && ('rowMode' in args[i] || 'types' in args[i])) {
                 const opts = { ...args[i] }
                 delete opts.rowMode
+                delete opts.types
                 args[i] = opts
               }
             }

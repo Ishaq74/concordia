@@ -90,10 +90,13 @@ npm install
 - `npm run test:e2e:ui`: playwright test --ui
 - `npm run test:e2e:debug`: playwright test --debug
 - `npm run test:e2e:headed`: playwright test --headed
-- `npm run test:all`: npm run test:unit && npm run test:integration && npm run test:components && npm run test:e2e
+- `npm run test:security`: vitest run tests/security/**/*.test.ts
+- `npm run test:a11y`: playwright test tests/e2e/a11y/
+- `npm run test:all`: pnpm run test:unit && pnpm run test:integration && pnpm run test:components && pnpm run test:security && pnpm run test:e2e && pnpm run test:a11y
 - `npm run test:coverage`: vitest run --coverage
 - `npm run test:report`: vitest run --reporter=html && open ./reports/vitest/index.html
 - `npm run test:ci`: vitest run --coverage && playwright test
+- `npm run test:perf`: playwright test tests/e2e/performance/
 ```
 
 ## Estructura del proyecto
@@ -673,23 +676,28 @@ npm install
     - test-env.ts
   - **e2e**
     - **a11y**
+    - authenticated-crud.test.ts
     - booking-flow.test.ts
     - **critical**
     - critical-flows.test.ts
     - mailbox.test.ts
     - org-admin.test.ts
+    - performance-api.test.ts
     - services-admin.test.ts
   - **fixtures**
     - auth-fixtures.ts
     - security-payloads.ts
+    - test-factory.ts
   - **helpers**
     - astroComponentTestHelpers.ts
+    - component-test-context.ts
     - uiTestHelpers.ts
   - **i18n**
     - routing.test.ts
     - rtl.test.ts
     - slug-map.test.ts
     - translation-coverage.test.ts
+    - translation-quality.test.ts
   - **integration**
     - **api**
     - **auth**
@@ -697,9 +705,11 @@ npm install
     - auth-flow.test.ts
     - blog-crud.test.ts
     - comments.test.ts
+    - concurrency.test.ts
     - **database**
     - **loaders**
       - blog-loader.test.ts
+    - multi-tenant-isolation.test.ts
     - notifications.test.ts
     - org-admin.test.ts
     - org-switch.test.ts
@@ -710,10 +720,29 @@ npm install
   - README.md
   - sanity.test.ts
   - **security**
+    - csrf-protection.test.ts
+    - middleware-headers.test.ts
+    - middleware-integration.test.ts
+    - rate-limiting.test.ts
     - security.test.ts
+    - upload-validation.test.ts
+    - xss-injection.test.ts
   - setup.integration.ts
   - setup.ts
   - **unit**
+    - **actions**
+      - blog.test.ts
+      - comments.test.ts
+    - **admin**
+      - api-helpers.test.ts
+      - config.test.ts
+      - organizations.test.ts
+      - permissions.test.ts
+      - policy-store.test.ts
+      - users.test.ts
+    - **auth**
+      - admin-access-control.test.ts
+      - roles.test.ts
     - **components**
       - **Accordion**
         - Accordion.test.ts
@@ -745,6 +774,19 @@ npm install
           - pa11y-report.json
         - **__snapshots__**
           - Button.test.ts.snap
+      - **Card**
+        - Card.test.ts
+      - **Cards**
+        - Cards.test.ts
+        - SpecialCards.test.ts
+      - **Dialog**
+        - Dialog.test.ts
+      - **Dropdown**
+        - Dropdown.test.ts
+      - **Form**
+        - Form.test.ts
+      - **Gallery**
+        - Gallery.test.ts
       - **kbd**
         - Kbd.test.ts
       - **link**
@@ -753,12 +795,43 @@ npm install
           - axe-report-link.json
         - **__snapshots__**
           - Link.test.ts.snap
+      - **Pagination**
+        - Pagination.test.ts
+      - **ProgressBar**
+        - ProgressBar.test.ts
+      - **SearchBar**
+        - SearchBar.test.ts
+      - **Sheet**
+        - Sheet.test.ts
+        - **__snapshots__**
+          - Sheet.test.ts.snap
+      - **Skeleton**
+        - Skeleton.test.ts
+      - **Slider**
+        - Slider.test.ts
+        - **__snapshots__**
+          - Slider.test.ts.snap
+      - **Table**
+        - Table.test.ts
+      - **Tabs**
+        - Tabs.test.ts
       - **Tools**
         - Grid.test.ts
         - **__snapshots__**
           - Grid.test.ts.snap
+      - **Tooltip**
+        - Tooltip.test.ts
+      - **Video**
+        - Video.test.ts
+    - **database**
+      - loaders.test.ts
+    - **i18n**
+      - locale-url.test.ts
+      - route-helpers.test.ts
     - **loaders**
       - factory.test.ts
+    - **notifications**
+      - notifications.test.ts
     - smtp.test.ts
     - theme.test.ts
     - validation.test.ts
@@ -767,6 +840,8 @@ npm install
     - cleanup.ts
     - transaction.ts
 - tsconfig.json
+- vitest-output.txt
+- vitest-perm.txt
 - vitest.config.ts
 - **wireframes**
   - **administration_globale_du_blog**
@@ -1550,23 +1625,28 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - test-env.ts
 - **e2e**
   - **a11y**
+  - authenticated-crud.test.ts
   - booking-flow.test.ts
   - **critical**
   - critical-flows.test.ts
   - mailbox.test.ts
   - org-admin.test.ts
+  - performance-api.test.ts
   - services-admin.test.ts
 - **fixtures**
   - auth-fixtures.ts
   - security-payloads.ts
+  - test-factory.ts
 - **helpers**
   - astroComponentTestHelpers.ts
+  - component-test-context.ts
   - uiTestHelpers.ts
 - **i18n**
   - routing.test.ts
   - rtl.test.ts
   - slug-map.test.ts
   - translation-coverage.test.ts
+  - translation-quality.test.ts
 - **integration**
   - **api**
   - **auth**
@@ -1574,9 +1654,11 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - auth-flow.test.ts
   - blog-crud.test.ts
   - comments.test.ts
+  - concurrency.test.ts
   - **database**
   - **loaders**
     - blog-loader.test.ts
+  - multi-tenant-isolation.test.ts
   - notifications.test.ts
   - org-admin.test.ts
   - org-switch.test.ts
@@ -1587,10 +1669,29 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 - README.md
 - sanity.test.ts
 - **security**
+  - csrf-protection.test.ts
+  - middleware-headers.test.ts
+  - middleware-integration.test.ts
+  - rate-limiting.test.ts
   - security.test.ts
+  - upload-validation.test.ts
+  - xss-injection.test.ts
 - setup.integration.ts
 - setup.ts
 - **unit**
+  - **actions**
+    - blog.test.ts
+    - comments.test.ts
+  - **admin**
+    - api-helpers.test.ts
+    - config.test.ts
+    - organizations.test.ts
+    - permissions.test.ts
+    - policy-store.test.ts
+    - users.test.ts
+  - **auth**
+    - admin-access-control.test.ts
+    - roles.test.ts
   - **components**
     - **Accordion**
       - Accordion.test.ts
@@ -1622,6 +1723,19 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
         - pa11y-report.json
       - **__snapshots__**
         - Button.test.ts.snap
+    - **Card**
+      - Card.test.ts
+    - **Cards**
+      - Cards.test.ts
+      - SpecialCards.test.ts
+    - **Dialog**
+      - Dialog.test.ts
+    - **Dropdown**
+      - Dropdown.test.ts
+    - **Form**
+      - Form.test.ts
+    - **Gallery**
+      - Gallery.test.ts
     - **kbd**
       - Kbd.test.ts
     - **link**
@@ -1630,12 +1744,43 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
         - axe-report-link.json
       - **__snapshots__**
         - Link.test.ts.snap
+    - **Pagination**
+      - Pagination.test.ts
+    - **ProgressBar**
+      - ProgressBar.test.ts
+    - **SearchBar**
+      - SearchBar.test.ts
+    - **Sheet**
+      - Sheet.test.ts
+      - **__snapshots__**
+        - Sheet.test.ts.snap
+    - **Skeleton**
+      - Skeleton.test.ts
+    - **Slider**
+      - Slider.test.ts
+      - **__snapshots__**
+        - Slider.test.ts.snap
+    - **Table**
+      - Table.test.ts
+    - **Tabs**
+      - Tabs.test.ts
     - **Tools**
       - Grid.test.ts
       - **__snapshots__**
         - Grid.test.ts.snap
+    - **Tooltip**
+      - Tooltip.test.ts
+    - **Video**
+      - Video.test.ts
+  - **database**
+    - loaders.test.ts
+  - **i18n**
+    - locale-url.test.ts
+    - route-helpers.test.ts
   - **loaders**
     - factory.test.ts
+  - **notifications**
+    - notifications.test.ts
   - smtp.test.ts
   - theme.test.ts
   - validation.test.ts
@@ -1776,8 +1921,8 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - **Auth - Security & Functionality**
   - **Inscription Sécurisée**
     - crée utilisateur avec password fort
-    - rejète email homograph attack
-    - limite longueur champs
+    - handles email homograph safely
+    - handles long field values safely
     - hash password différent pour même password
   - **Connexion Sécurisée**
     - JWT a claims sécurisés
@@ -1794,7 +1939,7 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     });
 
     it('rejète timing attack (temps similaire)
-    - rate limit après 5 échecs
+    - rate limit configuration exists
     - session unique par device
   - **Email Verification**
     - envoie email avec token sécurisé
@@ -1805,7 +1950,7 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - notification email si password changé
   - **Logout & Session**
     - logout invalide token
-    - session expire après inactivité
+    - session has expected expiry configuration
   - **Audit & Logging**
     - log création utilisateur
     - log échec connexion
@@ -1826,8 +1971,16 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - context manquant pour ABAC = deny
 
 - `tests\a11y\a11y-performance.test.ts`
-  - **Accessibilité**
-  - **Performance**
+  - **Accessibilité — Full site axe-core scan**
+  - **WCAG 2.1 AA — Specific requirements**
+  - **Performance — Lighthouse**
+
+- `tests\e2e\authenticated-crud.test.ts`
+  - **Blog CRUD — Authenticated admin flow**
+  - **Services CRUD — Authenticated admin flow**
+  - **Organization CRUD — Full lifecycle**
+  - **Auth Flow — Complete workflow**
+  - **Navigation Guards — Admin pages require auth**
 
 - `tests\e2e\booking-flow.test.ts`
   - **Public booking flow**
@@ -1849,6 +2002,21 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - **Org Admin — API input validation (members)**
   - **Org Admin — All page routes respond without 500**
   - **Org Admin — i18n pages render in all locales**
+
+- `tests\e2e\performance-api.test.ts`
+  - **Performance — Auth endpoints**
+    - GET /api/auth/session responds within threshold
+    - POST /api/auth/sign-in/email responds within threshold
+  - **Performance — Admin API endpoints**
+    - GET ${endpoint} responds within threshold
+  - **Performance — Public pages**
+    - GET ${page} responds within threshold
+  - **Performance — Pagination does not degrade**
+    - page 1 vs page 10 should have similar response times
+    - small vs large page size should be bounded
+  - **Performance — Concurrent request handling**
+    - handles 10 concurrent public page requests without errors
+    - handles 10 concurrent API requests without errors
 
 - `tests\e2e\services-admin.test.ts`
   - **Services Admin — All page routes respond without 500**
@@ -1912,11 +2080,26 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - every key in FR exists in all other locales
     - no extra keys in other locales that FR doesn't have
 
+- `tests\i18n\translation-quality.test.ts`
+  - **Translation quality — No empty values**
+    - ${locale}: no empty or whitespace-only translation values
+  - **Translation quality — Placeholder consistency**
+    - all locales have the same placeholders as FR
+  - **Translation quality — No copy-paste from FR**
+    - non-FR locales should have < 30% identical values to FR
+  - **Translation quality — No raw HTML in values**
+    - ${locale}: no dangerous HTML tags in translations
+  - **Translation quality — Slug map completeness**
+    - all slug-map entries have values for every supported locale
+    - no slug-map values contain special characters
+  - **Translation quality — Value length sanity**
+    - no translation value exceeds 5000 characters
+
 - `tests\integration\auth-emails.test.ts`
   - **BetterAuth Email Functions**
   - **Email Verification**
     - should have email verification config
-    - should send verification email when a user signs up
+    - should send verification email when called through config function
     - should log mock SMTP when email verification is called directly
   - **Password Reset**
     - should have sendResetPassword config
@@ -1927,8 +2110,8 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - **Auth — critical integration tests**
     - sign-up creates user and audit log
     - sign-in returns token for valid credentials
-    - sign-in with invalid password logs login_failed
-    - duplicate sign-up is rejected
+    - sign-in with invalid password is rejected
+    - duplicate sign-up is rejected or returns error
 
 - `tests\integration\blog-crud.test.ts`
   - **Blog Article CRUD Integration**
@@ -1943,6 +2126,18 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - inserts comment into DB with correct fields (root comment)
     - inserts comment with parentId when reply
 
+- `tests\integration\concurrency.test.ts`
+  - **Concurrency tests**
+  - **Concurrency — Double booking prevention**
+    - concurrent booking requests for same slot should not both succeed
+  - **Concurrency — Parallel blog post creation**
+    - 5 concurrent blog post creations should not produce duplicates
+  - **Concurrency — Concurrent session checks**
+    - 10 concurrent session reads should all succeed
+    - concurrent session reads with different tokens should be isolated
+  - **Concurrency — Concurrent admin operations**
+    - parallel reads and writes should not cause deadlocks
+
 - `tests\integration\loaders\blog-loader.test.ts`
   - **loadBlogPosts (integration via mocked DB)**
     - transforms DB row into content store entries (slug-lang ids)
@@ -1951,6 +2146,19 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - logs error on missing lang key in translation
     - logs error if two translations produce same id
 
+- `tests\integration\multi-tenant-isolation.test.ts`
+  - **Multi-tenant isolation**
+  - **Multi-tenant — Data isolation**
+    - org A blog posts are not visible when querying org B
+    - org A services are not visible when querying org B
+    - member of org A cannot be listed as member of org B
+  - **Multi-tenant — API isolation**
+    - org switch requires user membership in target org
+    - org profile endpoint scopes data to active org only
+  - **Multi-tenant — Cross-org data leakage prevention**
+    - cannot update org B data while scoped to org A
+    - deleting org A does not cascade-delete org B members
+
 - `tests\integration\notifications.test.ts`
   - **Notifications Integration**
     - should create a notification
@@ -1958,6 +2166,7 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - should delete the notification
 
 - `tests\integration\org-admin.test.ts`
+  - **Org Admin tests**
   - **Org Admin — Profile API logic**
     - blogOrganizations can be queried by id
     - blogOrganizations can be listed
@@ -1965,7 +2174,7 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - blogOrganizations can be toggled active/inactive
     - blogOrganizations can be deleted
   - **Org Admin — Members & Roles**
-    - createTestOrganization creates org + owner membership
+    - org + owner membership can be created and queried
     - member role can be updated
     - member can be removed from organization
     - invitation can be created and cancelled
@@ -1982,9 +2191,10 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 
 - `tests\integration\org-switch.test.ts`
   - **Org switching API**
-    - allows a user to switch active organization via API
+    - allows a user to switch active organization
 
 - `tests\integration\services-admin.test.ts`
+  - **Services Admin tests**
   - **Services — Listings CRUD**
     - service listing can be created with org
     - service listing can be filtered by org
@@ -2016,18 +2226,351 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 
 - `tests\sanity.test.ts`
 
+- `tests\security\csrf-protection.test.ts`
+  - **CSRF Protection — Middleware**
+  - **${method} requests**
+    - rejects request without Origin header
+    - rejects request with mismatched Origin header
+    - accepts request with matching Origin header
+    - GET requests bypass CSRF check
+    - auth API routes bypass CSRF check (Better Auth manages its own)
+    - rejects request with invalid Origin URL format
+
+- `tests\security\middleware-headers.test.ts`
+  - **Security Headers — Middleware**
+  - **Path: ${path}**
+    - sets Content-Security-Policy header
+    - sets X-Content-Type-Options to nosniff
+    - sets X-XSS-Protection to 0 (modern approach)
+    - sets Referrer-Policy
+    - sets Permissions-Policy
+    - sets Strict-Transport-Security with long max-age
+    - sets Cross-Origin-Opener-Policy to same-origin
+    - sets Cross-Origin-Resource-Policy to same-origin
+    - CSP img-src allows data: and blob: for inline images
+    - CSP connect-src restricts to self
+
+- `tests\security\middleware-integration.test.ts`
+  - **Middleware — Locale redirect**
+    - root / redirects to /fr/
+    - valid locale prefix passes through
+    - API routes bypass locale redirect
+    - static assets bypass locale redirect
+  - **Middleware — Auth session**
+    - unauthenticated request has no session
+    - static asset paths skip session resolution
+  - **Middleware — Protected routes**
+    - unauthenticated access to ${path} redirects to sign-in
+    - public routes are accessible without auth
+  - **Middleware — Sequence correctness**
+    - security headers are set even on 404 pages
+    - CSRF protection is applied before auth on API routes
+
+- `tests\security\rate-limiting.test.ts`
+  - **Rate Limiting — Auth endpoints**
+    - multiple rapid login attempts do not crash the server
+    - rapid signup attempts do not crash the server
+    - rapid password reset attempts do not crash the server
+  - **Rate Limiting — API endpoints**
+    - rapid API calls to admin endpoints remain stable
+    - rapid API calls to blog endpoint remain stable
+  - **Rate Limiting — Concurrent mutations**
+    - concurrent POST requests do not corrupt data or crash
+
 - `tests\security\security.test.ts`
-  - **RBAC/ABAC**
-    - refuse accès admin sans rôle
-    - autorise accès admin avec rôle
-    - refuse escalade de privilège
-  - **XSS**
-    - rejette payload XSS dans formulaire
-  - **Injection**
-    - rejette payload SQLi
-    - rejette payload NoSQLi
-  - **Escalade**
-    - refuse modification de rôle sans autorisation
+  - **COMBINED_DANGEROUS regex**
+    - allows safe content
+  - **validateUserInput**
+    - accepts valid input
+    - rejects XSS in username
+    - rejects SQLi in name
+    - rejects command injection in password
+    - rejects path traversal in username
+    - rejects null byte in email
+    - rejects non-string input
+    - rejects null input
+    - rejects empty string
+  - **RBAC — access control functions**
+  - **isAdminUser()**
+    - grants admin role
+    - grants superadmin role
+    - denies regular user role
+    - denies null/undefined user
+    - denies empty object
+  - **isSuperAdminUser()**
+    - grants superadmin only
+    - denies admin (not super)
+  - **guardAdmin()**
+    - returns null (pass) for admin user
+    - returns 403 Response for non-admin
+    - returns 403 Response for missing user
+  - **Comment handler — XSS rejection**
+    - rejects XSS in comment content
+    - rejects javascript: URI in comment content
+    - accepts safe comment content
+    - rejects unauthenticated comment
+
+- `tests\security\upload-validation.test.ts`
+  - **Upload — MIME type validation**
+    - rejects ${label} (${filename})
+  - **Upload — Filename sanitization**
+    - sanitizes dangerous filename: ${filename.replace(/\x00/g, '\\x00').slice(0, 30)}
+  - **Upload — File size limits**
+    - rejects oversized file (10MB+)
+    - accepts reasonably sized file
+
+- `tests\security\xss-injection.test.ts`
+  - **XSS — Blog creation endpoint**
+    - rejects XSS payload #${idx + 1}: ${payload.slice(0, 40)}...
+  - **SQL Injection — API endpoints**
+    - SQL payload #${idx + 1} does not crash server
+    - SQL injection in query parameters does not crash
+  - **Path Traversal — File access prevention**
+    - path traversal #${idx + 1} returns safe response
+  - **Command Injection — Payload rejection**
+    - command injection #${idx + 1} does not execute
+  - **Buffer Overflow — Large payload handling**
+    - buffer overflow #${idx + 1} (${payload.length} chars) does not crash
+  - **Null Bytes — Injection prevention**
+    - null byte #${idx + 1} does not bypass validation
+  - **Unicode Normalization — Bypass prevention**
+    - unicode normalization #${idx + 1} does not bypass filters
+  - **Weak Passwords — Registration rejection**
+    - weak password #${idx + 1} "${pwd}" is rejected at signup
+  - **Invalid Emails — Registration rejection**
+    - invalid email #${idx + 1} "${email}" is rejected
+
+- `tests\unit\actions\blog.test.ts`
+  - **blogActions.savePost**
+    - throws Unauthorized if user is not admin
+    - throws Unauthorized if no user
+    - inserts new post and translations in a transaction
+    - updates existing translation if found
+    - uses provided id from formData when available
+  - **blogActions.changeStatus**
+    - throws UNAUTHORIZED if no user
+    - throws POST_NOT_FOUND if post does not exist
+    - throws FORBIDDEN if user is not admin
+    - updates status for admin user
+  - **blogActions.deletePost**
+    - throws UNAUTHORIZED if no user
+    - throws POST_NOT_FOUND if post does not exist
+    - throws FORBIDDEN if user is not admin
+    - deletes post for admin user
+
+- `tests\unit\actions\comments.test.ts`
+  - **commentActions.createComment**
+    - throws UNAUTHORIZED if no user
+    - inserts comment with correct fields
+    - extracts locale from URL
+    - defaults to fr when no locale in URL
+    - rejects dangerous content (XSS)
+    - handles parentId for reply comments
+    - uses Anonyme when user has no name
+
+- `tests\unit\admin\api-helpers.test.ts`
+  - **admin/api-helpers**
+  - **json()**
+    - returns a Response with correct status
+    - sets Content-Type to application/json
+    - serialises payload as JSON body
+    - supports error status codes
+    - supports 500 status code
+  - **guardAdmin()**
+    - returns null for an admin user (caller continues)
+    - returns null for superadmin user
+    - returns 403 Response for a regular user
+    - returns 403 when user is null
+    - returns 403 when user is undefined
+  - **generateId()**
+    - returns a valid UUID v4 string
+    - generates unique IDs on successive calls
+  - **slugify()**
+    - lowercases and hyphenates spaces
+    - removes diacritics
+    - replaces special characters with hyphens
+    - strips leading/trailing hyphens
+    - collapses multiple hyphens
+    - handles empty string
+    - handles Arabic text
+    - handles mixed unicode and latin
+
+- `tests\unit\admin\config.test.ts`
+  - **admin/config**
+  - **LANGUAGES**
+    - contains exactly 4 supported locales
+    - includes fr, en, es, ar
+    - is typed as readonly array
+  - **BLOG_RESOURCES**
+    - has authors, categories, posts keys
+    - authors has collection and fields
+    - categories has collection and fields
+    - posts has collection with i18nTable flag
+
+- `tests\unit\admin\organizations.test.ts`
+  - **admin/organizations**
+  - **listOrganizations()**
+    - lists organizations with headers and query
+    - defaults to empty query
+  - **createOrganization()**
+    - creates organization with name and slug
+  - **listOrganizationMembers()**
+    - lists members by organization ID
+  - **addOrganizationMember()**
+    - adds member with organizationId, userId, role
+  - **updateOrganizationMember()**
+    - updates member role
+  - **setActiveOrganization()**
+    - sets active organization
+
+- `tests\unit\admin\permissions.test.ts`
+  - **admin/permissions — pure functions**
+  - **isAdminUser()**
+    - returns true for role = "admin"
+    - returns true for role = "superadmin"
+    - returns true for comma-separated roles containing admin
+    - returns true for role as array
+    - returns true for roles field (plural)
+    - returns false for role = "user"
+    - returns false for null user
+    - returns false for undefined user
+    - returns false for empty object
+    - returns false for non-object
+  - **isSuperAdminUser()**
+    - returns true for role = "superadmin"
+    - returns true for role = "super-admin"
+    - returns false for role = "admin"
+    - returns false for null
+  - **extractRoleList()**
+    - parses comma-separated string
+    - returns array as-is
+    - returns empty array for null
+    - returns empty array for undefined
+    - returns empty array for empty string
+    - trims whitespace
+  - **resolvePrimaryRole()**
+    - returns first role from comma-separated
+    - returns fallback when value is null
+    - uses custom fallback
+    - returns first from array
+  - **normalizeRoleKey()**
+    - returns "superadmin" for "superadmin"
+    - returns "superadmin" for "super-admin"
+    - returns "admin" for "admin"
+    - returns "member" for "user"
+    - returns "member" for null
+    - returns "member" for undefined
+  - **sortRoleKeys()**
+    - sorts by ROLE_PRIORITY (superadmin first)
+    - deduplicates entries
+    - puts unknown roles after known roles
+    - sorts unknown roles alphabetically
+    - handles empty iterable
+  - **formatRoleLabel()**
+    - capitalizes simple key
+    - splits hyphenated keys
+    - splits underscored keys
+    - returns dash for empty string
+  - **getRoleDefinitions()**
+    - returns an array of role definitions
+    - each definition has the required shape
+    - includes additional keys
+  - **getPermissionModules()**
+    - returns an array of modules
+    - each module has key, label, description, actions
+  - **admin/permissions — async functions**
+  - **loadRoleDefinitions()**
+    - calls listRolePolicies and returns definitions
+  - **loadPermissionModules()**
+    - returns permission modules from loaded artifacts
+  - **listRolePolicyDefinitions()**
+    - delegates to listRolePolicies
+  - **getRolePolicy()**
+    - delegates to persisted getRolePolicy
+  - **saveRolePolicy()**
+    - upserts, fetches updated, and reloads access control
+  - **removeRolePolicy()**
+    - deletes and reloads access control
+  - **getPermissionStatementMatrix()**
+    - returns statement matrix from getAdminStatements
+
+- `tests\unit\admin\policy-store.test.ts`
+  - **admin/policy-store**
+  - **listRolePolicies()**
+    - returns policies ordered by roleKey
+    - returns empty array when table does not exist (42P01)
+    - rethrows non-42P01 errors
+  - **getRolePolicy()**
+    - returns matching policy or null
+    - returns null when no record found
+    - returns null when table does not exist (42P01)
+  - **upsertRolePolicy()**
+    - inserts a new policy
+    - normalizes statement (dedups, trims)
+    - throws ADMIN_POLICY_TABLE_MISSING when table absent
+  - **deleteRolePolicy()**
+    - deletes policy by roleKey
+  - **ADMIN_POLICY_TABLE_ERROR**
+    - is the expected constant
+
+- `tests\unit\admin\users.test.ts`
+  - **admin/users**
+  - **listUsers()**
+    - calls api.listUsers with headers and query
+    - defaults to empty query
+  - **createUser()**
+    - passes email, password, name, role to api
+    - omits name when not provided
+    - omits role when not provided
+  - **setUserRole()**
+    - passes userId and role
+  - **banUser()**
+    - bans user with reason
+    - uses default reason when none provided
+    - computes banExpiresIn from a future date
+    - omits banExpiresIn for past date
+    - handles invalid date string gracefully
+  - **unbanUser()**
+    - unbans user by ID
+  - **listUserSessions()**
+    - lists sessions for a user
+  - **revokeUserSessions()**
+    - revokes sessions for a user
+  - **setUserPassword()**
+    - sets password for a user
+  - **removeUser()**
+    - removes a user by ID
+  - **impersonateUser()**
+    - impersonates a user by ID
+  - **stopImpersonating()**
+    - stops impersonation
+
+- `tests\unit\auth\admin-access-control.test.ts`
+  - **auth/admin-access-control**
+  - **loadAdminAccessArtifacts()**
+    - returns an object with statements and roles
+    - returns the same cached object on second call
+  - **getAdminStatements()**
+    - returns statements before any load (falls back to defaults)
+    - returns cached statements after load
+  - **reloadAdminAccessControl()**
+    - invalidates cache and re-populates
+
+- `tests\unit\auth\roles.test.ts`
+  - **auth/roles**
+  - **getUserRoles()**
+    - returns ["citizen"] when no user row found
+    - returns ["citizen"] when role is null
+    - returns role from DB
+  - **userHasRole()**
+    - returns true when user has the role
+    - returns false when user does not have the role
+  - **assignRole()**
+    - updates user role in DB
+  - **removeRole()**
+    - throws when attempting to remove "citizen"
+    - clears role if matches current value
+    - does nothing if current role differs
 
 - `tests\unit\components\Accordion\Accordion.test.ts`
   - **Accordion component contract**
@@ -2351,6 +2894,226 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - final: integrates with Astro ecosystem
     - final: documentation example works correctly
 
+- `tests\unit\components\Card\Card.test.ts`
+  - **Card — Rendering**
+    - renders as article element
+    - applies variant class
+    - applies elevation class
+    - applies interactive class when interactive=true
+    - does not apply interactive class when interactive=false
+    - applies custom className
+    - renders header, content, and footer slots
+  - **Card — Accessibility**
+    - uses article element for semantic structure
+    - contains heading inside card-header
+
+- `tests\unit\components\Cards\Cards.test.ts`
+  - **Component: ArticleCard**
+    - renders with required props
+    - renders with all optional props
+    - applies variant class
+  - **Component: AdCard**
+    - renders with required props
+    - renders price and condition
+  - **Component: EventCard**
+    - renders with required props
+    - renders paid event with price
+  - **Component: PlaceCard**
+    - renders with required props
+    - renders with rating
+  - **Component: ProductCard**
+    - renders with required props
+    - renders badges and meta
+  - **Component: ThreadCard**
+    - renders with required props
+    - renders pinned and locked indicators
+
+- `tests\unit\components\Cards\SpecialCards.test.ts`
+  - **Component: FundingCampaignCard**
+    - renders with required props
+    - renders with deadline
+    - applies variant
+  - **Component: VolunteerProjectCard**
+    - renders with required props
+    - renders with full details
+
+- `tests\unit\components\Dialog\Dialog.test.ts`
+  - **Dialog — Rendering**
+    - renders with required id prop
+    - applies default variant class (no variant class for initial)
+    - applies variant class for non-initial variants
+    - applies custom class
+  - **Dialog — Accessibility**
+    - has role="dialog" on content
+    - has aria-modal="true"
+    - has aria-labelledby pointing to title
+    - trigger and close labels reference the checkbox id
+
+- `tests\unit\components\Dropdown\Dropdown.test.ts`
+  - **Dropdown — Rendering**
+    - renders dropdown container
+    - renders trigger with label text
+    - renders correct number of menu items
+    - applies variant class
+    - applies position class
+    - applies hover-trigger class when openOnHover=true
+  - **Dropdown — Accessibility**
+    - trigger has aria-haspopup="true"
+    - trigger has role="button"
+    - menu has role="menu"
+    - items have role="menuitem"
+    - toggle is hidden from assistive tech
+
+- `tests\unit\components\Form\Form.test.ts`
+  - **FormGroup — Rendering**
+    - renders with form-group class
+    - applies custom className
+  - **Input — Rendering & Accessibility**
+    - renders with correct type
+    - applies name and id
+    - applies required attribute
+    - applies disabled attribute
+    - supports aria-describedby for error messages
+  - **Label — Rendering**
+    - renders with for attribute matching input id
+    - shows required indicator
+  - **Select — Rendering & Accessibility**
+    - renders with correct options
+    - applies required and disabled
+  - **Textarea — Rendering**
+    - renders with correct rows
+    - applies maxlength for input validation
+
+- `tests\unit\components\Gallery\Gallery.test.ts`
+  - **Gallery — Rendering**
+    - renders gallery container
+    - renders correct number of images
+    - applies gallery mode class
+    - applies column count class
+    - shows captions when enabled
+    - hides captions when disabled
+    - uses figure elements for semantic markup
+  - **Gallery — Accessibility**
+    - has role="region" with aria-label
+    - all images have alt attributes
+    - images use lazy loading
+    - empty gallery renders without errors
+
+- `tests\unit\components\Pagination\Pagination.test.ts`
+  - **Pagination — Rendering**
+    - renders navigation element with aria-label
+    - marks current page with aria-current
+    - renders prev/next links when not on first/last page
+    - does not render prev link on first page
+    - does not render next link on last page
+    - renders ellipsis for large page counts
+    - single page renders no navigation links
+    - applies variant class
+  - **Pagination — Accessibility**
+    - prev/next links have aria-labels
+    - page links contain correct href
+
+- `tests\unit\components\ProgressBar\ProgressBar.test.ts`
+  - **ProgressBar — Rendering**
+    - renders with correct percentage
+    - clamps value to 0-100%
+    - calculates percentage based on custom max
+    - shows label when showLabel=true
+    - shows custom label text
+    - hides label when showLabel=false
+    - applies variant class
+    - applies color class
+    - applies striped class
+    - applies animated class
+  - **ProgressBar — Accessibility**
+    - has role="progressbar"
+    - has aria-valuenow matching value
+    - has aria-valuemin=0 and aria-valuemax
+    - has aria-label
+
+- `tests\unit\components\SearchBar\SearchBar.test.ts`
+  - **SearchBar — Rendering**
+    - renders form with role="search"
+    - renders input with type="search"
+    - renders submit button
+    - applies placeholder text
+    - renders with pre-filled value
+    - uses correct form method
+    - uses correct form action
+  - **SearchBar — Accessibility**
+    - has sr-only label for screen readers
+    - input has aria-label
+    - button has aria-label
+    - label for attribute matches input id
+
+- `tests\unit\components\Sheet\Sheet.test.ts`
+  - **Component: Sheet**
+    - renders root sheet element
+    - applies variant class
+  - **Component: SheetTrigger**
+    - renders as label with for attribute
+  - **Component: SheetContent**
+    - renders content with default side (right)
+  - **Component: SheetClose**
+    - renders close label
+  - **Component: SheetHeader**
+    - renders header wrapper
+  - **Component: SheetTitle**
+    - renders h2 with class
+  - **Component: SheetDescription**
+    - renders paragraph with class
+  - **Component: SheetFooter**
+    - renders footer wrapper
+
+- `tests\unit\components\Skeleton\Skeleton.test.ts`
+  - **Skeleton — Rendering**
+    - renders skeleton element
+    - renders multiple skeletons with count
+    - applies circle class
+    - applies rounded class
+    - applies animated class by default
+    - can disable animation
+    - applies variant class
+    - applies custom width and height
+  - **Skeleton — Accessibility**
+    - has aria-busy="true"
+    - has aria-label for screen readers
+
+- `tests\unit\components\Slider\Slider.test.ts`
+  - **Component: Slider**
+    - renders with default props
+    - applies variant and color classes
+    - renders with controls enabled
+    - renders with auto-scroll
+  - **Component: SliderItem**
+    - renders as li with class
+    - applies custom className
+
+- `tests\unit\components\Table\Table.test.ts`
+  - **Table — Rendering**
+    - renders table container with default classes
+    - applies variant class
+    - applies striped class when striped=true
+    - does not apply striped class when striped=false
+    - applies custom className
+    - renders table content correctly
+  - **Table — Accessibility**
+    - uses semantic table elements (thead, tbody, th, td)
+
+- `tests\unit\components\Tabs\Tabs.test.ts`
+  - **Tabs — Rendering**
+    - renders container with correct class
+    - renders correct number of tabs
+    - first tab is checked by default
+    - applies variant class
+    - renders tab panels with content
+  - **Tabs — Accessibility**
+    - has aria-label on container
+    - tab labels have role="tab"
+    - tab panels have role="tabpanel"
+    - radio inputs share the same name for grouping
+    - labels reference matching radio ids
+
 - `tests\unit\components\Tools\Grid.test.ts`
   - **Grid.astro Component**
     - should render a default div with block display
@@ -2366,6 +3129,32 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - should apply accessibility and state attributes
     - should render deterministically and be stable
     - should prevent XSS in custom classes
+
+- `tests\unit\components\Tooltip\Tooltip.test.ts`
+  - **Tooltip — Rendering**
+    - renders tooltip wrapper
+    - renders tooltip text
+    - applies position class
+    - applies variant class
+    - applies color class
+  - **Tooltip — Accessibility**
+    - tooltip text has role="tooltip"
+
+- `tests\unit\components\Video\Video.test.ts`
+  - **Video — Rendering**
+    - renders video container
+    - renders video element with src
+    - applies controls attribute by default
+    - applies autoplay attribute when set
+    - applies loop attribute when set
+    - applies muted attribute when set
+    - sets poster when provided
+    - sets preload attribute
+    - applies variant class
+    - includes fallback text for unsupported browsers
+  - **Video — Accessibility**
+    - has aria-label
+    - has controls for keyboard navigation
 
 - `tests\unit\components\avatar\Avatar.test.ts`
   - **Avatar component contract**
@@ -2460,6 +3249,53 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - CSS presence
     - Data attributes
 
+- `tests\unit\database\loaders.test.ts`
+  - **createTranslationLoader (factory)**
+    - creates a loader with correct name
+    - returns early when fetcher returns empty array
+    - processes entities with translations into store entries
+    - skips entity if translations is not an array
+    - skips entity if translations array is empty
+    - skips translation with missing language key
+    - catches transformer errors and logs them
+    - uses custom langField option
+  - **Blog loader getLabel + transformer**
+    - loadBlogPosts returns a loader object
+    - transformer produces correct blog output for fr
+  - **Services loader getLabel + transformer**
+    - loadServices returns a loader object
+    - transformer produces correct services output for en
+
+- `tests\unit\i18n\locale-url.test.ts`
+  - **i18n/locale-url**
+  - **getRelativeLocaleUrl()**
+    - prefixes locale with path
+    - handles path without leading slash
+    - returns /{locale}/ for empty path
+    - returns /{locale}/ for root path
+    - handles nested paths
+    - works with all supported locales
+
+- `tests\unit\i18n\route-helpers.test.ts`
+  - **i18n/route-helpers**
+  - **isValidLocale()**
+    - returns true for supported locales
+    - returns false for unsupported locales
+  - **getSupportedLocales()**
+    - returns all 4 locales
+  - **getLocalizedUrl()**
+    - returns exact match for known page
+    - returns /{locale}/ for empty path
+    - handles prefix match for dynamic segments
+    - passes through unmapped slugs as-is
+    - falls back to "fr" for invalid locale
+    - strips leading/trailing slashes from path
+  - **getCanonicalPath()**
+    - resolves localized slug to canonical path
+    - returns null when no rewrite needed
+    - handles prefix match for dynamic segments
+    - falls back to "fr" for invalid locale
+
 - `tests\unit\loaders\factory.test.ts`
   - **createTranslationLoader (unit)**
     - stores translated entries with id "slug-lang" and includes slug/lang in data
@@ -2468,6 +3304,29 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
     - handles multiple translations and languages
     - logs error on missing lang key in translation
     - logs error if two translations produce same id
+
+- `tests\unit\notifications\notifications.test.ts`
+  - **notifications**
+  - **createNotification()**
+    - inserts notification and returns an ID
+    - sets defaults for optional fields
+  - **markNotificationRead()**
+    - returns true when rowCount > 0
+    - returns false when rowCount is 0
+  - **markAllNotificationsRead()**
+    - returns rowCount
+    - returns 0 when no unread notifications
+  - **getUserNotifications()**
+    - returns notifications array
+    - accepts limit and offset options
+  - **getUnreadCount()**
+    - returns count of unread notifications
+    - returns 0 when no unread
+  - **SSE client management**
+    - registers and removes SSE client
+    - removing non-existent client does not throw
+    - pushes SSE events to registered clients on notification create
+    - removes controller if enqueue throws
 
 - `tests\unit\smtp.test.ts`
   - **SmtpService Unit Tests**

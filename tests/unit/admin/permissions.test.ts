@@ -26,6 +26,14 @@ vi.mock('@lib/admin/policy-store', () => ({
   ADMIN_POLICY_TABLE_ERROR: 'ADMIN_POLICY_TABLE_MISSING',
 }));
 
+vi.mock('better-auth/plugins/admin/access', () => ({
+  defaultStatements: { user: ['create', 'list'] },
+  defaultRoles: {
+    admin: { statements: { user: ['create', 'list'] } },
+    user: { statements: {} },
+  },
+}));
+
 import {
   isAdminUser,
   isSuperAdminUser,
@@ -44,6 +52,15 @@ import {
   removeRolePolicy,
   getPermissionStatementMatrix,
 } from '@lib/admin/permissions';
+import {
+  listRolePolicies as _listRolePolicies,
+  getRolePolicy as _getPersistedRolePolicy,
+  upsertRolePolicy as _upsertRolePolicy,
+  deleteRolePolicy as _deleteRolePolicy,
+} from '@lib/admin/policy-store';
+import {
+  reloadAdminAccessControl as _reloadAdminAccessControl,
+} from '@lib/auth/admin-access-control';
 
 describe('admin/permissions — pure functions', () => {
   describe('isAdminUser()', () => {
@@ -267,12 +284,11 @@ describe('admin/permissions — pure functions', () => {
 });
 
 describe('admin/permissions — async functions', () => {
-  const { listRolePolicies } = vi.mocked(
-    await import('@lib/admin/policy-store'),
-  );
-  const { reloadAdminAccessControl } = vi.mocked(
-    await import('@lib/auth/admin-access-control'),
-  );
+  const listRolePolicies = vi.mocked(_listRolePolicies);
+  const reloadAdminAccessControl = vi.mocked(_reloadAdminAccessControl);
+  const getPersistedRolePolicy = vi.mocked(_getPersistedRolePolicy);
+  const upsertRolePolicy = vi.mocked(_upsertRolePolicy);
+  const deleteRolePolicy = vi.mocked(_deleteRolePolicy);
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -305,9 +321,6 @@ describe('admin/permissions — async functions', () => {
 
   describe('getRolePolicy()', () => {
     it('delegates to persisted getRolePolicy', async () => {
-      const { getRolePolicy: getPersistedRolePolicy } = vi.mocked(
-        await import('@lib/admin/policy-store'),
-      );
       getPersistedRolePolicy.mockResolvedValue(null);
       const result = await getRolePolicy('admin');
       expect(getPersistedRolePolicy).toHaveBeenCalledWith('admin');
@@ -317,8 +330,6 @@ describe('admin/permissions — async functions', () => {
 
   describe('saveRolePolicy()', () => {
     it('upserts, fetches updated, and reloads access control', async () => {
-      const { upsertRolePolicy, getRolePolicy: getPersistedRolePolicy } =
-        vi.mocked(await import('@lib/admin/policy-store'));
       upsertRolePolicy.mockResolvedValue(undefined);
       getPersistedRolePolicy.mockResolvedValue({
         roleKey: 'editor',
@@ -344,9 +355,6 @@ describe('admin/permissions — async functions', () => {
 
   describe('removeRolePolicy()', () => {
     it('deletes and reloads access control', async () => {
-      const { deleteRolePolicy } = vi.mocked(
-        await import('@lib/admin/policy-store'),
-      );
       deleteRolePolicy.mockResolvedValue(undefined);
       await removeRolePolicy('editor');
       expect(deleteRolePolicy).toHaveBeenCalledWith('editor');

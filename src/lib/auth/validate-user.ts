@@ -13,6 +13,7 @@ const dangerousPatterns = [
   /cat\s+\/etc\/passwd/i, // classic command injection
   /whoami|id|uname|ls|pwd|echo|nc|curl|wget|ping|sleep|base64|bash|sh|zsh|dash|ksh/i, // shell commands
   /\b(select|insert|update|delete|drop|union|#)\b/i, // SQL (word-based)
+  /'\s*\b(or|and)\b/i, // SQL boolean injection after quote (e.g. ' OR '1'='1)
   /--/, // SQL comment token (catch anywhere)
   /\b(db\.|\$where|\$ne|\$gt|\$lt|\$in|\$nin|\$or|\$and)\b/i, // NoSQL
   /\.\./, // path traversal
