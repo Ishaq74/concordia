@@ -6,31 +6,21 @@ import { member } from '@database/schemas/auth-schema';
 import { eq, and } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 import { getApiBase } from '@tests/utils/api-helpers';
-
-async function isServerAvailable(): Promise<boolean> {
-  try {
-    const base = getApiBase();
-    const res = await fetch(`${base}/`, { signal: AbortSignal.timeout(3000) });
-    return res.ok || res.status === 404;
-  } catch {
-    return false;
-  }
-}
+import { serverAvailable } from '@tests/helpers/server-guard';
 
 /**
  * Multi-tenant isolation tests — CRITICAL for government deployment.
  * Verifies that Organisation A cannot access or modify Organisation B data.
  */
 
+const serverUp = await serverAvailable();
+
 type TestOrg = { id: string; [key: string]: unknown };
 
-let serverUp = false;
-
-describe('Multi-tenant isolation', () => {
+describe.skipIf(!serverUp)('Multi-tenant isolation', () => {
   let test: any;
 
   beforeAll(async () => {
-    serverUp = await isServerAvailable();
     const { auth } = await import('@lib/auth/auth');
     const ctx = await auth.$context;
     test = ctx.test;
@@ -139,7 +129,6 @@ describe('Multi-tenant — Data isolation', () => {
 
 describe('Multi-tenant — API isolation', () => {
   it('org switch requires user membership in target org', async () => {
-    if (!serverUp) return; // requires running Astro server
     const orgA = await saveOrg({ name: 'Switch Org A' });
     const orgB = await saveOrg({ name: 'Switch Org B' });
     const user = await saveUser({ role: 'admin' });
@@ -179,7 +168,6 @@ describe('Multi-tenant — API isolation', () => {
   });
 
   it('org profile endpoint scopes data to active org only', async () => {
-    if (!serverUp) return; // requires running Astro server
     const orgA = await saveOrg({ name: 'Profile Org A' });
     const orgB = await saveOrg({ name: 'Profile Org B' });
     const user = await saveUser({ role: 'admin' });

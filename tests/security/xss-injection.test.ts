@@ -1,45 +1,35 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { auth } from '@lib/auth/auth';
 import type { TestHelpers } from 'better-auth/plugins';
-import { apiCall, getApiBase } from '@tests/utils/api-helpers';
+import { apiCall } from '@tests/utils/api-helpers';
 import { securityPayloads } from '@tests/fixtures/security-payloads';
+import { serverAvailable } from '@tests/helpers/server-guard';
 
 /**
  * Real XSS/Injection security tests using full payload library.
- * Each payload is tested against actual API endpoints, not mock handlers.
- * Government site requirement: ZERO payloads must pass through unescaped.
+ * Requires a running Astro dev server — tests are SKIPPED (not green) otherwise.
  */
 
-async function isServerAvailable(): Promise<boolean> {
-  try {
-    const base = getApiBase();
-    const res = await fetch(`${base}/`, { signal: AbortSignal.timeout(3000) });
-    return res.ok || res.status === 404;
-  } catch {
-    return false;
-  }
-}
+const serverUp = await serverAvailable();
 
 let test: TestHelpers;
 let adminToken: string;
-let serverUp = false;
 
-beforeAll(async () => {
-  serverUp = await isServerAvailable();
-  const ctx = await auth.$context;
-  test = ctx.test;
-  const adminUser = test.createUser({ role: 'admin', emailVerified: true });
-  const user = await test.saveUser(adminUser);
-  const login = await test.login({ userId: user.id });
-  adminToken = login.token;
-});
+describe.skipIf(!serverUp)('XSS/Injection — Server integration', () => {
+  beforeAll(async () => {
+    const ctx = await auth.$context;
+    test = ctx.test;
+    const adminUser = test.createUser({ role: 'admin', emailVerified: true });
+    const user = await test.saveUser(adminUser);
+    const login = await test.login({ userId: user.id });
+    adminToken = login.token;
+  });
 
 // ─── XSS Payloads against blog endpoints ──────────────────────
 
 describe('XSS — Blog creation endpoint', () => {
   for (const [idx, payload] of securityPayloads.xss.entries()) {
     it(`rejects XSS payload #${idx + 1}: ${payload.slice(0, 40)}...`, async () => {
-      if (!serverUp) return;
       const res = await apiCall(
         'POST',
         '/admin/blog',
@@ -73,7 +63,6 @@ describe('XSS — Blog creation endpoint', () => {
 describe('SQL Injection — API endpoints', () => {
   for (const [idx, payload] of securityPayloads.sql.entries()) {
     it(`SQL payload #${idx + 1} does not crash server`, async () => {
-      if (!serverUp) return;
       // Test against organization search/creation
       const res = await apiCall(
         'POST',
@@ -86,7 +75,6 @@ describe('SQL Injection — API endpoints', () => {
   }
 
   it('SQL injection in query parameters does not crash', async () => {
-    if (!serverUp) return;
     for (const payload of securityPayloads.sql) {
       const encoded = encodeURIComponent(payload);
       const res = await apiCall('GET', `/admin/blog?search=${encoded}`, undefined, {
@@ -102,7 +90,6 @@ describe('SQL Injection — API endpoints', () => {
 describe('Path Traversal — File access prevention', () => {
   for (const [idx, payload] of securityPayloads.pathTraversal.entries()) {
     it(`path traversal #${idx + 1} returns safe response`, async () => {
-      if (!serverUp) return;
       const encoded = encodeURIComponent(payload);
       const res = await apiCall('GET', `/admin/services/media?path=${encoded}`, undefined, {
         token: adminToken,
@@ -122,7 +109,6 @@ describe('Path Traversal — File access prevention', () => {
 describe('Command Injection — Payload rejection', () => {
   for (const [idx, payload] of securityPayloads.commandInjection.entries()) {
     it(`command injection #${idx + 1} does not execute`, async () => {
-      if (!serverUp) return;
       const res = await apiCall(
         'POST',
         '/admin/services/services',
@@ -142,7 +128,6 @@ describe('Command Injection — Payload rejection', () => {
 describe('Buffer Overflow — Large payload handling', () => {
   for (const [idx, payload] of securityPayloads.bufferOverflow.entries()) {
     it(`buffer overflow #${idx + 1} (${payload.length} chars) does not crash`, async () => {
-      if (!serverUp) return;
       const res = await apiCall(
         'POST',
         '/admin/blog',
@@ -160,7 +145,6 @@ describe('Buffer Overflow — Large payload handling', () => {
 describe('Null Bytes — Injection prevention', () => {
   for (const [idx, payload] of securityPayloads.nullBytes.entries()) {
     it(`null byte #${idx + 1} does not bypass validation`, async () => {
-      if (!serverUp) return;
       const res = await apiCall(
         'POST',
         '/admin/organizations',
@@ -177,7 +161,6 @@ describe('Null Bytes — Injection prevention', () => {
 describe('Unicode Normalization — Bypass prevention', () => {
   for (const [idx, payload] of securityPayloads.unicodeNormalization.entries()) {
     it(`unicode normalization #${idx + 1} does not bypass filters`, async () => {
-      if (!serverUp) return;
       const res = await apiCall(
         'POST',
         '/admin/blog',
@@ -194,7 +177,6 @@ describe('Unicode Normalization — Bypass prevention', () => {
 describe('Weak Passwords — Registration rejection', () => {
   for (const [idx, pwd] of securityPayloads.weakPasswords.entries()) {
     it(`weak password #${idx + 1} "${pwd}" is rejected at signup`, async () => {
-      if (!serverUp) return;
       const res = await apiCall('POST', '/auth/sign-up/email', {
         email: `weak${idx}@test.local`,
         password: pwd,
@@ -212,7 +194,6 @@ describe('Weak Passwords — Registration rejection', () => {
 describe('Invalid Emails — Registration rejection', () => {
   for (const [idx, email] of securityPayloads.invalidEmails.entries()) {
     it(`invalid email #${idx + 1} "${email}" is rejected`, async () => {
-      if (!serverUp) return;
       const res = await apiCall('POST', '/auth/sign-up/email', {
         email,
         password: 'ValidPass123!@#',
@@ -221,4 +202,5 @@ describe('Invalid Emails — Registration rejection', () => {
       expect(res.status).toBeLessThan(500);
     });
   }
+});
 });

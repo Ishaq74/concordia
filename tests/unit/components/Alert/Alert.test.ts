@@ -347,14 +347,6 @@ describe('ui/Alert', () => {
       const step = flowResult.steps[0];
       const lhr = step.lhr;
 
-      // Log les scores
-      console.log('Lighthouse Alert Scores:', {
-        performance: (lhr.categories.performance?.score ?? 0) * 100,
-        accessibility: (lhr.categories.accessibility?.score ?? 0) * 100,
-        bestPractices: (lhr.categories['best-practices']?.score ?? 0) * 100,
-        seo: (lhr.categories.seo?.score ?? 0) * 100,
-      });
-
       // Assertion
       expect(lhr.categories.accessibility?.score).toBeGreaterThanOrEqual(0.9);
 
@@ -418,7 +410,6 @@ describe('ui/Alert', () => {
     expect(alertsHtml[0]).toContain('role="alert"');
     expect(alertsHtml[999]).toContain('Alert 1000');
     expect(duration).toBeLessThan(10000);
-    console.log(`✓ Rendered 1000 alerts in ${duration.toFixed(2)}ms`);
   });
 
   // ----------------------
@@ -993,7 +984,6 @@ describe('ui/Alert', () => {
     expect(alertsHtml[0]).toContain('role="alert"');
     expect(alertsHtml[999]).toContain('Alert 1000');
     expect(duration).toBeLessThan(10000);
-    console.log(`✓ Rendered 1000 alerts in ${duration.toFixed(2)}ms`);
   });
 
   // ----------------------
@@ -2142,7 +2132,6 @@ describe('ui/Alert', () => {
     
     expect(renders).toHaveLength(batchSize);
     expect(duration).toBeLessThan(15000);
-    console.log(`✓ Rendered ${batchSize} alerts in ${duration.toFixed(2)}ms`);
   });
 
   it('final: component is production-ready', async () => {
@@ -2450,8 +2439,6 @@ describe('ui/Alert', () => {
     expect(closeButton).toBeTruthy();
     expect(closeButton?.getAttribute('aria-label')).toBeTruthy();
     expect(svg).toBeTruthy();
-    
-    console.log('✓ Alert component is fully production-ready');
   });
 
 });

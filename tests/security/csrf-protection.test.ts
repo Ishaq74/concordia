@@ -1,34 +1,16 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { apiCall, getApiBase } from '@tests/utils/api-helpers';
+import { serverAvailable } from '@tests/helpers/server-guard';
 
-/**
- * CSRF protection tests — validates the middleware enforces origin checks
- * on mutative requests to /api/ endpoints.
- */
+const serverUp = await serverAvailable();
 
-async function isServerAvailable(): Promise<boolean> {
-  try {
-    const base = getApiBase();
-    const res = await fetch(`${base}/`, { signal: AbortSignal.timeout(3000) });
-    return res.ok || res.status === 404;
-  } catch {
-    return false;
-  }
-}
-
-let serverUp = false;
-beforeAll(async () => {
-  serverUp = await isServerAvailable();
-});
-
-describe('CSRF Protection — Middleware', () => {
+describe.skipIf(!serverUp)('CSRF Protection — Middleware', () => {
   const mutativeMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
   const protectedPath = '/api/admin/organizations';
 
   for (const method of mutativeMethods) {
     describe(`${method} requests`, () => {
       it('rejects request without Origin header', async () => {
-        if (!serverUp) return;
         const base = getApiBase();
         const url = `${base}${protectedPath}`;
         const res = await fetch(url, {
@@ -46,7 +28,6 @@ describe('CSRF Protection — Middleware', () => {
       });
 
       it('rejects request with mismatched Origin header', async () => {
-        if (!serverUp) return;
         const base = getApiBase();
         const host = new URL(base).host;
         const url = `${base}${protectedPath}`;
@@ -67,7 +48,6 @@ describe('CSRF Protection — Middleware', () => {
       });
 
       it('accepts request with matching Origin header', async () => {
-        if (!serverUp) return;
         const base = getApiBase();
         const origin = new URL(base).origin;
         const host = new URL(base).host;
@@ -89,14 +69,12 @@ describe('CSRF Protection — Middleware', () => {
   }
 
   it('GET requests bypass CSRF check', async () => {
-    if (!serverUp) return;
     const res = await apiCall('GET', '/admin/organizations');
     // GET should never be blocked by CSRF, only by auth
     expect(res.status).toBeLessThan(500);
   });
 
   it('auth API routes bypass CSRF check (Better Auth manages its own)', async () => {
-    if (!serverUp) return;
     const base = getApiBase();
     const res = await fetch(`${base}/api/auth/session`, {
       method: 'POST',
@@ -108,7 +86,6 @@ describe('CSRF Protection — Middleware', () => {
   });
 
   it('rejects request with invalid Origin URL format', async () => {
-    if (!serverUp) return;
     const base = getApiBase();
     const host = new URL(base).host;
     const url = `${base}${protectedPath}`;

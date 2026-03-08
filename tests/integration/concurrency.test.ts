@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { getApiBase } from '@tests/utils/api-helpers';
+import { serverAvailable } from '@tests/helpers/server-guard';
 
 /**
  * Concurrency tests — verify the system handles race conditions:
@@ -11,30 +12,13 @@ import { getApiBase } from '@tests/utils/api-helpers';
  * These tests require a running Astro dev server (pnpm dev or pnpm test from CLI).
  */
 
-async function isServerAvailable(): Promise<boolean> {
-  try {
-    const base = getApiBase();
-    const res = await fetch(`${base}/`, { signal: AbortSignal.timeout(3000) });
-    return res.ok || res.status === 404;
-  } catch {
-    return false;
-  }
-}
+const serverUp = await serverAvailable();
 
-/** Wraps a fetch to gracefully handle server unavailability */
-async function safeFetch(url: string, init?: RequestInit): Promise<Response> {
-  const res = await fetch(url, init);
-  return res;
-}
-
-describe('Concurrency tests', () => {
+describe.skipIf(!serverUp)('Concurrency tests', () => {
   let adminToken: string;
   let userToken: string;
-  let serverUp = false;
 
   beforeAll(async () => {
-    serverUp = await isServerAvailable();
-    if (!serverUp) return;
 
     const { auth } = await import('@lib/auth/auth');
     const ctx = await auth.$context;
@@ -67,7 +51,6 @@ describe('Concurrency tests', () => {
 
   describe('Concurrency — Double booking prevention', () => {
   it('concurrent booking requests for same slot should not both succeed', async () => {
-    if (!await isServerAvailable()) return;
     const base = getApiBase();
     const headers = apiHeaders(userToken);
 
@@ -107,7 +90,6 @@ describe('Concurrency tests', () => {
 
 describe('Concurrency — Parallel blog post creation', () => {
   it('5 concurrent blog post creations should not produce duplicates', async () => {
-    if (!await isServerAvailable()) return;
     const base = getApiBase();
     const headers = apiHeaders(adminToken);
 
@@ -148,7 +130,6 @@ describe('Concurrency — Parallel blog post creation', () => {
 
 describe('Concurrency — Concurrent session checks', () => {
   it('10 concurrent session reads should all succeed', async () => {
-    if (!await isServerAvailable()) return;
     const base = getApiBase();
 
     const results = await Promise.all(
@@ -165,7 +146,6 @@ describe('Concurrency — Concurrent session checks', () => {
   });
 
   it('concurrent session reads with different tokens should be isolated', async () => {
-    if (!await isServerAvailable()) return;
     const base = getApiBase();
 
     const [res1, res2] = await Promise.all([
@@ -188,7 +168,6 @@ describe('Concurrency — Concurrent session checks', () => {
 
 describe('Concurrency — Concurrent admin operations', () => {
   it('parallel reads and writes should not cause deadlocks', async () => {
-    if (!await isServerAvailable()) return;
     const base = getApiBase();
     const headers = apiHeaders(adminToken);
 

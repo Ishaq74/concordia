@@ -691,6 +691,7 @@ npm install
   - **helpers**
     - astroComponentTestHelpers.ts
     - component-test-context.ts
+    - server-guard.ts
     - uiTestHelpers.ts
   - **i18n**
     - routing.test.ts
@@ -1638,6 +1639,7 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
 - **helpers**
   - astroComponentTestHelpers.ts
   - component-test-context.ts
+  - server-guard.ts
   - uiTestHelpers.ts
 - **i18n**
   - routing.test.ts
@@ -2125,7 +2127,6 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
     - inserts comment with parentId when reply
 
 - `tests\integration\concurrency.test.ts`
-  - **Concurrency tests**
   - **Concurrency — Double booking prevention**
     - concurrent booking requests for same slot should not both succeed
   - **Concurrency — Parallel blog post creation**
@@ -2145,7 +2146,6 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
     - logs error if two translations produce same id
 
 - `tests\integration\multi-tenant-isolation.test.ts`
-  - **Multi-tenant isolation**
   - **Multi-tenant — Data isolation**
     - org A blog posts are not visible when querying org B
     - org A services are not visible when querying org B
@@ -2225,7 +2225,6 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
 - `tests\sanity.test.ts`
 
 - `tests\security\csrf-protection.test.ts`
-  - **CSRF Protection — Middleware**
   - **${method} requests**
     - rejects request without Origin header
     - rejects request with mismatched Origin header
@@ -2235,7 +2234,6 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
     - rejects request with invalid Origin URL format
 
 - `tests\security\middleware-headers.test.ts`
-  - **Security Headers — Middleware**
   - **Path: ${path}**
     - sets Content-Security-Policy header
     - sets X-Content-Type-Options to nosniff

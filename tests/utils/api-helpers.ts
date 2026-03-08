@@ -39,7 +39,6 @@ export async function apiCall(
     // ensure path is under /api so tests can use short names like '/admin'.
     const prefix = path.startsWith('/api') ? '' : '/api';
     const finalUrl = `${getApiBase()}${prefix}${path}`;
-    console.log('[apiCall] ', method, finalUrl);
     const response = await fetch(finalUrl, {
       method,
       headers,

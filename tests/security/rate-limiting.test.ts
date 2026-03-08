@@ -1,30 +1,13 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { apiCall, getApiBase } from '@tests/utils/api-helpers';
+import { serverAvailable } from '@tests/helpers/server-guard';
 
-/**
- * Rate limiting tests — verifies the server does not allow brute-force or
- * denial-of-service through rapid repeated requests.
- * Government sites must resist credential stuffing and abuse.
- */
+const serverUp = await serverAvailable();
 
-async function isServerAvailable(): Promise<boolean> {
-  try {
-    const base = getApiBase();
-    const res = await fetch(`${base}/`, { signal: AbortSignal.timeout(3000) });
-    return res.ok || res.status === 404;
-  } catch {
-    return false;
-  }
-}
-
-let serverUp = false;
-beforeAll(async () => {
-  serverUp = await isServerAvailable();
-});
+describe.skipIf(!serverUp)('Rate Limiting', () => {
 
 describe('Rate Limiting — Auth endpoints', () => {
   it('multiple rapid login attempts do not crash the server', async () => {
-    if (!serverUp) return;
     const results = await Promise.all(
       Array.from({ length: 20 }, (_, i) =>
         apiCall('POST', '/auth/sign-in/email', {
@@ -52,7 +35,6 @@ describe('Rate Limiting — Auth endpoints', () => {
   });
 
   it('rapid signup attempts do not crash the server', async () => {
-    if (!serverUp) return;
     const results = await Promise.all(
       Array.from({ length: 15 }, (_, i) =>
         apiCall('POST', '/auth/sign-up/email', {
@@ -69,7 +51,6 @@ describe('Rate Limiting — Auth endpoints', () => {
   });
 
   it('rapid password reset attempts do not crash the server', async () => {
-    if (!serverUp) return;
     const results = await Promise.all(
       Array.from({ length: 15 }, (_, i) =>
         apiCall('POST', '/auth/forgot-password', {
@@ -86,7 +67,6 @@ describe('Rate Limiting — Auth endpoints', () => {
 
 describe('Rate Limiting — API endpoints', () => {
   it('rapid API calls to admin endpoints remain stable', async () => {
-    if (!serverUp) return;
     const results = await Promise.all(
       Array.from({ length: 30 }, () =>
         apiCall('GET', '/admin/organizations'),
@@ -99,7 +79,6 @@ describe('Rate Limiting — API endpoints', () => {
   });
 
   it('rapid API calls to blog endpoint remain stable', async () => {
-    if (!serverUp) return;
     const results = await Promise.all(
       Array.from({ length: 30 }, () =>
         apiCall('GET', '/admin/blog'),
@@ -114,7 +93,6 @@ describe('Rate Limiting — API endpoints', () => {
 
 describe('Rate Limiting — Concurrent mutations', () => {
   it('concurrent POST requests do not corrupt data or crash', async () => {
-    if (!serverUp) return;
     const base = getApiBase();
     const origin = new URL(base).origin;
     const host = new URL(base).host;
@@ -138,3 +116,5 @@ describe('Rate Limiting — Concurrent mutations', () => {
     }
   });
 });
+
+}); // end describe.skipIf Rate Limiting

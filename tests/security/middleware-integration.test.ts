@@ -1,35 +1,15 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { apiCall, getApiBase } from '@tests/utils/api-helpers';
+import { serverAvailable } from '@tests/helpers/server-guard';
 
-/**
- * Integration tests for middleware layers:
- * - Security headers
- * - Locale redirect
- * - CSRF protection
- * - Auth session resolution
- * - Protected routes
- */
+const serverUp = await serverAvailable();
 
-async function isServerAvailable(): Promise<boolean> {
-  try {
-    const base = getApiBase();
-    const res = await fetch(`${base}/`, { signal: AbortSignal.timeout(3000) });
-    return res.ok || res.status === 404;
-  } catch {
-    return false;
-  }
-}
-
-let serverUp = false;
-beforeAll(async () => {
-  serverUp = await isServerAvailable();
-});
+describe.skipIf(!serverUp)('Middleware Integration', () => {
 
 // ─── Locale Redirect ──────────────────────────────────────────
 
 describe('Middleware — Locale redirect', () => {
   it('root / redirects to /fr/', async () => {
-    if (!serverUp) return;
     const base = getApiBase();
     const res = await fetch(`${base}/`, { redirect: 'manual' });
     // Accept either a 302 redirect or a 200 from /fr/
@@ -42,20 +22,17 @@ describe('Middleware — Locale redirect', () => {
   });
 
   it('valid locale prefix passes through', async () => {
-    if (!serverUp) return;
     const base = getApiBase();
     const res = await fetch(`${base}/fr/`, { redirect: 'manual' });
     expect(res.status).toBeLessThan(500);
   });
 
   it('API routes bypass locale redirect', async () => {
-    if (!serverUp) return;
     const res = await apiCall('GET', '/auth/session');
     expect(res.status).toBeLessThan(500);
   });
 
   it('static assets bypass locale redirect', async () => {
-    if (!serverUp) return;
     const base = getApiBase();
     const res = await fetch(`${base}/_astro/test.css`);
     // Even if the file doesn't exist, we should not get redirected to /fr/
@@ -67,7 +44,6 @@ describe('Middleware — Locale redirect', () => {
 
 describe('Middleware — Auth session', () => {
   it('unauthenticated request has no session', async () => {
-    if (!serverUp) return;
     const res = await apiCall('GET', '/auth/session');
     expect(res.status).toBeLessThan(500);
     // Session endpoint should return empty/null session for unauth
@@ -78,7 +54,6 @@ describe('Middleware — Auth session', () => {
   });
 
   it('static asset paths skip session resolution', async () => {
-    if (!serverUp) return;
     const base = getApiBase();
     // Request to a font path — should not trigger DB lookups
     const res = await fetch(`${base}/fonts/test.woff2`);
@@ -100,7 +75,6 @@ describe('Middleware — Protected routes', () => {
 
   for (const path of protectedPaths) {
     it(`unauthenticated access to ${path} redirects to sign-in`, async () => {
-      if (!serverUp) return;
       const base = getApiBase();
       const res = await fetch(`${base}${path}`, { redirect: 'manual' });
       // Should redirect (302) to sign-in page, or serve the login page (200)
@@ -115,7 +89,6 @@ describe('Middleware — Protected routes', () => {
   }
 
   it('public routes are accessible without auth', async () => {
-    if (!serverUp) return;
     const base = getApiBase();
     const publicPaths = ['/fr/', '/en/', '/fr/blog/', '/fr/services/'];
     for (const path of publicPaths) {
@@ -129,14 +102,12 @@ describe('Middleware — Protected routes', () => {
 
 describe('Middleware — Sequence correctness', () => {
   it('security headers are set even on 404 pages', async () => {
-    if (!serverUp) return;
     const base = getApiBase();
     const res = await fetch(`${base}/fr/this-page-does-not-exist`);
     expect(res.headers.get('x-content-type-options')).toBe('nosniff');
   });
 
   it('CSRF protection is applied before auth on API routes', async () => {
-    if (!serverUp) return;
     const base = getApiBase();
     // POST to API with mismatched origin — should get CSRF 403 before auth check
     const res = await fetch(`${base}/api/admin/organizations`, {
@@ -155,3 +126,5 @@ describe('Middleware — Sequence correctness', () => {
     }
   });
 });
+
+}); // end describe.skipIf Middleware Integration

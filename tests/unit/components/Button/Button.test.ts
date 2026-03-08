@@ -233,13 +233,7 @@ describe('ui/Button', () => {
       const step = flowResult.steps[0];
       const lhr = step.lhr;
 
-      // Log les scores
-      console.log('Lighthouse Scores:', {
-        performance: (lhr.categories.performance?.score ?? 0) * 100,
-        accessibility: (lhr.categories.accessibility?.score ?? 0) * 100,
-        bestPractices: (lhr.categories['best-practices']?.score ?? 0) * 100,
-        seo: (lhr.categories.seo?.score ?? 0) * 100,
-      });
+
 
       // Assertion
       expect(lhr.categories.accessibility?.score).toBeGreaterThanOrEqual(0.9);
@@ -779,7 +773,6 @@ describe('ui/Button', () => {
     expect(buttonsHtml[0]).toContain('<button');
     expect(buttonsHtml[999]).toContain('Button 1000');
     expect(duration).toBeLessThan(10000); // Should render 1000 buttons in less than 10 seconds
-    console.log(`✓ Rendered 1000 buttons in ${duration.toFixed(2)}ms`);
   });
 
   // ----------------------
@@ -1894,7 +1887,6 @@ describe('ui/Button', () => {
     
     expect(renders).toHaveLength(batchSize);
     expect(duration).toBeLessThan(15000); // Should complete in reasonable time
-    console.log(`✓ Rendered ${batchSize} buttons in ${duration.toFixed(2)}ms`);
   });
 
   it('final: component is production-ready', async () => {

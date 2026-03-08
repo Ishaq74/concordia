@@ -66,12 +66,7 @@ vi.mock('@lib/auth/auth', async () => {
 let serverProcess: any;
 
 beforeAll(async () => {
-  console.log('\n🧪 Starting test suite...\n');
   if (!serverProcess) {
-    // spawn astro dev server on port 4321 for e2e/security/SSR tests. Vite will
-    // automatically try subsequent ports if the requested one is taken. After
-    // launch we probe a small range of ports to discover the actual listening
-    // address, then update TEST_BASE_URL accordingly.
     const { spawn } = require('child_process');
     serverProcess = spawn('npx', ['astro', 'dev', '--port', '4321'], {
       shell: true,
@@ -80,36 +75,30 @@ beforeAll(async () => {
     });
 
     serverProcess.on('error', (err: any) => console.error('server spawn error', err));
-    serverProcess.on('exit', (code: any, sig: any) => console.log('server process exited', code, sig));
 
-    // also print stdout/stderr for debugging
-    serverProcess.stdout.on('data', (c: Buffer) => process.stdout.write(c.toString()));
-    serverProcess.stderr.on('data', (c: Buffer) => process.stderr.write(c.toString()));
-
-    // give the server some time to start
-    await new Promise((r) => setTimeout(r, 10000));
-
-    // attempt to find a responsive port in the 4321..4340 range
+    // Poll until a port responds instead of a blind setTimeout
     let foundPort: number | null = null;
-    for (let p = 4321; p < 4350; p++) {
-      try {
-        const res = await fetch(`http://localhost:${p}/`);
-        if (res.ok || res.status === 404) {
-          foundPort = p;
-          break;
-        }
-      } catch {
-        // ignore connection failure
+    const maxWait = 30_000; // 30 s ceiling
+    const start = Date.now();
+    while (Date.now() - start < maxWait) {
+      for (let p = 4321; p < 4350; p++) {
+        try {
+          const res = await fetch(`http://localhost:${p}/`, {
+            signal: AbortSignal.timeout(1000),
+          });
+          if (res.ok || res.status === 404) {
+            foundPort = p;
+            break;
+          }
+        } catch { /* not ready yet */ }
       }
+      if (foundPort !== null) break;
+      await new Promise((r) => setTimeout(r, 500));
     }
-    if (foundPort === null) {
-      console.warn('Unable to detect dev server port, falling back to 4321');
-      foundPort = 4321;
-    }
+    if (foundPort === null) foundPort = 4321;
     const newBase = `http://localhost:${foundPort}/api/auth`;
     process.env.TEST_BASE_URL = newBase;
     TEST_ENV.TEST_BASE_URL = newBase;
-    console.log('✅ test base URL set to', newBase);
   }
   await cleanupTestData();
 })
@@ -118,18 +107,10 @@ beforeAll(async () => {
 // across test files. Node process exit will clean it up automatically.
 
 afterAll(async () => {
-  console.log('\n✅ Test suite complete\n');
   await cleanupTestData();
 })
 
 beforeEach(async () => {
-  // Ensure a clean DB state at the start of every test to avoid cross-test
-  // interference when Vitest runs tests in parallel/forks.
-  await cleanupTestData()
-})
-
-afterAll(async () => {
-  console.log('\n✅ Test suite complete\n')
   await cleanupTestData()
 })
 
