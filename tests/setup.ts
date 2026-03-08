@@ -100,14 +100,13 @@ beforeAll(async () => {
     process.env.TEST_BASE_URL = newBase;
     TEST_ENV.TEST_BASE_URL = newBase;
   }
-  await cleanupTestData();
-})
-
-// NOTE: we deliberately do NOT kill the server in afterAll so it persists
-// across test files. Node process exit will clean it up automatically.
+});
 
 afterAll(async () => {
-  await cleanupTestData();
+  if (serverProcess) {
+    serverProcess.kill();
+    serverProcess = null;
+  }
 })
 
 beforeEach(async () => {

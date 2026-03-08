@@ -1,7 +1,7 @@
 export const TEST_ENV = {
   NODE_ENV: 'test',
   SMTP_MOCK: '1',
-  BETTER_AUTH_URL: 'http://localhost:3000',
+  BETTER_AUTH_URL: 'http://localhost:4321',
   DATABASE_URL: 'postgresql://test:test@localhost/test_db',
   // base url used by apiCall helper; we override after server starts in setup.ts
   TEST_BASE_URL: 'http://localhost:4321/api',

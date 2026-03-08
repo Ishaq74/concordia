@@ -58,7 +58,7 @@ describe('Auth — critical integration tests', () => {
   it('duplicate sign-up is rejected or returns error', async () => {
     const { getAuth } = await import('@lib/auth/auth')
     const authInstance = await getAuth();
-    const email = `dup_${Math.random().toString(36).slice(2, 8)}@test.local`;
+    const email = `dup_${Date.now()}@test.local`;
     const password = 'SafePass123!';
 
     // First sign-up should succeed

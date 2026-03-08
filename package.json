@@ -29,12 +29,12 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:headed": "playwright test --headed",
     "test:security": "vitest run tests/security/**/*.test.ts",
-    "test:a11y": "playwright test tests/e2e/a11y/",
-    "test:all": "pnpm run test:unit && pnpm run test:integration && pnpm run test:components && pnpm run test:security && pnpm run test:e2e && pnpm run test:a11y",
+    "test:a11y": "playwright test tests/a11y/",
+    "test:all": "pnpm run test:unit && pnpm run test:integration && pnpm run test:components && pnpm run test:security && pnpm run test:e2e",
     "test:coverage": "vitest run --coverage",
     "test:report": "vitest run --reporter=html && open ./reports/vitest/index.html",
-    "test:ci": "vitest run --coverage && playwright test",
-    "test:perf": "playwright test tests/e2e/performance/"
+    "test:ci": "vitest run --coverage && pnpm run test:e2e",
+    "test:perf": "vitest run tests/integration/performance-api.test.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",

@@ -91,12 +91,12 @@ npm install
 - `npm run test:e2e:debug`: playwright test --debug
 - `npm run test:e2e:headed`: playwright test --headed
 - `npm run test:security`: vitest run tests/security/**/*.test.ts
-- `npm run test:a11y`: playwright test tests/e2e/a11y/
-- `npm run test:all`: pnpm run test:unit && pnpm run test:integration && pnpm run test:components && pnpm run test:security && pnpm run test:e2e && pnpm run test:a11y
+- `npm run test:a11y`: playwright test tests/a11y/
+- `npm run test:all`: pnpm run test:unit && pnpm run test:integration && pnpm run test:components && pnpm run test:security && pnpm run test:e2e
 - `npm run test:coverage`: vitest run --coverage
 - `npm run test:report`: vitest run --reporter=html && open ./reports/vitest/index.html
-- `npm run test:ci`: vitest run --coverage && playwright test
-- `npm run test:perf`: playwright test tests/e2e/performance/
+- `npm run test:ci`: vitest run --coverage && pnpm run test:e2e
+- `npm run test:perf`: vitest run tests/integration/performance-api.test.ts
 ```
 
 ## Estructura del proyecto
@@ -682,7 +682,6 @@ npm install
     - critical-flows.test.ts
     - mailbox.test.ts
     - org-admin.test.ts
-    - performance-api.test.ts
     - services-admin.test.ts
   - **fixtures**
     - auth-fixtures.ts
@@ -714,7 +713,10 @@ npm install
     - notifications.test.ts
     - org-admin.test.ts
     - org-switch.test.ts
+    - performance-api.test.ts
     - services-admin.test.ts
+  - **mocks**
+    - astro-schema.ts
   - **pages**
     - public-pages.test.ts
   - README-mocking.md
@@ -1630,7 +1632,6 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - critical-flows.test.ts
   - mailbox.test.ts
   - org-admin.test.ts
-  - performance-api.test.ts
   - services-admin.test.ts
 - **fixtures**
   - auth-fixtures.ts
@@ -1662,7 +1663,10 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - notifications.test.ts
   - org-admin.test.ts
   - org-switch.test.ts
+  - performance-api.test.ts
   - services-admin.test.ts
+- **mocks**
+  - astro-schema.ts
 - **pages**
   - public-pages.test.ts
 - README-mocking.md
@@ -2003,21 +2007,6 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
   - **Org Admin — All page routes respond without 500**
   - **Org Admin — i18n pages render in all locales**
 
-- `tests\e2e\performance-api.test.ts`
-  - **Performance — Auth endpoints**
-    - GET /api/auth/session responds within threshold
-    - POST /api/auth/sign-in/email responds within threshold
-  - **Performance — Admin API endpoints**
-    - GET ${endpoint} responds within threshold
-  - **Performance — Public pages**
-    - GET ${page} responds within threshold
-  - **Performance — Pagination does not degrade**
-    - page 1 vs page 10 should have similar response times
-    - small vs large page size should be bounded
-  - **Performance — Concurrent request handling**
-    - handles 10 concurrent public page requests without errors
-    - handles 10 concurrent API requests without errors
-
 - `tests\e2e\services-admin.test.ts`
   - **Services Admin — All page routes respond without 500**
   - **Services Admin — Auth guard (unauthenticated)**
@@ -2190,6 +2179,21 @@ Las pruebas están configuradas con Vitest (unitarias/integración) y Playwright
 - `tests\integration\org-switch.test.ts`
   - **Org switching API**
     - allows a user to switch active organization
+
+- `tests\integration\performance-api.test.ts`
+  - **Performance — Auth endpoints**
+    - GET /api/auth/session responds within threshold
+    - POST /api/auth/sign-in/email responds within threshold
+  - **Performance — Admin API endpoints**
+    - GET ${endpoint} responds within threshold
+  - **Performance — Public pages**
+    - GET ${page} responds within threshold
+  - **Performance — Pagination does not degrade**
+    - page 1 vs page 10 should have similar response times
+    - small vs large page size should be bounded
+  - **Performance — Concurrent request handling**
+    - handles 10 concurrent public page requests without errors
+    - handles 10 concurrent API requests without errors
 
 - `tests\integration\services-admin.test.ts`
   - **Services Admin tests**

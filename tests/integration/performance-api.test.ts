@@ -2,13 +2,18 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { auth } from '@lib/auth/auth';
 import type { TestHelpers } from 'better-auth/plugins';
 import { getApiBase } from '@tests/utils/api-helpers';
+import { serverAvailable } from '@tests/helpers/server-guard';
 
 /**
  * Performance API tests — measure response times for key endpoints,
  * detect N+1 queries, and validate pagination behavior.
  */
 
+const serverUp = await serverAvailable();
+
 let adminToken: string;
+
+describe.skipIf(!serverUp)('Performance API', () => {
 
 beforeAll(async () => {
   const ctx = await auth.$context;
@@ -177,3 +182,5 @@ describe('Performance — Concurrent request handling', () => {
     expect(errors.length).toBe(0);
   });
 });
+
+}); // end describe.skipIf Performance API

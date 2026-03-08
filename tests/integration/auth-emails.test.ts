@@ -27,10 +27,10 @@ describe('BetterAuth Email Functions', () => {
       const config = (auth as any).options.emailVerification
       const { getCalls } = await import('@tests/setup').then(m => m.createSmtpMock())
 
-      const dummy = `signup_${Math.random().toString(36).slice(2, 10)}@test.local`
+      const dummy = `signup_${Date.now()}@test.local`
       await config.sendVerificationEmail({
         user: { email: dummy, id: 'user-signup-test' },
-        url: 'http://localhost:3000/verify?code=test123',
+        url: 'http://localhost:4321/verify?code=test123',
         token: 'test123',
       })
 
@@ -49,10 +49,10 @@ describe('BetterAuth Email Functions', () => {
       const auth = await getAuth()
       const config = (auth as any).options.emailVerification
       const { getCalls } = await import('@tests/setup').then(m => m.createSmtpMock());
-      const dummy = `verify_${Math.random().toString(36).slice(2, 10)}@test.local`
+      const dummy = `verify_${Date.now()}@test.local`
       await config.sendVerificationEmail({
         user: { email: dummy, id: 'user-123' },
-        url: 'http://localhost:3000/verify?code=abc123',
+        url: 'http://localhost:4321/verify?code=abc123',
         token: 'abc123',
       })
       const calls = getCalls();
@@ -80,12 +80,12 @@ describe('BetterAuth Email Functions', () => {
       const { getAuth } = await import('@lib/auth/auth')
       const auth = await getAuth()
       const config = (auth as any).options.emailAndPassword
-      const dummy = `reset_${Math.random().toString(36).slice(2, 10)}@test.local`
+      const dummy = `reset_${Date.now()}@test.local`
 
       await expect(
         config.sendResetPassword({
           user: { email: dummy, id: 'user-123' },
-          url: 'http://localhost:3000/reset?token=xyz789',
+          url: 'http://localhost:4321/reset?token=xyz789',
           token: 'xyz789',
         })
       ).resolves.not.toThrow()
@@ -96,10 +96,10 @@ describe('BetterAuth Email Functions', () => {
       const auth = await getAuth()
       const config = (auth as any).options.emailAndPassword
       const { getCalls } = await import('@tests/setup').then(m => m.createSmtpMock());
-      const dummy = `reset_${Math.random().toString(36).slice(2, 10)}@test.local`
+      const dummy = `reset_${Date.now()}@test.local`
       await config.sendResetPassword({
         user: { email: dummy, id: 'user-123' },
-        url: 'http://localhost:3000/reset?token=xyz789',
+        url: 'http://localhost:4321/reset?token=xyz789',
         token: 'xyz789',
       })
       const calls = getCalls();

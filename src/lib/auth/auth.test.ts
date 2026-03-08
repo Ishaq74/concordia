@@ -9,6 +9,8 @@ import type { TestHelpers } from 'better-auth/plugins';
 
 describe('Auth - Security & Functionality', () => {
   let test: TestHelpers;
+  let _seq = 0;
+  const seq = () => `${Date.now()}_${++_seq}`;
 
   beforeAll(async () => {
     await cleanupTestData();
@@ -22,7 +24,7 @@ describe('Auth - Security & Functionality', () => {
   describe('Inscription Sécurisée', () => {
     it('crée utilisateur avec password fort', async () => {
       // ✅ Pas besoin de réinitialiser ctx à chaque test
-      const password = `P@ssw0rd!${Math.random().toString(36).slice(2, 8)}`;
+      const password = `P@ssw0rd!${Date.now().toString(36)}`;
       const userObj = test.createUser({ password });
       const user = await test.saveUser(userObj);
       
@@ -124,13 +126,13 @@ describe('Auth - Security & Functionality', () => {
     });
 
     it('hash password différent pour même password', async () => {
-      const samePassword = `P@ssw0rd!${Math.random().toString(36).slice(2, 8)}`;
+      const samePassword = `P@ssw0rd!${seq()}`;
       
       const { getAuth } = await import('@lib/auth/auth');
       const authInstance = await getAuth();
       
-      const email1 = `hash1_${Math.random().toString(36).slice(2, 8)}@test.local`;
-      const email2 = `hash2_${Math.random().toString(36).slice(2, 8)}@test.local`;
+      const email1 = `hash1_${seq()}@test.local`;
+      const email2 = `hash2_${seq()}@test.local`;
       
       // Sign up via API so account entries (with hashed passwords) are created
       await authInstance.api.signUpEmail({ body: { email: email1, password: samePassword, name: 'H1' } });
@@ -154,8 +156,8 @@ describe('Auth - Security & Functionality', () => {
 
   describe('Connexion Sécurisée', () => {
     it('JWT a claims sécurisés', async () => {
-      const password = `P@ssw0rd!${Math.random().toString(36).slice(2, 8)}`;
-      const userObj = test.createUser({ email: `jwt${Math.random()}@test.local`, password });
+      const password = `P@ssw0rd!${seq()}`;
+      const userObj = test.createUser({ email: `jwt${seq()}@test.local`, password });
       const user = await test.saveUser(userObj);
       
       // ✅ Utilise test.login avec userId
@@ -174,8 +176,8 @@ describe('Auth - Security & Functionality', () => {
     });
 
     it('rejète timing attack (temps similaire)', async () => {
-      const email = `timing_${Math.random().toString(36).slice(2, 10)}@test.local`;
-      const password = `P@ssw0rd!${Math.random().toString(36).slice(2, 8)}`;
+      const email = `timing_${seq()}@test.local`;
+      const password = `P@ssw0rd!${seq()}`;
       const userObj = test.createUser({ email, password });
       await test.saveUser(userObj);
 
@@ -208,8 +210,8 @@ describe('Auth - Security & Functionality', () => {
     });
 
     it('session unique par device', async () => {
-      const password = `P@ssw0rd!${Math.random().toString(36).slice(2, 8)}`;
-      const userObj = test.createUser({ email: `device${Math.random()}@test.local`, password });
+      const password = `P@ssw0rd!${seq()}`;
+      const userObj = test.createUser({ email: `device${seq()}@test.local`, password });
       const user = await test.saveUser(userObj);
 
       // ✅ Login 2 fois = 2 sessions différentes
@@ -229,8 +231,8 @@ describe('Auth - Security & Functionality', () => {
   describe('Email Verification', () => {
     it('envoie email avec token sécurisé', async () => {
       const smtp = await createSmtpMock();
-      const password = `P@ssw0rd!${Math.random().toString(36).slice(2, 8)}`;
-      const userObj = test.createUser({ email: `verify${Math.random()}@test.local`, password });
+      const password = `P@ssw0rd!${seq()}`;
+      const userObj = test.createUser({ email: `verify${seq()}@test.local`, password });
       const user = await test.saveUser(userObj);
 
       const calls = smtp.getCalls();
@@ -257,8 +259,8 @@ describe('Auth - Security & Functionality', () => {
 
     it('token verification à usage unique', async () => {
       const smtp = await createSmtpMock();
-      const password = `P@ssw0rd!${Math.random().toString(36).slice(2, 8)}`;
-      const userObj = test.createUser({ email: `uniquetoken${Math.random()}@test.local`, password });
+      const password = `P@ssw0rd!${seq()}`;
+      const userObj = test.createUser({ email: `uniquetoken${seq()}@test.local`, password });
       const user = await test.saveUser(userObj);
 
       const calls = smtp.getCalls();
@@ -283,8 +285,8 @@ describe('Auth - Security & Functionality', () => {
   describe('Password Reset', () => {
     it('token reset expire', async () => {
       const smtp = await createSmtpMock();
-      const password = `P@ssw0rd!${Math.random().toString(36).slice(2, 8)}`;
-      const userObj = test.createUser({ email: `reset${Math.random()}@test.local`, password });
+      const password = `P@ssw0rd!${seq()}`;
+      const userObj = test.createUser({ email: `reset${seq()}@test.local`, password });
       const user = await test.saveUser(userObj);
       
       const { getAuth } = await import('@lib/auth/auth');
@@ -319,8 +321,8 @@ describe('Auth - Security & Functionality', () => {
 
     it('token reset à usage unique', async () => {
       const smtp = await createSmtpMock();
-      const password = `P@ssw0rd!${Math.random().toString(36).slice(2, 8)}`;
-      const userObj = test.createUser({ email: `resetunique${Math.random()}@test.local`, password });
+      const password = `P@ssw0rd!${seq()}`;
+      const userObj = test.createUser({ email: `resetunique${seq()}@test.local`, password });
       const user = await test.saveUser(userObj);
       
       const { getAuth } = await import('@lib/auth/auth');
@@ -352,8 +354,8 @@ describe('Auth - Security & Functionality', () => {
     });
 
     it('notification email si password changé', async () => {
-      const password = `P@ssw0rd!${Math.random().toString(36).slice(2, 8)}`;
-      const userObj = test.createUser({ email: `pwchange${Math.random()}@test.local`, password });
+      const password = `P@ssw0rd!${seq()}`;
+      const userObj = test.createUser({ email: `pwchange${seq()}@test.local`, password });
       const user = await test.saveUser(userObj);
 
       // Verify password change notification config exists.
@@ -369,8 +371,8 @@ describe('Auth - Security & Functionality', () => {
 
   describe('Logout & Session', () => {
     it('logout invalide token', async () => {
-      const password = `P@ssw0rd!${Math.random().toString(36).slice(2, 8)}`;
-      const userObj = test.createUser({ email: `logout${Math.random()}@test.local`, password });
+      const password = `P@ssw0rd!${seq()}`;
+      const userObj = test.createUser({ email: `logout${seq()}@test.local`, password });
       const user = await test.saveUser(userObj);
       
       const { headers } = await test.login({ userId: user.id });
@@ -403,7 +405,7 @@ describe('Auth - Security & Functionality', () => {
   describe('Audit & Logging', () => {
     it('log création utilisateur', async () => {
       // ✅ Better Auth log automatiquement via le plugin
-      const userObj = test.createUser({ email: `audit${Math.random()}@test.local` });
+      const userObj = test.createUser({ email: `audit${seq()}@test.local` });
       const user = await test.saveUser(userObj);
       
       expect(user.id).toBeDefined();
@@ -412,17 +414,12 @@ describe('Auth - Security & Functionality', () => {
     });
 
     it('log échec connexion', async () => {
-      const password = `P@ssw0rd!${Math.random().toString(36).slice(2, 8)}`;
-      const userObj = test.createUser({ email: `logfail${Math.random()}@test.local`, password });
+      const password = `P@ssw0rd!${seq()}`;
+      const userObj = test.createUser({ email: `logfail${seq()}@test.local`, password });
       const user = await test.saveUser(userObj);
       
-      try {
-        // ✅ Tentative échouée
-        await test.login({ userId: 'fake-id' });
-      } catch {}
-      
-      // Les logs sont automatiques dans better-auth
-      expect(true).toBe(true);
+      // ✅ Tentative échouée — must throw
+      await expect(test.login({ userId: 'fake-id' })).rejects.toThrow();
       
       await test.deleteUser(user.id);
     });

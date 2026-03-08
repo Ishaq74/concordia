@@ -7,18 +7,7 @@ vi.mock('astro:actions', () => ({
   defineAction: (opts: any) => ({ handler: opts.handler }),
 }));
 
-vi.mock('astro:schema', () => {
-  const z = {
-    string: () => ({
-      min: () => ({ optional: () => ({ transform: (fn: any) => fn }), transform: (fn: any) => fn }),
-      optional: () => ({ transform: (fn: any) => fn }),
-      transform: (fn: any) => fn,
-    }),
-    object: (shape: any) => shape,
-    enum: () => ({}),
-  };
-  return { z };
-});
+vi.mock('astro:schema', () => import('@tests/mocks/astro-schema'));
 
 const { mockDb } = vi.hoisted(() => {
   const mockDb = {

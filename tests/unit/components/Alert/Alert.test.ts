@@ -1857,9 +1857,9 @@ describe('ui/Alert', () => {
       const { window: w6 } = new JD6(html);
       const scripts = w6.document.querySelectorAll('[href^="javascript:"], [src^="javascript:"]');
       expect(scripts.length).toBe(0);
-    } catch {
+    } catch (err) {
       // Throwing on invalid icon is acceptable secure behavior
-      expect(true).toBe(true);
+      expect(err).toBeDefined();
     }
   });
 
@@ -2183,8 +2183,8 @@ describe('ui/Alert', () => {
     try {
       const iconHtml = await container.renderToString(Alert, { props: { icon: 'unknown-icon' }, slots: { default: 'Icon' } });
       expect(iconHtml).toContain('<div');
-    } catch {
-      expect(true).toBe(true);
+    } catch (err) {
+      expect(err).toBeDefined();
     }
   });
 
