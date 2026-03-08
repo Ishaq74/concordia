@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Component: Sheet > renders root sheet element > Sheet-default 1`] = `"<div class="sheet" data-astro-cid-hoqoeqwx data-astro-source-file="C:/Users/Utilisateur/Documents/concordia/src/components/ui/Sheet/Sheet.astro" data-astro-source-loc="36:42"> <input type="checkbox" id="test-sheet" class="sheet-toggle" data-astro-cid-hoqoeqwx data-astro-source-file="C:/Users/Utilisateur/Documents/concordia/src/components/ui/Sheet/Sheet.astro" data-astro-source-loc="37:4"> <p>Content</p> </div> "`;
