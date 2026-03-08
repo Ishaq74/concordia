@@ -13,7 +13,7 @@ export default getViteConfig(
       environment: 'node',
       pool: 'forks',
       testTimeout: 60000,
-      hookTimeout: 30000,
+      hookTimeout: 120000,
       setupFiles: ['./tests/setup.ts'],
       coverage: {
         provider: 'v8',

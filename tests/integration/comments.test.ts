@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest'
 import { commentActions } from '@actions/comments'
-import { auth } from '@lib/auth/auth'
 import { getDrizzle } from '@database/drizzle'
 import { blogComments } from '@database/schemas'
 import { eq } from 'drizzle-orm'
@@ -52,6 +51,7 @@ vi.mock('astro:schema', () => {
 describe('Comments actions (createComment)', () => {
   let test: TestHelpers
   beforeAll(async () => {
+    const { auth } = await import('@lib/auth/auth')
     const ctx = await auth.$context
     test = ctx.test
   })

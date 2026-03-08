@@ -1,39 +1,24 @@
 // tests/setup.integration.ts
-import { beforeAll, afterAll, afterEach } from 'vitest';
-import { auth } from '@/lib/auth/auth';
+//
+// Shared helpers for integration tests that need Better Auth test utilities.
+//
+// Usage in test files:
+//   import { getAuthTestHelpers } from '@tests/setup.integration'
+//   const { test } = await getAuthTestHelpers()
+
 import type { TestHelpers } from 'better-auth/plugins';
-import { getDrizzle, getPgClient } from '@/database/drizzle';
-import { sql } from 'drizzle-orm';
 
-// Extension du contexte Vitest pour accès helpers
+let _helpers: { test: TestHelpers } | null = null;
 
-declare module 'vitest' {
-  interface TestContext {
-    auth: typeof auth;
-    testUtils: TestHelpers;
-  }
-}
-
-let testUtils: TestHelpers;
-
-beforeAll(async () => {
+/**
+ * Lazily initialise Better Auth test helpers. Returns cached instance on
+ * subsequent calls. The `auth` import is mocked by setup.ts to use the test
+ * database, so `auth.$context` resolves correctly.
+ */
+export async function getAuthTestHelpers(): Promise<{ test: TestHelpers }> {
+  if (_helpers) return _helpers;
+  const { auth } = await import('@lib/auth/auth');
   const ctx = await auth.$context;
-  testUtils = ctx.test;
-  // Nettoyage initial
-  const db = await getDrizzle();
-  await db.execute(sql`TRUNCATE TABLE users, organizations, members, sessions CASCADE`);
-});
-
-afterEach(async () => {
-  // Cleanup après chaque test pour isolation
-  const db = await getDrizzle();
-  await db.execute(sql`TRUNCATE TABLE users, organizations, members, sessions CASCADE`);
-});
-
-afterAll(async () => {
-  const pg = getPgClient();
-  await pg.end();
-});
-
-// Helper global pour accès rapide
-export { testUtils };
+  _helpers = { test: ctx.test };
+  return _helpers;
+}

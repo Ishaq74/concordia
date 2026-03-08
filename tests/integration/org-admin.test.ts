@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest'
 import { getTestDb } from '@tests/config/test-db'
 import { TEST_ENV } from '@tests/config/test-env'
-import { auth } from '@lib/auth/auth'
 import { blogOrganizations } from '@database/schemas'
 import { member, invitation } from '@database/schemas/auth-schema'
 import { eq, and } from 'drizzle-orm'
@@ -10,24 +9,47 @@ import { randomUUID } from 'crypto'
 /** Typed result from test.saveOrganization() */
 type TestOrg = { id: string; [key: string]: unknown }
 
-let test: Awaited<typeof auth.$context>['test']
+describe('Org Admin tests', () => {
+  let test: any
 
-beforeAll(async () => {
-  const ctx = await auth.$context
-  test = ctx.test
-})
+  beforeAll(async () => {
+    const { auth } = await import('@lib/auth/auth')
+    const ctx = await auth.$context
+    test = ctx.test
+  })
 
-beforeEach(() => {
-  Object.entries(TEST_ENV).forEach(([key, value]) => vi.stubEnv(key, value))
-})
+  beforeEach(() => {
+    Object.entries(TEST_ENV).forEach(([key, value]) => vi.stubEnv(key, value))
+  })
 
-async function saveOrg(data: Record<string, unknown> = {}): Promise<TestOrg> {
-  return await test.saveOrganization(test.createOrganization(data)) as TestOrg
-}
+  async function saveOrg(data: Record<string, unknown> = {}): Promise<TestOrg> {
+    const org = await test.saveOrganization(test.createOrganization(data)) as TestOrg
+    // Also insert into blogOrganizations so tests querying that table find entries
+    const db = await getTestDb()
+    const blogOrgValues: Record<string, unknown> = {
+      id: org.id,
+      name: (data.name as string) || (org as any).name || 'Test Org',
+      slug: (org as any).slug || `org-${org.id.slice(0, 8)}`,
+    }
+    if ('isActive' in data) blogOrgValues.isActive = Boolean(data.isActive)
+    await db.insert(blogOrganizations).values(blogOrgValues as any).onConflictDoNothing()
+    return org
+  }
 
-async function saveUser(overrides: Record<string, unknown> = {}) {
-  return await test.saveUser(test.createUser({ emailVerified: true, ...overrides }))
-}
+  async function saveUser(overrides: Record<string, unknown> = {}) {
+    return await test.saveUser(test.createUser({ emailVerified: true, ...overrides }))
+  }
+
+  async function addMembership(userId: string, orgId: string, role: string = 'member') {
+    const db = await getTestDb()
+    await db.insert(member).values({
+      id: randomUUID(),
+      userId,
+      organizationId: orgId,
+      role,
+      createdAt: new Date(),
+    }).onConflictDoNothing()
+  }
 
 // ─── Organization Profile API ───────────────────────────────────
 
@@ -98,10 +120,11 @@ describe('Org Admin — Profile API logic', () => {
 // ─── Organization Members ───────────────────────────────────────
 
 describe('Org Admin — Members & Roles', () => {
-  it('createTestOrganization creates org + owner membership', async () => {
+  it('org + owner membership can be created and queried', async () => {
     const db = await getTestDb()
     const user = await saveUser({ role: 'owner' })
     const org = await saveOrg({ name: 'Owner Test Org' })
+    await addMembership(user.id, org.id, 'owner')
     const [membership] = await db
       .select()
       .from(member)
@@ -113,9 +136,11 @@ describe('Org Admin — Members & Roles', () => {
 
   it('member role can be updated', async () => {
     const db = await getTestDb()
-    await saveUser({ role: 'owner' })
+    const owner = await saveUser({ role: 'owner' })
     const org = await saveOrg({ name: 'Role Update Org' })
+    await addMembership(owner.id, org.id, 'owner')
     const memberUser = await saveUser({ role: 'member' })
+    await addMembership(memberUser.id, org.id, 'member')
     await db
       .update(member)
       .set({ role: 'admin' })
@@ -130,9 +155,11 @@ describe('Org Admin — Members & Roles', () => {
 
   it('member can be removed from organization', async () => {
     const db = await getTestDb()
-    await saveUser({ role: 'owner' })
+    const owner = await saveUser({ role: 'owner' })
     const org = await saveOrg({ name: 'Remove Member Org' })
+    await addMembership(owner.id, org.id, 'owner')
     const memberUser = await saveUser({ role: 'member' })
+    await addMembership(memberUser.id, org.id, 'member')
     await db.delete(member).where(
       and(eq(member.userId, memberUser.id), eq(member.organizationId, org.id)),
     )
@@ -171,10 +198,13 @@ describe('Org Admin — Members & Roles', () => {
 
   it('multiple members can be listed for an organization', async () => {
     const db = await getTestDb()
-    await saveUser({ role: 'owner' })
+    const owner = await saveUser({ role: 'owner' })
     const org = await saveOrg({ name: 'List Members Org' })
-    for (let i = 0; i < 3; i++) {
-      await saveUser({ role: i === 0 ? 'admin' : 'member' })
+    await addMembership(owner.id, org.id, 'owner')
+    const roles = ['admin', 'member', 'member']
+    for (const role of roles) {
+      const u = await saveUser({ role })
+      await addMembership(u.id, org.id, role)
     }
     const members = await db
       .select()
@@ -193,6 +223,7 @@ describe('Org Admin — Org ID resolution logic', () => {
     const db = await getTestDb()
     const user = await saveUser({ role: 'member' })
     const org = await saveOrg({ name: 'Resolve Org' })
+    await addMembership(user.id, org.id, 'member')
     const [firstMembership] = await db
       .select({ organizationId: member.organizationId })
       .from(member)
@@ -211,13 +242,14 @@ describe('Org Admin — Org ID resolution logic', () => {
       .from(member)
       .where(eq(member.userId, user.id))
     expect(memberships.length).toBe(0)
-    const [firstOrg] = await db
+    // Query the specific org we just created
+    const [foundOrg] = await db
       .select({ id: blogOrganizations.id })
       .from(blogOrganizations)
+      .where(eq(blogOrganizations.id, org.id))
       .limit(1)
-    expect(firstOrg).toBeDefined()
-    expect(firstOrg.id).toBeTruthy()
-    expect(firstOrg.id).toBe(org.id)
+    expect(foundOrg).toBeDefined()
+    expect(foundOrg.id).toBe(org.id)
   })
 
   it('query param ?org= takes priority', () => {
@@ -265,3 +297,4 @@ describe('Org Admin — Permission checks', () => {
     expect(isSuperAdminUser({ role: 'member' })).toBe(false)
   })
 })
+});

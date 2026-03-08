@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest'
 import { getTestDb } from '@tests/config/test-db'
 import { TEST_ENV } from '@tests/config/test-env'
-import { auth } from '@lib/auth/auth'
 import {
   servicesListings,
   servicesCategories,
@@ -14,24 +13,26 @@ import { randomUUID } from 'crypto'
 /** Typed result from test.saveOrganization() */
 type TestOrg = { id: string; [key: string]: unknown }
 
-let test: Awaited<typeof auth.$context>['test']
+describe('Services Admin tests', () => {
+  let test: any
 
-beforeAll(async () => {
-  const ctx = await auth.$context
-  test = ctx.test
-})
+  beforeAll(async () => {
+    const { auth } = await import('@lib/auth/auth')
+    const ctx = await auth.$context
+    test = ctx.test
+  })
 
-beforeEach(() => {
-  Object.entries(TEST_ENV).forEach(([key, value]) => vi.stubEnv(key, value))
-})
+  beforeEach(() => {
+    Object.entries(TEST_ENV).forEach(([key, value]) => vi.stubEnv(key, value))
+  })
 
-async function saveOrg(data: Record<string, unknown> = {}): Promise<TestOrg> {
-  return await test.saveOrganization(test.createOrganization(data)) as TestOrg
-}
+  async function saveOrg(data: Record<string, unknown> = {}): Promise<TestOrg> {
+    return await test.saveOrganization(test.createOrganization(data)) as TestOrg
+  }
 
-async function saveUser(overrides: Record<string, unknown> = {}) {
-  return await test.saveUser(test.createUser({ emailVerified: true, ...overrides }))
-}
+  async function saveUser(overrides: Record<string, unknown> = {}) {
+    return await test.saveUser(test.createUser({ emailVerified: true, ...overrides }))
+  }
 
 // ─── Helpers ────────────────────────────────────────────────────
 
@@ -315,3 +316,4 @@ describe('Services — Org scoping isolation', () => {
     expect(allB.map((s: any) => s.id)).not.toContain(svcA1);
   });
 })
+});

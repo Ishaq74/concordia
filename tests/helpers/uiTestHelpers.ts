@@ -631,7 +631,9 @@ export function expectHasCSS(html: string, property: string, value?: string, opt
   if (options.shouldHaveCSS) {
     expect(target).toContain(property);
     if (value !== undefined) {
-      expect(target).toContain(`${property}: ${value}`);
+      const hasWithSpace = target.includes(`${property}: ${value}`);
+      const hasWithoutSpace = target.includes(`${property}:${value}`);
+      expect(hasWithSpace || hasWithoutSpace).toBe(true);
     }
   } else {
     expect(target).not.toContain(property);

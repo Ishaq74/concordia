@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { afterEach, beforeAll, beforeEach, afterAll, vi, expect } from 'vitest'
 import * as axeMatchers from 'vitest-axe/matchers';
 import { cleanupTestData } from './utils/cleanup'
@@ -41,6 +42,24 @@ vi.mock('@database/drizzle', async () => {
   return {
     ...actual,
     getDrizzle: async () => testDb.getTestDb(),
+  }
+})
+
+// Replace the sync CLI `auth` export (which uses an unconnected pg.Client on
+// the dev DB) with a properly initialised instance backed by the test DB.
+// getAuth() internally calls getDrizzle() — already mocked above — so the
+// returned instance connects to DATABASE_URL_TEST.
+// The email functions in auth.ts push directly to sendMailMock.mock.calls
+// when NODE_ENV=test, so no wrapper is needed here.
+vi.mock('@lib/auth/auth', async () => {
+  const actualModule = await vi.importActual<any>('@lib/auth/auth')
+  const authInstance = await actualModule.getAuth()
+
+  return {
+    ...actualModule,
+    auth: authInstance,
+    default: authInstance,
+    getAuth: async () => authInstance,
   }
 })
 
@@ -122,11 +141,14 @@ afterEach(() => {
 
 export const sendMailMock = {
   mock: {
-    calls: [],
+    calls: [] as any[],
     clear() { this.calls = []; },
   },
   mockClear() { this.mock.clear(); },
 };
+
+// Expose on globalThis so the auth mock factory can push calls
+;(globalThis as any).__sendMailMock = sendMailMock;
 
 /** Creates a resettable SMTP mock that tracks sendMail calls. */
 export type SmtpMockPayload = {

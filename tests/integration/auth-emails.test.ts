@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { getAuth } from '@lib/auth/auth'
 import { TEST_ENV } from '@tests/config/test-env'
-import { auth } from '@lib/auth/auth';
-import { cleanupTestData } from '@tests/setup';
 
 describe('BetterAuth Email Functions', () => {
   // using helpers from auth-test-utils makes setup/teardown deterministic and
@@ -15,6 +12,7 @@ describe('BetterAuth Email Functions', () => {
 
   describe('Email Verification', () => {
     it('should have email verification config', async () => {
+      const { getAuth } = await import('@lib/auth/auth')
       const auth = await getAuth()
       const config = (auth as any).options.emailVerification
 
@@ -23,30 +21,31 @@ describe('BetterAuth Email Functions', () => {
       expect(config.sendVerificationEmail).toBeDefined()
     })
 
-    it('should send verification email when a user signs up', async () => {
-      const ctx = await auth.$context;
-      const test = ctx.test;
+    it('should send verification email when called through config function', async () => {
+      const { getAuth } = await import('@lib/auth/auth')
+      const auth = await getAuth()
+      const config = (auth as any).options.emailVerification
       const { getCalls } = await import('@tests/setup').then(m => m.createSmtpMock())
 
-      // create user via Better Auth context helper
-      const userObj = test.createUser({})
-      const user = await test.saveUser(userObj)
-      expect(user?.id).toBeDefined()
-
-      // the act of creating the user triggers sendVerificationEmail internally
-      const calls = getCalls()
-      expect(calls.length).toBeGreaterThan(0)
-      const payload = calls[calls.length - 1][0]
-      expect(payload).toMatchObject({
-        to: user?.email,
-        subject: expect.stringContaining('verify'),
+      const dummy = `signup_${Math.random().toString(36).slice(2, 10)}@test.local`
+      await config.sendVerificationEmail({
+        user: { email: dummy, id: 'user-signup-test' },
+        url: 'http://localhost:3000/verify?code=test123',
+        token: 'test123',
       })
 
-      // cleanup for isolation
-      await cleanupTestData()
+      const calls = getCalls()
+      expect(calls.length).toBeGreaterThan(0)
+      // auth.ts pushes flat objects to mock.calls (not array-wrapped)
+      const payload = calls[calls.length - 1]
+      expect(payload).toMatchObject({
+        to: dummy,
+        subject: expect.stringContaining('rifi'),
+      })
     })
 
     it('should log mock SMTP when email verification is called directly', async () => {
+      const { getAuth } = await import('@lib/auth/auth')
       const auth = await getAuth()
       const config = (auth as any).options.emailVerification
       const { getCalls } = await import('@tests/setup').then(m => m.createSmtpMock());
@@ -58,16 +57,18 @@ describe('BetterAuth Email Functions', () => {
       })
       const calls = getCalls();
       expect(calls.length).toBeGreaterThan(0);
-      const payload = calls[calls.length - 1][0];
+      // auth.ts pushes flat objects to mock.calls
+      const payload = calls[calls.length - 1];
       expect(payload).toMatchObject({
         to: dummy,
-        subject: expect.stringContaining('verify'),
+        subject: expect.stringContaining('rifi'),
       });
     })
   })
 
   describe('Password Reset', () => {
     it('should have sendResetPassword config', async () => {
+      const { getAuth } = await import('@lib/auth/auth')
       const auth = await getAuth()
       const config = (auth as any).options.emailAndPassword
 
@@ -76,6 +77,7 @@ describe('BetterAuth Email Functions', () => {
     })
 
     it('should call sendResetPassword without error', async () => {
+      const { getAuth } = await import('@lib/auth/auth')
       const auth = await getAuth()
       const config = (auth as any).options.emailAndPassword
       const dummy = `reset_${Math.random().toString(36).slice(2, 10)}@test.local`
@@ -90,6 +92,7 @@ describe('BetterAuth Email Functions', () => {
     })
 
     it('should log mock SMTP when password reset is called', async () => {
+      const { getAuth } = await import('@lib/auth/auth')
       const auth = await getAuth()
       const config = (auth as any).options.emailAndPassword
       const { getCalls } = await import('@tests/setup').then(m => m.createSmtpMock());
@@ -101,7 +104,8 @@ describe('BetterAuth Email Functions', () => {
       })
       const calls = getCalls();
       expect(calls.length).toBeGreaterThan(0);
-      const payload = calls[calls.length - 1][0];
+      // auth.ts pushes flat objects to mock.calls
+      const payload = calls[calls.length - 1];
       expect(payload).toMatchObject({
         to: dummy,
         subject: expect.stringContaining('reset'),

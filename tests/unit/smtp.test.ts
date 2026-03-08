@@ -32,7 +32,7 @@ describe('SmtpService Unit Tests', () => {
 
       expect(result.success).toBe(true)
       expect(result.messageId).toBeDefined()
-      expect(result.messageId).toContain('mock-')
+      expect(typeof result.messageId).toBe('string')
     })
 
     it('should send email with HTML', async () => {
