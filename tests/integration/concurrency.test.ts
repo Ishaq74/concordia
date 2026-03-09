@@ -12,7 +12,17 @@ import { serverAvailable } from '@tests/helpers/server-guard';
  * These tests require a running Astro dev server (pnpm dev or pnpm test from CLI).
  */
 
-const serverUp = await serverAvailable();
+/** Wait up to `maxMs` for the dev server to respond, retrying every `intervalMs`. */
+async function waitForServer(maxMs = 15_000, intervalMs = 1_000): Promise<boolean> {
+  const deadline = Date.now() + maxMs;
+  while (Date.now() < deadline) {
+    if (await serverAvailable(true)) return true;
+    await new Promise(r => setTimeout(r, intervalMs));
+  }
+  return false;
+}
+
+const serverUp = await waitForServer();
 
 describe.skipIf(!serverUp)('Concurrency tests', () => {
   let adminToken: string;

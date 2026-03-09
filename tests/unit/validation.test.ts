@@ -248,17 +248,17 @@ describe('Input Validation Unit Tests', () => {
 
   describe('Required Fields Validation', () => {
     it('should require email', () => {
-      const data: any = { password: 'test', username: 'test' }
+      const data: Partial<{ email: string; password: string; username: string }> = { password: 'test', username: 'test' }
       expect(data.email).toBeUndefined()
     })
 
     it('should require password', () => {
-      const data: any = { email: 'test@example.com', username: 'test' }
+      const data: Partial<{ email: string; password: string; username: string }> = { email: 'test@example.com', username: 'test' }
       expect(data.password).toBeUndefined()
     })
 
     it('should require username', () => {
-      const data: any = { email: 'test@example.com', password: 'test' }
+      const data: Partial<{ email: string; password: string; username: string }> = { email: 'test@example.com', password: 'test' }
       expect(data.username).toBeUndefined()
     })
 

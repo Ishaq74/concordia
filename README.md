@@ -667,6 +667,7 @@ npm install
       - spacing.css
       - typography.css
 - **test-results**
+  - full-run.txt
 - **tests**
   - **a11y**
     - a11y-performance.test.ts
@@ -677,12 +678,15 @@ npm install
   - **e2e**
     - **a11y**
     - authenticated-crud.test.ts
+    - blog-flows.test.ts
     - booking-flow.test.ts
     - **critical**
     - critical-flows.test.ts
     - mailbox.test.ts
     - org-admin.test.ts
+    - profile-flow.test.ts
     - services-admin.test.ts
+    - services-browse.test.ts
   - **fixtures**
     - auth-fixtures.ts
     - security-payloads.ts
@@ -700,6 +704,25 @@ npm install
     - translation-quality.test.ts
   - **integration**
     - **api**
+      - admin-blog-articles.test.ts
+      - admin-blog-authors.test.ts
+      - admin-blog-categories.test.ts
+      - admin-blog-comments.test.ts
+      - admin-blog-media.test.ts
+      - admin-moderate.test.ts
+      - admin-org-members.test.ts
+      - admin-org-profile.test.ts
+      - admin-organizations.test.ts
+      - admin-roles.test.ts
+      - admin-services-availability.test.ts
+      - admin-services-bookings.test.ts
+      - admin-services-categories.test.ts
+      - admin-services-media.test.ts
+      - admin-services.test.ts
+      - admin-users.test.ts
+      - auth-proxy.test.ts
+      - profile.test.ts
+      - public-bookings.test.ts
     - **auth**
     - auth-emails.test.ts
     - auth-flow.test.ts
@@ -716,8 +739,10 @@ npm install
     - performance-api.test.ts
     - services-admin.test.ts
   - **mocks**
+    - astro-schema-strict.ts
     - astro-schema.ts
   - **pages**
+    - page-render.test.ts
     - public-pages.test.ts
   - README-mocking.md
   - README.md
@@ -739,19 +764,29 @@ npm install
     - **admin**
       - api-helpers.test.ts
       - config.test.ts
+      - history.test.ts
+      - loaders.test.ts
+      - markdown-editor.test.ts
+      - media-picker.test.ts
       - organizations.test.ts
       - permissions.test.ts
       - policy-store.test.ts
+      - toast.test.ts
       - users.test.ts
     - **auth**
       - admin-access-control.test.ts
+      - auth-client.test.ts
+      - profile-utils.test.ts
       - roles.test.ts
+      - validate-user.test.ts
     - **components**
       - **Accordion**
         - Accordion.test.ts
         - AccordionItem.test.ts
         - **__snapshots__**
           - AccordionItem.test.ts.snap
+      - **admin**
+        - AdminComponents.test.ts
       - **Alert**
         - Alert.test.ts
         - **reports**
@@ -798,6 +833,14 @@ npm install
           - axe-report-link.json
         - **__snapshots__**
           - Link.test.ts.snap
+      - **modules**
+        - **blog**
+          - ImageWithFallback.test.ts
+          - ShareButtons.test.ts
+          - StarRating.test.ts
+        - **services**
+          - PriceBadge.test.ts
+          - ServiceMeta.test.ts
       - **Pagination**
         - Pagination.test.ts
       - **ProgressBar**
@@ -828,6 +871,8 @@ npm install
         - Video.test.ts
     - **database**
       - loaders.test.ts
+      - migration-integrity.test.ts
+      - schema-validation.test.ts
     - **i18n**
       - locale-url.test.ts
       - route-helpers.test.ts
@@ -837,6 +882,8 @@ npm install
       - notifications.test.ts
     - smtp.test.ts
     - theme.test.ts
+    - **utils**
+      - transaction.test.ts
     - validation.test.ts
   - **utils**
     - api-helpers.ts
@@ -1627,12 +1674,15 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
 - **e2e**
   - **a11y**
   - authenticated-crud.test.ts
+  - blog-flows.test.ts
   - booking-flow.test.ts
   - **critical**
   - critical-flows.test.ts
   - mailbox.test.ts
   - org-admin.test.ts
+  - profile-flow.test.ts
   - services-admin.test.ts
+  - services-browse.test.ts
 - **fixtures**
   - auth-fixtures.ts
   - security-payloads.ts
@@ -1650,6 +1700,25 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - translation-quality.test.ts
 - **integration**
   - **api**
+    - admin-blog-articles.test.ts
+    - admin-blog-authors.test.ts
+    - admin-blog-categories.test.ts
+    - admin-blog-comments.test.ts
+    - admin-blog-media.test.ts
+    - admin-moderate.test.ts
+    - admin-org-members.test.ts
+    - admin-org-profile.test.ts
+    - admin-organizations.test.ts
+    - admin-roles.test.ts
+    - admin-services-availability.test.ts
+    - admin-services-bookings.test.ts
+    - admin-services-categories.test.ts
+    - admin-services-media.test.ts
+    - admin-services.test.ts
+    - admin-users.test.ts
+    - auth-proxy.test.ts
+    - profile.test.ts
+    - public-bookings.test.ts
   - **auth**
   - auth-emails.test.ts
   - auth-flow.test.ts
@@ -1666,8 +1735,10 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - performance-api.test.ts
   - services-admin.test.ts
 - **mocks**
+  - astro-schema-strict.ts
   - astro-schema.ts
 - **pages**
+  - page-render.test.ts
   - public-pages.test.ts
 - README-mocking.md
 - README.md
@@ -1689,19 +1760,29 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - **admin**
     - api-helpers.test.ts
     - config.test.ts
+    - history.test.ts
+    - loaders.test.ts
+    - markdown-editor.test.ts
+    - media-picker.test.ts
     - organizations.test.ts
     - permissions.test.ts
     - policy-store.test.ts
+    - toast.test.ts
     - users.test.ts
   - **auth**
     - admin-access-control.test.ts
+    - auth-client.test.ts
+    - profile-utils.test.ts
     - roles.test.ts
+    - validate-user.test.ts
   - **components**
     - **Accordion**
       - Accordion.test.ts
       - AccordionItem.test.ts
       - **__snapshots__**
         - AccordionItem.test.ts.snap
+    - **admin**
+      - AdminComponents.test.ts
     - **Alert**
       - Alert.test.ts
       - **reports**
@@ -1748,6 +1829,14 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
         - axe-report-link.json
       - **__snapshots__**
         - Link.test.ts.snap
+    - **modules**
+      - **blog**
+        - ImageWithFallback.test.ts
+        - ShareButtons.test.ts
+        - StarRating.test.ts
+      - **services**
+        - PriceBadge.test.ts
+        - ServiceMeta.test.ts
     - **Pagination**
       - Pagination.test.ts
     - **ProgressBar**
@@ -1778,6 +1867,8 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
       - Video.test.ts
   - **database**
     - loaders.test.ts
+    - migration-integrity.test.ts
+    - schema-validation.test.ts
   - **i18n**
     - locale-url.test.ts
     - route-helpers.test.ts
@@ -1787,6 +1878,8 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
     - notifications.test.ts
   - smtp.test.ts
   - theme.test.ts
+  - **utils**
+    - transaction.test.ts
   - validation.test.ts
 - **utils**
   - api-helpers.ts
@@ -1986,6 +2079,10 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - **Auth Flow — Complete workflow**
   - **Navigation Guards — Admin pages require auth**
 
+- `tests\e2e\blog-flows.test.ts`
+  - **Blog — Navigation**
+  - **Blog — Article Detail**
+
 - `tests\e2e\booking-flow.test.ts`
   - **Public booking flow**
 
@@ -2007,6 +2104,9 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - **Org Admin — All page routes respond without 500**
   - **Org Admin — i18n pages render in all locales**
 
+- `tests\e2e\profile-flow.test.ts`
+  - **Profile — View & Update**
+
 - `tests\e2e\services-admin.test.ts`
   - **Services Admin — All page routes respond without 500**
   - **Services Admin — Auth guard (unauthenticated)**
@@ -2015,6 +2115,10 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - **Public Services — Pages respond**
   - **Public Services — Index page content**
   - **Services Admin — Booking detail page**
+
+- `tests\e2e\services-browse.test.ts`
+  - **Services — Browsing**
+  - **Services — Search & Filter**
 
 - `tests\i18n\routing.test.ts`
   - **route-helpers**
@@ -2083,6 +2187,226 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
     - no slug-map values contain special characters
   - **Translation quality — Value length sanity**
     - no translation value exceeds 5000 characters
+
+- `tests\integration\api\admin-blog-articles.test.ts`
+  - **GET — list articles**
+    - rejects unauthenticated request
+    - rejects non-admin user
+    - returns articles list for admin
+    - supports search filter
+    - supports status filter
+    - returns 404 for nonexistent article id
+  - **POST — article actions**
+    - rejects unauthenticated POST
+    - rejects non-admin POST
+    - rejects create without required fields
+    - rejects delete without id
+    - rejects unknown action
+
+- `tests\integration\api\admin-blog-authors.test.ts`
+  - **GET — list authors**
+    - rejects unauthenticated request
+    - rejects non-admin user
+    - returns authors list for admin
+    - supports mode=all for flat list
+  - **POST — author actions**
+    - rejects unauthenticated POST
+    - rejects non-admin POST
+    - rejects create without required fields
+    - rejects delete without id
+
+- `tests\integration\api\admin-blog-categories.test.ts`
+  - **GET — list categories**
+    - rejects unauthenticated request
+    - rejects non-admin user
+    - returns categories list for admin
+    - supports mode=all for flat list
+    - returns 404 for nonexistent category id
+  - **POST — category actions**
+    - rejects unauthenticated POST
+    - rejects non-admin POST
+    - rejects create without required fields
+    - rejects delete without id
+
+- `tests\integration\api\admin-blog-comments.test.ts`
+  - **GET — list comments**
+    - rejects unauthenticated request
+    - rejects non-admin user
+    - returns comments list for admin
+    - supports status filter
+    - supports search filter
+  - **POST — comment moderation**
+    - rejects unauthenticated POST
+    - rejects non-admin POST
+    - rejects approve without id
+    - rejects unknown action
+
+- `tests\integration\api\admin-blog-media.test.ts`
+  - **GET — list media**
+    - rejects unauthenticated request
+    - rejects non-admin user
+    - returns media list for admin
+    - supports type filter
+    - supports search filter
+  - **POST — media actions**
+    - rejects unauthenticated POST
+    - rejects non-admin POST
+    - rejects delete without id
+
+- `tests\integration\api\admin-moderate.test.ts`
+  - **Tests**
+    - rejects unauthenticated request
+    - rejects user without moderation permission
+    - rejects missing fields
+    - rejects invalid postType
+    - rejects reason too short
+    - returns 404 for non-existent entity
+
+- `tests\integration\api\admin-org-members.test.ts`
+  - **GET**
+    - rejects non-admin
+    - requires organizationId
+  - **POST**
+    - rejects missing action
+    - rejects missing organizationId
+    - rejects invite without email
+    - rejects unknown action
+    - rejects remove-member without memberId
+    - rejects cancel-invitation without invitationId
+
+- `tests\integration\api\admin-org-profile.test.ts`
+  - **Tests**
+    - rejects non-admin GET
+    - returns all org profiles for admin
+    - returns 404 for non-existent org
+    - creates an org profile
+    - rejects create missing name/slug
+    - rejects update without organizationId
+    - rejects unknown action
+
+- `tests\integration\api\admin-organizations.test.ts`
+  - **GET**
+    - rejects non-admin user
+    - returns organizations list for admin
+  - **POST**
+    - rejects missing action
+    - rejects create without name/slug
+    - rejects unknown action
+    - rejects add-member without userId or role
+    - rejects action requiring organizationId when missing
+
+- `tests\integration\api\admin-roles.test.ts`
+  - **Tests**
+    - rejects unauthenticated request
+    - rejects user without change_role permission
+    - rejects missing fields
+    - rejects invalid action enum
+    - rejects invalid role enum
+    - prevents self-assignment
+    - prevents revoking citizen role
+    - assigns a valid role
+    - detects already-assigned role
+    - revokes a role
+
+- `tests\integration\api\admin-services-availability.test.ts`
+  - **GET — list availability**
+    - rejects unauthenticated request
+    - rejects non-admin user
+    - returns availability for admin
+    - supports serviceId filter
+  - **POST — availability actions**
+    - rejects unauthenticated POST
+    - rejects non-admin POST
+    - rejects create without required fields
+    - rejects delete without id
+
+- `tests\integration\api\admin-services-bookings.test.ts`
+  - **GET — list bookings**
+    - rejects unauthenticated request
+    - rejects non-admin user
+    - returns bookings list for admin
+    - supports status filter
+    - supports date range filter
+  - **PATCH — booking status updates**
+    - rejects unauthenticated PATCH
+    - rejects non-admin PATCH
+    - rejects PATCH without booking id
+
+- `tests\integration\api\admin-services-categories.test.ts`
+  - **GET — list service categories**
+    - rejects unauthenticated request
+    - rejects non-admin user
+    - returns categories for admin
+    - supports mode=all for flat list
+  - **POST — category actions**
+    - rejects unauthenticated POST
+    - rejects non-admin POST
+    - rejects create without required fields
+    - rejects delete without id
+
+- `tests\integration\api\admin-services-media.test.ts`
+  - **GET — list media**
+    - rejects unauthenticated request
+    - rejects non-admin user
+    - returns media list for admin
+    - supports type filter
+  - **POST — media actions**
+    - rejects unauthenticated POST
+    - rejects non-admin POST
+    - rejects delete without id
+
+- `tests\integration\api\admin-services.test.ts`
+  - **GET — list services**
+    - rejects unauthenticated request
+    - rejects non-admin user
+    - returns services list for admin
+    - supports search filter
+    - supports status filter
+    - returns 404 for nonexistent service id
+  - **POST — service actions**
+    - rejects unauthenticated POST
+    - rejects non-admin POST
+    - rejects create without required fields
+    - rejects delete without id
+    - rejects unknown action
+
+- `tests\integration\api\admin-users.test.ts`
+  - **GET — list users**
+    - rejects unauthenticated request
+    - rejects non-admin user
+    - returns users list for admin
+  - **POST — user actions**
+    - rejects missing action
+    - rejects missing userId
+    - rejects unknown action
+    - rejects set-role without role
+    - rejects non-admin user for POST
+
+- `tests\integration\api\auth-proxy.test.ts`
+  - **Tests**
+    - responds with security headers on auth endpoints
+    - returns 404 for non-existent auth route
+    - maps rate limit errors to 429
+    - rejects invalid content type gracefully
+
+- `tests\integration\api\profile.test.ts`
+  - **GET**
+    - rejects unauthenticated request
+    - returns (or auto-creates) profile for authenticated user
+  - **PATCH**
+    - rejects unauthenticated request
+    - rejects empty update body
+    - rejects bio over 500 chars
+    - rejects invalid preferredLanguage
+    - rejects website over 255 chars
+    - updates valid fields
+    - ignores non-whitelisted fields
+
+- `tests\integration\api\public-bookings.test.ts`
+  - **Tests**
+    - rejects unauthenticated request
+    - rejects missing required fields
+    - returns 404 for non-existent service
 
 - `tests\integration\auth-emails.test.ts`
   - **BetterAuth Email Functions**
@@ -2214,6 +2538,13 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
     - media record can be created
   - **Services — Org scoping isolation**
     - services from different orgs are properly isolated
+
+- `tests\pages\page-render.test.ts`
+  - **Tests**
+    - GET ${path} renders without error
+    - GET ${path} renders without error
+    - 404 page returns 404 status
+    - GET ${path} should not return 500 for unauthenticated user
 
 - `tests\pages\public-pages.test.ts`
   - **Public pages — localized URL generation**
@@ -2407,6 +2738,46 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
     - categories has collection and fields
     - posts has collection with i18nTable flag
 
+- `tests\unit\admin\history.test.ts`
+  - **admin/history — listSessionHistory**
+    - returns empty array when no sessions exist
+    - applies default limit of 50
+    - applies custom limit
+    - applies search filter when provided
+    - skips search filter for empty/whitespace search
+    - enriches rows with impersonator details
+
+- `tests\unit\admin\loaders.test.ts`
+  - **admin/loaders — getAdminListData**
+    - returns paginated data with total
+    - defaults to page 1 and pageSize 10
+    - calculates correct offset for page 3
+    - applies search filter with searchColumns
+    - calculates totalPages correctly
+    - handles zero total gracefully
+
+- `tests\unit\admin\markdown-editor.test.ts`
+  - **admin/markdown-editor**
+    - initializes editors for [data-md-editor] wrappers
+    - skips wrappers without textarea
+    - handles multiple editors
+    - detects minimal mode from data attribute
+  - **getEditorValue**
+    - returns value from editor instance
+    - falls back to textarea value when editor not found
+    - returns empty string when no editor and no textarea found
+
+- `tests\unit\admin\media-picker.test.ts`
+  - **admin/media-picker**
+    - opens the modal overlay
+    - returns null when cancelled
+    - returns null when closed via close button
+    - returns null when overlay not found
+    - closes on Escape key
+    - uses custom apiBase when provided
+    - resets search input on open
+    - disables select button on open
+
 - `tests\unit\admin\organizations.test.ts`
   - **admin/organizations**
   - **listOrganizations()**
@@ -2513,6 +2884,27 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - **ADMIN_POLICY_TABLE_ERROR**
     - is the expected constant
 
+- `tests\unit\admin\toast.test.ts`
+  - **admin/toast**
+    - creates a toast element in the container
+    - uses correct data-status for each type
+    - includes title when provided
+    - auto-dismisses after duration
+    - does not auto-dismiss when duration is 0
+    - close button triggers dismiss
+    - calls onClose callback when dismissed
+    - escapes HTML in message
+    - escapes HTML in title
+    - defaults to "info" type when no type given
+  - **convenience helpers**
+    - toastSuccess creates success toast
+    - toastError creates error toast
+    - toastWarning creates warning toast
+    - toastInfo creates info toast
+  - **fallback when container missing**
+    - falls back to alert() for errors when container absent
+    - falls back to console.info for non-errors when container absent
+
 - `tests\unit\admin\users.test.ts`
   - **admin/users**
   - **listUsers()**
@@ -2556,6 +2948,46 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - **reloadAdminAccessControl()**
     - invalidates cache and re-populates
 
+- `tests\unit\auth\auth-client.test.ts`
+  - **auth/auth-client**
+  - **sendVerificationEmail**
+    - sends POST to /api/auth-client/verification
+    - includes callbackURL when provided
+    - throws on non-ok response
+    - throws with statusText when body is empty
+  - **sendForgotPasswordEmail**
+    - sends POST to /api/auth-client/forgot-password
+    - includes callbackURL when provided
+    - throws on non-ok response
+  - **authClient export**
+    - exports a default auth client
+
+- `tests\unit\auth\profile-utils.test.ts`
+  - **slugify**
+    - lowercases and replaces spaces with hyphens
+    - strips diacritics (NFD decomposition)
+    - removes non-alphanumeric characters
+    - trims leading/trailing hyphens
+    - collapses consecutive hyphens
+    - truncates to 60 characters
+    - handles empty string
+    - handles Arabic text
+    - handles mixed latin and numbers
+  - **resolveErrorMessage**
+    - returns string error directly
+    - extracts body.error from object
+    - extracts body.message when body.error is missing
+    - extracts top-level message
+    - falls back to translations.serverError
+    - falls back to default French message
+    - ignores empty string error
+    - ignores whitespace-only string error
+    - ignores empty body.error
+  - **forwardSetCookies**
+    - forwards cookies via getSetCookie()
+    - falls back to entries() when getSetCookie is unavailable
+    - handles empty cookies gracefully
+
 - `tests\unit\auth\roles.test.ts`
   - **auth/roles**
   - **getUserRoles()**
@@ -2571,6 +3003,51 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
     - throws when attempting to remove "citizen"
     - clears role if matches current value
     - does nothing if current role differs
+
+- `tests\unit\auth\validate-user.test.ts`
+  - **COMBINED_DANGEROUS regex**
+    - detects: ${payload.slice(0, 40)}
+    - allows safe text: ${text}
+  - **validateUserInput — type checks**
+    - rejects null fields
+    - rejects undefined fields
+    - rejects number fields
+    - rejects boolean fields
+    - rejects array fields
+    - rejects empty string fields
+    - rejects whitespace-only fields
+  - **validateUserInput — email**
+    - accepts valid email
+    - rejects invalid email format
+    - rejects homograph attack (Cyrillic е)
+  - **validateUserInput — username**
+    - accepts valid username (3-32 chars)
+    - rejects too-short username
+    - rejects too-long username (>32)
+  - **validateUserInput — name**
+    - accepts valid name (1-64 chars)
+    - rejects too-long name (>64)
+  - **validateUserInput — password policy**
+    - rejects short password (<8)
+    - rejects long password (>128)
+    - rejects digits-only password
+    - rejects letters-only password
+    - rejects whitespace in password
+    - rejects password == username
+    - rejects password == email
+    - rejects weak password: ${weak}
+    - rejects repetitive patterns (repeatrepeat)
+    - rejects keyboard patterns (1q2w3e4r)
+    - rejects leet-speak variants (p@ssw0rd)
+    - rejects context-predictable (user@2024)
+  - **validateUserInput — injection rejection**
+    - rejects ${label} in username
+    - rejects ${label} in name
+  - **validateUserInput — valid acceptance**
+    - accepts fully valid input
+    - accepts unicode names (Arabic)
+    - accepts CJK names
+    - accepts accented names
 
 - `tests\unit\components\Accordion\Accordion.test.ts`
   - **Accordion component contract**
@@ -3156,6 +3633,39 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
     - has aria-label
     - has controls for keyboard navigation
 
+- `tests\unit\components\admin\AdminComponents.test.ts`
+  - **AdminToast — Structure**
+    - renders container with correct id
+    - has aria-live="polite" for screen readers
+    - has aria-atomic="true"
+    - starts empty (no toasts)
+  - **AdminToast — Alert variants**
+    - renders ${variant} alert with correct class
+    - alert has role="alert"
+    - close button has aria-label
+  - **MarkdownEditor — Structure**
+    - renders wrapper with data-md-editor attribute
+    - renders textarea with correct id and name
+    - sets rows from props
+    - defaults to 16 rows
+    - sets placeholder
+    - sets initial value
+  - **MarkdownEditor — Minimal mode**
+    - sets data-md-minimal="true" when minimal
+    - sets data-md-minimal="false" when not minimal
+  - **MediaPickerModal — Structure**
+    - renders overlay with display:none by default
+    - has role="dialog" and aria-modal="true"
+    - has accessible dialog label
+    - close button has aria-label
+  - **MediaPickerModal — Tabs**
+    - has tablist with 2 tabs
+    - library tab is active by default
+    - upload tab is inactive by default
+  - **MediaPickerModal — Upload panel**
+    - has file input with restricted accept types
+    - has search input in library panel
+
 - `tests\unit\components\avatar\Avatar.test.ts`
   - **Avatar component contract**
     - HTML validity: always div.avatar
@@ -3249,6 +3759,106 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
     - CSS presence
     - Data attributes
 
+- `tests\unit\components\modules\blog\ImageWithFallback.test.ts`
+  - **ImageWithFallback — Rendering**
+    - renders img element
+    - uses provided src when available
+    - uses placeholder when src is null
+    - uses placeholder when src is undefined
+  - **ImageWithFallback — Alt text**
+    - uses provided alt
+    - falls back to text prop when alt missing
+    - falls back to "Image" when neither alt nor text provided
+  - **ImageWithFallback — Placeholder determinism**
+    - generates deterministic color based on text length
+    - different text lengths produce different colors (when possible)
+    - truncates text longer than 30 chars in placeholder URL
+  - **ImageWithFallback — Performance attributes**
+    - has loading="lazy"
+    - has decoding="async"
+    - has onerror fallback handler
+  - **ImageWithFallback — CSS class**
+    - applies custom class
+
+- `tests\unit\components\modules\blog\ShareButtons.test.ts`
+  - **ShareButtons — Link generation**
+    - generates 4 share links
+    - generates Twitter intent URL
+    - generates LinkedIn share URL
+    - generates Facebook share URL
+    - generates mailto link
+  - **ShareButtons — Security**
+    - all external links have target="_blank"
+    - all external links have rel="noopener noreferrer"
+    - encodes title with special characters
+    - encodes URL with special characters
+  - **ShareButtons — Accessibility**
+    - each link has descriptive aria-label
+    - has share label text
+  - **ShareButtons — Variants**
+    - applies variant class to container
+
+- `tests\unit\components\modules\blog\StarRating.test.ts`
+  - **StarRating — Rendering**
+    - renders 5 stars
+    - fills correct number of stars for rating 4
+    - fills 0 stars for rating 0
+    - rounds rating to nearest integer
+    - rounds down for 2.3
+    - handles undefined/NaN rating gracefully
+  - **StarRating — Count display**
+    - shows count when showCount=true and count > 0
+    - hides count when showCount=false
+    - hides count when count=0
+  - **StarRating — Accessibility**
+    - has role="img" on container
+    - has descriptive aria-label
+    - stars have aria-hidden="true"
+    - each star svg has role="presentation"
+  - **StarRating — Variants & classes**
+    - applies variant class
+    - does not add variant class for initial
+    - applies color class
+    - does not add color class for default
+    - applies size class
+    - applies custom className
+
+- `tests\unit\components\modules\services\PriceBadge.test.ts`
+  - **PriceBadge — formatPrice logic**
+    - returns "Gratuit" for null basePrice (fr)
+    - returns "Gratuit" for "0" basePrice (fr)
+    - returns "Free" for null basePrice (en)
+    - returns fixed price with currency
+    - returns per_hour format
+    - returns per_session format
+    - returns "Sur devis" for on_quote
+    - returns "On quote" for on_quote (en)
+    - uses default currency EUR
+    - uses custom currency
+    - default priceType returns amount only
+  - **PriceBadge — Rendering**
+    - renders badge element
+    - uses accent color for free services
+    - uses primary color for paid services
+    - applies variant class
+    - displays formatted price text
+
+- `tests\unit\components\modules\services\ServiceMeta.test.ts`
+  - **ServiceMeta — Duration**
+    - shows duration when durationMinutes provided
+    - hides duration when null
+    - hides duration when 0
+  - **ServiceMeta — Mobile indicator**
+    - shows mobile badge when isMobile=true
+    - hides mobile badge when isMobile=false
+  - **ServiceMeta — Participants**
+    - shows max participants when provided
+    - hides participants when null
+  - **ServiceMeta — Combined display**
+    - shows all meta when all props provided
+    - shows nothing when no optional props
+    - applies custom className
+
 - `tests\unit\database\loaders.test.ts`
   - **createTranslationLoader (factory)**
     - creates a loader with correct name
@@ -3265,6 +3875,36 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
   - **Services loader getLabel + transformer**
     - loadServices returns a loader object
     - transformer produces correct services output for en
+
+- `tests\unit\database\migration-integrity.test.ts`
+  - **Migration journal**
+    - journal file exists
+    - is valid JSON with entries array
+    - entries have sequential idx
+    - entries have required fields
+  - **SQL migration files**
+    - at least one SQL migration exists
+    - each SQL file is non-empty
+    - each SQL file contains SQL statements
+    - SQL files follow numeric prefix convention
+    - every SQL file has a matching journal entry
+  - **Migration snapshots**
+    - each SQL migration has a corresponding snapshot
+    - snapshots are valid JSON
+  - **Schema barrel (schemas.ts)**
+    - barrel file exists
+    - every schema file is exported from barrel
+    - barrel does not reference nonexistent schema files
+
+- `tests\unit\database\schema-validation.test.ts`
+  - **Database Schema Validation**
+    - all expected tables exist in the test database
+    - user table has essential auth columns
+    - profile table has expected columns
+    - blog_comments table has moderation columns
+    - services_bookings table has booking columns
+    - schema exports are valid drizzle table objects
+    - migration is idempotent (running getTestDb twice does not throw)
 
 - `tests\unit\i18n\locale-url.test.ts`
   - **i18n/locale-url**
@@ -3366,6 +4006,11 @@ Testing is set up with Vitest (unit/integration) and Playwright (E2E). The repos
     - setTheme applies attribute and persists
     - initTheme writes initial attribute
     - dispatches themechange event when set
+
+- `tests\unit\utils\transaction.test.ts`
+  - **withTestTransaction**
+    - throws meaningful error when raw client is unavailable (pg-mem)
+    - error message guides developer to use real PostgreSQL
 
 - `tests\unit\validation.test.ts`
   - **Input Validation Unit Tests**

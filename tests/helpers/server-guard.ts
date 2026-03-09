@@ -22,9 +22,10 @@ let _available = false;
 /**
  * Checks once whether the dev server is responding.
  * Caches the result for the lifetime of the test worker.
+ * Pass `force` to bypass the cache (useful for retry loops).
  */
-export async function serverAvailable(): Promise<boolean> {
-  if (_checked) return _available;
+export async function serverAvailable(force = false): Promise<boolean> {
+  if (_checked && !force) return _available;
   _checked = true;
   try {
     const base = getApiBase();

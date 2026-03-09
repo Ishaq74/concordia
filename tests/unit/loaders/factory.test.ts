@@ -10,12 +10,12 @@ describe('createTranslationLoader (unit)', () => {
       }
     ])
 
-    const transformer = (_entity: any, translation: any) => ({
+    const transformer = (_entity: Record<string, unknown>, translation: Record<string, unknown>) => ({
       title: translation.headline,
       content: translation.articleBody,
     })
 
-    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
+    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as Record<string, unknown>)
 
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
@@ -24,7 +24,7 @@ describe('createTranslationLoader (unit)', () => {
     await loader.load({ store, logger })
 
     expect(store.set).toHaveBeenCalledTimes(1)
-    const callArg = (store.set as any).mock.calls[0][0]
+    const callArg = vi.mocked(store.set).mock.calls[0][0]
     expect(callArg.id).toBe('post-xyz-fr')
     expect(callArg.data.slug).toBe('post-xyz')
     expect(callArg.data.lang).toBe('fr')
@@ -34,7 +34,7 @@ describe('createTranslationLoader (unit)', () => {
   it('logs and continues when translations missing or empty', async () => {
     const fetcher = vi.fn(async () => [ { slug: 'no-trans', translations: [] } ])
     const transformer = vi.fn()
-    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
+    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as Record<string, unknown>)
 
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
@@ -52,7 +52,7 @@ describe('createTranslationLoader (unit)', () => {
       { slug: 'err-post', translations: [ { inLanguage: 'fr', headline: 'Titre', articleBody: 'Contenu' } ] }
     ])
     const transformer = vi.fn(() => { throw new Error('fail') })
-    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
+    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as Record<string, unknown>)
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
     // @ts-ignore
@@ -71,14 +71,14 @@ describe('createTranslationLoader (unit)', () => {
         ]
       }
     ])
-    const transformer = (_entity: any, translation: any) => ({ title: translation.headline })
-    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
+    const transformer = (_entity: Record<string, unknown>, translation: Record<string, unknown>) => ({ title: translation.headline })
+    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as Record<string, unknown>)
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
     // @ts-ignore
     await loader.load({ store, logger })
     expect(store.set).toHaveBeenCalledTimes(2)
-    const ids = (store.set as any).mock.calls.map((c: any) => c[0].id)
+    const ids = vi.mocked(store.set).mock.calls.map((c) => c[0].id)
     expect(ids).toContain('multi-fr')
     expect(ids).toContain('multi-en')
   })
@@ -87,8 +87,8 @@ describe('createTranslationLoader (unit)', () => {
     const fetcher = vi.fn(async () => [
       { slug: 'badlang', translations: [ { headline: 'NoLang', articleBody: '...' } ] }
     ])
-    const transformer = (_entity: any, translation: any) => ({ title: translation.headline })
-    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
+    const transformer = (_entity: Record<string, unknown>, translation: Record<string, unknown>) => ({ title: translation.headline })
+    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as Record<string, unknown>)
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
     // @ts-ignore
@@ -107,8 +107,8 @@ describe('createTranslationLoader (unit)', () => {
         ]
       }
     ])
-    const transformer = (_entity: any, translation: any) => ({ title: translation.headline })
-    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
+    const transformer = (_entity: Record<string, unknown>, translation: Record<string, unknown>) => ({ title: translation.headline })
+    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as Record<string, unknown>)
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
     // Patch store.set to throw on duplicate id

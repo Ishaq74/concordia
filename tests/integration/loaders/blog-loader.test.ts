@@ -71,7 +71,7 @@ describe('loadBlogPosts (integration via mocked DB)', () => {
     await (loadBlogPosts as any).load({ store, logger })
 
     expect(store.set).toHaveBeenCalled()
-    const call = (store.set as any).mock.calls[0][0]
+    const call = vi.mocked(store.set).mock.calls[0][0]
     expect(call.id).toBe('nice-post-fr')
     expect(call.data.slug).toBe('nice-post')
     expect(call.data.lang).toBe('fr')
@@ -118,7 +118,7 @@ describe('loadBlogPosts (integration via mocked DB)', () => {
     // @ts-ignore
     await (loadBlogPosts as any).load({ store, logger })
     expect(store.set).toHaveBeenCalledTimes(2)
-    const ids = (store.set as any).mock.calls.map((c: any) => c[0].id)
+    const ids = vi.mocked(store.set).mock.calls.map((c) => c[0].id)
     expect(ids).toContain('multi-fr')
     expect(ids).toContain('multi-en')
   })

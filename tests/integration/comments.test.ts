@@ -8,44 +8,7 @@ import type { TestHelpers } from "better-auth/plugins"
 
 // Mocks required so module can be imported in a Node test environment
 vi.mock('astro:actions', () => ({ defineAction: (opts: any) => ({ handler: opts.handler }) }))
-vi.mock('astro:schema', () => {
-  // Strict mocks: simulate zod validation
-  const z = {
-    string: () => {
-      let minLen: number | undefined = undefined;
-      let transformer: ((v: any) => any) | undefined = undefined;
-      return {
-        min(n: number) { minLen = n; return this; },
-        optional() { return this; },
-        transform(fn: any) { transformer = fn; return this; },
-        parse(v: any) {
-          if (typeof v !== 'string') throw new Error('Not a string');
-          if (minLen && v.length < minLen) throw new Error('Too short');
-          return transformer ? transformer(v) : v;
-        }
-      };
-    },
-    object: (shape: any) => ({
-      parse(obj: any) {
-        for (const k in shape) {
-          if (!(k in obj)) throw new Error(`Missing key: ${k}`);
-          if (typeof shape[k].parse === 'function') shape[k].parse(obj[k]);
-        }
-        return obj;
-      }
-    }),
-    enum: (arr: any[]) => {
-      return {
-        parse(v: any) {
-          if (!arr.includes(v)) throw new Error('Invalid enum');
-          return v;
-        },
-        optional() { return this; }
-      };
-    }
-  };
-  return { z };
-})
+vi.mock('astro:schema', () => import('@tests/mocks/astro-schema-strict'))
 
 
 describe('Comments actions (createComment)', () => {

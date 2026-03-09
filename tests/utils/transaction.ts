@@ -5,6 +5,15 @@ import { getTestDb } from '../config/test-db';
  * the callback completes (even if it throws). This allows tests to make
  * arbitrary modifications without needing to truncate the entire schema.
  *
+ * **When to use:**
+ * - Tests that only use direct Drizzle `db.insert()` / `db.update()` / `db.delete()`.
+ * - Fast, isolated DB tests where you want automatic rollback.
+ *
+ * **When NOT to use (prefer cleanupTestData instead):**
+ * - Tests that use Better Auth's `test.saveUser()` / `test.saveOrganization()` —
+ *   these use a separate connection that won't share the transaction.
+ * - Tests that call API endpoints via `apiCall()` — the server uses its own DB connection.
+ *
  * Usage:
  *
  * ```ts
@@ -18,10 +27,6 @@ import { getTestDb } from '../config/test-db';
  *   // at this point all changes have been rolled back automatically
  * });
  * ```
- *
- * The current setup still calls `cleanupTestData()` in the global hooks, so
- * adopting transactions is optional but can significantly speed up suites
- * that create many rows.
  */
 export async function withTestTransaction<T>(cb: (db: any) => Promise<T>): Promise<T> {
   const db = await getTestDb();

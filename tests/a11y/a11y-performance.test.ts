@@ -106,11 +106,9 @@ test.describe('WCAG 2.1 AA — Specific requirements', () => {
   test('skip-to-content link exists', async ({ page }) => {
     await page.goto('/fr/', { waitUntil: 'domcontentloaded' });
     const skipLink = page.locator('a[href="#main-content"], a[href="#contenu"], a.skip-link');
-    // Should exist (even if visually hidden)
+    // Must exist (even if visually hidden) — RGAA requirement
     const count = await skipLink.count();
-    if (count === 0) {
-      console.warn('⚠️  A11Y WARNING: No skip-to-content link found. RGAA requirement.');
-    }
+    expect(count).toBeGreaterThan(0);
   });
 
   test('form inputs have associated labels', async ({ page }) => {

@@ -5,12 +5,13 @@ import { blogOrganizations } from '@database/schemas'
 import { member, invitation } from '@database/schemas/auth-schema'
 import { eq, and } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
+import type { TestHelpers } from 'better-auth/plugins'
 
 /** Typed result from test.saveOrganization() */
 type TestOrg = { id: string; [key: string]: unknown }
 
 describe('Org Admin tests', () => {
-  let test: any
+  let test: TestHelpers
 
   beforeAll(async () => {
     const { auth } = await import('@lib/auth/auth')

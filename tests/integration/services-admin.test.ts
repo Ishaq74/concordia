@@ -9,12 +9,14 @@ import {
 } from '@database/schemas'
 import { eq } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
+import type { TestHelpers } from 'better-auth/plugins'
 
 /** Typed result from test.saveOrganization() */
 type TestOrg = { id: string; [key: string]: unknown }
+type TestDb = Awaited<ReturnType<typeof getTestDb>>
 
 describe('Services Admin tests', () => {
-  let test: any
+  let test: TestHelpers
 
   beforeAll(async () => {
     const { auth } = await import('@lib/auth/auth')
@@ -36,7 +38,7 @@ describe('Services Admin tests', () => {
 
 // ─── Helpers ────────────────────────────────────────────────────
 
-async function createCategory(db: any, overrides: Record<string, any> = {}) {
+async function createCategory(db: TestDb, overrides: Record<string, unknown> = {}) {
   const id = overrides.id ?? randomUUID()
   await db.insert(servicesCategories).values({
     id,
@@ -48,7 +50,7 @@ async function createCategory(db: any, overrides: Record<string, any> = {}) {
   return id
 }
 
-async function createService(db: any, providerId: string, orgId: string, catId?: string, overrides: Record<string, any> = {}) {
+async function createService(db: TestDb, providerId: string, orgId: string, catId?: string, overrides: Record<string, unknown> = {}) {
   const id = overrides.id ?? randomUUID()
   await db.insert(servicesListings).values({
     id,
@@ -65,7 +67,7 @@ async function createService(db: any, providerId: string, orgId: string, catId?:
   return id
 }
 
-async function createBooking(db: any, serviceId: string, customerId: string, providerId: string, overrides: Record<string, any> = {}) {
+async function createBooking(db: TestDb, serviceId: string, customerId: string, providerId: string, overrides: Record<string, unknown> = {}) {
   const id = overrides.id ?? randomUUID()
   await db.insert(servicesBookings).values({
     id,
@@ -312,8 +314,8 @@ describe('Services — Org scoping isolation', () => {
     const allB = await db.select().from(servicesListings).where(eq(servicesListings.organizationId, orgB.id));
     expect(allA.length).toBe(2);
     expect(allB.length).toBe(1);
-    expect(allA.map((s: any) => s.id)).not.toContain(svcB1);
-    expect(allB.map((s: any) => s.id)).not.toContain(svcA1);
+    expect(allA.map((s) => s.id)).not.toContain(svcB1);
+    expect(allB.map((s) => s.id)).not.toContain(svcA1);
   });
 })
 });
