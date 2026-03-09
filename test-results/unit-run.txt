@@ -1,0 +1,325 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/Utilisateur/Documents/concordia[39m
+
+[2m10:11:54[22m [34m[astro-icon][39m Loaded icons from src/icons, circle-flags, mdi, openmoji
+ [32mÔ£ô[39m tests/unit/components/Tools/Grid.test.ts [2m([22m[2m125 tests[22m[2m)[22m[33m 54891[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render a default div with block display [33m 744[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should handle autoFit and autoFill grid configurations [33m 379[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/validation.test.ts [2m([22m[2m96 tests[22m[2m)[22m[33m 51685[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should accept valid email: user@example.com [33m 1045[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should accept valid email: test.user@example.co.uk [33m 343[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should accept valid email: user+tag@example.com [33m 411[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should accept valid email: user123@example.com [33m 330[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/auth/validate-user.test.ts [2m([22m[2m72 tests[22m[2m)[22m[33m 14926[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m detects: <script>alert(1)</script> [33m 565[2mms[22m[39m
+[90mstdout[2m | tests/unit/smtp.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBasic Email Sending[2m > [22m[2mshould send valid email
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBasic Email Sending[2m > [22m[2mshould send email with HTML
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBasic Email Sending[2m > [22m[2mshould send email with custom from
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBasic Email Sending[2m > [22m[2mshould send email with replyTo
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid recipient email
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid sender email
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould require subject
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould require content (text or html)
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject subject longer than 998 chars
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: not-an-email
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: @example.com
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: user@
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: user@@example.com
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: user @example.com
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: user@example
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: 
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould accept valid email: user@example.com
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <script>alert(1)</script>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: "<script>alert(1)</script>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: '-alert(1)-'
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <img src=x onerror=alert(1)>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: javascript:alert(1)
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: ${alert(1)}
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: {{constructor.constructor("alert(1)")()}}
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <iframe src="javascript:alert(1)"></iframe>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <body onload=alert(1)>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <input onfocus=alert(1) autofocus>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <select onfocus=alert(1) autofocus>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <textarea onfocus=alert(1) autofocus>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <marquee onstart=alert(1)>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <div style="background:url(javascript:alert(1))">
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <script>alert(1)</script>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: "<script>alert(1)</script>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: '-alert(1)-'
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <img src=x onerror=alert(1)>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: javascript:alert(1)
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: ${alert(1)}
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: {{constructor.constructor("alert(1)")()}}
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <iframe src="javascript:alert(1)"></iframe>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <body onload=alert(1)>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <input onfocus=alert(1) autofocus>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <select onfocus=alert(1) autofocus>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <textarea onfocus=alert(1) autofocus>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <marquee onstart=alert(1)>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <div style="background:url(javascript:alert(1))">
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: '; DROP TABLE user; --
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: ' OR '1'='1
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: '; DELETE FROM user WHERE '1'='1'; --
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: 1'; UPDATE user SET role='admin' WHERE '1'='1
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: ' UNION SELECT * FROM pg_authid --
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: '; COPY (SELECT '') TO PROGRAM 'id'; --
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: admin'--
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: ' or 1=1--
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: ') OR ('1'='1
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - Null Bytes[2m > [22m[2mshould reject null bytes: test <script>alert(1)</script>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - Null Bytes[2m > [22m[2mshould reject null bytes: admin .php
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - Null Bytes[2m > [22m[2mshould accept valid email without null byte: user@example.com
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBatch Operations[2m > [22m[2mshould send batch emails
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBatch Operations[2m > [22m[2mshould batch with custom concurrency
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBatch Operations[2m > [22m[2mshould handle mixed valid and invalid emails in batch
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mConnection Management[2m > [22m[2mshould verify connection
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mConnection Management[2m > [22m[2mshould close connection
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mConnection Management[2m > [22m[2mshould return config
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mError Handling[2m > [22m[2mshould handle timeout gracefully
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mError Handling[2m > [22m[2mshould classify auth errors
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/unit/smtp.test.ts [2m([22m[2m65 tests[22m[2m)[22m[33m 12824[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should send valid email [33m 516[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Tools/Wrapper.test.ts [2m([22m[2m72 tests[22m[2m)[22m[33m 11998[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render a default section with block display [33m 475[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/modules/blog/StarRating.test.ts [2m([22m[2m19 tests[22m[2m)[22m[33m 4761[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders 5 stars [33m 799[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Button/Button.test.ts [2m([22m[2m137 tests[22m[2m)[22m[33m 179227[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m unit: renders a <button> with its children by default [33m 800[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m unit: applies variant and color classes [33m 353[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m unit: forwards aria-label and disabled attribute [33m 307[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m axe-core: accessible with default content [33m 1526[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m axe-core: accessible with icon [33m 865[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: renders text, is clickable, respects disabled [33m 999[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: icon rendered and positioned correctly [33m 6799[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: disabled button cannot be clicked [33m 5380[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m pa11y: accessible default button [33m 2556[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m lighthouse: default button [33m 14703[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m stress: renders 1000 buttons without performance degradation [33m 1839[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: button click events work with Playwright [33m 4534[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: disabled button is not clickable [33m 11674[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m focus: button is focusable [33m 8373[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m focus: disabled button is not focusable [33m 8800[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m focus: tab order is correct with multiple buttons [33m 3031[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m keyboard: Enter key activates button [33m 6510[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m keyboard: Space key activates button [33m 8014[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m keyboard: Escape key does not affect button [33m 881[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m aria: aria-label takes precedence over slot content [33m 321[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m performance: renders 1000 buttons sequentially with acceptable time [33m 1158[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m html: generates valid HTML structure [33m 323[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m integration-pw: full button workflow with Playwright [33m 1377[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m integration-pw: button with icon workflow [33m 6077[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m final: accessibility audit passes [33m 320[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m final: no memory leaks during batch rendering [33m 703[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/admin/AdminComponents.test.ts [2m([22m[2m27 tests[22m[2m)[22m[33m 5941[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders container with correct id [33m 675[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/api-helpers.test.ts [2m([22m[2m31 tests[22m[2m)[22m[33m 5619[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns a Response with correct status [33m 515[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Accordion/AccordionItem.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 5047[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m HTML validity [33m 891[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m Semantics [33m 306[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m Stress: 1000 items [33m 1079[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/avatar/Avatar.test.ts [2m([22m[2m26 tests[22m[2m)[22m[33m 5215[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m HTML validity: always div.avatar [33m 606[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/kbd/Kbd.test.ts [2m([22m[2m20 tests[22m[2m)[22m[33m 4088[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m HTML validity [33m 518[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Form/Form.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 3740[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders with form-group class [33m 758[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders with correct type [33m 389[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Gallery/Gallery.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 3262[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders gallery container [33m 859[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/ProgressBar/ProgressBar.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 4011[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders with correct percentage [33m 676[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m applies variant class [33m 329[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m applies color class [33m 304[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Alert/Alert.test.ts [2m([22m[2m164 tests[22m[2m)[22m[33m 228695[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m unit: renders a <div> with alert role by default [33m 1251[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m unit: applies variant classes [33m 342[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m unit: renders title when provided [33m 357[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m axe-core: alert with info status is accessible [33m 5080[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m axe-core: alert with success status is accessible [33m 788[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m axe-core: dismissible alert is accessible [33m 849[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m axe-core: alert with title is accessible [33m 576[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: renders alert and verifies text content [33m 990[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: close button removes alert when clicked [33m 7926[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: icon is rendered correctly [33m 13397[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: data-status attribute is correctly set [33m 6836[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m pa11y: accessible default alert [33m 7004[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m lighthouse: default alert [33m 31216[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m mutation: handles invalid status gracefully [33m 329[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m stress: renders 1000 alerts without performance degradation [33m 2786[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: close button has proper aria-label [33m 965[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: alert role is present and correct [33m 6147[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: multiple alerts can coexist [33m 3729[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: title is rendered as strong tag [33m 1870[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: icon is rendered inside alert [33m 3368[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m performance: renders 100 alerts concurrently [33m 312[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m performance: renders 1000 alerts sequentially [33m 2008[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m html: no XSS vulnerabilities [33m 338[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m integration-pw: full alert workflow [33m 649[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m integration-pw: alert with all variants [33m 3631[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m integration-pw: dismissible alert removes on close [33m 6014[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m final: accessibility audit passes [33m 461[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m final: no memory leaks during batch rendering [33m 521[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/toast.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 3656[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m creates a toast element in the container [33m 593[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Dropdown/Dropdown.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 34007[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders dropdown container [33m 1190[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders trigger with label text [33m 316[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders correct number of menu items [33m 388[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m applies variant class [33m 301[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/modules/blog/ImageWithFallback.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 38290[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders img element [33m 1041[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m uses provided src when available [33m 307[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m has decoding="async" [33m 308[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/link/Link.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 37026[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m HTML validity [33m 550[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Dialog/Dialog.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 34513[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders with required id prop [33m 777[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m applies default variant class (no variant class for initial) [33m 320[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m applies variant class for non-initial variants [33m 449[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Card/Card.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 35745[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders as article element [33m 1541[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m applies variant class [33m 682[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m applies elevation class [33m 775[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m applies interactive class when interactive=true [33m 393[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m applies custom className [33m 308[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m uses article element for semantic structure [33m 386[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/SearchBar/SearchBar.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 40268[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders form with role="search" [33m 2072[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders input with type="search" [33m 398[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders with pre-filled value [33m 302[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m uses correct form method [33m 396[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m input has aria-label [33m 305[2mms[22m[39m

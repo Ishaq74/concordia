@@ -19,14 +19,21 @@ let playwrightBrowser: Browser;
 
 let container: AstroContainer;
 
+/** Lazy-init puppeteer — only launched when pa11y/lighthouse tests actually need it */
+async function getPuppeteerBrowser(): Promise<PuppeteerBrowser> {
+  if (!puppeteerBrowser) {
+    puppeteerBrowser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+  }
+  return puppeteerBrowser;
+}
+
 describe('ui/Alert', () => {
   beforeAll(async () => {
     container = await AstroContainer.create();
     playwrightBrowser = await chromium.launch();
-    puppeteerBrowser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
     // Crée le dossier reports si inexistant
     if (!fs.existsSync(REPORTS_DIR)) {
       fs.mkdirSync(REPORTS_DIR, { recursive: true });
@@ -191,25 +198,22 @@ describe('ui/Alert', () => {
 
   it('playwright: data-status attribute is correctly set', async () => {
     const statuses = ['info', 'success', 'warning', 'danger', 'error'];
+    const page = await playwrightBrowser.newPage();
     
-    for (const status of statuses) {
-      const html = await container.renderToString(Alert, { 
-        props: { status: status as any }, 
-        slots: { default: `${status} alert` } 
-      });
-      
-      const page = await playwrightBrowser.newPage();
-      
-      try {
+    try {
+      for (const status of statuses) {
+        const html = await container.renderToString(Alert, { 
+          props: { status: status as any }, 
+          slots: { default: `${status} alert` } 
+        });
+        
         await page.setContent(html);
         const dataStatus = await page.getAttribute('[role="alert"]', 'data-status');
         
         expect(dataStatus).toBe(status);
-        await page.close();
-      } catch (error) {
-        await page.close();
-        throw error;
       }
+    } finally {
+      await page.close();
     }
   });
 
@@ -266,13 +270,14 @@ describe('ui/Alert', () => {
     
     let page: PuppeteerPage | undefined;
     try {
-      page = await puppeteerBrowser.newPage();
+      const browser = await getPuppeteerBrowser();
+      page = await browser.newPage();
       await page.goto(`file://${path.resolve(tmpFile)}`, { waitUntil: 'networkidle0' });
       
       const results = await pa11y(`file://${path.resolve(tmpFile)}`, {
         standard: 'WCAG2AA',
         page: page as any,
-        browser: puppeteerBrowser as any,
+        browser: browser as any,
       });
 
       const reportFile = path.join(REPORTS_DIR, 'pa11y-alert-report.json');
@@ -314,7 +319,7 @@ describe('ui/Alert', () => {
     fs.writeFileSync(tmpFile, fullHtml);
 
     try {
-      const page = await puppeteerBrowser.newPage();
+      const page = await (await getPuppeteerBrowser()).newPage();
       await page.setViewport({ width: 1280, height: 720 });
 
       // Créer un flow Lighthouse
@@ -446,7 +451,7 @@ describe('ui/Alert', () => {
   });
 
   it('symmetry: toggling icon presence results in expected DOM changes', async () => {
-    const noIconHtml = await container.renderToString(Alert, { 
+    await container.renderToString(Alert, { 
       props: { icon: undefined }, 
       slots: { default: 'No icon' } 
     });
@@ -1420,16 +1425,15 @@ describe('ui/Alert', () => {
 
   it('integration-pw: alert with all variants', async () => {
     const variants = ['initial', 'retro', 'modern', 'futuristic'];
+    const page = await playwrightBrowser.newPage();
     
-    for (const variant of variants) {
-      const html = await container.renderToString(Alert, { 
-        props: { variant: variant as any }, 
-        slots: { default: `${variant} alert` } 
-      });
-      
-      const page = await playwrightBrowser.newPage();
-      
-      try {
+    try {
+      for (const variant of variants) {
+        const html = await container.renderToString(Alert, { 
+          props: { variant: variant as any }, 
+          slots: { default: `${variant} alert` } 
+        });
+        
         await page.setContent(html);
         
         const alert = await page.$('[role="alert"]');
@@ -1437,12 +1441,9 @@ describe('ui/Alert', () => {
         
         const text = await page.textContent('[role="alert"]');
         expect(text).toContain(`${variant} alert`);
-        
-        await page.close();
-      } catch (error) {
-        await page.close();
-        throw error;
       }
+    } finally {
+      await page.close();
     }
   });
 
@@ -1749,7 +1750,7 @@ describe('ui/Alert', () => {
     // Astro renders slot content as raw HTML; verify via JSDOM that no executable handler exists
     const { JSDOM: JD3 } = await import('jsdom');
     const { window: w3 } = new JD3(html);
-    const imgWithHandler = w3.document.querySelector('img[onerror]');
+    w3.document.querySelector('img[onerror]');
     // In JSDOM, the onerror attribute is parsed but won't execute; we check the alert div is safe
     expect(html).toContain('role="alert"');
   });

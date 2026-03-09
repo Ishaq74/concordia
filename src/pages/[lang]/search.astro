@@ -1,0 +1,593 @@
+---
+// src/pages/[lang]/search.astro — Global search page with tabs, filters, and results
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+
+export const prerender = false;
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const q = Astro.url.searchParams.get("q") || "";
+const activeTab = Astro.url.searchParams.get("type") || "all";
+---
+
+<BaseLayout title={`${t.search?.title ?? "Recherche"} — Concordia`} lang={lang}>
+  <main class="search-page">
+    <div class="search-container">
+
+      <!-- Search Header -->
+      <div class="search-header">
+        <h1 class="search-title">{t.search?.resultsTitle ?? "Résultats de recherche"}</h1>
+
+        <!-- Search Bar -->
+        <div class="search-bar-wrapper">
+          <div class="search-bar">
+            <Icon name="mdi:magnify" class="search-bar__icon" />
+            <input
+              type="search"
+              id="searchInput"
+              class="search-bar__input"
+              placeholder={t.search?.placeholder ?? "Rechercher services, articles, organisations, citoyens..."}
+              value={q}
+              autocomplete="off"
+            />
+            <button id="clearSearch" class="search-bar__clear" aria-label="Effacer" style={q ? "" : "display:none"}>
+              <Icon name="mdi:close-circle" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <nav class="search-tabs" role="tablist" aria-label="Type de résultats">
+          <button role="tab" class:list={["search-tab", { active: activeTab === "all" }]} data-type="all">
+            <Icon name="mdi:view-dashboard-outline" />
+            {t.search?.tabAll ?? "Tout"}
+          </button>
+          <button role="tab" class:list={["search-tab", { active: activeTab === "services" }]} data-type="services">
+            <Icon name="mdi:hand-heart-outline" />
+            {t.search?.tabServices ?? "Services"}
+          </button>
+          <button role="tab" class:list={["search-tab", { active: activeTab === "blog" }]} data-type="blog">
+            <Icon name="mdi:newspaper-variant-outline" />
+            {t.search?.tabBlog ?? "Articles"}
+          </button>
+          <button role="tab" class:list={["search-tab", { active: activeTab === "organizations" }]} data-type="organizations">
+            <Icon name="mdi:domain" />
+            {t.search?.tabOrgs ?? "Organisations"}
+          </button>
+          <button role="tab" class:list={["search-tab", { active: activeTab === "citizens" }]} data-type="citizens">
+            <Icon name="mdi:account-group-outline" />
+            {t.search?.tabCitizens ?? "Citoyens"}
+          </button>
+        </nav>
+      </div>
+
+      <div class="search-body">
+        <!-- Sidebar Filters -->
+        <aside class="search-filters">
+          <div class="filters-card">
+            <h2 class="filters-title">
+              <Icon name="mdi:tune-variant" />
+              {t.search?.filters ?? "Filtres"}
+            </h2>
+
+            <!-- Language filter -->
+            <div class="filter-group">
+              <h3 class="filter-label">{t.search?.filterLang ?? "Langue du contenu"}</h3>
+              <label class="filter-checkbox">
+                <input type="checkbox" value="fr" checked class="lang-filter" />
+                <span>Français</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" value="en" class="lang-filter" />
+                <span>English</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" value="ar" class="lang-filter" />
+                <span>العربية</span>
+              </label>
+              <label class="filter-checkbox">
+                <input type="checkbox" value="es" class="lang-filter" />
+                <span>Español</span>
+              </label>
+            </div>
+
+            <!-- Date filter -->
+            <div class="filter-group">
+              <h3 class="filter-label">{t.search?.filterDate ?? "Date de publication"}</h3>
+              <label class="filter-radio">
+                <input type="radio" name="dateFilter" value="any" checked />
+                <span>{t.search?.dateAny ?? "N'importe quand"}</span>
+              </label>
+              <label class="filter-radio">
+                <input type="radio" name="dateFilter" value="week" />
+                <span>{t.search?.dateWeek ?? "Cette semaine"}</span>
+              </label>
+              <label class="filter-radio">
+                <input type="radio" name="dateFilter" value="month" />
+                <span>{t.search?.dateMonth ?? "Ce mois-ci"}</span>
+              </label>
+              <label class="filter-radio">
+                <input type="radio" name="dateFilter" value="year" />
+                <span>{t.search?.dateYear ?? "Cette année"}</span>
+              </label>
+            </div>
+
+            <!-- Sort -->
+            <div class="filter-group">
+              <h3 class="filter-label">{t.search?.sortBy ?? "Trier par"}</h3>
+              <select id="sortSelect" class="filter-select">
+                <option value="relevance">{t.search?.sortRelevance ?? "Pertinence"}</option>
+                <option value="recent">{t.search?.sortRecent ?? "Plus récent"}</option>
+                <option value="rating">{t.search?.sortRating ?? "Mieux notés"}</option>
+              </select>
+            </div>
+
+            <button id="resetFilters" class="filter-reset">
+              <Icon name="mdi:refresh" />
+              {t.search?.resetFilters ?? "Réinitialiser"}
+            </button>
+          </div>
+        </aside>
+
+        <!-- Results Area -->
+        <section class="search-results" aria-live="polite">
+          <div class="results-status">
+            <p id="resultsCount" class="results-count"></p>
+          </div>
+
+          <div id="resultsContainer" class="results-list">
+            <!-- Results injected by JS -->
+          </div>
+
+          <!-- Loading -->
+          <div id="loadingState" class="search-loading" style="display:none">
+            <Icon name="mdi:loading" class="spin" />
+            <p>{t.search?.loading ?? "Recherche en cours..."}</p>
+          </div>
+
+          <!-- Empty state -->
+          <div id="emptyState" class="search-empty" style="display:none">
+            <Icon name="mdi:magnify-close" />
+            <h3>{t.search?.noResults ?? "Aucun résultat"}</h3>
+            <p>{t.search?.noResultsHint ?? "Essayez avec d'autres mots-clés ou modifiez les filtres."}</p>
+          </div>
+
+          <!-- Initial state -->
+          <div id="initialState" class="search-initial">
+            <Icon name="mdi:text-search" />
+            <h3>{t.search?.startSearch ?? "Lancez votre recherche"}</h3>
+            <p>{t.search?.startSearchHint ?? "Tapez au moins 2 caractères pour trouver des services, articles, organisations ou citoyens."}</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<script is:inline define:vars={{ lang, q: q, activeTab }}>
+(function() {
+  const input = document.getElementById("searchInput");
+  const clearBtn = document.getElementById("clearSearch");
+  const container = document.getElementById("resultsContainer");
+  const countEl = document.getElementById("resultsCount");
+  const loadingEl = document.getElementById("loadingState");
+  const emptyEl = document.getElementById("emptyState");
+  const initialEl = document.getElementById("initialState");
+  const tabs = document.querySelectorAll(".search-tab");
+
+  let currentType = activeTab || "all";
+  let debounceTimer = null;
+
+  // Tab switching
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      currentType = tab.dataset.type;
+      doSearch();
+    });
+  });
+
+  // Clear button
+  clearBtn.addEventListener("click", () => {
+    input.value = "";
+    clearBtn.style.display = "none";
+    container.innerHTML = "";
+    countEl.textContent = "";
+    emptyEl.style.display = "none";
+    initialEl.style.display = "";
+    // Update URL without query
+    const url = new URL(window.location);
+    url.searchParams.delete("q");
+    history.replaceState(null, "", url);
+  });
+
+  // Input with debounce
+  input.addEventListener("input", () => {
+    clearBtn.style.display = input.value ? "" : "none";
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(doSearch, 350);
+  });
+
+  // Reset filters
+  document.getElementById("resetFilters").addEventListener("click", () => {
+    document.querySelectorAll(".lang-filter").forEach(cb => { cb.checked = cb.value === "fr"; });
+    document.querySelectorAll('[name="dateFilter"]').forEach(r => { r.checked = r.value === "any"; });
+    document.getElementById("sortSelect").value = "relevance";
+    doSearch();
+  });
+
+  async function doSearch() {
+    const query = input.value.trim();
+    if (query.length < 2) {
+      container.innerHTML = "";
+      countEl.textContent = "";
+      emptyEl.style.display = "none";
+      initialEl.style.display = query.length === 0 ? "" : "none";
+      return;
+    }
+
+    // Update URL
+    const url = new URL(window.location);
+    url.searchParams.set("q", query);
+    url.searchParams.set("type", currentType);
+    history.replaceState(null, "", url);
+
+    loadingEl.style.display = "";
+    initialEl.style.display = "none";
+    emptyEl.style.display = "none";
+
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&type=${currentType}&lang=${lang}&limit=20`);
+      const data = await res.json();
+
+      loadingEl.style.display = "none";
+
+      if (!data.results || data.results.length === 0) {
+        container.innerHTML = "";
+        countEl.textContent = "0 résultat";
+        emptyEl.style.display = "";
+        return;
+      }
+
+      countEl.textContent = data.results.length + " résultat" + (data.results.length > 1 ? "s" : "") + " trouvé" + (data.results.length > 1 ? "s" : "");
+      container.innerHTML = data.results.map(renderResult).join("");
+    } catch (err) {
+      loadingEl.style.display = "none";
+      container.innerHTML = '<p class="search-error">Erreur lors de la recherche. Veuillez réessayer.</p>';
+    }
+  }
+
+  function renderResult(r) {
+    const typeLabels = { service: "Service", blog: "Article", organization: "Organisation", citizen: "Citoyen" };
+    const typeColors = { service: "var(--color-primary)", blog: "var(--color-info, #3b82f6)", organization: "var(--color-secondary, #6b7280)", citizen: "var(--color-success, #10b981)" };
+    const typeIcons = { service: "hand_heart", blog: "article", organization: "domain", citizen: "person" };
+
+    const badge = `<span class="result-badge" style="background:${typeColors[r.type]}15;color:${typeColors[r.type]}">${typeLabels[r.type] || r.type}</span>`;
+
+    const img = r.image
+      ? `<div class="result-image"><img src="${r.image}" alt="" loading="lazy" /></div>`
+      : `<div class="result-image result-image--placeholder"><span class="material-symbols-outlined">${typeIcons[r.type] || "search"}</span></div>`;
+
+    const meta = [];
+    if (r.meta?.price) meta.push(`<span class="result-price">${r.meta.price}${r.meta.currency === "EUR" ? "€" : r.meta.currency || ""}</span>`);
+    if (r.meta?.rating) meta.push(`<span class="result-rating">★ ${Number(r.meta.rating).toFixed(1)}</span>`);
+    if (r.meta?.role) meta.push(`<span class="result-role">${r.meta.role}</span>`);
+    if (r.meta?.location) meta.push(`<span class="result-location">${r.meta.location}</span>`);
+    if (r.meta?.publishedAt) {
+      const d = new Date(r.meta.publishedAt);
+      meta.push(`<span class="result-date">${d.toLocaleDateString("fr-FR")}</span>`);
+    }
+
+    return `
+      <a href="${r.url || "#"}" class="result-card">
+        ${img}
+        <div class="result-content">
+          <div class="result-header">
+            ${badge}
+            ${meta.length ? '<div class="result-meta">' + meta.join("") + '</div>' : ""}
+          </div>
+          <h3 class="result-title">${escapeHtml(r.title)}</h3>
+          ${r.description ? `<p class="result-desc">${escapeHtml(r.description)}</p>` : ""}
+        </div>
+      </a>
+    `;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // Auto-search if query param present
+  if (q && q.length >= 2) {
+    doSearch();
+  }
+})();
+</script>
+
+<style>
+  .search-page {
+    padding: var(--space-6) var(--space-4);
+    min-height: 70vh;
+  }
+  .search-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  /* Header */
+  .search-header {
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  .search-title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  /* Search bar */
+  .search-bar-wrapper { width: 100%; }
+  .search-bar {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-muted, #f4f0eb);
+    height: 3.5rem;
+    padding: 0 var(--space-3);
+    transition: border-color 0.2s;
+  }
+  .search-bar:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+  .search-bar__icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+  .search-bar__input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: var(--text-lg);
+    color: var(--color-text);
+    padding: 0 var(--space-2);
+    outline: none;
+  }
+  .search-bar__input::placeholder { color: var(--color-text-muted); }
+  .search-bar__clear {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: var(--space-1);
+    display: flex;
+    align-items: center;
+  }
+  .search-bar__clear:hover { color: var(--color-text); }
+  .search-bar__clear [data-icon] { width: 1.25rem; height: 1.25rem; }
+
+  /* Tabs */
+  .search-tabs {
+    display: flex;
+    gap: var(--space-1);
+    border-bottom: 2px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .search-tabs::-webkit-scrollbar { display: none; }
+  .search-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    border: none;
+    background: none;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .search-tab:hover { color: var(--color-text); }
+  .search-tab.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+  .search-tab [data-icon] { width: 1.125rem; height: 1.125rem; }
+
+  /* Body layout */
+  .search-body {
+    display: flex;
+    gap: var(--space-8);
+  }
+
+  /* Sidebar filters */
+  .search-filters {
+    width: 280px;
+    flex-shrink: 0;
+  }
+  .filters-card {
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    position: sticky;
+    top: 5rem;
+  }
+  .filters-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .filters-title [data-icon] { width: 1.25rem; height: 1.25rem; }
+  .filter-group { display: flex; flex-direction: column; gap: var(--space-2); }
+  .filter-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-1);
+  }
+  .filter-checkbox,
+  .filter-radio {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+  .filter-checkbox:hover span,
+  .filter-radio:hover span { color: var(--color-text); }
+  .filter-checkbox input,
+  .filter-radio input {
+    accent-color: var(--color-primary);
+    width: 1rem;
+    height: 1rem;
+  }
+  .filter-select {
+    width: 100%;
+    padding: var(--space-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--color-surface, #fff);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+  }
+  .filter-reset {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    transition: all 0.2s;
+    justify-content: center;
+  }
+  .filter-reset:hover { border-color: var(--color-primary); color: var(--color-primary); }
+  .filter-reset [data-icon] { width: 1rem; height: 1rem; }
+
+  /* Results */
+  .search-results { flex: 1; min-width: 0; }
+  .results-status { margin-bottom: var(--space-4); }
+  .results-count {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+  .results-list { display: flex; flex-direction: column; gap: var(--space-4); }
+
+  /* Result card (injected via JS) */
+  :global(.result-card) {
+    display: flex;
+    gap: var(--space-4);
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.2s, transform 0.1s;
+  }
+  :global(.result-card:hover) {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+  }
+  :global(.result-image) {
+    width: 180px;
+    height: 140px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--color-bg-muted, #f4f0eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  :global(.result-image img) { width: 100%; height: 100%; object-fit: cover; }
+  :global(.result-image--placeholder) { color: var(--color-text-muted); font-size: 2.5rem; }
+  :global(.result-content) { flex: 1; display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+  :global(.result-header) { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+  :global(.result-badge) {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-full, 9999px);
+  }
+  :global(.result-meta) { display: flex; align-items: center; gap: var(--space-2); margin-left: auto; font-size: var(--text-xs); color: var(--color-text-muted); }
+  :global(.result-price) { font-weight: 700; color: var(--color-text); font-size: var(--text-base); }
+  :global(.result-rating) { color: var(--color-primary); font-weight: 600; }
+  :global(.result-title) { font-size: var(--text-lg); font-weight: 700; color: var(--color-text); line-height: 1.3; }
+  :global(.result-desc) {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* States */
+  .search-loading,
+  .search-empty,
+  .search-initial {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-12) var(--space-4);
+    gap: var(--space-3);
+    color: var(--color-text-muted);
+  }
+  .search-loading [data-icon],
+  .search-empty [data-icon],
+  .search-initial [data-icon] { width: 3rem; height: 3rem; opacity: 0.5; }
+  .search-loading h3,
+  .search-empty h3,
+  .search-initial h3 { font-size: var(--text-lg); font-weight: 600; color: var(--color-text); }
+  :global(.search-error) { color: var(--color-error, #ef4444); text-align: center; padding: var(--space-4); }
+  :global(.spin) { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .search-body { flex-direction: column; }
+    .search-filters { width: 100%; }
+    .filters-card { position: static; }
+  }
+  @media (max-width: 640px) {
+    :global(.result-card) { flex-direction: column; }
+    :global(.result-image) { width: 100%; height: 180px; }
+  }
+</style>

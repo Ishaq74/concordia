@@ -56,6 +56,21 @@ const knowsAbout = (org.knowsAbout ?? []) as string[];
 const knowsLanguage = (org.knowsLanguage ?? []) as string[];
 const areaServed = (org.areaServed ?? []) as string[];
 const makesOffer = (org.makesOffer ?? []) as string[];
+
+// Opening hours (stored in contactPoint as a schedule entry)
+const contactPoints = (org.contactPoint ?? []) as { contactType?: string; telephone?: string; email?: string; hoursAvailable?: { dayOfWeek: string; opens: string; closes: string }[] }[];
+const scheduleEntry = contactPoints.find(cp => cp.contactType === "schedule");
+const openingHours = (scheduleEntry?.hoursAvailable ?? []) as { dayOfWeek: string; opens: string; closes: string }[];
+const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const dayLabels: Record<string, string> = {
+  Monday: "Lundi", Tuesday: "Mardi", Wednesday: "Mercredi",
+  Thursday: "Jeudi", Friday: "Vendredi", Saturday: "Samedi", Sunday: "Dimanche"
+};
+const hoursMap = new Map(openingHours.map(h => [h.dayOfWeek, h]));
+
+// Supported i18n languages
+const i18nLanguages = ["fr","en","ar","es"];
+const i18nLabels: Record<string, string> = { fr: "Français", en: "English", ar: "العربية", es: "Español" };
 ---
 
 <AdminLayout title={`${org.name} — ${to.profileConfig ?? "Profil & Configuration"}`} activeSection="org-profile">
@@ -220,6 +235,52 @@ const makesOffer = (org.makesOffer ?? []) as string[];
           </div>
         </CardContent>
       </Card>
+
+      <!-- Opening Hours -->
+      <Card variant="modern" elevation="sm" class="profile-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:clock-outline" /> {to.openingHours ?? "Horaires d'ouverture"}</h2>
+          <div class="hours-grid">
+            {days.map(day => {
+              const h = hoursMap.get(day);
+              return (
+                <div class="hours-row" data-day={day}>
+                  <label class="hours-day">
+                    <input type="checkbox" class="hours-toggle" data-day={day} checked={!!h} />
+                    <span>{dayLabels[day] ?? day}</span>
+                  </label>
+                  <div class="hours-times">
+                    <input type="time" class="hours-open" data-day={day} value={h?.opens ?? "09:00"} disabled={!h} />
+                    <span class="hours-sep">—</span>
+                    <input type="time" class="hours-close" data-day={day} value={h?.closes ?? "18:00"} disabled={!h} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- i18n Language Configuration -->
+      <Card variant="modern" elevation="sm" class="profile-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:translate" /> {to.i18nConfig ?? "Configuration multilingue"}</h2>
+          <p class="section-desc">{to.i18nDesc ?? "Sélectionnez les langues dans lesquelles votre contenu sera disponible"}</p>
+          <div class="i18n-grid">
+            {i18nLanguages.map(code => (
+              <label class="i18n-lang">
+                <input type="checkbox" class="i18n-check" data-lang={code} checked={knowsLanguage.includes(code) || code === "fr"} disabled={code === "fr"} />
+                <div class="i18n-card">
+                  <span class="i18n-flag">{code === "fr" ? "🇫🇷" : code === "en" ? "🇬🇧" : code === "ar" ? "🇸🇦" : "🇪🇸"}</span>
+                  <span class="i18n-name">{i18nLabels[code]}</span>
+                  <span class="i18n-code">{code.toUpperCase()}</span>
+                  {code === "fr" && <Badge variant="modern" color="primary">Par défaut</Badge>}
+                </div>
+              </label>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
 
     <!-- Sidebar -->
@@ -308,12 +369,46 @@ const makesOffer = (org.makesOffer ?? []) as string[];
       descEl.addEventListener("input", update);
     }
 
+    // Hours toggles
+    document.querySelectorAll(".hours-toggle").forEach(cb => {
+      cb.addEventListener("change", () => {
+        const day = cb.dataset.day;
+        const open = document.querySelector(`.hours-open[data-day="${day}"]`);
+        const close = document.querySelector(`.hours-close[data-day="${day}"]`);
+        if (open) open.disabled = !cb.checked;
+        if (close) close.disabled = !cb.checked;
+      });
+    });
+
     // Save
     const saveBtn = document.getElementById("save-profile-btn");
     function val(id) { return document.getElementById(id)?.value?.trim() ?? ""; }
     function checked(id) { return document.getElementById(id)?.checked ?? false; }
     function csvToArr(id) { return val(id).split(",").map(s => s.trim()).filter(Boolean); }
     function linesToArr(id) { return val(id).split("\n").map(s => s.trim()).filter(Boolean); }
+
+    // Collect opening hours
+    function collectHours() {
+      const hours = [];
+      document.querySelectorAll(".hours-toggle").forEach(cb => {
+        if (cb.checked) {
+          const day = cb.dataset.day;
+          const opens = document.querySelector(`.hours-open[data-day="${day}"]`)?.value ?? "09:00";
+          const closes = document.querySelector(`.hours-close[data-day="${day}"]`)?.value ?? "18:00";
+          hours.push({ dayOfWeek: day, opens, closes });
+        }
+      });
+      return hours;
+    }
+
+    // Collect i18n languages
+    function collectI18nLanguages() {
+      const langs = [];
+      document.querySelectorAll(".i18n-check").forEach(cb => {
+        if (cb.checked) langs.push(cb.dataset.lang);
+      });
+      return langs;
+    }
 
     saveBtn?.addEventListener("click", async () => {
       const body = {
@@ -343,6 +438,8 @@ const makesOffer = (org.makesOffer ?? []) as string[];
         sameAs: linesToArr("p-socials"),
         isActive: checked("p-active"),
         isFeatured: checked("p-featured"),
+        contactPoint: [{ contactType: "schedule", hoursAvailable: collectHours() }],
+        knowsLanguage: collectI18nLanguages(),
       };
 
       try {
@@ -436,5 +533,36 @@ const makesOffer = (org.makesOffer ?? []) as string[];
   }
   @media (max-width: 768px) {
     .form-grid, .branding-fields { grid-template-columns: 1fr; }
+    .i18n-grid { grid-template-columns: 1fr 1fr; }
   }
+
+  /* Hours editor */
+  .hours-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+  .hours-row { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border-default, #f1f5f9); }
+  .hours-day { display: flex; align-items: center; gap: 0.5rem; min-width: 140px; font-size: 0.875rem; font-weight: 600; cursor: pointer; }
+  .hours-day input[type="checkbox"] { accent-color: var(--color-primary, #eab308); }
+  .hours-times { display: flex; align-items: center; gap: 0.5rem; }
+  .hours-times input[type="time"] {
+    border: 1px solid var(--border-default, #e2e8f0); border-radius: 0.375rem;
+    padding: 0.375rem 0.5rem; font-size: 0.8125rem;
+    background: var(--bg-default, white); transition: opacity 0.2s;
+  }
+  .hours-times input[type="time"]:disabled { opacity: 0.4; }
+  .hours-sep { color: var(--text-muted, #94a3b8); }
+
+  /* i18n language cards */
+  .section-desc { font-size: 0.875rem; color: var(--text-muted, #64748b); margin: -0.5rem 0 1rem; }
+  .i18n-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+  .i18n-lang { cursor: pointer; }
+  .i18n-lang input { display: none; }
+  .i18n-card {
+    display: flex; flex-direction: column; align-items: center; gap: 0.375rem;
+    padding: 1rem; border: 2px solid var(--border-default, #e2e8f0);
+    border-radius: 0.75rem; transition: all 0.2s; text-align: center;
+  }
+  .i18n-lang input:checked + .i18n-card { border-color: var(--color-primary, #eab308); background: rgba(234,179,8,0.05); }
+  .i18n-lang input:disabled + .i18n-card { opacity: 0.8; }
+  .i18n-flag { font-size: 1.5rem; }
+  .i18n-name { font-size: 0.875rem; font-weight: 600; }
+  .i18n-code { font-size: 0.75rem; color: var(--text-muted, #94a3b8); }
 </style>

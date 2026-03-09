@@ -46,7 +46,7 @@ describe('createTranslationLoader (factory)', () => {
   it('creates a loader with correct name', () => {
     const loader = createTranslationLoader({
       fetcher: async () => [],
-      transformer: (entity: any, t: any) => ({}),
+      transformer: (_entity: any, _t: any) => ({}),
     });
     expect(loader.name).toBe('drizzle-translation-loader');
   });
@@ -54,7 +54,7 @@ describe('createTranslationLoader (factory)', () => {
   it('returns early when fetcher returns empty array', async () => {
     const loader = createTranslationLoader({
       fetcher: async () => [],
-      transformer: (entity: any, t: any) => ({}),
+      transformer: (_entity: any, _t: any) => ({}),
     });
     const { store, logger } = makeStoreAndLogger();
     await loader.load({ store, logger } as any);
@@ -77,7 +77,7 @@ describe('createTranslationLoader (factory)', () => {
           ],
         },
       ],
-      transformer: (entity: any, t: any) => ({ title: t.title }),
+      transformer: (_entity: any, t: any) => ({ title: t.title }),
     });
     const { store, logger } = makeStoreAndLogger();
     await loader.load({ store, logger } as any);

@@ -35,6 +35,14 @@ describe.skipIf(!serverUp)('Page render — public pages', () => {
     '/en/services/',
     '/fr/organisations/',
     '/en/organizations/',
+    '/fr/charter/',
+    '/en/charter/',
+    '/fr/citizens/',
+    '/en/citizens/',
+    '/fr/search/',
+    '/en/search/',
+    '/fr/notifications/',
+    '/en/notifications/',
   ]
 
   for (const path of publicPages) {
@@ -87,6 +95,16 @@ describe.skipIf(!serverUp)('Page render — admin pages redirect unauthenticated
   const adminPages = [
     '/fr/admin/',
     '/en/admin/',
+    '/fr/admin/organizations/members/',
+    '/en/admin/organizations/members/',
+    '/fr/admin/organizations/blog/',
+    '/en/admin/organizations/blog/',
+    '/fr/admin/organizations/bookings/',
+    '/en/admin/organizations/bookings/',
+    '/fr/admin/organizations/services/',
+    '/en/admin/organizations/services/',
+    '/fr/admin/organizations/translations/',
+    '/en/admin/organizations/translations/',
   ]
 
   for (const path of adminPages) {

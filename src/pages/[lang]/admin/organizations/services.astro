@@ -8,9 +8,17 @@ import CardContent from "@components/ui/Card/CardContent.astro";
 import Badge from "@components/ui/Badge.astro";
 import Button from "@components/ui/Button.astro";
 import Pagination from "@components/ui/Pagination.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Label from "@components/ui/Form/Label.astro";
 import { Icon } from "astro-icon/components";
 import { getDrizzle } from "@database/drizzle";
-import { servicesListings, servicesTranslations, servicesCategories } from "@database/schemas";
+import { servicesListings, servicesTranslations, servicesCategories, servicesBookings } from "@database/schemas";
 import { blogOrganizations } from "@database/schemas";
 import { member } from "@database/schemas/auth-schema";
 import { eq, and, desc, count, inArray } from "drizzle-orm";
@@ -58,6 +66,13 @@ const [totalResult] = await db.select({ value: count() }).from(servicesListings)
 const [activeResult] = await db.select({ value: count() }).from(servicesListings).where(and(eq(servicesListings.organizationId, activeOrgId), eq(servicesListings.isActive, true)));
 const [featuredResult] = await db.select({ value: count() }).from(servicesListings).where(and(eq(servicesListings.organizationId, activeOrgId), eq(servicesListings.isFeatured, true)));
 
+// Booking stats for this org's services
+const orgServiceIds = (await db.select({ id: servicesListings.id }).from(servicesListings).where(eq(servicesListings.organizationId, activeOrgId))).map(s => s.id);
+const bookingStats = orgServiceIds.length > 0
+  ? await db.select({ value: count() }).from(servicesBookings).where(inArray(servicesBookings.serviceId, orgServiceIds))
+  : [{ value: 0 }];
+const totalBookings = bookingStats[0]?.value ?? 0;
+
 // Pages
 const [countResult] = await db.select({ value: count() }).from(servicesListings).where(whereClause);
 const totalPages = Math.max(1, Math.ceil(countResult.value / perPage));
@@ -100,7 +115,8 @@ const getTitle = (svcId: string) => {
   return match ? loc(match.title, svcId.slice(0, 8)) : svcId.slice(0, 8);
 };
 
-const statusBadgeColor: Record<string, string> = {
+type BadgeColor = "default" | "primary" | "secondary" | "accent" | "success" | "warning" | "error";
+const statusBadgeColor: Record<string, BadgeColor> = {
   active: "success",
   pending_review: "warning",
   draft: "secondary",
@@ -148,29 +164,39 @@ const statusBadgeColor: Record<string, string> = {
         </div>
       </CardContent>
     </Card>
+    <Card variant="modern" elevation="sm">
+      <CardContent>
+        <div class="stat-compact stat-bookings">
+          <Icon name="mdi:calendar-check" />
+          <div><span class="stat-num">{totalBookings}</span><span class="stat-label">{to.totalBookings ?? "Réservations"}</span></div>
+        </div>
+      </CardContent>
+    </Card>
   </div>
 
   <!-- Filters -->
   <Card variant="modern" elevation="sm" class="filters-card">
     <CardContent>
       <form class="filters-form" method="get">
-        <div class="filter-group">
-          <select name="status" class="filter-select">
+        <div class="filter-field">
+          <Label htmlFor="status">{to.status ?? "Statut"}</Label>
+          <Select id="status" name="status">
             <option value="">{to.allStatuses ?? "Tous les statuts"}</option>
             <option value="active" selected={statusFilter === "active"}>{to.statusActive ?? "Actif"}</option>
             <option value="pending_review" selected={statusFilter === "pending_review"}>{to.statusPending ?? "En attente"}</option>
             <option value="draft" selected={statusFilter === "draft"}>{to.statusDraft ?? "Brouillon"}</option>
             <option value="suspended" selected={statusFilter === "suspended"}>{to.statusSuspended ?? "Suspendu"}</option>
-          </select>
+          </Select>
         </div>
         {categories.length > 0 && (
-          <div class="filter-group">
-            <select name="category" class="filter-select">
+          <div class="filter-field">
+            <Label htmlFor="category">{to.category ?? "Catégorie"}</Label>
+            <Select id="category" name="category">
               <option value="">{to.allCategories ?? "Toutes les catégories"}</option>
               {categories.map(c => (
                 <option value={c.id} selected={categoryFilter === c.id}>{c.slug}</option>
               ))}
-            </select>
+            </Select>
           </div>
         )}
         <Button type="submit" variant="modern" color="secondary" size="sm">{to.filter ?? "Filtrer"}</Button>
@@ -182,61 +208,59 @@ const statusBadgeColor: Record<string, string> = {
   <!-- Services table -->
   <Card variant="modern" elevation="sm">
     <CardContent>
-      <div class="table-responsive">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>{ts.service ?? "Service"}</th>
-              <th>{ts.status ?? "Statut"}</th>
-              <th>{ts.price ?? "Prix"}</th>
-              <th>{ts.duration ?? "Durée"}</th>
-              <th>{to.actions ?? "Actions"}</th>
-            </tr>
-          </thead>
-          <tbody>
+      <Table variant="modern" striped>
+        <TableHeader>
+          <TableRow>
+            <TableHead>{ts.service ?? "Service"}</TableHead>
+            <TableHead>{ts.status ?? "Statut"}</TableHead>
+            <TableHead>{ts.price ?? "Prix"}</TableHead>
+            <TableHead>{ts.duration ?? "Durée"}</TableHead>
+            <TableHead>{to.actions ?? "Actions"}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
             {services.map(s => {
               const title = getTitle(s.id);
               return (
-                <tr>
-                  <td>
+                <TableRow>
+                  <TableCell>
                     <div class="service-cell">
                       <strong>{title}</strong>
                       <code class="service-slug">/{s.slug}</code>
                     </div>
-                  </td>
-                  <td><Badge variant="modern" color={(statusBadgeColor[s.status] ?? "secondary") as any}>{s.status}</Badge></td>
-                  <td class="meta-cell">{s.basePrice ? `${s.basePrice} ${s.currency ?? "EUR"}` : "-"}</td>
-                  <td class="meta-cell">{s.durationMinutes ? `${s.durationMinutes} min` : "-"}</td>
-                  <td>
+                  </TableCell>
+                  <TableCell><Badge variant="modern" color={statusBadgeColor[s.status] ?? "secondary"}>{s.status}</Badge></TableCell>
+                  <TableCell className="meta-cell">{s.basePrice ? `${s.basePrice} ${s.currency ?? "EUR"}` : "-"}</TableCell>
+                  <TableCell className="meta-cell">{s.durationMinutes ? `${s.durationMinutes} min` : "-"}</TableCell>
+                  <TableCell>
                     <div class="action-btns">
                       <a href={`${adminBase}/services/${s.id}/edit`} class="btn-icon" title={to.edit ?? "Éditer"}>
                         <Icon name="mdi:pencil" />
                       </a>
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               );
             })}
             {services.length === 0 && (
-              <tr>
-                <td colspan={5}>
+              <TableRow>
+                <TableCell>
                   <div class="empty-state">
                     <Icon name="mdi:room-service-off" />
                     <p>{to.noServices ?? "Aucun service trouvé."}</p>
                     <a href={`${adminBase}/services/new`}>{ts.addService ?? "Créer un service"}</a>
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
-      </div>
+        </TableBody>
+      </Table>
     </CardContent>
   </Card>
 
   {totalPages > 1 && (
     <div class="pagination-wrap">
-      <Pagination currentPage={page} totalPages={totalPages} baseUrl={`${adminBase}/organizations/services`} />
+      <Pagination currentPage={page} totalPages={totalPages} baseUrl={`${adminBase}/organizations/services?${[statusFilter ? `status=${statusFilter}` : '', categoryFilter ? `category=${categoryFilter}` : ''].filter(Boolean).join('&')}${statusFilter || categoryFilter ? '&' : ''}page=`} />
     </div>
   )}
 </AdminLayout>
@@ -248,25 +272,20 @@ const statusBadgeColor: Record<string, string> = {
   .admin-page-description { font-size: 0.9375rem; color: var(--text-muted, #64748b); margin: 0.25rem 0 0; }
   .btn-new { text-decoration: none; }
 
-  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
   .stat-compact { display: flex; align-items: center; gap: 0.75rem; }
   .stat-compact :global(svg) { width: 1.5rem; height: 1.5rem; color: var(--color-primary, #eab308); }
   .stat-active :global(svg) { color: #22c55e; }
   .stat-featured :global(svg) { color: #f59e0b; }
+  .stat-bookings :global(svg) { color: #3b82f6; }
   .stat-num { display: block; font-size: 1.5rem; font-weight: 800; line-height: 1; }
   .stat-label { font-size: 0.8125rem; color: var(--text-muted, #64748b); }
 
   .filters-card { margin-bottom: 1.5rem; }
-  .filters-form { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-  .filter-group { display: flex; align-items: center; gap: 0.5rem; }
-  .filter-select { border: 1px solid var(--border-default, #e2e8f0); border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; background: var(--bg-default, white); }
+  .filters-form { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+  .filter-field { display: flex; flex-direction: column; gap: 0.25rem; }
   .clear-filter { font-size: 0.8125rem; color: var(--text-muted, #64748b); text-decoration: underline; }
 
-  .table-responsive { overflow-x: auto; }
-  .admin-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-  .admin-table th { text-align: left; font-weight: 600; padding: 0.75rem; border-bottom: 2px solid var(--border-default, #e2e8f0); color: var(--text-muted, #64748b); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
-  .admin-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-default, #f1f5f9); vertical-align: middle; }
-  .admin-table tr:hover td { background: var(--bg-muted, rgba(241,245,249,0.5)); }
   .service-cell strong { font-weight: 600; display: block; }
   .service-slug { font-size: 0.75rem; color: var(--text-muted, #94a3b8); }
   .meta-cell { color: var(--text-muted, #94a3b8); }

@@ -91,7 +91,7 @@ describe('admin/markdown-editor', () => {
       const editors = new Map<string, typeof mockMDE>()
       editors.set('test', mockMDE)
 
-      const value = getEditorValue(editors as Parameters<typeof getEditorValue>[0], 'test')
+      const value = getEditorValue(editors as unknown as Parameters<typeof getEditorValue>[0], 'test')
       expect(value).toBe('# Hello')
     })
 

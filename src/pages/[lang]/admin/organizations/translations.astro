@@ -1,0 +1,499 @@
+---
+// src/pages/[lang]/admin/organizations/translations.astro — Content translation interface (i18n split view)
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Button from "@components/ui/Button.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+import { getDrizzle } from "@database/drizzle";
+import { blogPosts, blogTranslations, servicesListings, servicesTranslations } from "@database/schemas";
+import { eq, and } from "drizzle-orm";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const to = t.adminTranslations ?? ({} as Record<string, string>);
+
+const db = await getDrizzle();
+const orgId = Astro.url.searchParams.get("org") || "";
+const contentType = Astro.url.searchParams.get("type") || "blog"; // blog | services
+const contentId = Astro.url.searchParams.get("id") || "";
+const sourceLang = Astro.url.searchParams.get("source") || "fr";
+const targetLang = Astro.url.searchParams.get("target") || "en";
+
+const locales = [
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "ar", label: "العربية", flag: "🇸🇦" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+];
+
+// Fetch translatable content list for the sidebar
+let contentItems: Array<{ id: string; title: string; type: string; translatedLocales: string[] }> = [];
+let sourceData: Record<string, string> = {};
+let targetData: Record<string, string> = {};
+let totalFields = 0;
+let translatedFields = 0;
+
+try {
+  // Fetch blog posts with their translations
+  const posts = await db.select({
+    id: blogPosts.id,
+    slug: blogPosts.slug,
+  }).from(blogPosts).limit(50);
+
+  for (const post of posts) {
+    const translations = await db.select({
+      lang: blogTranslations.inLanguage,
+      headline: blogTranslations.headline,
+    }).from(blogTranslations).where(eq(blogTranslations.postId, post.id));
+
+    contentItems.push({
+      id: post.id,
+      title: String(translations.find(tr => tr.lang === "fr")?.headline ?? "") || post.slug || post.id,
+      type: "blog",
+      translatedLocales: translations.map(tr => tr.lang),
+    });
+  }
+
+  // Fetch services
+  const services = await db.select({
+    id: servicesListings.id,
+    slug: servicesListings.slug,
+  }).from(servicesListings).limit(50);
+
+  for (const svc of services) {
+    const translations = await db.select({
+      lang: servicesTranslations.inLanguage,
+      title: servicesTranslations.title,
+    }).from(servicesTranslations).where(eq(servicesTranslations.serviceId, svc.id));
+
+    contentItems.push({
+      id: svc.id,
+      title: String(translations.find(tr => tr.lang === "fr")?.title ?? "") || svc.slug || svc.id,
+      type: "service",
+      translatedLocales: translations.map(tr => tr.lang),
+    });
+  }
+
+  // Fetch source + target data for selected content
+  if (contentId && contentType === "blog") {
+    const [sourceRows, targetRows] = await Promise.all([
+      db.select().from(blogTranslations).where(and(eq(blogTranslations.postId, contentId), eq(blogTranslations.inLanguage, sourceLang))),
+      db.select().from(blogTranslations).where(and(eq(blogTranslations.postId, contentId), eq(blogTranslations.inLanguage, targetLang))),
+    ]);
+    if (sourceRows[0]) {
+      sourceData = { title: String(sourceRows[0].headline ?? ""), excerpt: String(sourceRows[0].excerpt ?? ""), content: String(sourceRows[0].articleBody ?? "") };
+    }
+    if (targetRows[0]) {
+      targetData = { title: String(targetRows[0].headline ?? ""), excerpt: String(targetRows[0].excerpt ?? ""), content: String(targetRows[0].articleBody ?? "") };
+    }
+    totalFields = Object.keys(sourceData).length;
+    translatedFields = Object.values(targetData).filter(v => v && v.trim()).length;
+  }
+  if (contentId && contentType === "services") {
+    const [sourceRows, targetRows] = await Promise.all([
+      db.select().from(servicesTranslations).where(and(eq(servicesTranslations.serviceId, contentId), eq(servicesTranslations.inLanguage, sourceLang))),
+      db.select().from(servicesTranslations).where(and(eq(servicesTranslations.serviceId, contentId), eq(servicesTranslations.inLanguage, targetLang))),
+    ]);
+    if (sourceRows[0]) {
+      sourceData = { title: String(sourceRows[0].title ?? ""), description: String(sourceRows[0].description ?? "") };
+    }
+    if (targetRows[0]) {
+      targetData = { title: String(targetRows[0].title ?? ""), description: String(targetRows[0].description ?? "") };
+    }
+    totalFields = Object.keys(sourceData).length;
+    translatedFields = Object.values(targetData).filter(v => v && v.trim()).length;
+  }
+} catch (err) {
+  console.error("[translations] Error loading data:", err);
+}
+
+const progress = totalFields > 0 ? Math.round((translatedFields / totalFields) * 100) : 0;
+
+const fieldLabels: Record<string, string> = {
+  title: "Titre",
+  excerpt: "Extrait / Résumé SEO",
+  content: "Contenu complet",
+  description: "Description",
+};
+---
+
+<AdminLayout title={to.title ?? "Interface de traduction"} activeSection="translations">
+  <div class="admin-page-header">
+    <div class="trans-header">
+      <div>
+        <h1 class="admin-page-title">{to.title ?? "Interface de traduction"}</h1>
+        <p class="admin-page-description">{to.subtitle ?? "Traduisez le contenu de votre plateforme"}</p>
+      </div>
+      {contentId && (
+        <div class="trans-progress">
+          <span class="trans-progress__label">{progress}% {to.translated ?? "traduit"}</span>
+          <div class="trans-progress__bar">
+            <div class="trans-progress__fill" style={`width:${progress}%`}></div>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <div class="trans-layout">
+    <!-- Sidebar: content list -->
+    <aside class="trans-sidebar">
+      <div class="trans-sidebar__card">
+        <h3 class="trans-sidebar__title">{to.contentList ?? "Contenus"}</h3>
+
+        <div class="trans-type-tabs">
+          <a href={`?type=blog&source=${sourceLang}&target=${targetLang}${orgId ? `&org=${orgId}` : ""}`}
+             class:list={["trans-type-tab", { active: contentType === "blog" }]}>
+            <Icon name="mdi:newspaper-variant-outline" /> Blog
+          </a>
+          <a href={`?type=services&source=${sourceLang}&target=${targetLang}${orgId ? `&org=${orgId}` : ""}`}
+             class:list={["trans-type-tab", { active: contentType === "services" }]}>
+            <Icon name="mdi:hand-heart-outline" /> Services
+          </a>
+        </div>
+
+        <div class="trans-content-list">
+          {contentItems.filter(c => c.type === (contentType === "services" ? "service" : "blog")).map(item => {
+            const isSelected = item.id === contentId;
+            return (
+              <a
+                href={`?type=${contentType}&id=${item.id}&source=${sourceLang}&target=${targetLang}${orgId ? `&org=${orgId}` : ""}`}
+                class:list={["trans-item", { active: isSelected }]}
+              >
+                <span class="trans-item__title">{item.title}</span>
+                <div class="trans-item__locales">
+                  {locales.map(loc => (
+                    <span class:list={["trans-locale-dot", { filled: item.translatedLocales.includes(loc.code) }]} title={loc.label}>
+                      {loc.flag}
+                    </span>
+                  ))}
+                </div>
+              </a>
+            );
+          })}
+          {contentItems.filter(c => c.type === (contentType === "services" ? "service" : "blog")).length === 0 && (
+            <p class="trans-empty">{to.noContent ?? "Aucun contenu trouvé"}</p>
+          )}
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main: split view editor -->
+    <main class="trans-main">
+      {!contentId ? (
+        <div class="trans-placeholder">
+          <Icon name="mdi:translate" />
+          <h3>{to.selectContent ?? "Sélectionnez un contenu"}</h3>
+          <p>{to.selectContentHint ?? "Choisissez un élément dans la liste à gauche pour commencer la traduction."}</p>
+        </div>
+      ) : (
+        <div class="trans-editor">
+          <!-- Toolbar -->
+          <div class="trans-toolbar">
+            <div class="trans-lang-switch">
+              <span class="trans-lang-badge source">
+                {locales.find(l => l.code === sourceLang)?.flag} {locales.find(l => l.code === sourceLang)?.label ?? sourceLang}
+                <Icon name="mdi:lock-outline" />
+              </span>
+              <Icon name="mdi:arrow-right" class="trans-arrow" />
+              <select id="targetLangSelect" class="trans-lang-select">
+                {locales.filter(l => l.code !== sourceLang).map(loc => (
+                  <option value={loc.code} selected={loc.code === targetLang}>{loc.flag} {loc.label}</option>
+                ))}
+              </select>
+            </div>
+            <div class="trans-toolbar__actions">
+              <Button id="saveTranslation" variant="modern" color="primary" size="sm">
+                <Icon name="mdi:content-save-outline" /> {to.save ?? "Enregistrer"}
+              </Button>
+            </div>
+          </div>
+
+          <!-- Split view -->
+          <div class="trans-split">
+            <!-- Source (read-only) -->
+            <div class="trans-col trans-col--source">
+              <div class="trans-col__header">
+                <Icon name="mdi:lock-outline" />
+                <span>{to.sourceText ?? "Texte source"} ({sourceLang.toUpperCase()})</span>
+              </div>
+              {Object.entries(sourceData).map(([key, value]) => (
+                <div class="trans-field">
+                  <label class="trans-field__label">{fieldLabels[key] || key}</label>
+                  {key === "content" || key === "description" ? (
+                    <div class="trans-field__readonly trans-field__readonly--tall">{value || "—"}</div>
+                  ) : (
+                    <div class="trans-field__readonly">{value || "—"}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <!-- Target (editable) -->
+            <div class="trans-col trans-col--target">
+              <div class="trans-col__header">
+                <Icon name="mdi:pencil-outline" />
+                <span>{to.targetText ?? "Traduction"} ({targetLang.toUpperCase()})</span>
+              </div>
+              {Object.entries(sourceData).map(([key, _]) => (
+                <div class="trans-field">
+                  <label class="trans-field__label" for={`target-${key}`}>{fieldLabels[key] || key}</label>
+                  {key === "content" || key === "description" ? (
+                    <textarea id={`target-${key}`} class="trans-field__input trans-field__input--tall" data-field={key}>{targetData[key] || ""}</textarea>
+                  ) : (
+                    <input type="text" id={`target-${key}`} class="trans-field__input" data-field={key} value={targetData[key] || ""} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
+  </div>
+</AdminLayout>
+
+<script is:inline define:vars={{ contentType, contentId, sourceLang, targetLang, orgId }}>
+(function() {
+  // Language switch
+  const langSelect = document.getElementById("targetLangSelect");
+  if (langSelect) {
+    langSelect.addEventListener("change", () => {
+      const params = new URLSearchParams(window.location.search);
+      params.set("target", langSelect.value);
+      window.location.search = params.toString();
+    });
+  }
+
+  // Save translation
+  const saveBtn = document.getElementById("saveTranslation");
+  if (saveBtn) {
+    saveBtn.addEventListener("click", async () => {
+      const fields = {};
+      document.querySelectorAll("[data-field]").forEach(el => {
+        fields[el.dataset.field] = el.value || el.textContent || "";
+      });
+
+      try {
+        const res = await fetch("/api/admin/translations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contentType,
+            contentId,
+            locale: targetLang,
+            fields,
+          }),
+        });
+        if (res.ok) {
+          if (window.showToast) window.showToast("Traduction enregistrée !", "success");
+          else alert("Traduction enregistrée !");
+        } else {
+          const data = await res.json();
+          throw new Error(data.error || "Erreur");
+        }
+      } catch (err) {
+        if (window.showToast) window.showToast(err.message, "error");
+        else alert("Erreur: " + err.message);
+      }
+    });
+  }
+})();
+</script>
+
+<style>
+  .admin-page-header { margin-bottom: 1.5rem; }
+  .admin-page-title { font-size: 1.75rem; font-weight: 800; margin: 0; }
+  .admin-page-description { font-size: 0.9375rem; color: var(--text-muted, #64748b); margin: 0.25rem 0 0; }
+
+  .trans-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; }
+  .trans-progress { min-width: 200px; }
+  .trans-progress__label { font-size: 0.8125rem; font-weight: 700; color: var(--color-primary); }
+  .trans-progress__bar {
+    height: 6px;
+    background: var(--color-bg-muted, #f0ebe5);
+    border-radius: 3px;
+    margin-top: 0.25rem;
+    overflow: hidden;
+  }
+  .trans-progress__fill {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+
+  .trans-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  /* Sidebar */
+  .trans-sidebar__card {
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--border, #e2e0dc);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    position: sticky;
+    top: 4rem;
+  }
+  .trans-sidebar__title { font-size: 0.9375rem; font-weight: 700; margin: 0 0 0.75rem; }
+  .trans-type-tabs { display: flex; gap: 0.25rem; margin-bottom: 0.75rem; }
+  .trans-type-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-muted, #64748b);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .trans-type-tab:hover { background: var(--color-bg-muted, #f0ebe5); }
+  .trans-type-tab.active { background: color-mix(in srgb, var(--color-primary) 10%, transparent); color: var(--color-primary); font-weight: 600; }
+  .trans-type-tab :global(svg) { width: 1rem; height: 1rem; }
+
+  .trans-content-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .trans-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
+  }
+  .trans-item:hover { background: var(--color-bg-muted, #f0ebe5); }
+  .trans-item.active { background: color-mix(in srgb, var(--color-primary) 10%, transparent); }
+  .trans-item__title { font-size: 0.8125rem; font-weight: 500; color: var(--color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .trans-item__locales { display: flex; gap: 0.25rem; }
+  .trans-locale-dot { font-size: 0.75rem; opacity: 0.3; }
+  .trans-locale-dot.filled { opacity: 1; }
+  .trans-empty { text-align: center; color: var(--text-muted, #64748b); padding: 1rem; font-size: 0.8125rem; }
+
+  /* Main area */
+  .trans-main { min-width: 0; }
+  .trans-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted, #64748b);
+    gap: 0.75rem;
+  }
+  .trans-placeholder :global(svg) { width: 3rem; height: 3rem; opacity: 0.4; }
+  .trans-placeholder h3 { font-size: 1.125rem; font-weight: 600; color: var(--color-text); }
+
+  /* Toolbar */
+  .trans-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--border, #e2e0dc);
+    border-radius: 0.75rem 0.75rem 0 0;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .trans-lang-switch { display: flex; align-items: center; gap: 0.75rem; }
+  .trans-lang-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+  .trans-lang-badge.source { background: var(--color-bg-muted, #f0ebe5); color: var(--color-text); }
+  .trans-lang-badge :global(svg) { width: 0.875rem; height: 0.875rem; opacity: 0.5; }
+  .trans-arrow { color: var(--text-muted, #64748b); }
+  .trans-arrow:global(svg) { width: 1.25rem; height: 1.25rem; }
+  .trans-lang-select {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--border, #e2e0dc);
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    background: var(--color-surface, #fff);
+    color: var(--color-text);
+  }
+  .trans-toolbar__actions { display: flex; gap: 0.5rem; }
+
+  /* Split view */
+  .trans-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--border, #e2e0dc);
+    border-top: none;
+    border-radius: 0 0 0.75rem 0.75rem;
+    overflow: hidden;
+  }
+  .trans-col { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
+  .trans-col--source { background: var(--color-bg-muted, #f9f7f5); border-right: 1px solid var(--border, #e2e0dc); }
+  .trans-col--target { background: var(--color-surface, #fff); }
+  .trans-col__header {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted, #64748b);
+  }
+  .trans-col__header :global(svg) { width: 0.875rem; height: 0.875rem; }
+
+  .trans-field { display: flex; flex-direction: column; gap: 0.375rem; }
+  .trans-field__label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted, #64748b); text-transform: uppercase; letter-spacing: 0.03em; }
+  .trans-field__readonly {
+    padding: 0.625rem 0.75rem;
+    background: transparent;
+    border: 1px solid var(--border, #e2e0dc);
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+  .trans-field__readonly--tall { min-height: 8rem; }
+  .trans-field__input {
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--border, #e2e0dc);
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    background: var(--color-surface, #fff);
+    font-family: inherit;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+  }
+  .trans-field__input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+  }
+  .trans-field__input--tall { min-height: 8rem; resize: vertical; }
+
+  @media (max-width: 1024px) {
+    .trans-layout { grid-template-columns: 1fr; }
+    .trans-sidebar__card { position: static; }
+    .trans-split { grid-template-columns: 1fr; }
+    .trans-col--source { border-right: none; border-bottom: 1px solid var(--border, #e2e0dc); }
+  }
+</style>

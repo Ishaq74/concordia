@@ -335,6 +335,7 @@ npm install
       - Link.astro
       - Map.astro
       - MenuDropdown.astro
+      - NotificationDropdown.astro
       - Pagination.astro
       - PlaceCard.astro
       - ProductCard.astro
@@ -510,17 +511,22 @@ npm install
           - bookings.ts
           - categories.ts
           - media.ts
+          - reviews.ts
           - services.ts
+        - translations.ts
         - users.ts
       - **auth**
         - [...all].ts
       - **auth-client**
         - forgot-password.ts
         - verification.ts
+      - notifications.ts
       - **profile**
         - index.ts
+      - search.ts
       - **services**
         - bookings.ts
+        - reviews.ts
     - **[lang]**
       - about.astro
       - **admin**
@@ -560,6 +566,7 @@ npm install
           - new.astro
           - profile.astro
           - services.astro
+          - translations.astro
           - [id].astro
         - **services**
           - **bookings**
@@ -596,6 +603,10 @@ npm install
         - **[category]**
           - [slug].astro
         - [category].astro
+      - charter.astro
+      - **citizens**
+        - index.astro
+        - [slug].astro
       - contact.astro
       - **docs**
         - **components**
@@ -640,17 +651,22 @@ npm install
           - index.astro
           - table-of-contents.astro
       - index.astro
+      - legal.astro
+      - notifications.astro
       - **organizations**
         - index.astro
         - **[slug]**
           - services.astro
         - [slug].astro
       - profile.astro
+      - search.astro
       - **services**
         - index.astro
         - **[category]**
           - [slug].astro
         - [category].astro
+      - **settings**
+        - accessibility.astro
     - **__mocks__**
       - emails.ts
   - **styles**
@@ -667,7 +683,11 @@ npm install
       - spacing.css
       - typography.css
 - **test-results**
+  - audit-run.txt
   - full-run.txt
+  - json-out.json
+  - run.txt
+  - unit-run.txt
 - **tests**
   - **a11y**
     - a11y-performance.test.ts
@@ -742,6 +762,9 @@ npm install
     - astro-schema-strict.ts
     - astro-schema.ts
   - **pages**
+    - admin-pages.test.ts
+    - charter.test.ts
+    - citizens.test.ts
     - page-render.test.ts
     - public-pages.test.ts
   - README-mocking.md
@@ -773,6 +796,10 @@ npm install
       - policy-store.test.ts
       - toast.test.ts
       - users.test.ts
+    - **api**
+      - notifications-api.test.ts
+      - search-api.test.ts
+      - translations-api.test.ts
     - **auth**
       - admin-access-control.test.ts
       - auth-client.test.ts
@@ -784,7 +811,6 @@ npm install
         - Accordion.test.ts
         - AccordionItem.test.ts
         - **__snapshots__**
-          - AccordionItem.test.ts.snap
       - **admin**
         - AdminComponents.test.ts
       - **Alert**
@@ -832,7 +858,6 @@ npm install
         - **reports**
           - axe-report-link.json
         - **__snapshots__**
-          - Link.test.ts.snap
       - **modules**
         - **blog**
           - ImageWithFallback.test.ts
@@ -850,21 +875,21 @@ npm install
       - **Sheet**
         - Sheet.test.ts
         - **__snapshots__**
-          - Sheet.test.ts.snap
       - **Skeleton**
         - Skeleton.test.ts
       - **Slider**
         - Slider.test.ts
         - **__snapshots__**
-          - Slider.test.ts.snap
       - **Table**
         - Table.test.ts
       - **Tabs**
         - Tabs.test.ts
       - **Tools**
         - Grid.test.ts
+        - Wrapper.test.ts
         - **__snapshots__**
           - Grid.test.ts.snap
+          - Wrapper.test.ts.snap
       - **Tooltip**
         - Tooltip.test.ts
       - **Video**
@@ -1738,6 +1763,9 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
   - astro-schema-strict.ts
   - astro-schema.ts
 - **pages**
+  - admin-pages.test.ts
+  - charter.test.ts
+  - citizens.test.ts
   - page-render.test.ts
   - public-pages.test.ts
 - README-mocking.md
@@ -1769,6 +1797,10 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
     - policy-store.test.ts
     - toast.test.ts
     - users.test.ts
+  - **api**
+    - notifications-api.test.ts
+    - search-api.test.ts
+    - translations-api.test.ts
   - **auth**
     - admin-access-control.test.ts
     - auth-client.test.ts
@@ -1780,7 +1812,6 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
       - Accordion.test.ts
       - AccordionItem.test.ts
       - **__snapshots__**
-        - AccordionItem.test.ts.snap
     - **admin**
       - AdminComponents.test.ts
     - **Alert**
@@ -1828,7 +1859,6 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
       - **reports**
         - axe-report-link.json
       - **__snapshots__**
-        - Link.test.ts.snap
     - **modules**
       - **blog**
         - ImageWithFallback.test.ts
@@ -1846,21 +1876,21 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
     - **Sheet**
       - Sheet.test.ts
       - **__snapshots__**
-        - Sheet.test.ts.snap
     - **Skeleton**
       - Skeleton.test.ts
     - **Slider**
       - Slider.test.ts
       - **__snapshots__**
-        - Slider.test.ts.snap
     - **Table**
       - Table.test.ts
     - **Tabs**
       - Tabs.test.ts
     - **Tools**
       - Grid.test.ts
+      - Wrapper.test.ts
       - **__snapshots__**
         - Grid.test.ts.snap
+        - Wrapper.test.ts.snap
     - **Tooltip**
       - Tooltip.test.ts
     - **Video**
@@ -2000,17 +2030,22 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
     - bookings.ts
     - categories.ts
     - media.ts
+    - reviews.ts
     - services.ts
+  - translations.ts
   - users.ts
 - **auth**
   - [...all].ts
 - **auth-client**
   - forgot-password.ts
   - verification.ts
+- notifications.ts
 - **profile**
   - index.ts
+- search.ts
 - **services**
   - bookings.ts
+  - reviews.ts
 
 #### Test file summaries
 
@@ -2539,6 +2574,87 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
   - **Services — Org scoping isolation**
     - services from different orgs are properly isolated
 
+- `tests\pages\admin-pages.test.ts`
+  - **Admin pages — org resolution logic**
+    - prefers query param org over session
+    - falls back to session org when no query param
+    - results in redirect when no org found
+  - **Admin members page — role labels and colors**
+    - has label for every defined role
+    - has badge color for every defined role
+    - counts roles correctly from member list
+  - **Admin blog page — translation map**
+    - builds translation title map correctly
+    - localization chain: lang → inLanguage → fr → en → slug
+    - blog status filters are correct
+    - blog stats count correctly
+  - **Admin bookings page — status badges**
+    - has valid Badge color for every booking status
+    - covers all 5 booking statuses
+  - **Admin bookings page — pagination**
+    - calculates total pages correctly
+    - preserves filter in pagination URL
+  - **Admin bookings page — customer/provider map**
+    - de-duplicates user lookups
+  - **Admin services page — status filters**
+    - defines 5 service statuses
+    - builds conditions correctly with status filter
+  - **Admin services page — translation batch loading**
+    - maps translations by service ID
+  - **Admin translations page — progress calculation**
+    - calculates blog translation progress (3 fields)
+    - calculates service translation progress (2 fields)
+  - **Admin translations page — locale flags**
+    - maps locale codes to flag emojis
+    - shows translated locale dots correctly
+  - **Admin pages — i18n translations**
+    - ${lang}: adminOrganizations translations accessible
+
+- `tests\pages\charter.test.ts`
+  - **Charter page — static paths**
+    - defines prerender = true and getStaticPaths for all 4 locales
+  - **Charter page — translation keys**
+  - **locale: ${lang}**
+    - has charter section in translations or uses fallback
+    - provides safe fallback for all charter keys
+  - **Charter page — localized CTA URLs**
+    - sign-up link generates correct URL per locale
+    - legal link generates correct URL per locale
+  - **Charter page — data structures**
+    - defines 4 districts
+    - defines 6 governance principles
+    - defines 4 impact stats
+    - defines 5 commitment items
+
+- `tests\pages\citizens.test.ts`
+  - **Citizens page — role helpers**
+    - roleLabel returns correct labels for known roles
+    - roleLabel returns raw role for unknown roles
+    - roleColor returns valid Badge color for known roles
+    - roleColor returns secondary for unknown roles
+    - roleColor only returns valid Badge colors
+  - **Citizens page — pagination URL builder**
+    - generates base URL without filters
+    - includes search query in URL
+    - includes role filter in URL
+    - includes both search and role in URL
+    - works for all supported locales
+  - **Citizens page — pagination math**
+    - calculates total pages correctly
+    - calculates offset correctly
+    - clamps page to min 1
+  - **Citizens page — translations**
+    - ${lang}: has no crash on citizens translations
+  - **Citizens page — districts data**
+    - defines 4 district types
+  - **Citizens page — roles dropdown**
+    - defines all + user + admin filter options
+  - **Citizens profile page — fallback chains**
+    - name fallback: fullName → name → username
+    - avatar fallback: image → avatarUrl → placeholder
+    - average rating formatted correctly
+    - member since year from createdAt
+
 - `tests\pages\page-render.test.ts`
   - **Tests**
     - GET ${path} renders without error
@@ -2725,6 +2841,19 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
     - handles empty string
     - handles Arabic text
     - handles mixed unicode and latin
+  - **guardPermission()**
+    - returns null for admin user with any permission
+    - returns null for author with article permissions
+    - returns 403 for citizen without article permissions
+    - returns 401 when user is null
+    - returns 403 for moderator without article permissions
+    - returns null for moderator with moderation permissions
+  - **guardOrgOwnership()**
+    - returns null for admin user (bypass)
+    - returns null when resource has no org
+    - returns null when org matches
+    - returns 403 when org does not match
+    - returns 403 when user has no active org
 
 - `tests\unit\admin\config.test.ts`
   - **admin/config**
@@ -2936,6 +3065,53 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
     - impersonates a user by ID
   - **stopImpersonating()**
     - stops impersonation
+
+- `tests\unit\api\notifications-api.test.ts`
+  - **GET /api/notifications**
+    - returns 401 when not authenticated
+    - returns notifications for authenticated user
+    - parses page and limit from query params
+    - clamps limit to max 50
+    - clamps page to min 1
+    - filters by type when provided
+    - filters by unread when unread=true
+  - **PATCH /api/notifications**
+    - returns 401 when not authenticated
+    - marks a single notification as read
+    - marks all notifications as read
+    - returns 400 for invalid action
+  - **DELETE /api/notifications**
+    - returns 401 when not authenticated
+    - returns 400 when notification id is missing
+    - deletes notification by id
+
+- `tests\unit\api\search-api.test.ts`
+  - **GET /api/search**
+    - returns empty results for empty query
+    - returns empty results for query shorter than 2 chars
+    - searches services when type=services
+    - searches blog posts when type=blog
+    - searches organizations when type=organizations
+    - searches citizens when type=citizens
+    - searches all types when type=all
+    - defaults to type=all and lang=fr
+    - clamps page to min 1
+    - clamps limit to max 20
+    - generates correct URLs for results
+    - handles database errors gracefully
+
+- `tests\unit\api\translations-api.test.ts`
+  - **POST /api/admin/translations**
+    - returns 401 when not authenticated
+    - returns 400 when required fields are missing
+    - returns 400 for invalid content type
+  - **blog translations**
+    - inserts new blog translation when none exists
+    - updates existing blog translation
+  - **services translations**
+    - inserts new service translation when none exists
+    - updates existing service translation
+    - handles database errors gracefully
 
 - `tests\unit\auth\admin-access-control.test.ts`
   - **auth/admin-access-control**
@@ -3606,6 +3782,145 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
     - should apply accessibility and state attributes
     - should render deterministically and be stable
     - should prevent XSS in custom classes
+  - **All variants**
+    - should apply variant class u-${v}
+  - **All colors**
+    - should apply color class u-${c}
+  - **All display modes**
+    - should render display=${display} with class ${cls}
+    - should apply grid-template-columns for inline-grid
+  - **All xAlign values**
+    - should map xAlign=${xAlign} to u-justify-${expected}
+  - **All yAlign values**
+    - should map yAlign=${yAlign} to u-items-${expected}
+  - **All spacing tokens for gap**
+    - should apply gap token u-gap-${token}
+  - **Spacing tokens for padding and margin**
+    - should apply padding token u-p-${token}
+    - should apply margin token u-m-${token}
+  - **rowGap and columnGap tokens**
+    - should apply rowGap token u-rowgap-${token}
+    - should apply columnGap token u-colgap-${token}
+  - **yPadding/xPadding shortcuts**
+    - should apply yPadding to both pt and pb
+    - should apply xPadding to both pl and pr
+    - should let paddingTop override yPadding
+    - should apply yMargin to both mt and mb
+    - should apply xMargin to both ml and mr
+  - **Border types**
+    - should render border with borderType=${bt}
+    - should not apply border style when border=false
+  - **gridTemplateColumns**
+    - should use custom gridTemplateColumns string
+    - should prioritize gridTemplateColumns over cols
+  - **Size props as inline styles**
+    - should apply width as inline style
+    - should apply height as inline style
+    - should apply maxWidth as inline style
+    - should apply minHeight as inline style
+    - should use hFull for 100% height
+    - should use wFull for 100% width
+    - should default to auto for height/width when not specified
+  - **Overflow**
+    - should default to overflow hidden
+    - should set overflow visible when overflowHidden=false
+  - **zIndex**
+    - should add z-index to inline style
+    - should accept numeric zIndex
+  - **Background props**
+    - should apply backgroundColor
+    - should apply backgroundImage as url()
+  - **clipPath**
+    - should apply clipPathTop
+    - should apply clipPathBottom when clipPathTop is none
+  - **Inline style passthrough**
+    - should append custom style to the style string
+  - **Animation classes**
+    - should apply animate class
+    - should apply hover animation with prefix
+    - should apply focus animation with prefix
+    - should apply active animation with prefix
+    - should apply transition duration and timing
+  - **id prop**
+    - should render id attribute on the element
+  - **All flex directions**
+    - should apply flex direction ${dir}
+  - **All flex wrap modes**
+    - should apply flex wrap ${w}
+  - **Grid column count**
+    - should generate u-cols-${n} for cols=${n}
+  - **Text align**
+    - should apply text-align=${ta}
+    - snapshot: default render
+    - snapshot: full grid with all props
+
+- `tests\unit\components\Tools\Wrapper.test.ts`
+  - **Wrapper.astro Component**
+    - should render a default section with block display
+  - **All display modes**
+    - should render display=${display} with class ${cls}
+  - **All variants**
+    - should apply variant class wrapper-variant-${v}
+  - **All colors**
+    - should apply color class wrapper-color-${c}
+  - **id prop**
+    - should render id attribute on the element
+    - should not render id when not provided
+  - **Polymorphic tags**
+    - should render as <${tag}>
+  - **Grid configuration**
+    - should set grid-template-columns for grid display
+    - should handle autoFit
+    - should handle autoFill
+  - **Gap prop**
+    - should apply gap style for token ${token}
+    - should not add gap style when not provided
+  - **Alignment**
+    - should apply justify-content from xAlign
+    - should override both axes when align=center
+    - should apply alignItems from yAlign
+  - **Spacing tokens**
+    - should apply padding as inline style using tokens
+    - should apply individual padding overrides
+    - should apply margin as inline style using tokens
+    - should use aligned token names (xs instead of xsm, xxl instead of 2xl)
+  - **Size props**
+    - should apply width
+    - should apply height
+    - should apply maxWidth
+    - should apply minHeight
+  - **Border**
+    - should apply border class for borderType=${bt}
+    - should not apply border when border=false
+  - **Box shadow**
+    - should apply known shadow class for sm
+    - should apply known shadow class for lg
+    - should not generate invalid class names when boxShadow is not provided
+  - **Background video**
+    - should render video element when backgroundVideo is set
+    - should not render video element when backgroundVideo is not set
+  - **Overlay**
+    - should render overlay when overlayColor is provided
+    - should not render overlay when overlayColor is not provided
+    - should apply custom overlayOpacity
+  - **Inline style passthrough**
+    - should append custom style to the style string
+    - should not create invalid style entries from inlineStyle
+  - **Animation**
+    - should apply animate class
+    - should apply hover animation class
+    - should apply transition duration/timing
+  - **Accessibility and state**
+    - should apply ariaLabel
+    - should apply disabled state
+    - should apply hidden state
+  - **Flex configuration**
+    - should apply flexDirection
+    - should apply justifyItems
+    - should prevent XSS in custom classes
+    - should render deterministically
+    - snapshot: default render
+    - snapshot: full grid with all props
 
 - `tests\unit\components\Tooltip\Tooltip.test.ts`
   - **Tooltip — Rendering**

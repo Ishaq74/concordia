@@ -10,6 +10,12 @@ import Button from "@components/ui/Button.astro";
 import Input from "@components/ui/Form/Input.astro";
 import Label from "@components/ui/Form/Label.astro";
 import Select from "@components/ui/Form/Select.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
 import { Icon } from "astro-icon/components";
 import { getDrizzle } from "@database/drizzle";
 import { member, user as userTable, invitation } from "@database/schemas/auth-schema";
@@ -56,6 +62,9 @@ const [members, invitations] = await Promise.all([
 
 const pendingInvitations = invitations.filter(i => i.status === "pending");
 
+// Role breakdown
+const roleCounts = members.reduce((acc, m) => { acc[m.role] = (acc[m.role] || 0) + 1; return acc; }, {} as Record<string, number>);
+
 const roleLabels: Record<string, string> = {
   owner: to.roleOwner ?? "Propriétaire",
   admin: to.roleAdmin ?? "Administrateur",
@@ -64,13 +73,14 @@ const roleLabels: Record<string, string> = {
   manager: to.roleManager ?? "Gestionnaire",
   translator: to.roleTranslator ?? "Traducteur",
 };
-const roleBadgeColor: Record<string, string> = {
+type BadgeColor = "default" | "primary" | "secondary" | "accent" | "success" | "warning" | "error";
+const roleBadgeColor: Record<string, BadgeColor> = {
   owner: "warning",
   admin: "primary",
   member: "secondary",
-  editor: "info",
+  editor: "accent",
   manager: "success",
-  translator: "accent",
+  translator: "default",
 };
 ---
 
@@ -104,7 +114,29 @@ const roleBadgeColor: Record<string, string> = {
         </Card>
         <Card variant="modern" elevation="sm">
           <CardContent>
-            <div class="stat-compact">
+            <div class="stat-compact stat-admin">
+              <Icon name="mdi:shield-account" />
+              <div>
+                <span class="stat-num">{(roleCounts.admin ?? 0) + (roleCounts.owner ?? 0)}</span>
+                <span class="stat-label">{to.admins ?? "Administrateurs"}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card variant="modern" elevation="sm">
+          <CardContent>
+            <div class="stat-compact stat-editor">
+              <Icon name="mdi:pencil-outline" />
+              <div>
+                <span class="stat-num">{roleCounts.editor ?? 0}</span>
+                <span class="stat-label">{to.editors ?? "Rédacteurs"}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card variant="modern" elevation="sm">
+          <CardContent>
+            <div class="stat-compact stat-invite">
               <Icon name="mdi:email-outline" />
               <div>
                 <span class="stat-num">{pendingInvitations.length}</span>
@@ -115,58 +147,77 @@ const roleBadgeColor: Record<string, string> = {
         </Card>
       </div>
 
+      <!-- Filter toolbar -->
+      <Card variant="modern" elevation="sm" class="filter-bar">
+        <CardContent>
+          <div class="filter-row">
+            <div class="filter-field filter-search">
+              <Label htmlFor="member-search">{to.searchMembers ?? "Rechercher"}</Label>
+              <Input id="member-search" type="search" placeholder={to.searchMembers ?? "Rechercher un membre..."} icon="mdi:magnify" iconPosition="left" />
+            </div>
+            <div class="filter-field">
+              <Label htmlFor="role-filter">{to.roleLabel ?? "Rôle"}</Label>
+              <Select id="role-filter">
+                <option value="">{to.allRoles ?? "Tous les rôles"}</option>
+                {Object.entries(roleLabels).map(([val, label]) => (
+                  <option value={val}>{label}</option>
+                ))}
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <!-- Members table -->
       <Card variant="modern" elevation="sm">
         <CardContent>
           <h2 class="section-title"><Icon name="mdi:account-group" /> {to.currentMembers ?? "Membres actuels"}</h2>
-          <div class="table-responsive">
-            <table class="admin-table">
-              <thead>
-                <tr>
-                  <th>{to.member ?? "Membre"}</th>
-                  <th>{to.role ?? "Rôle"}</th>
-                  <th>{to.joinedAt ?? "Rejoint le"}</th>
-                  <th>{to.actions ?? "Actions"}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {members.map(m => (
-                  <tr data-member-id={m.id}>
-                    <td>
-                      <div class="member-cell">
-                        {m.image ? (
-                          <img src={m.image} alt={m.name} class="member-avatar" />
-                        ) : (
-                          <div class="member-avatar-placeholder">{m.name.charAt(0)}</div>
-                        )}
-                        <div>
-                          <strong class="member-name">{m.name}</strong>
-                          <small class="member-email">{m.email}</small>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="role-selector" data-member-id={m.id}>
-                        <select class="role-select" data-current={m.role}>
-                          {Object.entries(roleLabels).map(([val, label]) => (
-                            <option value={val} selected={val === m.role}>{label}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </td>
-                    <td class="date-cell">{m.createdAt.toLocaleDateString(lang, { day: "numeric", month: "short", year: "numeric" })}</td>
-                    <td>
-                      {m.role !== "owner" && (
-                        <button class="btn-icon btn-danger remove-member-btn" data-member-id={m.id} data-name={m.name} title={to.removeMember ?? "Retirer"}>
-                          <Icon name="mdi:account-remove" />
-                        </button>
+          <Table variant="modern" striped>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{to.member ?? "Membre"}</TableHead>
+                <TableHead>{to.role ?? "Rôle"}</TableHead>
+                <TableHead>{to.joinedAt ?? "Rejoint le"}</TableHead>
+                <TableHead>{to.actions ?? "Actions"}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {members.map(m => (
+                <TableRow data-member-id={m.id}>
+                  <TableCell>
+                    <div class="member-cell">
+                      {m.image ? (
+                        <img src={m.image} alt={m.name} class="member-avatar" />
+                      ) : (
+                        <div class="member-avatar-placeholder">{m.name.charAt(0)}</div>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      <div>
+                        <strong class="member-name">{m.name}</strong>
+                        <small class="member-email">{m.email}</small>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div class="role-selector" data-member-id={m.id}>
+                      <select class="role-select" data-current={m.role}>
+                        {Object.entries(roleLabels).map(([val, label]) => (
+                          <option value={val} selected={val === m.role}>{label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </TableCell>
+                  <TableCell className="date-cell">{m.createdAt.toLocaleDateString(lang, { day: "numeric", month: "short", year: "numeric" })}</TableCell>
+                  <TableCell>
+                    {m.role !== "owner" && (
+                      <button class="btn-icon btn-danger remove-member-btn" data-member-id={m.id} data-name={m.name} title={to.removeMember ?? "Retirer"}>
+                        <Icon name="mdi:account-remove" />
+                      </button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
           {members.length === 0 && (
             <div class="empty-state">
               <Icon name="mdi:account-off" />
@@ -181,34 +232,32 @@ const roleBadgeColor: Record<string, string> = {
         <Card variant="modern" elevation="sm">
           <CardContent>
             <h2 class="section-title"><Icon name="mdi:email-fast" /> {to.pendingInvitations ?? "Invitations en attente"}</h2>
-            <div class="table-responsive">
-              <table class="admin-table">
-                <thead>
-                  <tr>
-                    <th>{to.email ?? "Email"}</th>
-                    <th>{to.role ?? "Rôle"}</th>
-                    <th>{to.sentAt ?? "Envoyée le"}</th>
-                    <th>{to.expiresAt ?? "Expire le"}</th>
-                    <th>{to.actions ?? "Actions"}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pendingInvitations.map(inv => (
-                    <tr data-invitation-id={inv.id}>
-                      <td><strong>{inv.email}</strong></td>
-                      <td><Badge variant="modern" color={(roleBadgeColor[inv.role ?? "member"] ?? "secondary") as any}>{roleLabels[inv.role ?? "member"] ?? inv.role}</Badge></td>
-                      <td class="date-cell">{inv.createdAt.toLocaleDateString(lang, { day: "numeric", month: "short" })}</td>
-                      <td class="date-cell">{inv.expiresAt.toLocaleDateString(lang, { day: "numeric", month: "short" })}</td>
-                      <td>
-                        <button class="btn-icon btn-danger cancel-invite-btn" data-inv-id={inv.id} title={to.cancelInvitation ?? "Annuler"}>
-                          <Icon name="mdi:close-circle" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <Table variant="modern" striped>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{to.email ?? "Email"}</TableHead>
+                  <TableHead>{to.role ?? "Rôle"}</TableHead>
+                  <TableHead>{to.sentAt ?? "Envoyée le"}</TableHead>
+                  <TableHead>{to.expiresAt ?? "Expire le"}</TableHead>
+                  <TableHead>{to.actions ?? "Actions"}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pendingInvitations.map(inv => (
+                  <TableRow data-invitation-id={inv.id}>
+                    <TableCell><strong>{inv.email}</strong></TableCell>
+                    <TableCell><Badge variant="modern" color={roleBadgeColor[inv.role ?? "member"] ?? "secondary"}>{roleLabels[inv.role ?? "member"] ?? inv.role}</Badge></TableCell>
+                    <TableCell className="date-cell">{inv.createdAt.toLocaleDateString(lang, { day: "numeric", month: "short" })}</TableCell>
+                    <TableCell className="date-cell">{inv.expiresAt.toLocaleDateString(lang, { day: "numeric", month: "short" })}</TableCell>
+                    <TableCell>
+                      <button class="btn-icon btn-danger cancel-invite-btn" data-inv-id={inv.id} title={to.cancelInvitation ?? "Annuler"}>
+                        <Icon name="mdi:close-circle" />
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       )}
@@ -383,6 +432,26 @@ const roleBadgeColor: Record<string, string> = {
         } catch (e) { toast(e.message, "error"); }
       });
     });
+
+    // --- Client-side filter ---
+    const searchInput = document.getElementById("member-search");
+    const roleFilter = document.getElementById("role-filter");
+    const rows = Array.from(document.querySelectorAll("tr.table-row")).filter(row => row.querySelector(".member-name"));
+
+    function applyFilter() {
+      const q = (searchInput?.value ?? "").toLowerCase();
+      const role = roleFilter?.value ?? "";
+      rows.forEach(row => {
+        const name = (row.querySelector(".member-name")?.textContent ?? "").toLowerCase();
+        const email = (row.querySelector(".member-email")?.textContent ?? "").toLowerCase();
+        const memberRole = row.querySelector(".role-select")?.getAttribute("data-current") ?? "";
+        const matchSearch = !q || name.includes(q) || email.includes(q);
+        const matchRole = !role || memberRole === role;
+        row.style.display = matchSearch && matchRole ? "" : "none";
+      });
+    }
+    searchInput?.addEventListener("input", applyFilter);
+    roleFilter?.addEventListener("change", applyFilter);
   });
 </script>
 
@@ -395,20 +464,22 @@ const roleBadgeColor: Record<string, string> = {
   .members-main { display: flex; flex-direction: column; gap: 1.5rem; }
   .members-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
 
-  .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
   .stat-compact { display: flex; align-items: center; gap: 0.75rem; }
   .stat-compact :global(svg) { width: 1.5rem; height: 1.5rem; color: var(--color-primary, #eab308); }
+  .stat-admin :global(svg) { color: #8b5cf6; }
+  .stat-editor :global(svg) { color: #3b82f6; }
+  .stat-invite :global(svg) { color: #f59e0b; }
   .stat-num { display: block; font-size: 1.5rem; font-weight: 800; line-height: 1; }
   .stat-label { font-size: 0.8125rem; color: var(--text-muted, #64748b); }
 
+  .filter-bar { margin-bottom: 0; }
+  .filter-row { display: flex; align-items: flex-end; gap: 1rem; }
+  .filter-field { flex: 1; min-width: 180px; }
+  .filter-search { flex: 2; }
+
   .section-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; margin: 0 0 1rem; }
   .section-title :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary, #eab308); }
-
-  .table-responsive { overflow-x: auto; }
-  .admin-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-  .admin-table th { text-align: left; font-weight: 600; padding: 0.75rem; border-bottom: 2px solid var(--border-default, #e2e8f0); color: var(--text-muted, #64748b); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
-  .admin-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-default, #f1f5f9); vertical-align: middle; }
-  .admin-table tr:hover td { background: var(--bg-muted, rgba(241,245,249,0.5)); }
 
   .member-cell { display: flex; align-items: center; gap: 0.75rem; }
   .member-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }

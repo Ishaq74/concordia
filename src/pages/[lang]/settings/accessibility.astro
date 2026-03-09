@@ -1,0 +1,309 @@
+---
+// src/pages/[lang]/settings/accessibility.astro — Paramètres d'accessibilité
+// Stockage côté client (localStorage) — pas de DB nécessaire
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: "fr" } },
+    { params: { lang: "en" } },
+    { params: { lang: "ar" } },
+    { params: { lang: "es" } },
+  ];
+}
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+---
+
+<BaseLayout title={t.a11y?.metaTitle ?? "Paramètres d'Accessibilité — Concordia"} lang={lang}>
+  <main class="a11y-page">
+    <section class="a11y-hero">
+      <Badge variant="retro" color="accent">{t.a11y?.heroLabel ?? "Accessibilité"}</Badge>
+      <h1>{t.a11y?.heroTitle ?? "Paramètres d'Accessibilité"}</h1>
+      <p>{t.a11y?.heroSubtitle ?? "Personnalisez votre expérience pour un confort optimal."}</p>
+    </section>
+
+    <div class="a11y-layout">
+      <div class="a11y-settings">
+        {/* ===== CONFORT VISUEL ===== */}
+        <Card variant="retro">
+          <CardContent>
+            <h2 class="a11y-section-title"><Icon name="mdi:eye-outline" size={22} /> {t.a11y?.visualTitle ?? "Confort Visuel"}</h2>
+
+            <div class="a11y-option">
+              <div class="a11y-option__info">
+                <strong>{t.a11y?.highContrast ?? "Mode contraste élevé"}</strong>
+                <span>{t.a11y?.highContrastDesc ?? "Augmente le contraste des couleurs pour une meilleure lisibilité."}</span>
+              </div>
+              <label class="a11y-toggle" aria-label="Mode contraste élevé">
+                <input type="checkbox" id="toggle-contrast" />
+                <span class="a11y-toggle__slider"></span>
+              </label>
+            </div>
+
+            <div class="a11y-option">
+              <div class="a11y-option__info">
+                <strong>{t.a11y?.dyslexiaFont ?? "Police dyslexie"}</strong>
+                <span>{t.a11y?.dyslexiaFontDesc ?? "Utilise une police conçue pour faciliter la lecture en cas de dyslexie."}</span>
+              </div>
+              <label class="a11y-toggle" aria-label="Police dyslexie">
+                <input type="checkbox" id="toggle-dyslexia" />
+                <span class="a11y-toggle__slider"></span>
+              </label>
+            </div>
+
+            <div class="a11y-option a11y-option--column">
+              <div class="a11y-option__info">
+                <strong>{t.a11y?.fontSize ?? "Taille de police"}</strong>
+                <span>{t.a11y?.fontSizeDesc ?? "Ajustez la taille du texte sur l'ensemble du site."}</span>
+              </div>
+              <div class="a11y-slider-wrap">
+                <span class="a11y-slider-label">Aa</span>
+                <input type="range" id="slider-fontsize" min="80" max="150" value="100" step="5" aria-label="Taille de police" />
+                <span class="a11y-slider-label a11y-slider-label--large">Aa</span>
+                <output id="output-fontsize" class="a11y-slider-value">100%</output>
+              </div>
+            </div>
+
+            <div class="a11y-option">
+              <div class="a11y-option__info">
+                <strong>{t.a11y?.reducedMotion ?? "Réduire les animations"}</strong>
+                <span>{t.a11y?.reducedMotionDesc ?? "Désactive les transitions et animations pour réduire les stimuli visuels."}</span>
+              </div>
+              <label class="a11y-toggle" aria-label="Réduire les animations">
+                <input type="checkbox" id="toggle-motion" />
+                <span class="a11y-toggle__slider"></span>
+              </label>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ===== NAVIGATION ===== */}
+        <Card variant="retro">
+          <CardContent>
+            <h2 class="a11y-section-title"><Icon name="mdi:keyboard-outline" size={22} /> {t.a11y?.navTitle ?? "Navigation"}</h2>
+
+            <div class="a11y-option">
+              <div class="a11y-option__info">
+                <strong>{t.a11y?.focusHighlight ?? "Surlignage du focus"}</strong>
+                <span>{t.a11y?.focusHighlightDesc ?? "Affiche un contour visible autour de l'élément actif lors de la navigation au clavier."}</span>
+              </div>
+              <label class="a11y-toggle" aria-label="Surlignage du focus">
+                <input type="checkbox" id="toggle-focus" checked />
+                <span class="a11y-toggle__slider"></span>
+              </label>
+            </div>
+
+            <div class="a11y-option">
+              <div class="a11y-option__info">
+                <strong>{t.a11y?.screenReader ?? "Optimisation lecteur d'écran"}</strong>
+                <span>{t.a11y?.screenReaderDesc ?? "Ajoute des descriptions supplémentaires et des repères ARIA pour les technologies d'assistance."}</span>
+              </div>
+              <label class="a11y-toggle" aria-label="Optimisation lecteur d'écran">
+                <input type="checkbox" id="toggle-sr" />
+                <span class="a11y-toggle__slider"></span>
+              </label>
+            </div>
+
+            <div class="a11y-option">
+              <div class="a11y-option__info">
+                <strong>{t.a11y?.largeClickTargets ?? "Zones cliquables élargies"}</strong>
+                <span>{t.a11y?.largeClickTargetsDesc ?? "Agrandit les boutons et liens pour faciliter l'interaction tactile et motrice."}</span>
+              </div>
+              <label class="a11y-toggle" aria-label="Zones cliquables élargies">
+                <input type="checkbox" id="toggle-targets" />
+                <span class="a11y-toggle__slider"></span>
+              </label>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ===== LANGUE & RÉGION ===== */}
+        <Card variant="retro">
+          <CardContent>
+            <h2 class="a11y-section-title"><Icon name="mdi:translate" size={22} /> {t.a11y?.regionTitle ?? "Langue & Région"}</h2>
+
+            <div class="a11y-option">
+              <div class="a11y-option__info">
+                <strong>{t.a11y?.language ?? "Langue d'affichage"}</strong>
+              </div>
+              <select id="select-language" class="a11y-select">
+                <option value="fr" selected={lang === "fr"}>Français</option>
+                <option value="en" selected={lang === "en"}>English</option>
+                <option value="ar" selected={lang === "ar"}>العربية</option>
+                <option value="es" selected={lang === "es"}>Español</option>
+              </select>
+            </div>
+
+            <div class="a11y-option">
+              <div class="a11y-option__info">
+                <strong>{t.a11y?.dateFormat ?? "Format de date"}</strong>
+              </div>
+              <select id="select-dateformat" class="a11y-select">
+                <option value="dd/mm/yyyy">JJ/MM/AAAA</option>
+                <option value="mm/dd/yyyy">MM/JJ/AAAA</option>
+                <option value="yyyy-mm-dd">AAAA-MM-JJ</option>
+              </select>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div class="a11y-actions">
+          <Button variant="retro" color="secondary" id="btn-reset" icon={{ name: "mdi:restore", side: "left" }}>
+            {t.a11y?.resetBtn ?? "Rétablir les paramètres par défaut"}
+          </Button>
+        </div>
+      </div>
+
+      {/* ===== PRÉVISUALISATION ===== */}
+      <aside class="a11y-preview" aria-label="Prévisualisation">
+        <Card variant="retro">
+          <CardContent>
+            <h3 class="a11y-preview__title"><Icon name="mdi:eye-outline" size={18} /> {t.a11y?.previewTitle ?? "Aperçu en direct"}</h3>
+            <div class="a11y-preview__box" id="preview-box">
+              <div class="a11y-preview__card">
+                <div class="a11y-preview__img" aria-hidden="true"></div>
+                <h4>{t.a11y?.previewEventTitle ?? "Atelier Poterie Collaborative"}</h4>
+                <p>{t.a11y?.previewEventDesc ?? "Rejoignez un atelier convivial de poterie dans le quartier de Belleville. Matériel fourni."}</p>
+                <div class="a11y-preview__meta">
+                  <span><Icon name="mdi:calendar" size={14} /> 15 mars 2026</span>
+                  <span><Icon name="mdi:map-marker" size={14} /> Paris 20e</span>
+                </div>
+                <button class="a11y-preview__btn">{t.a11y?.previewCta ?? "S'inscrire"}</button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </aside>
+    </div>
+  </main>
+</BaseLayout>
+
+<script is:inline>
+(function() {
+  const STORAGE_KEY = 'concordia_a11y';
+  const defaults = { contrast: false, dyslexia: false, fontSize: 100, motion: false, focus: true, sr: false, targets: false, dateFormat: 'dd/mm/yyyy' };
+
+  function load() {
+    try { return { ...defaults, ...JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') }; } catch { return { ...defaults }; }
+  }
+  function save(prefs) { localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs)); apply(prefs); }
+  function apply(p) {
+    const root = document.documentElement;
+    root.classList.toggle('a11y-high-contrast', p.contrast);
+    root.classList.toggle('a11y-dyslexia', p.dyslexia);
+    root.classList.toggle('a11y-reduced-motion', p.motion);
+    root.classList.toggle('a11y-focus-visible', p.focus);
+    root.classList.toggle('a11y-sr-optimized', p.sr);
+    root.classList.toggle('a11y-large-targets', p.targets);
+    root.style.fontSize = p.fontSize + '%';
+    const box = document.getElementById('preview-box');
+    if (box) {
+      box.classList.toggle('preview--contrast', p.contrast);
+      box.classList.toggle('preview--dyslexia', p.dyslexia);
+      box.style.fontSize = p.fontSize + '%';
+    }
+  }
+
+  const prefs = load();
+  apply(prefs);
+
+  // Bind toggles
+  const bindings = [
+    ['toggle-contrast', 'contrast'], ['toggle-dyslexia', 'dyslexia'],
+    ['toggle-motion', 'motion'], ['toggle-focus', 'focus'],
+    ['toggle-sr', 'sr'], ['toggle-targets', 'targets'],
+  ];
+  bindings.forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) { el.checked = prefs[key]; el.addEventListener('change', () => { prefs[key] = el.checked; save(prefs); }); }
+  });
+
+  // Font size slider
+  const slider = document.getElementById('slider-fontsize');
+  const output = document.getElementById('output-fontsize');
+  if (slider) { slider.value = prefs.fontSize; if (output) output.textContent = prefs.fontSize + '%'; slider.addEventListener('input', () => { prefs.fontSize = parseInt(slider.value); if (output) output.textContent = prefs.fontSize + '%'; save(prefs); }); }
+
+  // Date format
+  const dfSel = document.getElementById('select-dateformat');
+  if (dfSel) { dfSel.value = prefs.dateFormat; dfSel.addEventListener('change', () => { prefs.dateFormat = dfSel.value; save(prefs); }); }
+
+  // Language switch
+  const langSel = document.getElementById('select-language');
+  if (langSel) { langSel.addEventListener('change', () => { const newLang = langSel.value; const path = window.location.pathname.replace(/^\/[a-z]{2}\//, '/' + newLang + '/'); window.location.href = path; }); }
+
+  // Reset
+  const resetBtn = document.getElementById('btn-reset');
+  if (resetBtn) { resetBtn.addEventListener('click', () => {
+    localStorage.removeItem(STORAGE_KEY);
+    Object.assign(prefs, defaults); apply(prefs);
+    bindings.forEach(([id, key]) => { const el = document.getElementById(id); if (el) el.checked = defaults[key]; });
+    if (slider) slider.value = defaults.fontSize;
+    if (output) output.textContent = defaults.fontSize + '%';
+    if (dfSel) dfSel.value = defaults.dateFormat;
+  }); }
+})();
+</script>
+
+<style>
+  .a11y-page { max-width: 72rem; margin: 0 auto; padding: 0 var(--space-4, 1rem) var(--space-12, 3rem); }
+  .a11y-hero { text-align: center; padding: var(--space-10, 2.5rem) 0 var(--space-6, 1.5rem); }
+  .a11y-hero h1 { font-size: clamp(1.5rem, 4vw, 2.25rem); margin: var(--space-3, .75rem) 0 0; }
+  .a11y-hero p { color: var(--text-secondary, #555); margin-top: 0.5rem; }
+
+  .a11y-layout { display: grid; grid-template-columns: 1fr 320px; gap: var(--space-6, 1.5rem); align-items: start; }
+  @media (max-width: 900px) { .a11y-layout { grid-template-columns: 1fr; } .a11y-preview { order: -1; } }
+
+  .a11y-settings { display: flex; flex-direction: column; gap: var(--space-4, 1rem); }
+  .a11y-section-title { font-size: 1.125rem; display: flex; align-items: center; gap: 0.4rem; margin: 0 0 var(--space-4, 1rem); padding-bottom: var(--space-2, .5rem); border-bottom: 1px solid var(--border, #e5e5e5); }
+
+  .a11y-option { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3, .75rem); padding: var(--space-3, .75rem) 0; border-bottom: 1px solid var(--border-light, #f0f0f0); }
+  .a11y-option:last-child { border-bottom: none; }
+  .a11y-option--column { flex-direction: column; align-items: stretch; }
+  .a11y-option__info { flex: 1; }
+  .a11y-option__info strong { display: block; font-size: 0.95rem; }
+  .a11y-option__info span { font-size: 0.825rem; color: var(--text-muted, #888); }
+
+  .a11y-toggle { position: relative; display: inline-block; width: 48px; height: 26px; flex-shrink: 0; }
+  .a11y-toggle input { opacity: 0; width: 0; height: 0; }
+  .a11y-toggle__slider { position: absolute; inset: 0; cursor: pointer; background: var(--bg-muted, #d4d4d4); border-radius: 26px; transition: background 0.2s; }
+  .a11y-toggle__slider::before { content: ""; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: white; top: 3px; left: 3px; transition: transform 0.2s; }
+  .a11y-toggle input:checked + .a11y-toggle__slider { background: var(--color-primary, #b85c38); }
+  .a11y-toggle input:checked + .a11y-toggle__slider::before { transform: translateX(22px); }
+  .a11y-toggle input:focus-visible + .a11y-toggle__slider { outline: 2px solid var(--color-primary, #b85c38); outline-offset: 2px; }
+
+  .a11y-slider-wrap { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+  .a11y-slider-wrap input[type="range"] { flex: 1; accent-color: var(--color-primary, #b85c38); }
+  .a11y-slider-label { font-size: 0.875rem; color: var(--text-muted, #888); }
+  .a11y-slider-label--large { font-size: 1.25rem; font-weight: 600; }
+  .a11y-slider-value { min-width: 3rem; text-align: center; font-weight: 600; font-size: 0.9rem; color: var(--color-primary, #b85c38); }
+
+  .a11y-select { padding: 0.4rem 0.75rem; border: 1px solid var(--border, #d4d4d4); border-radius: var(--radius-md, 6px); font-size: 0.9rem; background: var(--bg-surface, #fff); }
+
+  .a11y-actions { display: flex; justify-content: flex-end; padding-top: var(--space-2, .5rem); }
+
+  /* Preview */
+  .a11y-preview { position: sticky; top: 5rem; }
+  .a11y-preview__title { font-size: 0.95rem; display: flex; align-items: center; gap: 0.3rem; margin-bottom: var(--space-3, .75rem); }
+  .a11y-preview__box { background: var(--bg-surface, #fff); border: 1px solid var(--border, #eee); border-radius: var(--radius-md, 8px); padding: var(--space-3, .75rem); transition: all 0.3s; }
+  .a11y-preview__card { }
+  .a11y-preview__img { height: 120px; border-radius: var(--radius-sm, 4px); background: linear-gradient(135deg, var(--color-primary-soft, #f0e0d6), var(--bg-muted, #e8e0d6)); margin-bottom: var(--space-2, .5rem); }
+  .a11y-preview__card h4 { font-size: 1rem; margin: 0 0 0.25rem; }
+  .a11y-preview__card p { font-size: 0.825rem; color: var(--text-secondary, #555); margin: 0 0 0.5rem; line-height: 1.5; }
+  .a11y-preview__meta { display: flex; gap: 0.75rem; font-size: 0.75rem; color: var(--text-muted, #888); margin-bottom: 0.5rem; }
+  .a11y-preview__meta span { display: flex; align-items: center; gap: 0.2rem; }
+  .a11y-preview__btn { width: 100%; padding: 0.5rem; background: var(--color-primary, #b85c38); color: white; border: none; border-radius: var(--radius-md, 6px); cursor: pointer; font-size: 0.875rem; font-weight: 500; }
+
+  /* Preview states */
+  .preview--contrast { filter: contrast(1.5); }
+  .preview--dyslexia { font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif; }
+</style>

@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { json, guardAdmin } from "@lib/admin/api-helpers";
+import { json, guardAdmin, guardPermission } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import { servicesBookings, servicesListings, servicesTranslations } from "@database/schemas";
 import { user } from "@database/schemas/auth-schema";
@@ -102,6 +102,10 @@ export const GET: APIRoute = async ({ request, locals }) => {
 export const PATCH: APIRoute = async ({ request, locals }) => {
   const guard = guardAdmin(locals);
   if (guard) return guard;
+
+  // Booking management permission check
+  const permGuard = guardPermission(locals, "booking.manage_own_service");
+  if (permGuard) return permGuard;
 
   let payload: Record<string, unknown>;
   try {

@@ -6,11 +6,11 @@ import { describe, it, expect, beforeAll } from 'vitest'
 import { getTestDb } from '@tests/config/test-db'
 import { sql } from 'drizzle-orm'
 import {
-  user, session, account, verification, organization, member, invitation,
-  blogPosts, blogAuthors, blogCategories, blogComments, blogMedia, blogOrganizations, blogTranslations,
+  user, session, account, verification, organization, member,
+  blogPosts, blogAuthors, blogCategories, blogComments, blogMedia, blogOrganizations,
   profile,
   servicesListings, servicesCategories, servicesBookings, servicesMedia,
-  servicesAvailability, servicesTranslations, servicesReviews,
+  servicesAvailability,
   notification,
 } from '@database/schemas'
 

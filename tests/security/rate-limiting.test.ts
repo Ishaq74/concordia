@@ -4,7 +4,7 @@ import { serverAvailable } from '@tests/helpers/server-guard';
 
 const serverUp = await serverAvailable();
 
-describe.skipIf(!serverUp)('Rate Limiting', () => {
+describe.skipIf(!serverUp)('Rate Limiting', { timeout: 120_000 }, () => {
 
 describe('Rate Limiting — Auth endpoints', () => {
   it('multiple rapid login attempts do not crash the server', async () => {

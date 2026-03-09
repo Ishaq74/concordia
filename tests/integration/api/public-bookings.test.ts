@@ -2,14 +2,12 @@
  * Integration tests for /api/services/bookings (public booking creation).
  * Tests auth, validation, availability, self-booking prevention.
  */
-import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest'
-import { getTestDb } from '@tests/config/test-db'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { TEST_ENV } from '@tests/config/test-env'
-import { servicesListings, servicesAvailability } from '@database/schemas'
 import { randomUUID } from 'crypto'
 import { serverAvailable } from '@tests/helpers/server-guard'
 import { apiCall } from '@tests/utils/api-helpers'
-import { createUserWithToken, createSavedUser, buildApiHeaders } from '@tests/fixtures/test-factory'
+import { createUserWithToken, buildApiHeaders } from '@tests/fixtures/test-factory'
 
 const serverUp = await serverAvailable()
 

@@ -39,7 +39,7 @@ describe('Services Admin tests', () => {
 // ─── Helpers ────────────────────────────────────────────────────
 
 async function createCategory(db: TestDb, overrides: Record<string, unknown> = {}) {
-  const id = overrides.id ?? randomUUID()
+  const id = (overrides.id ?? randomUUID()) as string
   await db.insert(servicesCategories).values({
     id,
     slug: overrides.slug ?? `cat-${id.slice(0, 8)}`,
@@ -51,7 +51,7 @@ async function createCategory(db: TestDb, overrides: Record<string, unknown> = {
 }
 
 async function createService(db: TestDb, providerId: string, orgId: string, catId?: string, overrides: Record<string, unknown> = {}) {
-  const id = overrides.id ?? randomUUID()
+  const id = (overrides.id ?? randomUUID()) as string
   await db.insert(servicesListings).values({
     id,
     slug: overrides.slug ?? `svc-${id.slice(0, 8)}`,
@@ -68,7 +68,7 @@ async function createService(db: TestDb, providerId: string, orgId: string, catI
 }
 
 async function createBooking(db: TestDb, serviceId: string, customerId: string, providerId: string, overrides: Record<string, unknown> = {}) {
-  const id = overrides.id ?? randomUUID()
+  const id = (overrides.id ?? randomUUID()) as string
   await db.insert(servicesBookings).values({
     id,
     serviceId,
@@ -314,8 +314,8 @@ describe('Services — Org scoping isolation', () => {
     const allB = await db.select().from(servicesListings).where(eq(servicesListings.organizationId, orgB.id));
     expect(allA.length).toBe(2);
     expect(allB.length).toBe(1);
-    expect(allA.map((s) => s.id)).not.toContain(svcB1);
-    expect(allB.map((s) => s.id)).not.toContain(svcA1);
+    expect(allA.map((s: any) => s.id)).not.toContain(svcB1);
+    expect(allB.map((s: any) => s.id)).not.toContain(svcA1);
   });
 })
 });

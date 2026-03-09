@@ -1,0 +1,263 @@
+---
+// src/pages/[lang]/legal.astro — Mentions Légales, Politique de Confidentialité & CGV
+// Conforme au droit français : Loi n°2004-575 LCEN, RGPD, Code de la Consommation
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: "fr" } },
+    { params: { lang: "en" } },
+    { params: { lang: "ar" } },
+    { params: { lang: "es" } },
+  ];
+}
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const lastUpdate = "9 mars 2026";
+
+const tabs = [
+  { id: "legal", icon: "mdi:scale-balance", label: t.legal?.tabLegal ?? "Mentions Légales" },
+  { id: "privacy", icon: "mdi:shield-lock-outline", label: t.legal?.tabPrivacy ?? "Politique de Confidentialité" },
+  { id: "terms", icon: "mdi:file-document-outline", label: t.legal?.tabTerms ?? "Conditions Générales" },
+  { id: "cookies", icon: "mdi:cookie-outline", label: t.legal?.tabCookies ?? "Politique de Cookies" },
+];
+---
+
+<BaseLayout title={t.legal?.metaTitle ?? "Mentions Légales — Concordia"} lang={lang}>
+  <main class="legal-page">
+    <section class="legal-hero">
+      <div class="legal-hero__content">
+        <Badge variant="retro" color="accent">{t.legal?.heroLabel ?? "Informations légales"}</Badge>
+        <h1 class="legal-hero__title">{t.legal?.heroTitle ?? "Mentions Légales & Conditions d'Utilisation"}</h1>
+        <p class="legal-hero__subtitle">{t.legal?.heroSubtitle ?? "Transparence, conformité RGPD et respect de vos droits."}</p>
+        <p class="legal-hero__update"><Icon name="mdi:calendar-clock" size={16} /> {t.legal?.lastUpdate ?? "Dernière mise à jour"} : {lastUpdate}</p>
+      </div>
+    </section>
+
+    <section class="legal-content">
+      <nav class="legal-tabs" role="tablist" aria-label="Sections légales">
+        {tabs.map((tab, i) => (
+          <button class={`legal-tab ${i === 0 ? "legal-tab--active" : ""}`} role="tab" aria-selected={i === 0 ? "true" : "false"} aria-controls={`panel-${tab.id}`} data-tab={tab.id}>
+            <Icon name={tab.icon} size={18} />
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </nav>
+
+      {/* ===== MENTIONS LÉGALES ===== */}
+      <div class="legal-panel legal-panel--active" id="panel-legal" role="tabpanel">
+        <Card variant="retro">
+          <CardContent>
+            <h2>{t.legal?.legalTitle ?? "Mentions Légales"}</h2>
+            <p class="legal-intro">{t.legal?.legalIntro ?? "Conformément aux dispositions de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN), il est porté à la connaissance des utilisateurs du site Concordia les présentes mentions légales."}</p>
+
+            <h3><Icon name="mdi:domain" size={20} /> {t.legal?.publisherTitle ?? "1. Éditeur du site"}</h3>
+            <dl class="legal-dl">
+              <dt>{t.legal?.companyName ?? "Raison sociale"}</dt><dd>Concordia — Plateforme citoyenne de services locaux</dd>
+              <dt>{t.legal?.legalForm ?? "Forme juridique"}</dt><dd>{t.legal?.legalFormValue ?? "Association loi 1901 / Société coopérative d'intérêt collectif (SCIC)"}</dd>
+              <dt>{t.legal?.siret ?? "SIRET"}</dt><dd>XXX XXX XXX XXXXX</dd>
+              <dt>{t.legal?.rcs ?? "RCS"}</dt><dd>Paris B XXX XXX XXX</dd>
+              <dt>{t.legal?.address ?? "Siège social"}</dt><dd>12 rue de la Solidarité, 75020 Paris, France</dd>
+              <dt>{t.legal?.phone ?? "Téléphone"}</dt><dd>+33 1 XX XX XX XX</dd>
+              <dt>{t.legal?.email ?? "Email"}</dt><dd>contact@concordia.app</dd>
+              <dt>{t.legal?.director ?? "Directeur de la publication"}</dt><dd>[Nom du responsable légal]</dd>
+            </dl>
+
+            <h3><Icon name="mdi:server-network" size={20} /> {t.legal?.hostingTitle ?? "2. Hébergement"}</h3>
+            <dl class="legal-dl">
+              <dt>{t.legal?.hostProvider ?? "Hébergeur"}</dt><dd>Vercel Inc. / [Hébergeur choisi]</dd>
+              <dt>{t.legal?.hostAddress ?? "Adresse"}</dt><dd>340 S Lemon Ave #4133, Walnut, CA 91789, USA</dd>
+              <dt>{t.legal?.hostContact ?? "Contact"}</dt><dd>privacy@vercel.com</dd>
+            </dl>
+
+            <h3><Icon name="mdi:copyright" size={20} /> {t.legal?.ipTitle ?? "3. Propriété intellectuelle"}</h3>
+            <p>{t.legal?.ipText ?? "L'ensemble du contenu du site Concordia (textes, images, graphismes, logo, icônes, sons, logiciels, etc.) est protégé par le droit d'auteur et le droit de la propriété intellectuelle. Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des éléments du site est interdite sans l'autorisation écrite préalable de Concordia."}</p>
+
+            <h3><Icon name="mdi:link-variant" size={20} /> {t.legal?.linksTitle ?? "4. Liens hypertextes"}</h3>
+            <p>{t.legal?.linksText ?? "Le site Concordia peut contenir des liens hypertextes vers d'autres sites. Concordia ne dispose d'aucun contrôle sur le contenu de ces sites tiers et décline toute responsabilité quant à leur contenu."}</p>
+
+            <h3><Icon name="mdi:gavel" size={20} /> {t.legal?.jurisdictionTitle ?? "5. Loi applicable & juridiction"}</h3>
+            <p>{t.legal?.jurisdictionText ?? "Les présentes mentions légales sont soumises au droit français. En cas de litige, les tribunaux de Paris seront seuls compétents, après tentative de résolution amiable via le médiateur de la consommation désigné."}</p>
+            <p><strong>{t.legal?.mediatorTitle ?? "Médiateur de la consommation"}</strong> : {t.legal?.mediatorText ?? "Conformément à l'article L.612-1 du Code de la consommation, le consommateur a le droit de recourir gratuitement à un médiateur de la consommation."}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ===== POLITIQUE DE CONFIDENTIALITÉ (RGPD) ===== */}
+      <div class="legal-panel" id="panel-privacy" role="tabpanel" hidden>
+        <Card variant="retro">
+          <CardContent>
+            <h2>{t.legal?.privacyTitle ?? "Politique de Confidentialité — RGPD"}</h2>
+            <p class="legal-intro">{t.legal?.privacyIntro ?? "Conformément au Règlement Général sur la Protection des Données (UE 2016/679) et à la loi Informatique et Libertés du 6 janvier 1978 modifiée, Concordia s'engage à protéger vos données personnelles."}</p>
+
+            <h3><Icon name="mdi:account-outline" size={20} /> {t.legal?.controllerTitle ?? "1. Responsable du traitement"}</h3>
+            <p>{t.legal?.controllerText ?? "Le responsable du traitement des données est Concordia, association loi 1901, dont le siège social est situé au 12 rue de la Solidarité, 75020 Paris."}</p>
+            <p><strong>DPO (Délégué à la Protection des Données)</strong> : dpo@concordia.app</p>
+
+            <h3><Icon name="mdi:database-outline" size={20} /> {t.legal?.dataCollectedTitle ?? "2. Données collectées"}</h3>
+            <p>{t.legal?.dataCollectedIntro ?? "Nous collectons uniquement les données nécessaires au fonctionnement du service :"}</p>
+            <ul>
+              <li><strong>{t.legal?.identityData ?? "Données d'identité"}</strong> : {t.legal?.identityDataDetail ?? "nom, prénom, adresse email, photo de profil (facultatif)"}</li>
+              <li><strong>{t.legal?.connectionData ?? "Données de connexion"}</strong> : {t.legal?.connectionDataDetail ?? "adresse IP, logs de connexion, agent utilisateur"}</li>
+              <li><strong>{t.legal?.usageData ?? "Données d'usage"}</strong> : {t.legal?.usageDataDetail ?? "réservations, avis, commentaires, préférences de langue"}</li>
+              <li><strong>{t.legal?.orgData ?? "Données d'organisation"}</strong> : {t.legal?.orgDataDetail ?? "nom d'organisation, SIRET (si organisation professionnelle), adresse"}</li>
+            </ul>
+
+            <h3><Icon name="mdi:target" size={20} /> {t.legal?.purposeTitle ?? "3. Finalités du traitement"}</h3>
+            <table class="legal-table">
+              <thead><tr><th>{t.legal?.purposeCol ?? "Finalité"}</th><th>{t.legal?.basisCol ?? "Base légale"}</th><th>{t.legal?.retentionCol ?? "Durée de conservation"}</th></tr></thead>
+              <tbody>
+                <tr><td>{t.legal?.purposeAccount ?? "Gestion du compte utilisateur"}</td><td>{t.legal?.basisContract ?? "Exécution du contrat"}</td><td>{t.legal?.retention3y ?? "3 ans après dernière activité"}</td></tr>
+                <tr><td>{t.legal?.purposeBooking ?? "Gestion des réservations"}</td><td>{t.legal?.basisContract ?? "Exécution du contrat"}</td><td>{t.legal?.retention5y ?? "5 ans (obligation comptable)"}</td></tr>
+                <tr><td>{t.legal?.purposeSecurity ?? "Sécurité et prévention de la fraude"}</td><td>{t.legal?.basisInterest ?? "Intérêt légitime"}</td><td>{t.legal?.retention1y ?? "1 an"}</td></tr>
+                <tr><td>{t.legal?.purposeStats ?? "Statistiques anonymisées"}</td><td>{t.legal?.basisInterest ?? "Intérêt légitime"}</td><td>{t.legal?.retention2y ?? "2 ans"}</td></tr>
+                <tr><td>{t.legal?.purposeNewsletter ?? "Communication / newsletter"}</td><td>{t.legal?.basisConsent ?? "Consentement"}</td><td>{t.legal?.retentionConsent ?? "Jusqu'au retrait du consentement"}</td></tr>
+              </tbody>
+            </table>
+
+            <h3><Icon name="mdi:hand-pointing-right" size={20} /> {t.legal?.rightsTitle ?? "4. Vos droits"}</h3>
+            <p>{t.legal?.rightsIntro ?? "Conformément au RGPD (articles 15 à 22), vous disposez des droits suivants :"}</p>
+            <ul>
+              <li><strong>{t.legal?.rightAccess ?? "Droit d'accès"}</strong> (art. 15) — {t.legal?.rightAccessDetail ?? "Obtenir la confirmation du traitement et une copie de vos données"}</li>
+              <li><strong>{t.legal?.rightRectification ?? "Droit de rectification"}</strong> (art. 16) — {t.legal?.rightRectificationDetail ?? "Corriger vos données inexactes ou incomplètes"}</li>
+              <li><strong>{t.legal?.rightErasure ?? "Droit à l'effacement"}</strong> (art. 17) — {t.legal?.rightErasureDetail ?? "Demander la suppression de vos données"}</li>
+              <li><strong>{t.legal?.rightPortability ?? "Droit à la portabilité"}</strong> (art. 20) — {t.legal?.rightPortabilityDetail ?? "Recevoir vos données dans un format structuré"}</li>
+              <li><strong>{t.legal?.rightRestriction ?? "Droit à la limitation"}</strong> (art. 18) — {t.legal?.rightRestrictionDetail ?? "Restreindre le traitement de vos données"}</li>
+              <li><strong>{t.legal?.rightObjection ?? "Droit d'opposition"}</strong> (art. 21) — {t.legal?.rightObjectionDetail ?? "Vous opposer au traitement pour motifs légitimes"}</li>
+            </ul>
+            <p>{t.legal?.rightsContact ?? "Pour exercer vos droits : envoyez un email à"} <strong>dpo@concordia.app</strong> {t.legal?.rightsDelay ?? "— Réponse sous 30 jours."}</p>
+            <p>{t.legal?.cnil ?? "Vous pouvez introduire une réclamation auprès de la CNIL"} : <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a></p>
+
+            <h3><Icon name="mdi:earth" size={20} /> {t.legal?.transferTitle ?? "5. Transferts internationaux"}</h3>
+            <p>{t.legal?.transferText ?? "Vos données sont hébergées au sein de l'Union Européenne. En cas de transfert hors UE, des garanties appropriées sont mises en place (clauses contractuelles types de la Commission Européenne, décision d'adéquation)."}</p>
+
+            <h3><Icon name="mdi:lock-outline" size={20} /> {t.legal?.securityTitle ?? "6. Sécurité"}</h3>
+            <p>{t.legal?.securityText ?? "Concordia met en œuvre des mesures techniques et organisationnelles appropriées : chiffrement TLS, hachage des mots de passe (bcrypt/argon2), contrôle d'accès basé sur les rôles (RBAC), journalisation des accès, sauvegardes chiffrées."}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ===== CONDITIONS GÉNÉRALES ===== */}
+      <div class="legal-panel" id="panel-terms" role="tabpanel" hidden>
+        <Card variant="retro">
+          <CardContent>
+            <h2>{t.legal?.termsTitle ?? "Conditions Générales d'Utilisation et de Vente"}</h2>
+            <p class="legal-intro">{t.legal?.termsIntro ?? "Les présentes conditions régissent l'utilisation de la plateforme Concordia et les transactions effectuées par son intermédiaire."}</p>
+
+            <h3>{t.legal?.termsObjectTitle ?? "1. Objet"}</h3>
+            <p>{t.legal?.termsObjectText ?? "Concordia est une plateforme de mise en relation entre citoyens, organisations et prestataires de services locaux. Elle permet la publication de services, la réservation, la gestion de contenus et la médiation communautaire."}</p>
+
+            <h3>{t.legal?.termsAccessTitle ?? "2. Accès et inscription"}</h3>
+            <p>{t.legal?.termsAccessText ?? "L'accès à Concordia est gratuit. L'inscription est nécessaire pour accéder aux fonctionnalités de réservation, de publication de services et de gestion d'organisation. L'utilisateur doit être âgé d'au moins 16 ans. Les données communiquées doivent être exactes et à jour."}</p>
+
+            <h3>{t.legal?.termsServiceTitle ?? "3. Services et réservations"}</h3>
+            <p>{t.legal?.termsServiceText ?? "Les prestataires publient leurs services avec leurs conditions (tarifs, disponibilités, modalités). Le citoyen peut réserver un service via la plateforme. La réservation constitue un engagement ferme sous réserve de confirmation par le prestataire."}</p>
+
+            <h3>{t.legal?.termsPricingTitle ?? "4. Tarifs et paiements"}</h3>
+            <p>{t.legal?.termsPricingText ?? "Les prix sont affichés en euros (€) TTC sauf mention contraire. Le paiement s'effectue via les prestataires de paiement sécurisés intégrés (Stripe, Polar). Concordia peut percevoir une commission sur les transactions, indiquée avant la confirmation."}</p>
+
+            <h3>{t.legal?.termsWithdrawalTitle ?? "5. Droit de rétractation"}</h3>
+            <p>{t.legal?.termsWithdrawalText ?? "Conformément à l'article L.221-18 du Code de la consommation, le consommateur dispose d'un délai de 14 jours pour exercer son droit de rétractation pour les achats de biens ou services non personnalisés, à compter de la conclusion du contrat. Ce droit ne s'applique pas aux services pleinement exécutés avant la fin du délai de rétractation avec l'accord du consommateur."}</p>
+
+            <h3>{t.legal?.termsResponsibilityTitle ?? "6. Responsabilités"}</h3>
+            <p>{t.legal?.termsResponsibilityText ?? "Concordia agit en tant qu'intermédiaire technique. Elle ne peut être tenue responsable du contenu publié par les utilisateurs, de la qualité des services proposés par les prestataires, ni des différends entre utilisateurs. Concordia met à disposition un système de médiation pour résoudre les litiges."}</p>
+
+            <h3>{t.legal?.termsModerationTitle ?? "7. Modération et sanctions"}</h3>
+            <p>{t.legal?.termsModerationText ?? "Concordia se réserve le droit de modérer, suspendre ou supprimer tout contenu contraire aux présentes conditions, à la loi ou aux bonnes mœurs. Un utilisateur peut être temporairement ou définitivement banni en cas de manquement grave ou répété."}</p>
+
+            <h3>{t.legal?.termsDisputeTitle ?? "8. Règlement des litiges"}</h3>
+            <p>{t.legal?.termsDisputeText ?? "En cas de litige, les parties s'efforceront de trouver une solution amiable via le système de médiation de Concordia. À défaut, le consommateur peut saisir le médiateur de la consommation ou les tribunaux compétents de Paris."}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ===== COOKIES ===== */}
+      <div class="legal-panel" id="panel-cookies" role="tabpanel" hidden>
+        <Card variant="retro">
+          <CardContent>
+            <h2>{t.legal?.cookiesTitle ?? "Politique de Cookies"}</h2>
+            <p class="legal-intro">{t.legal?.cookiesIntro ?? "Conformément à la directive européenne 2009/136/CE et aux recommandations de la CNIL, nous vous informons de l'utilisation de cookies sur Concordia."}</p>
+
+            <h3>{t.legal?.cookiesWhatTitle ?? "1. Qu'est-ce qu'un cookie ?"}</h3>
+            <p>{t.legal?.cookiesWhatText ?? "Un cookie est un petit fichier texte déposé sur votre terminal lors de la visite d'un site. Il permet de conserver des données afin d'améliorer votre navigation."}</p>
+
+            <h3>{t.legal?.cookiesUsedTitle ?? "2. Cookies utilisés"}</h3>
+            <table class="legal-table">
+              <thead><tr><th>{t.legal?.cookieNameCol ?? "Cookie"}</th><th>{t.legal?.cookieTypeCol ?? "Type"}</th><th>{t.legal?.cookiePurposeCol ?? "Finalité"}</th><th>{t.legal?.cookieDurationCol ?? "Durée"}</th></tr></thead>
+              <tbody>
+                <tr><td>session_token</td><td>{t.legal?.cookieStrictly ?? "Strictement nécessaire"}</td><td>{t.legal?.cookieSessionPurpose ?? "Authentification de l'utilisateur"}</td><td>7 {t.legal?.days ?? "jours"}</td></tr>
+                <tr><td>locale</td><td>{t.legal?.cookieStrictly ?? "Strictement nécessaire"}</td><td>{t.legal?.cookieLocalePurpose ?? "Préférence de langue"}</td><td>1 {t.legal?.year ?? "an"}</td></tr>
+                <tr><td>theme</td><td>{t.legal?.cookieFunctional ?? "Fonctionnel"}</td><td>{t.legal?.cookieThemePurpose ?? "Préférence de thème (clair/sombre)"}</td><td>1 {t.legal?.year ?? "an"}</td></tr>
+                <tr><td>a11y_prefs</td><td>{t.legal?.cookieFunctional ?? "Fonctionnel"}</td><td>{t.legal?.cookieA11yPurpose ?? "Paramètres d'accessibilité"}</td><td>1 {t.legal?.year ?? "an"}</td></tr>
+              </tbody>
+            </table>
+            <p><strong>{t.legal?.noCookiesTracking ?? "Concordia n'utilise aucun cookie de traçage publicitaire ni analytique tiers."}</strong></p>
+
+            <h3>{t.legal?.cookiesManageTitle ?? "3. Gestion des cookies"}</h3>
+            <p>{t.legal?.cookiesManageText ?? "Vous pouvez configurer votre navigateur pour accepter ou refuser les cookies. Le refus des cookies essentiels peut empêcher l'utilisation de certaines fonctionnalités du site."}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div class="legal-footer">
+        <p><Icon name="mdi:help-circle-outline" size={16} /> {t.legal?.helpText ?? "Une question ? Contactez-nous à"} <a href="mailto:contact@concordia.app">contact@concordia.app</a></p>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<script is:inline>
+  document.querySelectorAll('.legal-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.legal-tab').forEach(t => { t.classList.remove('legal-tab--active'); t.setAttribute('aria-selected', 'false'); });
+      document.querySelectorAll('.legal-panel').forEach(p => { p.classList.remove('legal-panel--active'); p.hidden = true; });
+      tab.classList.add('legal-tab--active');
+      tab.setAttribute('aria-selected', 'true');
+      const panel = document.getElementById('panel-' + tab.dataset.tab);
+      if (panel) { panel.classList.add('legal-panel--active'); panel.hidden = false; }
+    });
+  });
+</script>
+
+<style>
+  .legal-page { max-width: 72rem; margin: 0 auto; padding: 0 var(--space-4, 1rem); }
+  .legal-hero { text-align: center; padding: var(--space-12, 3rem) 0 var(--space-8, 2rem); }
+  .legal-hero__title { font-size: clamp(1.75rem, 4vw, 2.5rem); margin: var(--space-4, 1rem) 0 var(--space-2, .5rem); }
+  .legal-hero__subtitle { color: var(--text-secondary, #666); font-size: 1.125rem; max-width: 40rem; margin: 0 auto var(--space-2, .5rem); }
+  .legal-hero__update { font-size: 0.875rem; color: var(--text-muted, #888); display: flex; align-items: center; justify-content: center; gap: 0.25rem; }
+
+  .legal-tabs { display: flex; flex-wrap: wrap; gap: var(--space-2, .5rem); margin-bottom: var(--space-6, 1.5rem); border-bottom: 2px solid var(--border, #e5e5e5); padding-bottom: var(--space-2, .5rem); }
+  .legal-tab { display: flex; align-items: center; gap: 0.4rem; padding: 0.6rem 1rem; border: none; background: none; cursor: pointer; font-size: 0.9rem; font-weight: 500; color: var(--text-secondary, #666); border-radius: var(--radius-md, 6px) var(--radius-md, 6px) 0 0; transition: all 0.2s; }
+  .legal-tab:hover { color: var(--color-primary, #b85c38); background: var(--bg-subtle, #f9f5f1); }
+  .legal-tab--active { color: var(--color-primary, #b85c38); border-bottom: 2px solid var(--color-primary, #b85c38); margin-bottom: -2px; }
+
+  .legal-panel { display: none; } .legal-panel--active { display: block; }
+  .legal-panel h2 { font-size: 1.5rem; margin-bottom: var(--space-4, 1rem); }
+  .legal-panel h3 { font-size: 1.125rem; margin: var(--space-6, 1.5rem) 0 var(--space-2, .5rem); display: flex; align-items: center; gap: 0.4rem; }
+  .legal-intro { font-size: 1rem; color: var(--text-secondary, #555); margin-bottom: var(--space-4, 1rem); border-left: 3px solid var(--color-primary, #b85c38); padding-left: var(--space-3, .75rem); }
+
+  .legal-dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; margin: var(--space-3, .75rem) 0; }
+  .legal-dl dt { font-weight: 600; color: var(--text-primary, #333); }
+  .legal-dl dd { margin: 0; color: var(--text-secondary, #555); }
+
+  .legal-table { width: 100%; border-collapse: collapse; margin: var(--space-3, .75rem) 0; font-size: 0.9rem; }
+  .legal-table th { background: var(--bg-subtle, #f9f5f1); padding: 0.6rem; text-align: left; font-weight: 600; border-bottom: 2px solid var(--border, #e5e5e5); }
+  .legal-table td { padding: 0.6rem; border-bottom: 1px solid var(--border, #eee); }
+
+  .legal-footer { text-align: center; padding: var(--space-8, 2rem) 0; color: var(--text-muted, #888); font-size: 0.9rem; }
+  .legal-footer a { color: var(--color-primary, #b85c38); }
+
+  @media (max-width: 640px) {
+    .legal-tabs { flex-direction: column; }
+    .legal-dl { grid-template-columns: 1fr; }
+    .legal-table { font-size: 0.8rem; }
+  }
+</style>

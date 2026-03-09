@@ -4,7 +4,7 @@ import { beforeAll, beforeEach, afterAll, describe, expect, it } from 'vitest';
 import Button from '@components/ui/Button.astro';
 import axe from 'axe-core';
 import { JSDOM } from 'jsdom';
-import { chromium } from 'playwright';
+import { chromium, type Browser } from 'playwright';
 import pa11y from 'pa11y';
 import { startFlow } from 'lighthouse';
 import fs from 'fs';
@@ -15,6 +15,7 @@ const REPORTS_DIR = path.join(__dirname, 'reports');
 import puppeteer, { Browser as PuppeteerBrowser, Page as PuppeteerPage } from 'puppeteer';
 
 let puppeteerBrowser: PuppeteerBrowser;
+let playwrightBrowser: Browser;
 
 let container: AstroContainer;
 
@@ -22,6 +23,7 @@ let container: AstroContainer;
 describe('ui/Button', () => {
   beforeAll(async () => {
     container = await AstroContainer.create();
+    playwrightBrowser = await chromium.launch();
     puppeteerBrowser = await puppeteer.launch();
     // Crée le dossier reports si inexistant
     if (!fs.existsSync(REPORTS_DIR)) {
@@ -30,6 +32,7 @@ describe('ui/Button', () => {
   });
 
   afterAll(async () => {
+    await playwrightBrowser?.close();
     await puppeteerBrowser?.close();
   });
 
@@ -96,35 +99,32 @@ describe('ui/Button', () => {
   // ----------------------
   it('playwright: renders text, is clickable, respects disabled', async () => {
     const html = await container.renderToString(Button, { props: {}, slots: { default: 'PW Test' } });
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     await page.setContent(html);
     const button = await page.$('button');
     const text = (await button?.textContent())?.trim();
     expect(text).toBe('PW Test');
     await button?.click();
-    await browser.close();
+    await page.close();
   });
 
   it('playwright: icon rendered and positioned correctly', async () => {
     const html = await container.renderToString(Button, { props: { icon: { name: 'concordia', side: 'left' } }, slots: { default: 'Icon' } });
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     await page.setContent(html);
     const svg = await page.$('svg');
     expect(svg).toBeTruthy();
-    await browser.close();
+    await page.close();
   });
 
   it('playwright: disabled button cannot be clicked', async () => {
     const html = await container.renderToString(Button, { props: { disabled: true }, slots: { default: 'Disabled' } });
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     await page.setContent(html);
     const button = await page.$('button');
     const disabled = await button?.getAttribute('disabled');
     expect(disabled).toBe('');
-    await browser.close();
+    await page.close();
   });
 
   // ----------------------
@@ -362,8 +362,7 @@ describe('ui/Button', () => {
       slots: { default: 'Click Me' } 
     });
     
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     
     try {
       await page.setContent(html);
@@ -377,10 +376,8 @@ describe('ui/Button', () => {
       });
       
       expect(isEnabled).toBe(true);
-      await browser.close();
-    } catch (error) {
-      await browser.close();
-      throw error;
+    } finally {
+      await page.close();
     }
   });
 
@@ -390,8 +387,7 @@ describe('ui/Button', () => {
       slots: { default: 'Disabled' } 
     });
     
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     
     try {
       await page.setContent(html);
@@ -402,10 +398,8 @@ describe('ui/Button', () => {
       });
       
       expect(isDisabled).toBe(true);
-      await browser.close();
-    } catch (error) {
-      await browser.close();
-      throw error;
+    } finally {
+      await page.close();
     }
   });
 
@@ -457,8 +451,7 @@ describe('ui/Button', () => {
       slots: { default: 'Focus Me' } 
     });
     
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     
     try {
       await page.setContent(html);
@@ -469,10 +462,8 @@ describe('ui/Button', () => {
       });
       
       expect(focusedElement).toBe('focus-test');
-      await browser.close();
-    } catch (error) {
-      await browser.close();
-      throw error;
+    } finally {
+      await page.close();
     }
   });
 
@@ -482,8 +473,7 @@ describe('ui/Button', () => {
       slots: { default: 'Cannot Focus' } 
     });
     
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     
     try {
       await page.setContent(html);
@@ -499,10 +489,8 @@ describe('ui/Button', () => {
       });
       
       expect(focusedElement).not.toBe('disabled-focus-test');
-      await browser.close();
-    } catch (error) {
-      await browser.close();
-      throw error;
+    } finally {
+      await page.close();
     }
   });
 
@@ -519,8 +507,7 @@ describe('ui/Button', () => {
     
     const html = `${button1}${button2}`;
     
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     
     try {
       await page.setContent(html);
@@ -532,11 +519,8 @@ describe('ui/Button', () => {
       await page.keyboard.press('Tab');
       focusedElement = await page.evaluate(() => document.activeElement?.id);
       expect(focusedElement).toBe('btn-2');
-      
-      await browser.close();
-    } catch (error) {
-      await browser.close();
-      throw error;
+    } finally {
+      await page.close();
     }
   });
 
@@ -546,8 +530,7 @@ describe('ui/Button', () => {
       slots: { default: 'Press Enter' } 
     });
     
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     
     try {
       await page.setContent(html);
@@ -567,11 +550,8 @@ describe('ui/Button', () => {
         const btn = document.querySelector('#enter-test') as HTMLButtonElement;
         return btn.getAttribute('data-clicked') === 'true';
       });
-      
-      await browser.close();
-    } catch (error) {
-      await browser.close();
-      throw error;
+    } finally {
+      await page.close();
     }
   });
 
@@ -581,8 +561,7 @@ describe('ui/Button', () => {
       slots: { default: 'Press Space' } 
     });
     
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     
     try {
       await page.setContent(html);
@@ -595,10 +574,8 @@ describe('ui/Button', () => {
       });
       
       expect(isActive).toBe(true);
-      await browser.close();
-    } catch (error) {
-      await browser.close();
-      throw error;
+    } finally {
+      await page.close();
     }
   });
 
@@ -608,8 +585,7 @@ describe('ui/Button', () => {
       slots: { default: 'Press Escape' } 
     });
     
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     
     try {
       await page.setContent(html);
@@ -621,10 +597,8 @@ describe('ui/Button', () => {
       });
       
       expect(focusedElement).toBe('escape-test');
-      await browser.close();
-    } catch (error) {
-      await browser.close();
-      throw error;
+    } finally {
+      await page.close();
     }
   });
 
@@ -1183,8 +1157,7 @@ describe('ui/Button', () => {
       slots: { default: 'Workflow Test' } 
     });
     
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     
     try {
       await page.setContent(html);
@@ -1207,11 +1180,8 @@ describe('ui/Button', () => {
         return !btn.disabled;
       });
       expect(isClickable).toBe(true);
-      
-      await browser.close();
-    } catch (error) {
-      await browser.close();
-      throw error;
+    } finally {
+      await page.close();
     }
   });
 
@@ -1225,8 +1195,7 @@ describe('ui/Button', () => {
       slots: { default: 'Icon Button' } 
     });
     
-    const browser = await chromium.launch();
-    const page = await browser.newPage();
+    const page = await playwrightBrowser.newPage();
     
     try {
       await page.setContent(html);
@@ -1245,11 +1214,8 @@ describe('ui/Button', () => {
       // Check button text
       const text = await page.textContent('#icon-workflow');
       expect(text).toContain('Icon Button');
-      
-      await browser.close();
-    } catch (error) {
-      await browser.close();
-      throw error;
+    } finally {
+      await page.close();
     }
   });
 

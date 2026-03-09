@@ -1,7 +1,7 @@
 {
   "extends": "astro/tsconfigs/base",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "vitest.config.ts"],
+  "exclude": ["dist", "vitest.config.ts", "wireframes"],
   "compilerOptions": {
     "baseUrl": ".",
     "resolveJsonModule": true,

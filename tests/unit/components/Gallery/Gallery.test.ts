@@ -30,7 +30,7 @@ function renderGallery(props: {
     .join(' ');
 
   let html = `<div class="${classes}" role="region" aria-label="Image gallery">`;
-  for (const [idx, img] of props.images.entries()) {
+  for (const [_idx, img] of props.images.entries()) {
     html += `<figure class="gallery-item">`;
     html += `<img src="${img.src}" alt="${img.alt}" loading="lazy" width="${img.width || ''}" height="${img.height || ''}" />`;
     if (showCaptions && img.caption) {

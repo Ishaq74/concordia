@@ -16,17 +16,17 @@ describe('Org switching API', () => {
     const org2 = await test.saveOrganization(org2Obj);
 
     // Add user as member of both orgs
-    await test.addMember({ userId, organizationId: org1.id, role: 'admin' });
-    await test.addMember({ userId, organizationId: org2.id, role: 'member' });
+    await test.addMember({ userId, organizationId: org1.id as string, role: 'admin' });
+    await test.addMember({ userId, organizationId: org2.id as string, role: 'member' });
 
     const { headers } = await test.login({ userId });
 
     // Switch to first org via internal API
-    const r1 = await auth.api.setActiveOrganization({ headers, body: { organizationId: org1.id } });
+    const r1 = await auth.api.setActiveOrganization({ headers, body: { organizationId: org1.id as string } });
     expect(r1).toBeDefined();
     
     // Switch to second org
-    const r2 = await auth.api.setActiveOrganization({ headers, body: { organizationId: org2.id } });
+    const r2 = await auth.api.setActiveOrganization({ headers, body: { organizationId: org2.id as string } });
     expect(r2).toBeDefined();
   });
 });

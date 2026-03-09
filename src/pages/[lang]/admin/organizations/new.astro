@@ -29,9 +29,33 @@ const adminBase = `/${lang}/admin`;
     </div>
   </div>
 
+  <!-- Stepper -->
+  <div class="onboarding-stepper">
+    <div class="stepper">
+      <button class="stepper__step active" data-step="1">
+        <span class="stepper__num">1</span>
+        <span class="stepper__label">{to.stepIdentity ?? "Identité"}</span>
+      </button>
+      <div class="stepper__line"></div>
+      <button class="stepper__step" data-step="2">
+        <span class="stepper__num">2</span>
+        <span class="stepper__label">{to.stepContact ?? "Contact & Adresse"}</span>
+      </button>
+      <div class="stepper__line"></div>
+      <button class="stepper__step" data-step="3">
+        <span class="stepper__num">3</span>
+        <span class="stepper__label">{to.stepBranding ?? "Identité visuelle"}</span>
+      </button>
+    </div>
+    <div class="stepper-progress">
+      <div class="stepper-progress__bar" id="stepperBar" style="width:33%"></div>
+    </div>
+  </div>
+
   <div class="form-layout">
     <main class="form-main">
-      <!-- Identity -->
+      <!-- Step 1: Identity -->
+      <div class="wizard-step" data-wizard-step="1">
       <Card variant="modern" elevation="sm" class="form-section">
         <CardContent>
           <h2 class="section-title"><Icon name="mdi:domain" /> {to.identity ?? "Identité"}</h2>
@@ -57,6 +81,8 @@ const adminBase = `/${lang}/admin`;
       </Card>
 
       <!-- Contact -->
+      </div>
+      <div class="wizard-step" data-wizard-step="2" style="display:none">
       <Card variant="modern" elevation="sm" class="form-section">
         <CardContent>
           <h2 class="section-title"><Icon name="mdi:card-account-phone" /> {to.contact ?? "Contact"}</h2>
@@ -107,6 +133,8 @@ const adminBase = `/${lang}/admin`;
       </Card>
 
       <!-- Branding -->
+      </div>
+      <div class="wizard-step" data-wizard-step="3" style="display:none">
       <Card variant="modern" elevation="sm" class="form-section">
         <CardContent>
           <h2 class="section-title"><Icon name="mdi:palette" /> {to.branding ?? "Identité visuelle"}</h2>
@@ -122,13 +150,45 @@ const adminBase = `/${lang}/admin`;
           </div>
         </CardContent>
       </Card>
+      </div>
     </main>
 
     <aside class="form-sidebar">
+      <!-- Live Preview -->
       <Card variant="modern" elevation="sm" class="sticky-card">
         <CardContent>
+          <h3 class="sidebar-title"><Icon name="mdi:eye-outline" /> Aperçu</h3>
+          <div class="preview-card" id="livePreview">
+            <div class="preview-cover" id="previewCover"></div>
+            <div class="preview-logo" id="previewLogo">
+              <Icon name="mdi:domain" />
+            </div>
+            <div class="preview-body">
+              <h4 class="preview-name" id="previewName">Mon Organisation</h4>
+              <p class="preview-slug" id="previewSlug">@mon-organisation</p>
+              <p class="preview-desc" id="previewDesc">Description de l'organisation</p>
+              <div class="preview-location" id="previewLocation">
+                <Icon name="mdi:map-marker-outline" />
+                <span id="previewCity">Ville, FR</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Actions -->
+      <Card variant="modern" elevation="sm" class="sticky-card" style="margin-top:1rem">
+        <CardContent>
           <h3 class="sidebar-title"><Icon name="mdi:content-save" /> {to.actions ?? "Actions"}</h3>
-          <Button id="create-org-btn" variant="modern" color="primary" className="btn-full">
+          <div class="wizard-nav">
+            <button id="prevStep" class="wizard-btn wizard-btn--secondary" style="display:none">
+              <Icon name="mdi:arrow-left" /> Précédent
+            </button>
+            <button id="nextStep" class="wizard-btn wizard-btn--primary">
+              Suivant <Icon name="mdi:arrow-right" />
+            </button>
+          </div>
+          <Button id="create-org-btn" variant="modern" color="primary" className="btn-full" style="display:none">
             <Icon name="mdi:plus-circle" /> {to.createOrganization ?? "Créer l'organisation"}
           </Button>
           <a href={`${adminBase}/organizations`} class="btn-cancel">{to.cancel ?? "Annuler"}</a>
@@ -158,12 +218,75 @@ const adminBase = `/${lang}/admin`;
       }
     });
 
+    // === Wizard navigation ===
+    let currentStep = 1;
+    const totalSteps = 3;
+    const steps = document.querySelectorAll<HTMLElement>(".wizard-step");
+    const stepBtns = document.querySelectorAll<HTMLElement>(".stepper__step");
+    const bar = document.getElementById("stepperBar") as HTMLElement;
+    const prevBtn = document.getElementById("prevStep") as HTMLElement;
+    const nextBtn = document.getElementById("nextStep") as HTMLElement;
+    const createBtn = document.getElementById("create-org-btn") as HTMLElement;
+
+    function goToStep(n: number) {
+      if (n < 1 || n > totalSteps) return;
+      currentStep = n;
+      steps.forEach(s => { s.style.display = s.dataset.wizardStep === String(n) ? "block" : "none"; });
+      stepBtns.forEach(b => {
+        const sn = Number(b.dataset.step);
+        b.classList.toggle("active", sn === n);
+        b.classList.toggle("done", sn < n);
+      });
+      bar.style.width = `${(n / totalSteps) * 100}%`;
+      prevBtn.style.display = n > 1 ? "inline-flex" : "none";
+      nextBtn.style.display = n < totalSteps ? "inline-flex" : "none";
+      createBtn.style.display = n === totalSteps ? "flex" : "none";
+    }
+
+    prevBtn?.addEventListener("click", () => goToStep(currentStep - 1));
+    nextBtn?.addEventListener("click", () => goToStep(currentStep + 1));
+    stepBtns.forEach(b => b.addEventListener("click", () => goToStep(Number(b.dataset.step))));
+
+    // === Live preview ===
     const val = (id: string) => (document.getElementById(id) as HTMLInputElement)?.value?.trim() ?? "";
 
-    document.getElementById("create-org-btn")?.addEventListener("click", async () => {
+    function updatePreview() {
+      const name = val("org-name") || "Mon Organisation";
+      const slug = val("org-slug") || "mon-organisation";
+      const desc = val("org-desc") || "Description de l'organisation";
+      const city = val("org-city") || "Ville";
+      const country = val("org-country") || "FR";
+      const logo = val("org-logo");
+      const cover = val("org-image");
+
+      const pName = document.getElementById("previewName");
+      const pSlug = document.getElementById("previewSlug");
+      const pDesc = document.getElementById("previewDesc");
+      const pCity = document.getElementById("previewCity");
+      const pLogo = document.getElementById("previewLogo");
+      const pCover = document.getElementById("previewCover");
+
+      if (pName) pName.textContent = name;
+      if (pSlug) pSlug.textContent = `@${slug}`;
+      if (pDesc) pDesc.textContent = desc;
+      if (pCity) pCity.textContent = `${city}, ${country}`;
+      if (pCover) pCover.style.backgroundImage = cover ? `url(${cover})` : "";
+      if (pLogo) {
+        if (logo) {
+          pLogo.innerHTML = `<img src="${logo}" alt="Logo" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
+        }
+      }
+    }
+
+    ["org-name","org-slug","org-desc","org-city","org-country","org-logo","org-image"].forEach(id => {
+      document.getElementById(id)?.addEventListener("input", updatePreview);
+    });
+
+    // === Create organization ===
+    createBtn?.addEventListener("click", async () => {
       const name = val("org-name");
       const slug = val("org-slug");
-      if (!name || !slug) { showToast("Nom et slug requis", "error"); return; }
+      if (!name || !slug) { showToast("Nom et slug requis", "error"); goToStep(1); return; }
 
       const body = {
         action: "create",
@@ -212,7 +335,32 @@ const adminBase = `/${lang}/admin`;
   .admin-page-title { font-size: 1.75rem; font-weight: 800; margin: 0; }
   .admin-page-description { font-size: 0.9375rem; color: var(--text-muted, #64748b); margin: 0.25rem 0 0; }
 
-  .form-layout { display: grid; grid-template-columns: 1fr 280px; gap: 1.5rem; align-items: start; }
+  /* Stepper */
+  .onboarding-stepper { margin-bottom: 2rem; }
+  .stepper { display: flex; align-items: center; justify-content: center; gap: 0; }
+  .stepper__step {
+    display: flex; align-items: center; gap: 0.5rem;
+    background: none; border: none; cursor: pointer;
+    padding: 0.5rem 1rem; border-radius: 999px;
+    font-size: 0.875rem; font-weight: 600;
+    color: var(--text-muted, #64748b);
+    transition: all 0.2s;
+  }
+  .stepper__step.active { color: var(--color-primary, #eab308); }
+  .stepper__step.done { color: var(--color-success, #22c55e); }
+  .stepper__num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.75rem; height: 1.75rem; border-radius: 50%;
+    background: var(--color-surface, #f1f5f9); border: 2px solid var(--border, #e2e8f0);
+    font-size: 0.75rem; font-weight: 700; transition: all 0.2s;
+  }
+  .stepper__step.active .stepper__num { background: var(--color-primary, #eab308); color: #fff; border-color: var(--color-primary, #eab308); }
+  .stepper__step.done .stepper__num { background: var(--color-success, #22c55e); color: #fff; border-color: var(--color-success, #22c55e); }
+  .stepper__line { width: 3rem; height: 2px; background: var(--border, #e2e8f0); }
+  .stepper-progress { height: 4px; background: var(--color-surface, #f1f5f9); border-radius: 999px; margin-top: 1rem; overflow: hidden; }
+  .stepper-progress__bar { height: 100%; background: var(--color-primary, #eab308); border-radius: 999px; transition: width 0.4s ease; }
+
+  .form-layout { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start; }
   .form-main { display: flex; flex-direction: column; gap: 1.5rem; }
   .section-title { font-size: 1.125rem; font-weight: 700; margin: 0 0 1rem; display: flex; align-items: center; gap: 0.5rem; }
   .section-title :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary, #eab308); }
@@ -226,8 +374,41 @@ const adminBase = `/${lang}/admin`;
   .btn-full { width: 100%; justify-content: center; }
   .btn-cancel { display: block; text-align: center; margin-top: 0.75rem; font-size: 0.875rem; color: var(--text-muted, #64748b); text-decoration: underline; }
 
+  /* Wizard nav */
+  .wizard-nav { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+  .wizard-btn {
+    display: inline-flex; align-items: center; gap: 0.375rem;
+    padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .wizard-btn :global(svg) { width: 1rem; height: 1rem; }
+  .wizard-btn--primary { background: var(--color-primary, #eab308); color: #fff; flex: 1; justify-content: center; }
+  .wizard-btn--primary:hover { filter: brightness(1.1); }
+  .wizard-btn--secondary { background: var(--color-surface, #f1f5f9); color: var(--color-text, #0f172a); }
+  .wizard-btn--secondary:hover { background: var(--border, #e2e8f0); }
+
+  /* Live preview */
+  .preview-card { border: 1px solid var(--border, #e2e8f0); border-radius: 0.75rem; overflow: hidden; }
+  .preview-cover { height: 80px; background: linear-gradient(135deg, var(--color-primary, #eab308) 0%, #f59e0b 100%); background-size: cover; background-position: center; }
+  .preview-logo {
+    width: 3rem; height: 3rem; border-radius: 50%;
+    background: #fff; border: 3px solid #fff;
+    display: flex; align-items: center; justify-content: center;
+    margin: -1.5rem auto 0; position: relative; z-index: 1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;
+  }
+  .preview-logo :global(svg) { width: 1.5rem; height: 1.5rem; color: var(--color-primary, #eab308); }
+  .preview-body { padding: 0.75rem 1rem 1rem; text-align: center; }
+  .preview-name { font-size: 0.9375rem; font-weight: 700; margin: 0; }
+  .preview-slug { font-size: 0.75rem; color: var(--text-muted, #64748b); margin: 0.125rem 0 0.5rem; }
+  .preview-desc { font-size: 0.8125rem; color: var(--color-text, #0f172a); margin: 0 0 0.5rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .preview-location { display: flex; align-items: center; justify-content: center; gap: 0.25rem; font-size: 0.75rem; color: var(--text-muted, #64748b); }
+  .preview-location :global(svg) { width: 0.875rem; height: 0.875rem; }
+
   @media (max-width: 768px) {
     .form-layout { grid-template-columns: 1fr; }
     .form-grid { grid-template-columns: 1fr; }
+    .stepper { flex-wrap: wrap; gap: 0.5rem; }
+    .stepper__line { width: 1.5rem; }
   }
 </style>

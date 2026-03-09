@@ -2,7 +2,7 @@
  * Integration tests for /api/admin/roles endpoint.
  * Tests permission check, role assign/revoke, self-assignment prevention, enum validation.
  */
-import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { TEST_ENV } from '@tests/config/test-env'
 import { serverAvailable } from '@tests/helpers/server-guard'
 import { apiCall } from '@tests/utils/api-helpers'

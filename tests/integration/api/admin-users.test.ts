@@ -2,11 +2,10 @@
  * Integration tests for /api/admin/users endpoint.
  * Tests admin guard, user listing, role management, ban/unban, sessions.
  */
-import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest'
-import { getTestDb } from '@tests/config/test-db'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { TEST_ENV } from '@tests/config/test-env'
 import { serverAvailable } from '@tests/helpers/server-guard'
-import { apiCall, signUp } from '@tests/utils/api-helpers'
+import { apiCall } from '@tests/utils/api-helpers'
 import { createAdminWithToken, createUserWithToken, buildApiHeaders } from '@tests/fixtures/test-factory'
 
 const serverUp = await serverAvailable()

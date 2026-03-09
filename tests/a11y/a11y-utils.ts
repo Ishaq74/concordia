@@ -10,6 +10,7 @@ export async function runLighthouse(url: string) {
   // Dynamic import to avoid hard dependency in envs without chrome
   try {
     const lighthouse = (await import('lighthouse')).default;
+    // @ts-expect-error chrome-launcher may not be installed
     const chromeLauncher = await import('chrome-launcher');
     const chrome = await chromeLauncher.launch({ chromeFlags: ['--headless', '--no-sandbox'] });
     const result = await lighthouse(url, {

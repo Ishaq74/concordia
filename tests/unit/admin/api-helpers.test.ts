@@ -9,7 +9,19 @@ vi.mock('@lib/admin/permissions', () => ({
   }),
 }));
 
-import { json, guardAdmin, generateId, slugify } from '@lib/admin/api-helpers';
+vi.mock('@lib/auth/permissions', () => ({
+  hasPermission: vi.fn((roles: string[], permission: string) => {
+    // Admin role has all permissions in tests
+    if (roles.includes('admin')) return true;
+    // Author role has article permissions
+    if (roles.includes('author') && permission.startsWith('article.')) return true;
+    // Moderator has moderation permissions
+    if (roles.includes('moderator') && permission.startsWith('moderation.')) return true;
+    return false;
+  }),
+}));
+
+import { json, guardAdmin, guardPermission, guardOrgOwnership, generateId, slugify } from '@lib/admin/api-helpers';
 
 describe('admin/api-helpers', () => {
   describe('json()', () => {
@@ -122,6 +134,80 @@ describe('admin/api-helpers', () => {
 
     it('handles mixed unicode and latin', () => {
       expect(slugify('Café Latte')).toBe('cafe-latte');
+    });
+  });
+
+  describe('guardPermission()', () => {
+    it('returns null for admin user with any permission', () => {
+      const locals = { user: { id: '1', role: 'admin' } } as unknown as App.Locals;
+      expect(guardPermission(locals, 'article.create')).toBeNull();
+    });
+
+    it('returns null for author with article permissions', () => {
+      const locals = { user: { id: '1', role: 'author' } } as unknown as App.Locals;
+      expect(guardPermission(locals, 'article.create')).toBeNull();
+    });
+
+    it('returns 403 for citizen without article permissions', async () => {
+      const locals = { user: { id: '1', role: 'citizen' } } as unknown as App.Locals;
+      const res = guardPermission(locals, 'article.create');
+      expect(res).toBeInstanceOf(Response);
+      expect(res!.status).toBe(403);
+      const body = await res!.json();
+      expect(body.error).toBe('forbidden');
+      expect(body.requiredPermission).toBe('article.create');
+    });
+
+    it('returns 401 when user is null', () => {
+      const locals = { user: null } as unknown as App.Locals;
+      const res = guardPermission(locals, 'article.create');
+      expect(res).toBeInstanceOf(Response);
+      expect(res!.status).toBe(401);
+    });
+
+    it('returns 403 for moderator without article permissions', () => {
+      const locals = { user: { id: '1', role: 'moderator' } } as unknown as App.Locals;
+      const res = guardPermission(locals, 'article.create');
+      expect(res).toBeInstanceOf(Response);
+      expect(res!.status).toBe(403);
+    });
+
+    it('returns null for moderator with moderation permissions', () => {
+      const locals = { user: { id: '1', role: 'moderator' } } as unknown as App.Locals;
+      expect(guardPermission(locals, 'moderation.action')).toBeNull();
+    });
+  });
+
+  describe('guardOrgOwnership()', () => {
+    it('returns null for admin user (bypass)', () => {
+      const locals = { user: { role: 'admin' }, organizationId: 'org-2' } as unknown as App.Locals;
+      expect(guardOrgOwnership(locals, 'org-1')).toBeNull();
+    });
+
+    it('returns null when resource has no org', () => {
+      const locals = { user: { role: 'citizen' }, organizationId: 'org-1' } as unknown as App.Locals;
+      expect(guardOrgOwnership(locals, null)).toBeNull();
+    });
+
+    it('returns null when org matches', () => {
+      const locals = { user: { role: 'citizen' }, organizationId: 'org-1' } as unknown as App.Locals;
+      expect(guardOrgOwnership(locals, 'org-1')).toBeNull();
+    });
+
+    it('returns 403 when org does not match', async () => {
+      const locals = { user: { role: 'citizen' }, organizationId: 'org-1' } as unknown as App.Locals;
+      const res = guardOrgOwnership(locals, 'org-2');
+      expect(res).toBeInstanceOf(Response);
+      expect(res!.status).toBe(403);
+      const body = await res!.json();
+      expect(body.reason).toBe('organization_mismatch');
+    });
+
+    it('returns 403 when user has no active org', () => {
+      const locals = { user: { role: 'citizen' } } as unknown as App.Locals;
+      const res = guardOrgOwnership(locals, 'org-1');
+      expect(res).toBeInstanceOf(Response);
+      expect(res!.status).toBe(403);
     });
   });
 });

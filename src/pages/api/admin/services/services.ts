@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { json, guardAdmin, generateId, slugify } from "@lib/admin/api-helpers";
+import { json, guardAdmin, guardPermission, guardOrgOwnership, generateId, slugify } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import {
   servicesListings,
@@ -129,6 +129,21 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const action = String(payload.action ?? "").trim();
   if (!action) return json(400, { error: "missing_action" });
 
+  // Fine-grained RBAC check based on action
+  const permMap: Record<string, Parameters<typeof guardPermission>[1]> = {
+    create: "service.create",
+    update: "service.update_own",
+    delete: "service.delete_own",
+    activate: "service.update_own",
+    deactivate: "service.update_own",
+    duplicate: "service.create",
+  };
+  const requiredPerm = permMap[action];
+  if (requiredPerm) {
+    const permGuard = guardPermission(locals, requiredPerm);
+    if (permGuard) return permGuard;
+  }
+
   const db = await getDrizzle();
   const userId = locals.user?.id ?? "system";
 
@@ -210,6 +225,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
       const id = String(payload.id ?? "");
       if (!id) return json(400, { error: "missing_id" });
 
+      // Org ownership check
+      const [existingService] = await db.select().from(servicesListings).where(eq(servicesListings.id, id));
+      if (!existingService) return json(404, { error: "not_found" });
+      const orgGuard = guardOrgOwnership(locals, existingService.organizationId);
+      if (orgGuard) return orgGuard;
+
       const updates: Record<string, unknown> = {};
       if (payload.slug !== undefined) updates.slug = slugify(String(payload.slug));
       if (payload.categoryId !== undefined) updates.categoryId = payload.categoryId || null;
@@ -290,6 +311,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
       const id = String(payload.id ?? "");
       if (!id) return json(400, { error: "missing_id" });
 
+      // Org ownership check
+      const [svcToDelete] = await db.select().from(servicesListings).where(eq(servicesListings.id, id));
+      if (svcToDelete) {
+        const orgGuard = guardOrgOwnership(locals, svcToDelete.organizationId);
+        if (orgGuard) return orgGuard;
+      }
+
       await db.delete(servicesMediaLinks).where(eq(servicesMediaLinks.serviceId, id));
       await db.delete(servicesTranslations).where(eq(servicesTranslations.serviceId, id));
       await db.delete(servicesListings).where(eq(servicesListings.id, id));
@@ -309,6 +337,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (action === "activate") {
       const id = String(payload.id ?? "");
       if (!id) return json(400, { error: "missing_id" });
+
+      // Org ownership check
+      const [svcToActivate] = await db.select().from(servicesListings).where(eq(servicesListings.id, id));
+      if (svcToActivate) {
+        const orgGuard = guardOrgOwnership(locals, svcToActivate.organizationId);
+        if (orgGuard) return orgGuard;
+      }
+
       await db.update(servicesListings).set({ isActive: true, status: "active", updatedAt: new Date() }).where(eq(servicesListings.id, id));
       return json(200, { activated: true });
     }
@@ -317,6 +353,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (action === "deactivate") {
       const id = String(payload.id ?? "");
       if (!id) return json(400, { error: "missing_id" });
+
+      // Org ownership check
+      const [svcToDeactivate] = await db.select().from(servicesListings).where(eq(servicesListings.id, id));
+      if (svcToDeactivate) {
+        const orgGuard = guardOrgOwnership(locals, svcToDeactivate.organizationId);
+        if (orgGuard) return orgGuard;
+      }
+
       await db.update(servicesListings).set({ isActive: false, status: "suspended", updatedAt: new Date() }).where(eq(servicesListings.id, id));
       return json(200, { deactivated: true });
     }

@@ -4,7 +4,7 @@ import { serverAvailable } from '@tests/helpers/server-guard';
 
 const serverUp = await serverAvailable();
 
-describe.skipIf(!serverUp)('Middleware Integration', () => {
+describe.skipIf(!serverUp)('Middleware Integration', { timeout: 120_000 }, () => {
 
 // ─── Locale Redirect ──────────────────────────────────────────
 

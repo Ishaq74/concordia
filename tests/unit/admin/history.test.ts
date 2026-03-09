@@ -5,7 +5,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock the drizzle module
-const mockFindMany = vi.fn().mockResolvedValue([])
 const mockSelect = vi.fn()
 const mockFrom = vi.fn()
 const mockInnerJoin = vi.fn()

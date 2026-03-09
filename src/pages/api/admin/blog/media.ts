@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { json, guardAdmin, generateId } from "@lib/admin/api-helpers";
+import { json, guardAdmin, guardPermission, generateId } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import { blogMedia, auditLog } from "@database/schemas";
 import { eq, desc, count, ilike, and } from "drizzle-orm";
@@ -84,6 +84,10 @@ export const GET: APIRoute = async ({ request, locals }) => {
 export const POST: APIRoute = async ({ request, locals }) => {
   const guard = guardAdmin(locals);
   if (guard) return guard;
+
+  // Gallery management permission check
+  const permGuard = guardPermission(locals, "gallery.create");
+  if (permGuard) return permGuard;
 
   const db = await getDrizzle();
   const userId = locals.user?.id ?? "system";

@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { json, guardAdmin, generateId } from "@lib/admin/api-helpers";
+import { json, guardAdmin, guardPermission, generateId } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import { servicesAvailability } from "@database/schemas";
 import { eq } from "drizzle-orm";
@@ -36,6 +36,10 @@ export const GET: APIRoute = async ({ request, locals }) => {
 export const POST: APIRoute = async ({ request, locals }) => {
   const guard = guardAdmin(locals);
   if (guard) return guard;
+
+  // Service management permission check
+  const permGuard = guardPermission(locals, "service.update_own");
+  if (permGuard) return permGuard;
 
   let payload: Record<string, unknown>;
   try {

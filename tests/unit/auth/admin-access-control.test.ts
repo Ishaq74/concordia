@@ -45,7 +45,7 @@ describe('auth/admin-access-control', () => {
 
   describe('reloadAdminAccessControl()', () => {
     it('invalidates cache and re-populates', async () => {
-      const first = await loadAdminAccessArtifacts();
+      await loadAdminAccessArtifacts();
       await reloadAdminAccessControl();
       const second = await loadAdminAccessArtifacts();
       // After reload, a new object is built from defaults

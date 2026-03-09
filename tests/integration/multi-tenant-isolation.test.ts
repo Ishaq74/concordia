@@ -5,7 +5,6 @@ import { blogOrganizations, blogPosts, servicesListings } from '@database/schema
 import { member } from '@database/schemas/auth-schema';
 import { eq, and } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
-import { getApiBase } from '@tests/utils/api-helpers';
 import { serverAvailable } from '@tests/helpers/server-guard';
 
 /**
@@ -71,7 +70,7 @@ describe('Multi-tenant — Data isolation', () => {
       .from(blogPosts)
       .where(eq(blogPosts.organizationId, orgB.id));
 
-    expect(orgBPosts.find((p) => p.id === postId)).toBeUndefined();
+    expect(orgBPosts.find((p: any) => p.id === postId)).toBeUndefined();
   });
 
   it('org A services are not visible when querying org B', async () => {
@@ -97,7 +96,7 @@ describe('Multi-tenant — Data isolation', () => {
       .from(servicesListings)
       .where(eq(servicesListings.organizationId, orgB.id));
 
-    expect(orgBServices.find((s) => s.id === svcId)).toBeUndefined();
+    expect(orgBServices.find((s: any) => s.id === svcId)).toBeUndefined();
   });
 
   it('member of org A cannot be listed as member of org B', async () => {
@@ -121,7 +120,7 @@ describe('Multi-tenant — Data isolation', () => {
       .from(member)
       .where(eq(member.organizationId, orgB.id));
 
-    expect(orgBMembers.find((m) => m.userId === userA.id)).toBeUndefined();
+    expect(orgBMembers.find((m: any) => m.userId === userA.id)).toBeUndefined();
   });
 });
 
@@ -261,7 +260,7 @@ describe('Multi-tenant — Cross-org data leakage prevention', () => {
       .from(member)
       .where(eq(member.organizationId, orgB.id));
     expect(orgBMembers.length).toBeGreaterThanOrEqual(1);
-    expect(orgBMembers.some((m) => m.userId === user.id)).toBe(true);
+    expect(orgBMembers.some((m: any) => m.userId === user.id)).toBe(true);
   });
 });
 });

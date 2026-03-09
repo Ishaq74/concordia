@@ -1,0 +1,161 @@
+---
+// src/pages/[lang]/citizens/[slug].astro — Profil public du citoyen
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import { user as userTable } from "@database/schemas/auth-schema";
+import { profile } from "@database/schemas/profile.schema";
+import { member, organization } from "@database/schemas/auth-schema";
+import { servicesListings, servicesReviews } from "@database/schemas";
+import { blogComments, blogPostAuthors } from "@database/schemas";
+import { eq, count, avg } from "drizzle-orm";
+import { getTranslations } from "@i18n/translations";
+
+const lang = Astro.params.lang as string;
+const slug = Astro.params.slug as string;
+const t = getTranslations(lang);
+
+const db = await getDrizzle();
+
+// Find user by username (slug)
+const [targetUser] = await db.select().from(userTable).where(eq(userTable.username, slug)).limit(1);
+if (!targetUser) return Astro.redirect(`/${lang}/404`);
+
+// Load profile + stats in parallel
+const [userProfile, orgs, [serviceCount], [reviewStats], [postCount], [commentCount]] = await Promise.all([
+  db.select().from(profile).where(eq(profile.userId, targetUser.id)).then(r => r[0]),
+  db.select({ orgId: member.organizationId, orgName: organization.name, orgSlug: organization.slug, orgLogo: organization.logo, role: member.role })
+    .from(member).innerJoin(organization, eq(member.organizationId, organization.id)).where(eq(member.userId, targetUser.id)),
+  db.select({ value: count() }).from(servicesListings).where(eq(servicesListings.providerId, targetUser.id)),
+  db.select({ count: count(), avg: avg(servicesReviews.rating) }).from(servicesReviews).where(eq(servicesReviews.authorId, targetUser.id)),
+  db.select({ value: count() }).from(blogPostAuthors).where(eq(blogPostAuthors.authorId, targetUser.id)),
+  db.select({ value: count() }).from(blogComments).where(eq(blogComments.authorEmail, targetUser.email)),
+]);
+
+const displayName = userProfile?.fullName || targetUser.name || targetUser.username || "Citoyen";
+const memberSince = targetUser.createdAt ? new Date(targetUser.createdAt).getFullYear() : "—";
+const avatarUrl = targetUser.image || userProfile?.avatarUrl || "/images/placeholder.jpg";
+const bio = userProfile?.bio || t.profile?.noBio || "Ce citoyen n'a pas encore rédigé de biographie.";
+const location = userProfile?.location || null;
+const website = userProfile?.website || null;
+
+const stats = [
+  { icon: "mdi:briefcase-outline", value: serviceCount?.value ?? 0, label: t.profile?.statsServices ?? "Services proposés" },
+  { icon: "mdi:star-outline", value: reviewStats?.count ?? 0, label: t.profile?.statsReviews ?? "Avis reçus" },
+  { icon: "mdi:newspaper-variant-outline", value: postCount?.value ?? 0, label: t.profile?.statsPosts ?? "Articles publiés" },
+  { icon: "mdi:comment-text-outline", value: commentCount?.value ?? 0, label: t.profile?.statsComments ?? "Commentaires" },
+];
+const avgRating = reviewStats?.avg ? parseFloat(String(reviewStats.avg)).toFixed(1) : null;
+---
+
+<BaseLayout title={`${displayName} — Concordia`} lang={lang}>
+  <main class="citizen-profile">
+    {/* ===== HEADER COVER + AVATAR ===== */}
+    <section class="cp-header">
+      <div class="cp-cover" aria-hidden="true"></div>
+      <div class="cp-header__content">
+        <img src={avatarUrl} alt={displayName} class="cp-avatar" width="120" height="120" loading="eager" />
+        <div class="cp-header__info">
+          <h1 class="cp-name">{displayName}</h1>
+          <div class="cp-meta">
+            {targetUser.role && <Badge variant="retro" color="accent">{targetUser.role}</Badge>}
+            <span class="cp-meta__item"><Icon name="mdi:calendar-star" size={16} /> {t.profile?.memberSince ?? "Membre depuis"} {memberSince}</span>
+            {location && <span class="cp-meta__item"><Icon name="mdi:map-marker-outline" size={16} /> {location}</span>}
+            {avgRating && <span class="cp-meta__item"><Icon name="mdi:star" size={16} /> {avgRating}/5</span>}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="cp-layout">
+      {/* ===== COLONNE PRINCIPALE ===== */}
+      <div class="cp-main">
+        {/* Bio */}
+        <Card variant="retro">
+          <CardContent>
+            <h2 class="cp-section-title"><Icon name="mdi:account-outline" size={20} /> {t.profile?.aboutTitle ?? "À propos"}</h2>
+            <p class="cp-bio">{bio}</p>
+            {website && <p class="cp-website"><Icon name="mdi:link-variant" size={16} /> <a href={website} target="_blank" rel="noopener">{website}</a></p>}
+          </CardContent>
+        </Card>
+
+        {/* Organisations */}
+        {orgs.length > 0 && (
+          <Card variant="retro">
+            <CardContent>
+              <h2 class="cp-section-title"><Icon name="mdi:office-building-outline" size={20} /> {t.profile?.orgsTitle ?? "Organisations"}</h2>
+              <div class="cp-orgs">
+                {orgs.map(org => (
+                  <a href={`/${lang}/organizations/${org.orgSlug}`} class="cp-org-card">
+                    {org.orgLogo ? <img src={org.orgLogo} alt={org.orgName} class="cp-org-logo" width="40" height="40" /> : <div class="cp-org-logo cp-org-logo--placeholder"><Icon name="mdi:office-building" size={20} /></div>}
+                    <div>
+                      <strong>{org.orgName}</strong>
+                      <Badge variant="retro" color="primary">{org.role}</Badge>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* ===== SIDEBAR ===== */}
+      <aside class="cp-sidebar">
+        {/* Stats */}
+        <Card variant="retro">
+          <CardContent>
+            <h3 class="cp-section-title">{t.profile?.activityTitle ?? "Activité"}</h3>
+            <div class="cp-stats">
+              {stats.map(s => (
+                <div class="cp-stat">
+                  <Icon name={s.icon} size={20} />
+                  <span class="cp-stat__value">{s.value}</span>
+                  <span class="cp-stat__label">{s.label}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </aside>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .citizen-profile { max-width: 72rem; margin: 0 auto; padding: 0 var(--space-4, 1rem) var(--space-12, 3rem); }
+
+  .cp-header { position: relative; margin-bottom: var(--space-6, 1.5rem); }
+  .cp-cover { height: 200px; background: linear-gradient(135deg, var(--color-primary-soft, #f0e0d6) 0%, var(--bg-muted, #e8e0d6) 100%); border-radius: 0 0 var(--radius-lg, 12px) var(--radius-lg, 12px); }
+  .cp-header__content { display: flex; align-items: flex-end; gap: var(--space-4, 1rem); max-width: 64rem; margin: -60px auto 0; padding: 0 var(--space-4, 1rem); position: relative; z-index: 1; }
+  .cp-avatar { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--bg-surface, #fff); object-fit: cover; background: var(--bg-muted, #e5e5e5); }
+  .cp-header__info { padding-bottom: var(--space-2, .5rem); }
+  .cp-name { font-size: 1.75rem; margin: 0; }
+  .cp-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-top: 0.25rem; }
+  .cp-meta__item { display: flex; align-items: center; gap: 0.2rem; font-size: 0.85rem; color: var(--text-muted, #888); }
+
+  .cp-layout { display: grid; grid-template-columns: 1fr 300px; gap: var(--space-6, 1.5rem); align-items: start; }
+  @media (max-width: 768px) { .cp-layout { grid-template-columns: 1fr; } .cp-header__content { flex-direction: column; align-items: center; text-align: center; } }
+
+  .cp-main { display: flex; flex-direction: column; gap: var(--space-4, 1rem); }
+  .cp-section-title { font-size: 1rem; display: flex; align-items: center; gap: 0.3rem; margin: 0 0 var(--space-3, .75rem); }
+  .cp-bio { line-height: 1.7; color: var(--text-secondary, #555); }
+  .cp-website a { color: var(--color-primary, #b85c38); }
+
+  .cp-orgs { display: flex; flex-direction: column; gap: var(--space-2, .5rem); }
+  .cp-org-card { display: flex; align-items: center; gap: var(--space-3, .75rem); padding: var(--space-2, .5rem); border-radius: var(--radius-md, 6px); text-decoration: none; color: inherit; transition: background 0.15s; }
+  .cp-org-card:hover { background: var(--bg-subtle, #f9f5f1); }
+  .cp-org-logo { width: 40px; height: 40px; border-radius: var(--radius-md, 6px); object-fit: cover; }
+  .cp-org-logo--placeholder { background: var(--bg-muted, #e5e5e5); display: flex; align-items: center; justify-content: center; color: var(--text-muted, #888); }
+
+  .cp-sidebar { position: sticky; top: 5rem; }
+  .cp-stats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3, .75rem); }
+  .cp-stat { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; text-align: center; color: var(--color-primary, #b85c38); }
+  .cp-stat__value { font-size: 1.5rem; font-weight: 700; }
+  .cp-stat__label { font-size: 0.75rem; color: var(--text-muted, #888); }
+</style>

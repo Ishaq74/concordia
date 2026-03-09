@@ -1,9 +1,8 @@
 import 'dotenv/config'
-import { afterEach, beforeAll, beforeEach, afterAll, vi, expect } from 'vitest'
+import { afterEach, beforeEach, vi, expect } from 'vitest'
 import * as axeMatchers from 'vitest-axe/matchers';
 import { cleanupTestData } from './utils/cleanup'
 export { cleanupTestData };
-import { TEST_ENV } from './config/test-env'
 
 // add axe matchers globally
 expect.extend(axeMatchers);
@@ -63,51 +62,10 @@ vi.mock('@lib/auth/auth', async () => {
   }
 })
 
-let serverProcess: any;
-
-beforeAll(async () => {
-  if (!serverProcess) {
-    const { spawn } = require('child_process');
-    serverProcess = spawn('npx', ['astro', 'dev', '--port', '4321'], {
-      shell: true,
-      stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env, NODE_ENV: 'test' },
-    });
-
-    serverProcess.on('error', (err: any) => console.error('server spawn error', err));
-
-    // Poll until a port responds instead of a blind setTimeout
-    let foundPort: number | null = null;
-    const maxWait = 30_000; // 30 s ceiling
-    const start = Date.now();
-    while (Date.now() - start < maxWait) {
-      for (let p = 4321; p < 4350; p++) {
-        try {
-          const res = await fetch(`http://localhost:${p}/`, {
-            signal: AbortSignal.timeout(1000),
-          });
-          if (res.ok || res.status === 404) {
-            foundPort = p;
-            break;
-          }
-        } catch { /* not ready yet */ }
-      }
-      if (foundPort !== null) break;
-      await new Promise((r) => setTimeout(r, 500));
-    }
-    if (foundPort === null) foundPort = 4321;
-    const newBase = `http://localhost:${foundPort}/api/auth`;
-    process.env.TEST_BASE_URL = newBase;
-    TEST_ENV.TEST_BASE_URL = newBase;
-  }
-});
-
-afterAll(async () => {
-  if (serverProcess) {
-    serverProcess.kill();
-    serverProcess = null;
-  }
-})
+// Server-dependent tests (page-render, security, etc.) use the
+// serverAvailable() guard and skip automatically when no dev server is running.
+// To run those tests, start the server manually:  pnpm dev
+// The guard in tests/helpers/server-guard.ts handles detection.
 
 beforeEach(async () => {
   await cleanupTestData()

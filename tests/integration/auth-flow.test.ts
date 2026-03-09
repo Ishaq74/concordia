@@ -62,14 +62,14 @@ describe('Auth — critical integration tests', () => {
     const password = 'SafePass123!';
 
     // First sign-up should succeed
-    const first = await authInstance.api.signUpEmail({
+    const first = await (authInstance.api as any).signUpEmail({
       body: { email, password, username: `user_${Date.now()}`, name: 'Test User' }
     });
     expect(first).toBeDefined();
 
     // Second sign-up with same email should either throw or return an error/different user
     try {
-      const second = await authInstance.api.signUpEmail({
+      const second = await (authInstance.api as any).signUpEmail({
         body: { email, password, username: `user2_${Date.now()}`, name: 'Test User 2' }
       });
       // If it doesn't throw, the result should be different from the first

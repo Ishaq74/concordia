@@ -8,9 +8,18 @@ import CardContent from "@components/ui/Card/CardContent.astro";
 import Badge from "@components/ui/Badge.astro";
 import Button from "@components/ui/Button.astro";
 import Pagination from "@components/ui/Pagination.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
 import { Icon } from "astro-icon/components";
 import { getDrizzle } from "@database/drizzle";
-import { blogPosts, blogTranslations } from "@database/schemas";
+import { blogPosts, blogTranslations, blogComments } from "@database/schemas";
 import { member } from "@database/schemas/auth-schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { getTranslations } from "@i18n/translations";
@@ -108,7 +117,25 @@ const published = allPosts.filter(p => p.status === "published").length;
 const drafts = allPosts.filter(p => p.status === "draft").length;
 const featured = allPosts.filter(p => p.isFeatured).length;
 
-const statusBadgeColor: Record<string, string> = {
+// Comments moderation — fetch comments for this org's posts
+const orgPostIds = allPosts.map(p => p.id);
+const allComments = orgPostIds.length > 0
+  ? await db.select({
+    id: blogComments.id,
+    postId: blogComments.postId,
+    authorName: blogComments.authorName,
+    authorEmail: blogComments.authorEmail,
+    content: blogComments.content,
+    status: blogComments.status,
+    createdAt: blogComments.createdAt,
+  }).from(blogComments)
+    .where(sql`${blogComments.postId} IN (${sql.join(orgPostIds.map(id => sql`${id}`), sql`, `)})`)
+    .orderBy(desc(blogComments.createdAt))
+  : [];
+const pendingComments = allComments.filter(c => c.status === "pending");
+
+type BadgeColor = "default" | "primary" | "secondary" | "accent" | "success" | "warning" | "error";
+const statusBadgeColor: Record<string, BadgeColor> = {
   published: "success",
   draft: "secondary",
   pending: "warning",
@@ -141,7 +168,7 @@ const statusBadgeColor: Record<string, string> = {
     </Card>
     <Card variant="modern" elevation="sm">
       <CardContent>
-        <div class="stat-compact">
+        <div class="stat-compact stat-published">
           <Icon name="mdi:check-circle" />
           <div><span class="stat-num">{published}</span><span class="stat-label">{to.published ?? "Publiés"}</span></div>
         </div>
@@ -149,7 +176,7 @@ const statusBadgeColor: Record<string, string> = {
     </Card>
     <Card variant="modern" elevation="sm">
       <CardContent>
-        <div class="stat-compact">
+        <div class="stat-compact stat-drafts">
           <Icon name="mdi:pencil-outline" />
           <div><span class="stat-num">{drafts}</span><span class="stat-label">{to.drafts ?? "Brouillons"}</span></div>
         </div>
@@ -157,9 +184,17 @@ const statusBadgeColor: Record<string, string> = {
     </Card>
     <Card variant="modern" elevation="sm">
       <CardContent>
-        <div class="stat-compact">
+        <div class="stat-compact stat-star">
           <Icon name="mdi:star" />
           <div><span class="stat-num">{featured}</span><span class="stat-label">{to.featured ?? "En vedette"}</span></div>
+        </div>
+      </CardContent>
+    </Card>
+    <Card variant="modern" elevation="sm">
+      <CardContent>
+        <div class="stat-compact stat-comments">
+          <Icon name="mdi:comment-alert-outline" />
+          <div><span class="stat-num">{pendingComments.length}</span><span class="stat-label">{to.pendingComments ?? "Commentaires en attente"}</span></div>
         </div>
       </CardContent>
     </Card>
@@ -169,18 +204,19 @@ const statusBadgeColor: Record<string, string> = {
   <Card variant="modern" elevation="sm" class="filters-card">
     <CardContent>
       <form class="filters-form" method="get">
-        <div class="filter-group">
-          <Icon name="mdi:magnify" />
-          <input type="text" name="q" value={search} placeholder={to.searchArticle ?? "Rechercher un article..."} class="filter-input" />
+        <div class="filter-field filter-search">
+          <Label htmlFor="q">{to.searchArticle ?? "Rechercher"}</Label>
+          <Input id="q" name="q" type="search" value={search} placeholder={to.searchArticle ?? "Rechercher un article..."} icon="mdi:magnify" iconPosition="left" />
         </div>
-        <div class="filter-group">
-          <select name="status" class="filter-select">
+        <div class="filter-field">
+          <Label htmlFor="status">{to.status ?? "Statut"}</Label>
+          <Select id="status" name="status">
             <option value="">{to.allStatuses ?? "Tous les statuts"}</option>
             <option value="published" selected={statusFilter === "published"}>{to.statusPublished ?? "Publiés"}</option>
             <option value="draft" selected={statusFilter === "draft"}>{to.statusDraft ?? "Brouillons"}</option>
             <option value="pending" selected={statusFilter === "pending"}>{to.statusPending ?? "En attente"}</option>
-            <option value="archived" selected={statusFilter === "archived"}>{to.statusArchived ?? "Archivés"}</option>
-          </select>
+            <option value="archived" selected={statusFilter === "archived"}>{to.statusArchivés ?? "Archivés"}</option>
+          </Select>
         </div>
         <Button variant="modern" color="secondary" type="submit" icon={{ name: "mdi:filter", side: "left" }}>
           {to.filter ?? "Filtrer"}
@@ -192,46 +228,44 @@ const statusBadgeColor: Record<string, string> = {
   <!-- Table -->
   <Card variant="modern" elevation="sm">
     <CardContent>
-      <div class="table-responsive">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>{to.article ?? "Article"}</th>
-              <th>{to.status ?? "Statut"}</th>
-              <th>{to.language ?? "Langue"}</th>
-              <th>{to.readingTime ?? "Lecture"}</th>
-              <th>{to.publishedAt ?? "Publié le"}</th>
-              <th>{to.actions ?? "Actions"}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {posts.map(p => (
-              <tr>
-                <td>
-                  <div class="article-cell">
-                    <strong class="article-title">{p.title}</strong>
-                    <code class="article-slug">/{p.slug}</code>
-                  </div>
-                </td>
-                <td><Badge variant="modern" color={(statusBadgeColor[p.status] ?? "secondary") as any}>{p.status}</Badge></td>
-                <td><Badge variant="modern" color="accent">{p.inLanguage.toUpperCase()}</Badge></td>
-                <td class="meta-cell">{p.readingTime ?? "-"}</td>
-                <td class="meta-cell">{p.publishedAt ? p.publishedAt.toLocaleDateString(lang, { day: "numeric", month: "short", year: "numeric" }) : "-"}</td>
-                <td>
-                  <div class="action-btns">
-                    <a href={`${adminBase}/blog/articles/${p.id}`} class="btn-icon" title={to.edit ?? "Éditer"}>
-                      <Icon name="mdi:pencil" />
-                    </a>
-                    <a href={`/${lang}/blog/${p.slug}`} target="_blank" class="btn-icon" title={to.view ?? "Voir"}>
-                      <Icon name="mdi:open-in-new" />
-                    </a>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table variant="modern" striped>
+        <TableHeader>
+          <TableRow>
+            <TableHead>{to.article ?? "Article"}</TableHead>
+            <TableHead>{to.status ?? "Statut"}</TableHead>
+            <TableHead>{to.language ?? "Langue"}</TableHead>
+            <TableHead>{to.readingTime ?? "Lecture"}</TableHead>
+            <TableHead>{to.publishedAt ?? "Publié le"}</TableHead>
+            <TableHead>{to.actions ?? "Actions"}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {posts.map(p => (
+            <TableRow>
+              <TableCell>
+                <div class="article-cell">
+                  <strong class="article-title">{p.title}</strong>
+                  <code class="article-slug">/{p.slug}</code>
+                </div>
+              </TableCell>
+              <TableCell><Badge variant="modern" color={statusBadgeColor[p.status] ?? "secondary"}>{p.status}</Badge></TableCell>
+              <TableCell><Badge variant="modern" color="accent">{p.inLanguage.toUpperCase()}</Badge></TableCell>
+              <TableCell className="meta-cell">{p.readingTime ?? "-"}</TableCell>
+              <TableCell className="meta-cell">{p.publishedAt ? p.publishedAt.toLocaleDateString(lang, { day: "numeric", month: "short", year: "numeric" }) : "-"}</TableCell>
+              <TableCell>
+                <div class="action-btns">
+                  <a href={`${adminBase}/blog/articles/${p.id}`} class="btn-icon" title={to.edit ?? "Éditer"}>
+                    <Icon name="mdi:pencil" />
+                  </a>
+                  <a href={`/${lang}/blog/${p.slug}`} target="_blank" class="btn-icon" title={to.view ?? "Voir"}>
+                    <Icon name="mdi:open-in-new" />
+                  </a>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
       {posts.length === 0 && (
         <div class="empty-state">
           <Icon name="mdi:file-document-outline" />
@@ -249,31 +283,110 @@ const statusBadgeColor: Record<string, string> = {
       <Pagination currentPage={page} totalPages={totalPages} baseUrl={`${adminBase}/organizations/blog`} />
     </div>
   )}
+
+  <!-- Comments Moderation -->
+  {pendingComments.length > 0 && (
+    <Card variant="modern" elevation="sm" class="comments-section">
+      <CardContent>
+        <h2 class="section-title"><Icon name="mdi:comment-alert-outline" /> {to.pendingComments ?? "Commentaires en attente de modération"} <Badge variant="modern" color="warning">{pendingComments.length}</Badge></h2>
+        <Table variant="modern" striped>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{to.author ?? "Auteur"}</TableHead>
+              <TableHead>{to.comment ?? "Commentaire"}</TableHead>
+              <TableHead>{to.date ?? "Date"}</TableHead>
+              <TableHead>{to.actions ?? "Actions"}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {pendingComments.slice(0, 10).map(c => {
+              const txt = typeof c.content === "string" ? c.content : (c.content as any)?.text ?? JSON.stringify(c.content);
+              const postTitle = filteredPosts.find(p => p.id === c.postId)?.title ?? c.postId.slice(0, 8);
+              return (
+                <TableRow>
+                  <TableCell>
+                    <div class="comment-author">
+                      <strong>{c.authorName}</strong>
+                      <small>{c.authorEmail}</small>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div class="comment-content">
+                      <small class="comment-post">sur: {postTitle}</small>
+                      <p class="comment-text">{txt.slice(0, 120)}{txt.length > 120 ? "..." : ""}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell className="meta-cell">{c.createdAt.toLocaleDateString(lang, { day: "numeric", month: "short" })}</TableCell>
+                  <TableCell>
+                    <div class="action-btns">
+                      <button class="btn-icon btn-success approve-comment" data-id={c.id} title={to.approve ?? "Approuver"}>
+                        <Icon name="mdi:check" />
+                      </button>
+                      <button class="btn-icon btn-danger reject-comment" data-id={c.id} title={to.reject ?? "Rejeter"}>
+                        <Icon name="mdi:close" />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+        {pendingComments.length > 10 && (
+          <p class="comments-more">{to.andMore ?? "et"} {pendingComments.length - 10} {to.moreComments ?? "commentaires supplémentaires..."}</p>
+        )}
+      </CardContent>
+    </Card>
+  )}
 </AdminLayout>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const toast = (msg: string, type = "info") => (window as any).showToast ? (window as any).showToast(msg, type) : alert(msg);
+
+    async function moderateComment(id: string, action: "approve" | "reject") {
+      try {
+        const res = await fetch("/api/admin/blog/comments", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, action }),
+        });
+        if (!res.ok) throw new Error((await res.json()).error ?? "Erreur");
+        toast(action === "approve" ? "Commentaire approuvé" : "Commentaire rejeté", "success");
+        const btn = document.querySelector(`[data-id="${id}"]`);
+        const row = btn?.closest("tr") as HTMLElement | null;
+        if (row) { row.style.opacity = "0.3"; setTimeout(() => row.remove(), 400); }
+      } catch (e: any) { toast(e.message, "error"); }
+    }
+
+    document.querySelectorAll(".approve-comment").forEach(btn => {
+      btn.addEventListener("click", () => moderateComment((btn as HTMLElement).dataset.id!, "approve"));
+    });
+    document.querySelectorAll(".reject-comment").forEach(btn => {
+      btn.addEventListener("click", () => moderateComment((btn as HTMLElement).dataset.id!, "reject"));
+    });
+  });
+</script>
 
 <style>
   .admin-page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
   .admin-page-title { font-size: 1.75rem; font-weight: 800; margin: 0; }
   .admin-page-description { font-size: 0.9375rem; color: var(--text-muted, #64748b); margin: 0.25rem 0 0; }
 
-  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
   .stat-compact { display: flex; align-items: center; gap: 0.75rem; }
   .stat-compact :global(svg) { width: 1.5rem; height: 1.5rem; color: var(--color-primary, #eab308); }
+  .stat-published :global(svg) { color: #22c55e; }
+  .stat-drafts :global(svg) { color: #94a3b8; }
+  .stat-star :global(svg) { color: #f59e0b; }
+  .stat-comments :global(svg) { color: #ef4444; }
   .stat-num { display: block; font-size: 1.5rem; font-weight: 800; line-height: 1; }
   .stat-label { font-size: 0.8125rem; color: var(--text-muted, #64748b); }
 
   .filters-card { margin-bottom: 1.5rem; }
-  .filters-form { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-  .filter-group { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 200px; }
-  .filter-group :global(svg) { width: 1.125rem; height: 1.125rem; color: var(--text-muted, #94a3b8); }
-  .filter-input { border: 1px solid var(--border-default, #e2e8f0); border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; width: 100%; }
-  .filter-select { border: 1px solid var(--border-default, #e2e8f0); border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; background: var(--bg-default, white); }
-
-  .table-responsive { overflow-x: auto; }
-  .admin-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-  .admin-table th { text-align: left; font-weight: 600; padding: 0.75rem; border-bottom: 2px solid var(--border-default, #e2e8f0); color: var(--text-muted, #64748b); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
-  .admin-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-default, #f1f5f9); vertical-align: middle; }
-  .admin-table tr:hover td { background: var(--bg-muted, rgba(241,245,249,0.5)); }
+  .filters-form { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+  .filter-field { flex: 1; min-width: 180px; }
+  .filter-search { flex: 2; }
 
   .article-cell { display: flex; flex-direction: column; gap: 0.125rem; }
   .article-title { font-weight: 600; }
@@ -293,4 +406,20 @@ const statusBadgeColor: Record<string, string> = {
 
   @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 480px) { .stats-row { grid-template-columns: 1fr; } }
+
+  /* Comments moderation */
+  .comments-section { margin-top: 1.5rem; }
+  .section-title { font-size: 1.125rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; margin: 0 0 1rem; }
+  .section-title :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary, #eab308); }
+  .comment-author { display: flex; flex-direction: column; }
+  .comment-author strong { font-weight: 600; }
+  .comment-author small { color: var(--text-muted, #64748b); font-size: 0.75rem; }
+  .comment-content { display: flex; flex-direction: column; gap: 0.25rem; max-width: 400px; }
+  .comment-post { color: var(--color-primary, #eab308); font-size: 0.75rem; font-weight: 600; }
+  .comment-text { margin: 0; font-size: 0.875rem; line-height: 1.4; }
+  .comments-more { margin: 0.75rem 0 0; font-size: 0.8125rem; color: var(--text-muted, #94a3b8); text-align: center; }
+  .btn-success { color: #22c55e; }
+  .btn-success:hover { background: #f0fdf4; }
+  .btn-danger { color: #ef4444; }
+  .btn-danger:hover { background: #fef2f2; }
 </style>

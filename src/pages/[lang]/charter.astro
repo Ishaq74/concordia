@@ -1,0 +1,202 @@
+---
+// src/pages/[lang]/charter.astro — Charte de la Cité-État Numérique Concordia
+export const prerender = true;
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: "fr" } },
+    { params: { lang: "en" } },
+    { params: { lang: "ar" } },
+    { params: { lang: "es" } },
+  ];
+}
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+
+const districts = [
+  { icon: "mdi:map-outline", color: "#4a7c59", title: t.charter?.districtMapping ?? "Cartographie Locale", desc: t.charter?.districtMappingDesc ?? "Recenser, visualiser et connecter les acteurs, les lieux et les ressources de votre territoire. Chaque citoyen contribue à une carte vivante de la communauté." },
+  { icon: "mdi:account-voice", color: "#b85c38", title: t.charter?.districtMediation ?? "Médiation & Justice", desc: t.charter?.districtMediationDesc ?? "Résoudre les conflits par le dialogue, accompagner les différends entre voisins, prestataires et organisations. Une justice de proximité, humaine et transparente." },
+  { icon: "mdi:tools", color: "#5b7ea1", title: t.charter?.districtSkills ?? "Compétences & Entraide", desc: t.charter?.districtSkillsDesc ?? "Partager vos savoir-faire, proposer des services, former et être formé. Un marché solidaire du temps et des compétences." },
+  { icon: "mdi:school-outline", color: "#8b6f47", title: t.charter?.districtEducation ?? "Éducation & Bien-être", desc: t.charter?.districtEducationDesc ?? "Accéder à des ressources éducatives, des formations citoyennes et des outils de santé communautaire. Le savoir comme bien commun." },
+];
+
+const principles = [
+  { icon: "mdi:eye-outline", title: t.charter?.principleTransparency ?? "Transparence absolue", desc: t.charter?.principleTransparencyDesc ?? "Toutes les décisions, budgets et algorithmes sont documentés et accessibles. Aucune boîte noire." },
+  { icon: "mdi:vote-outline", title: t.charter?.principleDemocracy ?? "Démocratie participative", desc: t.charter?.principleDemocracyDesc ?? "Chaque citoyen a voix au chapitre. Les décisions majeures sont soumises au vote communautaire." },
+  { icon: "mdi:shield-check-outline", title: t.charter?.principleSovereignty ?? "Souveraineté des données", desc: t.charter?.principleSovereigntyDesc ?? "Vos données vous appartiennent. Portabilité totale, droit à l'effacement, aucune monétisation de vos informations personnelles." },
+  { icon: "mdi:sprout", title: t.charter?.principleEcology ?? "Sobriété numérique", desc: t.charter?.principleEcologyDesc ?? "Infrastructure minimale, code optimisé, hébergement vert. Chaque octet compte dans notre empreinte collective." },
+  { icon: "mdi:hand-heart-outline", title: t.charter?.principleInclusion ?? "Inclusion sans compromis", desc: t.charter?.principleInclusionDesc ?? "Accessibilité WCAG AAA, multilingue (fr, en, ar, es), interface adaptée aux handicaps visuels, moteurs et cognitifs." },
+  { icon: "mdi:scale-balance", title: t.charter?.principleEquity ?? "Équité économique", desc: t.charter?.principleEquityDesc ?? "Commissions justes, tarification solidaire pour les associations, revenus redistribués dans l'écosystème local." },
+];
+
+const stats = [
+  { value: "12k+", label: t.charter?.statsCitizens ?? "Citoyens enregistrés", icon: "mdi:account-group" },
+  { value: "850", label: t.charter?.statsMediators ?? "Médiateurs actifs", icon: "mdi:account-voice" },
+  { value: "45k", label: t.charter?.statsHours ?? "Heures de bénévolat", icon: "mdi:clock-outline" },
+  { value: "4/4", label: t.charter?.statsDistricts ?? "Districts opérationnels", icon: "mdi:map-marker-check" },
+];
+---
+
+<BaseLayout title={t.charter?.metaTitle ?? "Charte de la Cité-État Numérique — Concordia"} lang={lang}>
+  <main class="charter-page">
+    {/* ===== HERO ===== */}
+    <section class="charter-hero">
+      <div class="charter-hero__bg" aria-hidden="true"><div class="charter-hero__overlay" /></div>
+      <div class="charter-hero__content">
+        <Badge variant="retro" color="accent">{t.charter?.heroLabel ?? "Manifeste fondateur"}</Badge>
+        <h1 class="charter-hero__title">{t.charter?.heroTitle ?? "Charte de la Cité-État Numérique"}</h1>
+        <p class="charter-hero__subtitle">{t.charter?.heroSubtitle ?? "Un contrat social pour l'ère numérique. Transparence, participation, souveraineté."}</p>
+        <a href="#districts">
+          <Button variant="retro" color="primary" icon={{ name: "mdi:arrow-down", side: "right" }}>
+            {t.charter?.heroCta ?? "Découvrir les fondements"}
+          </Button>
+        </a>
+      </div>
+    </section>
+
+    {/* ===== MISSION ===== */}
+    <section class="charter-section" id="mission">
+      <div class="charter-section__inner">
+        <h2 class="charter-section__title">{t.charter?.missionTitle ?? "Notre Mission"}</h2>
+        <p class="charter-section__text charter-section__text--large">{t.charter?.missionText ?? "Concordia est née d'une conviction : la technologie doit servir le lien social, pas le remplacer. Nous construisons une infrastructure numérique publique — une cité-état où chaque citoyen est acteur de sa communauté, où les organisations coopèrent au service du bien commun, et où la transparence est un principe non négociable."}</p>
+        <p class="charter-section__text">{t.charter?.missionText2 ?? "Inspirée des modèles de gouvernance ouverte, Concordia organise la vie numérique locale autour de quatre districts, chacun correspondant à un pilier de la vie en société."}</p>
+      </div>
+    </section>
+
+    {/* ===== 4 DISTRICTS ===== */}
+    <section class="charter-section charter-section--alt" id="districts">
+      <div class="charter-section__inner">
+        <Badge variant="retro" color="primary">{t.charter?.districtsLabel ?? "Structure"}</Badge>
+        <h2 class="charter-section__title">{t.charter?.districtsTitle ?? "Les 4 Districts"}</h2>
+        <p class="charter-section__text">{t.charter?.districtsSubtitle ?? "Chaque district correspond à un domaine fondamental de la vie citoyenne."}</p>
+        <div class="charter-districts">
+          {districts.map(d => (
+            <Card variant="retro" class="charter-district-card">
+              <CardContent>
+                <div class="charter-district-icon" style={`background: ${d.color}15; color: ${d.color};`}>
+                  <Icon name={d.icon} size={32} />
+                </div>
+                <h3>{d.title}</h3>
+                <p>{d.desc}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ===== PRINCIPES DE GOUVERNANCE ===== */}
+    <section class="charter-section" id="governance">
+      <div class="charter-section__inner">
+        <Badge variant="retro" color="accent">{t.charter?.governanceLabel ?? "Gouvernance"}</Badge>
+        <h2 class="charter-section__title">{t.charter?.governanceTitle ?? "Principes Fondateurs"}</h2>
+        <p class="charter-section__text">{t.charter?.governanceSubtitle ?? "Six engagements irrévocables qui guident chaque décision."}</p>
+        <div class="charter-principles">
+          {principles.map(p => (
+            <div class="charter-principle">
+              <div class="charter-principle__icon"><Icon name={p.icon} size={24} /></div>
+              <div>
+                <h3 class="charter-principle__title">{p.title}</h3>
+                <p class="charter-principle__desc">{p.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ===== IMPACT ===== */}
+    <section class="charter-section charter-section--alt" id="impact">
+      <div class="charter-section__inner">
+        <h2 class="charter-section__title">{t.charter?.impactTitle ?? "Impact Collectif"}</h2>
+        <div class="charter-stats">
+          {stats.map(s => (
+            <div class="charter-stat">
+              <Icon name={s.icon} size={28} />
+              <span class="charter-stat__value">{s.value}</span>
+              <span class="charter-stat__label">{s.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {/* ===== ENGAGEMENTS ===== */}
+    <section class="charter-section" id="commitment">
+      <div class="charter-section__inner charter-section__inner--narrow">
+        <h2 class="charter-section__title">{t.charter?.commitmentTitle ?? "L'Engagement du Citoyen"}</h2>
+        <div class="charter-commitment-box">
+          <p>{t.charter?.commitmentText ?? "En rejoignant Concordia, je m'engage à :"}</p>
+          <ul>
+            <li>{t.charter?.commit1 ?? "Respecter chaque membre de la communauté, indépendamment de son origine, genre, âge ou opinion."}</li>
+            <li>{t.charter?.commit2 ?? "Contribuer positivement à la vie de la cité par mes actions, publications et interactions."}</li>
+            <li>{t.charter?.commit3 ?? "Signaler tout contenu ou comportement contraire à l'éthique de la plateforme."}</li>
+            <li>{t.charter?.commit4 ?? "Privilégier le dialogue et la médiation pour résoudre les désaccords."}</li>
+            <li>{t.charter?.commit5 ?? "Protéger les données et la vie privée des autres citoyens."}</li>
+          </ul>
+        </div>
+        <div class="charter-cta">
+          <a href={getLocalizedUrl("/auth/sign-up", lang)}>
+            <Button variant="retro" color="primary" icon={{ name: "mdi:account-plus-outline", side: "left" }}>
+              {t.charter?.ctaJoin ?? "Devenir Citoyen de Concordia"}
+            </Button>
+          </a>
+          <a href={getLocalizedUrl("/legal", lang)}>
+            <Button variant="retro" color="secondary" icon={{ name: "mdi:file-document-outline", side: "left" }}>
+              {t.charter?.ctaLegal ?? "Lire les mentions légales"}
+            </Button>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .charter-page { color: var(--text-primary, #2d2d2d); }
+
+  .charter-hero { position: relative; text-align: center; padding: clamp(4rem, 10vw, 7rem) var(--space-4, 1rem); overflow: hidden; background: linear-gradient(135deg, var(--bg-subtle, #f9f5f1) 0%, var(--bg-muted, #f0e8de) 100%); }
+  .charter-hero__content { position: relative; z-index: 1; max-width: 40rem; margin: 0 auto; }
+  .charter-hero__title { font-size: clamp(2rem, 5vw, 3rem); margin: var(--space-4, 1rem) 0 var(--space-2, .5rem); line-height: 1.15; }
+  .charter-hero__subtitle { font-size: 1.125rem; color: var(--text-secondary, #555); margin-bottom: var(--space-6, 1.5rem); }
+
+  .charter-section { padding: clamp(3rem, 6vw, 5rem) var(--space-4, 1rem); }
+  .charter-section--alt { background: var(--bg-subtle, #f9f5f1); }
+  .charter-section__inner { max-width: 68rem; margin: 0 auto; }
+  .charter-section__inner--narrow { max-width: 48rem; }
+  .charter-section__title { font-size: clamp(1.5rem, 3.5vw, 2rem); text-align: center; margin-bottom: var(--space-2, .5rem); }
+  .charter-section__text { text-align: center; color: var(--text-secondary, #555); max-width: 48rem; margin: 0 auto var(--space-4, 1rem); }
+  .charter-section__text--large { font-size: 1.125rem; line-height: 1.7; }
+
+  .charter-districts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4, 1rem); margin-top: var(--space-6, 1.5rem); }
+  .charter-district-icon { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: var(--space-3, .75rem); }
+  .charter-district-card h3 { font-size: 1.125rem; margin: 0 0 var(--space-2, .5rem); }
+  .charter-district-card p { font-size: 0.9rem; color: var(--text-secondary, #555); line-height: 1.6; }
+
+  .charter-principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-4, 1rem); margin-top: var(--space-6, 1.5rem); }
+  .charter-principle { display: flex; gap: var(--space-3, .75rem); align-items: flex-start; }
+  .charter-principle__icon { width: 44px; height: 44px; min-width: 44px; border-radius: 50%; background: var(--color-primary-soft, #f0e0d6); color: var(--color-primary, #b85c38); display: flex; align-items: center; justify-content: center; }
+  .charter-principle__title { font-size: 1rem; font-weight: 600; margin: 0 0 0.25rem; }
+  .charter-principle__desc { font-size: 0.875rem; color: var(--text-secondary, #555); margin: 0; line-height: 1.6; }
+
+  .charter-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-4, 1rem); margin-top: var(--space-6, 1.5rem); text-align: center; }
+  .charter-stat { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; color: var(--color-primary, #b85c38); }
+  .charter-stat__value { font-size: 2rem; font-weight: 700; line-height: 1.2; }
+  .charter-stat__label { font-size: 0.85rem; color: var(--text-secondary, #555); }
+
+  .charter-commitment-box { background: var(--bg-subtle, #f9f5f1); border-radius: var(--radius-lg, 12px); padding: var(--space-6, 1.5rem); margin: var(--space-6, 1.5rem) 0; border-left: 4px solid var(--color-primary, #b85c38); }
+  .charter-commitment-box ul { margin: var(--space-3, .75rem) 0 0; padding-left: 1.25rem; }
+  .charter-commitment-box li { margin-bottom: 0.5rem; line-height: 1.6; }
+
+  .charter-cta { display: flex; flex-wrap: wrap; gap: var(--space-3, .75rem); justify-content: center; margin-top: var(--space-6, 1.5rem); }
+</style>

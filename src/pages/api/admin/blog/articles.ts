@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { json, guardAdmin, generateId, slugify } from "@lib/admin/api-helpers";
+import { json, guardAdmin, guardPermission, guardOrgOwnership, generateId, slugify } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import {
   blogPosts,
@@ -190,6 +190,21 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const action = String(payload.action ?? "").trim();
   if (!action) return json(400, { error: "missing_action" });
 
+  // Fine-grained RBAC check based on action
+  const permMap: Record<string, Parameters<typeof guardPermission>[1]> = {
+    create: "article.create",
+    update: "article.update_any",
+    delete: "article.delete_any",
+    publish: "article.approve",
+    unpublish: "article.approve",
+    duplicate: "article.create",
+  };
+  const requiredPerm = permMap[action];
+  if (requiredPerm) {
+    const permGuard = guardPermission(locals, requiredPerm);
+    if (permGuard) return permGuard;
+  }
+
   const db = await getDrizzle();
   const userId = locals.user?.id ?? "system";
 
@@ -310,6 +325,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
       const [existing] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
       if (!existing) return json(404, { error: "not_found" });
 
+      // Org ownership check: ensure user can only edit posts from their org
+      const orgGuard = guardOrgOwnership(locals, existing.organizationId);
+      if (orgGuard) return orgGuard;
+
       const updateData: Record<string, unknown> = { updatedAt: new Date() };
       if (payload.slug !== undefined) updateData.slug = slugify(String(payload.slug));
       if (payload.status !== undefined) {
@@ -419,6 +438,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
       const id = String(payload.id ?? "").trim();
       if (!id) return json(400, { error: "missing_id" });
 
+      // Org ownership check
+      const [postToDelete] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+      if (postToDelete) {
+        const orgGuard = guardOrgOwnership(locals, postToDelete.organizationId);
+        if (orgGuard) return orgGuard;
+      }
+
       // Delete related data first
       await db.delete(blogTranslations).where(eq(blogTranslations.postId, id));
       await db.delete(blogPostAuthors).where(eq(blogPostAuthors.postId, id));
@@ -441,6 +467,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (action === "publish") {
       const id = String(payload.id ?? "").trim();
       if (!id) return json(400, { error: "missing_id" });
+
+      // Org ownership check
+      const [postToPublish] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+      if (postToPublish) {
+        const orgGuard = guardOrgOwnership(locals, postToPublish.organizationId);
+        if (orgGuard) return orgGuard;
+      }
+
       await db.update(blogPosts).set({
         status: "published",
         publishedAt: new Date(),
@@ -462,6 +496,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (action === "unpublish") {
       const id = String(payload.id ?? "").trim();
       if (!id) return json(400, { error: "missing_id" });
+
+      // Org ownership check
+      const [postToUnpublish] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+      if (postToUnpublish) {
+        const orgGuard = guardOrgOwnership(locals, postToUnpublish.organizationId);
+        if (orgGuard) return orgGuard;
+      }
+
       await db.update(blogPosts).set({
         status: "draft",
         updatedAt: new Date(),

@@ -8,6 +8,14 @@ import CardContent from "@components/ui/Card/CardContent.astro";
 import Badge from "@components/ui/Badge.astro";
 import Button from "@components/ui/Button.astro";
 import Pagination from "@components/ui/Pagination.astro";
+import Table from "@components/ui/Table/Table.astro";
+import TableHeader from "@components/ui/Table/TableHeader.astro";
+import TableBody from "@components/ui/Table/TableBody.astro";
+import TableRow from "@components/ui/Table/TableRow.astro";
+import TableHead from "@components/ui/Table/TableHead.astro";
+import TableCell from "@components/ui/Table/TableCell.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Label from "@components/ui/Form/Label.astro";
 import { Icon } from "astro-icon/components";
 import { getDrizzle } from "@database/drizzle";
 import { servicesBookings, servicesListings, servicesTranslations } from "@database/schemas";
@@ -115,7 +123,8 @@ const loc = (val: any) => {
   return val[lang] ?? val.en ?? val.fr ?? Object.values(val)[0] ?? "";
 };
 
-const statusBadgeColor: Record<string, string> = {
+type BadgeColor = "default" | "primary" | "secondary" | "accent" | "success" | "warning" | "error";
+const statusBadgeColor: Record<string, BadgeColor> = {
   pending: "warning",
   confirmed: "primary",
   completed: "success",
@@ -179,13 +188,14 @@ const statusLabels: Record<string, string> = {
   <Card variant="modern" elevation="sm" class="filters-card">
     <CardContent>
       <form class="filters-form" method="get">
-        <div class="filter-group">
-          <select name="status" class="filter-select">
+        <div class="filter-field">
+          <Label htmlFor="status">{to.status ?? "Statut"}</Label>
+          <Select id="status" name="status">
             <option value="">{to.allStatuses ?? "Tous les statuts"}</option>
             {Object.entries(statusLabels).map(([val, label]) => (
               <option value={val} selected={statusFilter === val}>{label}</option>
             ))}
-          </select>
+          </Select>
         </div>
         <Button variant="modern" color="secondary" type="submit" icon={{ name: "mdi:filter", side: "left" }}>
           {to.filter ?? "Filtrer"}
@@ -193,38 +203,68 @@ const statusLabels: Record<string, string> = {
         {statusFilter && (
           <a href={`${adminBase}/organizations/bookings`} class="clear-filter">{to.clearFilter ?? "Effacer le filtre"}</a>
         )}
+        <div class="view-toggle">
+          <button type="button" class="view-btn active" data-view="list" title="Liste">
+            <Icon name="mdi:format-list-bulleted" />
+          </button>
+          <button type="button" class="view-btn" data-view="calendar" title="Calendrier">
+            <Icon name="mdi:calendar-month" />
+          </button>
+        </div>
       </form>
     </CardContent>
   </Card>
 
-  <!-- Bookings table -->
+  <!-- Calendar View -->
+  <div class="calendar-view" id="calendarView" style="display:none">
+    <Card variant="modern" elevation="sm">
+      <CardContent>
+        <div class="calendar-header">
+          <button type="button" id="calPrev" class="cal-nav"><Icon name="mdi:chevron-left" /></button>
+          <h3 class="cal-month" id="calMonth"></h3>
+          <button type="button" id="calNext" class="cal-nav"><Icon name="mdi:chevron-right" /></button>
+        </div>
+        <div class="calendar-grid" id="calGrid">
+          <div class="cal-day-label">Lun</div>
+          <div class="cal-day-label">Mar</div>
+          <div class="cal-day-label">Mer</div>
+          <div class="cal-day-label">Jeu</div>
+          <div class="cal-day-label">Ven</div>
+          <div class="cal-day-label">Sam</div>
+          <div class="cal-day-label">Dim</div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+
+  <!-- List view -->
+  <div class="list-view" id="listView">
   <Card variant="modern" elevation="sm">
     <CardContent>
-      <div class="table-responsive">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>{to.service ?? "Service"}</th>
-              <th>{to.customer ?? "Client"}</th>
-              <th>{to.provider ?? "Prestataire"}</th>
-              <th>{to.dateTime ?? "Date & Heure"}</th>
-              <th>{to.price ?? "Prix"}</th>
-              <th>{to.status ?? "Statut"}</th>
-              <th>{to.actions ?? "Actions"}</th>
-            </tr>
-          </thead>
-          <tbody>
+      <Table variant="modern" striped>
+        <TableHeader>
+          <TableRow>
+            <TableHead>{to.service ?? "Service"}</TableHead>
+            <TableHead>{to.customer ?? "Client"}</TableHead>
+            <TableHead>{to.provider ?? "Prestataire"}</TableHead>
+            <TableHead>{to.dateTime ?? "Date & Heure"}</TableHead>
+            <TableHead>{to.price ?? "Prix"}</TableHead>
+            <TableHead>{to.status ?? "Statut"}</TableHead>
+            <TableHead>{to.actions ?? "Actions"}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
             {bookings.map(b => {
               const cust = customerMap.get(b.customerId);
               const prov = providerMap.get(b.providerId);
               return (
-                <tr class="booking-row" data-booking-id={b.id}>
-                  <td>
+                <TableRow>
+                  <TableCell>
                     <div class="service-cell">
                       <strong>{loc(b.serviceName) || b.serviceId.slice(0, 8)}</strong>
                     </div>
-                  </td>
-                  <td>
+                  </TableCell>
+                  <TableCell>
                     <div class="user-cell">
                       {cust?.image ? <img src={cust.image} alt="" class="user-avatar" /> : <div class="user-avatar-ph">{(cust?.name ?? "?").charAt(0)}</div>}
                       <div>
@@ -232,27 +272,27 @@ const statusLabels: Record<string, string> = {
                         <small class="user-email">{cust?.email ?? ""}</small>
                       </div>
                     </div>
-                  </td>
-                  <td>
+                  </TableCell>
+                  <TableCell>
                     <span class="user-name">{prov?.name ?? b.providerId.slice(0, 8)}</span>
-                  </td>
-                  <td>
+                  </TableCell>
+                  <TableCell>
                     <div class="datetime-cell">
                       <span class="date-value">{b.bookingDate}</span>
                       <small class="time-value">{b.bookingTime} · {b.durationMinutes} min</small>
                     </div>
-                  </td>
-                  <td>
+                  </TableCell>
+                  <TableCell>
                     {b.totalPrice ? (
                       <strong>{b.totalPrice} {b.currency}</strong>
                     ) : (
                       <span class="meta-cell">-</span>
                     )}
-                  </td>
-                  <td>
-                    <Badge variant="modern" color={(statusBadgeColor[b.status] ?? "secondary") as any}>{statusLabels[b.status] ?? b.status}</Badge>
-                  </td>
-                  <td>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="modern" color={statusBadgeColor[b.status] ?? "secondary"}>{statusLabels[b.status] ?? b.status}</Badge>
+                  </TableCell>
+                  <TableCell>
                     <div class="action-btns">
                       <button class="btn-icon detail-btn" data-booking={JSON.stringify({
                         id: b.id,
@@ -282,13 +322,12 @@ const statusLabels: Record<string, string> = {
                         </>
                       )}
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               );
             })}
-          </tbody>
-        </table>
-      </div>
+        </TableBody>
+      </Table>
       {bookings.length === 0 && (
         <div class="empty-state">
           <Icon name="mdi:calendar-blank" />
@@ -300,9 +339,10 @@ const statusLabels: Record<string, string> = {
 
   {totalPages > 1 && (
     <div class="pagination-wrap">
-      <Pagination currentPage={page} totalPages={totalPages} baseUrl={`${adminBase}/organizations/bookings`} />
+      <Pagination currentPage={page} totalPages={totalPages} baseUrl={`${adminBase}/organizations/bookings${statusFilter ? `?status=${statusFilter}&` : "?"}page=`} />
     </div>
   )}
+  </div>
 
   <!-- Detail side panel -->
   <div class="detail-overlay" id="detail-overlay" hidden>
@@ -321,6 +361,90 @@ const statusLabels: Record<string, string> = {
     const overlay = document.getElementById("detail-overlay");
     const body = document.getElementById("detail-body");
     const toast = (msg: string, type = "info") => (window as any).showToast ? (window as any).showToast(msg, type) : alert(msg);
+
+    // === View toggle ===
+    const listView = document.getElementById("listView");
+    const calendarView = document.getElementById("calendarView");
+    const viewBtns = document.querySelectorAll<HTMLElement>(".view-btn");
+
+    viewBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const view = btn.dataset.view;
+        viewBtns.forEach(b => b.classList.toggle("active", b === btn));
+        if (listView) listView.style.display = view === "list" ? "block" : "none";
+        if (calendarView) calendarView.style.display = view === "calendar" ? "block" : "none";
+        if (view === "calendar") renderCalendar();
+      });
+    });
+
+    // === Calendar ===
+    let calYear = new Date().getFullYear();
+    let calMonth = new Date().getMonth();
+    const calGrid = document.getElementById("calGrid");
+    const calMonthLabel = document.getElementById("calMonth");
+    const statusColors: Record<string, string> = {
+      pending: "#f59e0b", confirmed: "#3b82f6", completed: "#22c55e", cancelled: "#94a3b8", declined: "#ef4444"
+    };
+
+    // Collect booking data from detail buttons
+    const bookingData: { date: string; time: string; service: string; status: string }[] = [];
+    document.querySelectorAll<HTMLElement>(".detail-btn").forEach(btn => {
+      try {
+        const d = JSON.parse(btn.dataset.booking ?? "{}");
+        if (d.date) bookingData.push({ date: d.date, time: d.time ?? "", service: d.service ?? "", status: d.status ?? "pending" });
+      } catch {}
+    });
+
+    function renderCalendar() {
+      if (!calGrid || !calMonthLabel) return;
+      const monthNames = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+      calMonthLabel.textContent = `${monthNames[calMonth]} ${calYear}`;
+
+      // Remove old day cells
+      calGrid.querySelectorAll(".cal-cell").forEach(c => c.remove());
+
+      const firstDay = new Date(calYear, calMonth, 1);
+      const lastDay = new Date(calYear, calMonth + 1, 0);
+      const startWeekday = (firstDay.getDay() + 6) % 7; // Monday=0
+
+      // Empty cells before month start
+      for (let i = 0; i < startWeekday; i++) {
+        const empty = document.createElement("div");
+        empty.className = "cal-cell cal-empty";
+        calGrid.appendChild(empty);
+      }
+
+      // Day cells
+      for (let d = 1; d <= lastDay.getDate(); d++) {
+        const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        const dayBookings = bookingData.filter(b => b.date === dateStr);
+        const cell = document.createElement("div");
+        cell.className = "cal-cell" + (dayBookings.length > 0 ? " has-bookings" : "");
+        const isToday = new Date().toISOString().slice(0, 10) === dateStr;
+        if (isToday) cell.classList.add("today");
+
+        let html = `<span class="cal-num">${d}</span>`;
+        if (dayBookings.length > 0) {
+          html += `<div class="cal-dots">`;
+          dayBookings.slice(0, 3).forEach(b => {
+            html += `<span class="cal-dot" style="background:${statusColors[b.status] ?? '#94a3b8'}" title="${b.service} · ${b.time}"></span>`;
+          });
+          if (dayBookings.length > 3) html += `<span class="cal-more">+${dayBookings.length - 3}</span>`;
+          html += `</div>`;
+        }
+        cell.innerHTML = html;
+        calGrid.appendChild(cell);
+      }
+    }
+
+    document.getElementById("calPrev")?.addEventListener("click", () => {
+      calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+      renderCalendar();
+    });
+    document.getElementById("calNext")?.addEventListener("click", () => {
+      calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+      renderCalendar();
+    });
 
     // Detail panel
     document.querySelectorAll(".detail-btn").forEach(btn => {
@@ -386,17 +510,37 @@ const statusLabels: Record<string, string> = {
   .stat-num { display: block; font-size: 1.5rem; font-weight: 800; line-height: 1; }
   .stat-label { font-size: 0.8125rem; color: var(--text-muted, #64748b); }
 
-  .filters-card { margin-bottom: 1.5rem; }
-  .filters-form { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-  .filter-group { display: flex; align-items: center; gap: 0.5rem; }
-  .filter-select { border: 1px solid var(--border-default, #e2e8f0); border-radius: 0.375rem; padding: 0.5rem 0.75rem; font-size: 0.875rem; background: var(--bg-default, white); }
-  .clear-filter { font-size: 0.8125rem; color: var(--text-muted, #64748b); text-decoration: underline; }
+  /* View toggle */
+  .view-toggle { display: flex; gap: 2px; margin-left: auto; background: var(--bg-muted, #f1f5f9); border-radius: 0.5rem; padding: 2px; }
+  .view-btn {
+    display: flex; align-items: center; justify-content: center;
+    padding: 0.375rem 0.625rem; border: none; background: none;
+    border-radius: 0.375rem; cursor: pointer; color: var(--text-muted, #64748b); transition: all 0.15s;
+  }
+  .view-btn :global(svg) { width: 1.125rem; height: 1.125rem; }
+  .view-btn.active { background: white; color: var(--color-primary, #eab308); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-  .table-responsive { overflow-x: auto; }
-  .admin-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-  .admin-table th { text-align: left; font-weight: 600; padding: 0.75rem; border-bottom: 2px solid var(--border-default, #e2e8f0); color: var(--text-muted, #64748b); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
-  .admin-table td { padding: 0.75rem; border-bottom: 1px solid var(--border-default, #f1f5f9); vertical-align: middle; }
-  .admin-table tr:hover td { background: var(--bg-muted, rgba(241,245,249,0.5)); }
+  /* Calendar */
+  .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .cal-month { font-size: 1.125rem; font-weight: 700; margin: 0; }
+  .cal-nav { border: none; background: var(--bg-muted, #f1f5f9); border-radius: 0.375rem; padding: 0.375rem; cursor: pointer; display: flex; align-items: center; transition: background 0.15s; }
+  .cal-nav:hover { background: var(--border, #e2e8f0); }
+  .cal-nav :global(svg) { width: 1.25rem; height: 1.25rem; }
+  .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-day-label { text-align: center; font-size: 0.75rem; font-weight: 600; color: var(--text-muted, #64748b); padding: 0.5rem 0; text-transform: uppercase; }
+  .cal-cell { min-height: 70px; padding: 0.375rem; border: 1px solid var(--border-default, #f1f5f9); border-radius: 0.375rem; position: relative; }
+  .cal-cell.today { background: rgba(234,179,8,0.06); border-color: var(--color-primary, #eab308); }
+  .cal-cell.has-bookings { background: var(--bg-muted, rgba(241,245,249,0.5)); }
+  .cal-empty { border: none; }
+  .cal-num { font-size: 0.8125rem; font-weight: 600; }
+  .cal-dots { display: flex; gap: 3px; margin-top: 0.375rem; flex-wrap: wrap; }
+  .cal-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .cal-more { font-size: 0.625rem; color: var(--text-muted, #94a3b8); line-height: 8px; }
+
+  .filters-card { margin-bottom: 1.5rem; }
+  .filters-form { display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+  .filter-field { display: flex; flex-direction: column; gap: 0.25rem; }
+  .clear-filter { font-size: 0.8125rem; color: var(--text-muted, #64748b); text-decoration: underline; }
 
   .service-cell strong { font-weight: 600; }
   .user-cell { display: flex; align-items: center; gap: 0.5rem; }

@@ -1,0 +1,221 @@
+---
+// src/components/ui/NotificationDropdown.astro — Header notification bell + dropdown
+interface Props {
+  lang?: string;
+}
+const { lang = "fr" } = Astro.props;
+---
+
+<div class="notif-dropdown" id="notifDropdown">
+  <button class="notif-bell" id="notifBell" aria-label="Notifications" aria-expanded="false">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+    <span class="notif-bell__badge" id="notifBellBadge" style="display:none">0</span>
+  </button>
+
+  <div class="notif-panel" id="notifPanel" role="dialog" aria-label="Notifications">
+    <div class="notif-panel__header">
+      <h3>Notifications</h3>
+      <button id="notifMarkAll" class="notif-panel__action">Tout lire</button>
+    </div>
+    <div id="notifPanelList" class="notif-panel__list">
+      <!-- Items injected by JS -->
+    </div>
+    <a href={`/${lang}/notifications`} class="notif-panel__footer">
+      Voir tout
+    </a>
+  </div>
+</div>
+
+<script is:inline>
+(function() {
+  const bell = document.getElementById("notifBell");
+  const panel = document.getElementById("notifPanel");
+  const badge = document.getElementById("notifBellBadge");
+  const listEl = document.getElementById("notifPanelList");
+  const markAllBtn = document.getElementById("notifMarkAll");
+  let isOpen = false;
+
+  bell.addEventListener("click", (e) => {
+    e.stopPropagation();
+    isOpen = !isOpen;
+    panel.classList.toggle("open", isOpen);
+    bell.setAttribute("aria-expanded", isOpen);
+    if (isOpen) loadNotifications();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (isOpen && !document.getElementById("notifDropdown").contains(e.target)) {
+      isOpen = false;
+      panel.classList.remove("open");
+      bell.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  markAllBtn.addEventListener("click", async () => {
+    await fetch("/api/notifications", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "markAllRead" }),
+    });
+    badge.style.display = "none";
+    listEl.querySelectorAll(".nd-item.unread").forEach(el => el.classList.remove("unread"));
+  });
+
+  async function loadNotifications() {
+    try {
+      const res = await fetch("/api/notifications?limit=5&unread=false");
+      const data = await res.json();
+      if (data.unread > 0) {
+        badge.textContent = data.unread > 9 ? "9+" : data.unread;
+        badge.style.display = "";
+      } else {
+        badge.style.display = "none";
+      }
+
+      if (!data.notifications || data.notifications.length === 0) {
+        listEl.innerHTML = '<p class="nd-empty">Aucune notification</p>';
+        return;
+      }
+      listEl.innerHTML = data.notifications.slice(0, 5).map(n => {
+        const time = n.createdAt ? new Date(n.createdAt).toLocaleString("fr-FR", { hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" }) : "";
+        const div = document.createElement("div");
+        div.textContent = n.title || "";
+        const safeTitle = div.innerHTML;
+        div.textContent = n.body || n.message || "";
+        const safeBody = div.innerHTML;
+        return '<div class="nd-item ' + (!n.isRead ? "unread" : "") + '">' +
+          '<div class="nd-item__text"><strong>' + safeTitle + '</strong><span class="nd-item__time">' + time + '</span></div>' +
+          (safeBody ? '<p class="nd-item__body">' + safeBody + '</p>' : '') +
+        '</div>';
+      }).join("");
+    } catch {
+      listEl.innerHTML = '<p class="nd-empty">Erreur</p>';
+    }
+  }
+
+  // Poll for unread count every 60s
+  async function pollUnread() {
+    try {
+      const res = await fetch("/api/notifications?limit=1&unread=true");
+      const data = await res.json();
+      if (data.unread > 0) {
+        badge.textContent = data.unread > 9 ? "9+" : data.unread;
+        badge.style.display = "";
+      } else {
+        badge.style.display = "none";
+      }
+    } catch { /* silent */ }
+  }
+  pollUnread();
+  setInterval(pollUnread, 60000);
+})();
+</script>
+
+<style>
+  .notif-dropdown {
+    position: relative;
+    display: inline-flex;
+  }
+  .notif-bell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .notif-bell:hover { background: var(--color-bg-muted, #f4f0eb); color: var(--color-text); }
+  .notif-bell__badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 0.625rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.25rem;
+    border: 2px solid var(--color-surface, #fff);
+  }
+
+  .notif-panel {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: 360px;
+    max-height: 460px;
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg, 0.75rem);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    display: none;
+    flex-direction: column;
+    z-index: 100;
+    overflow: hidden;
+  }
+  .notif-panel.open { display: flex; }
+  .notif-panel__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+    border-bottom: 1px solid var(--border);
+  }
+  .notif-panel__header h3 { font-size: 0.9375rem; font-weight: 700; color: var(--color-text); margin: 0; }
+  .notif-panel__action {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .notif-panel__action:hover { text-decoration: underline; }
+
+  .notif-panel__list {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-2, 0.5rem);
+  }
+
+  .notif-panel__footer {
+    display: block;
+    text-align: center;
+    padding: var(--space-3, 0.75rem);
+    border-top: 1px solid var(--border);
+    color: var(--color-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .notif-panel__footer:hover { background: var(--color-bg-muted, #f4f0eb); }
+
+  /* Dropdown items */
+  :global(.nd-item) {
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    border-radius: var(--radius, 0.5rem);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  :global(.nd-item:hover) { background: var(--color-bg-muted, #f4f0eb); }
+  :global(.nd-item.unread) { background: color-mix(in srgb, var(--color-primary) 5%, transparent); }
+  :global(.nd-item__text) { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+  :global(.nd-item__text strong) { font-size: 0.8125rem; color: var(--color-text); }
+  :global(.nd-item__time) { font-size: 0.6875rem; color: var(--color-text-muted); white-space: nowrap; }
+  :global(.nd-item__body) { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.125rem; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+  :global(.nd-empty) { text-align: center; padding: 2rem 1rem; color: var(--color-text-muted); font-size: 0.875rem; }
+</style>

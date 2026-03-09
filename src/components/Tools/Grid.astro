@@ -45,6 +45,7 @@ interface Props {
   alignItems?: 'flex-start' | 'center' | 'flex-end' | 'baseline' | 'stretch';
   alignContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'stretch';
   justifyItems?: boolean;
+  justifyContent?: string;
   
   // Spacing (shared)
   yPadding?: string;
@@ -181,7 +182,7 @@ function getSpacingToken(val: string | undefined): string {
 const Tag = tag;
 
 // Determine display mode
-const isGrid = display === 'grid';
+const isGrid = display === 'grid' || display === 'inline-grid';
 
 // Grid template
 const getGridTemplateColumns = (): string => {
@@ -214,15 +215,9 @@ const borderWidthComputed = border
   : '0';
 
 // Build classes
-const classParts: string[] = [display === 'grid' ? 'u-grid' : display === 'flex' ? 'u-flex' : display === 'inline-flex' ? 'u-inline-flex' : 'u-block'];
-
-
-
-
-
-
-
-
+const classParts: string[] = [
+  display === 'grid' ? 'u-grid' : display === 'inline-grid' ? 'u-inline-grid' : display === 'flex' ? 'u-flex' : display === 'inline-flex' ? 'u-inline-flex' : 'u-block'
+];
 
 if (variant) classParts.push(`u-${variant}`);
 if (color) classParts.push(`u-${color}`);
@@ -267,28 +262,21 @@ const pushSpacingClass = (prefix: string, val?: string) => {
 };
 // Générer toutes les classes pour chaque prop, sans écrasement
 pushSpacingClass('p', padding);
-pushSpacingClass('pt', paddingTop);
-pushSpacingClass('pt', yPadding);
-pushSpacingClass('pb', paddingBottom);
-pushSpacingClass('pl', paddingLeft);
-pushSpacingClass('pl', xPadding);
-pushSpacingClass('pr', paddingRight);
+pushSpacingClass('pt', paddingTop ?? yPadding);
+pushSpacingClass('pb', paddingBottom ?? yPadding);
+pushSpacingClass('pl', paddingLeft ?? xPadding);
+pushSpacingClass('pr', paddingRight ?? xPadding);
 
 pushSpacingClass('m', margin);
-pushSpacingClass('mt', marginTop);
-pushSpacingClass('mt', yMargin);
-pushSpacingClass('mb', marginBottom);
-pushSpacingClass('ml', marginLeft);
-pushSpacingClass('ml', xMargin);
-pushSpacingClass('mr', marginRight);
-if (width) classParts.push(`u-w-${width.replace(/[^0-9]/g, '')}`);
-if (height) classParts.push(`u-h-${height.replace(/[^0-9]/g, '')}`);
-if (maxWidth) classParts.push(`u-maxw-${maxWidth.replace(/[^0-9]/g, '')}`);
-if (minHeight) classParts.push(`u-minh-${minHeight.replace(/[^0-9]/g, '')}`);
+pushSpacingClass('mt', marginTop ?? yMargin);
+pushSpacingClass('mb', marginBottom ?? yMargin);
+pushSpacingClass('ml', marginLeft ?? xMargin);
+pushSpacingClass('mr', marginRight ?? xMargin);
+
 
 classParts.push(animate, hoverAnimate ? `hover-${hoverAnimate}` : '', focusAnimate ? `focus-${focusAnimate}` : '', activeAnimate ? `active-${activeAnimate}` : '', hidden ? 'hidden' : '', disabled ? 'disabled' : '');
 
-const classes = [classParts.join(' '), customClasses?.replace(/[^a-zA-Z0-9-_ ]/g, ''), className?.replace(/[^a-zA-Z0-9-_ ]/g, '')].filter(Boolean).join(' ');
+const classes = [...new Set([...classParts, customClasses?.replace(/[^a-zA-Z0-9-_ ]/g, ''), className?.replace(/[^a-zA-Z0-9-_ ]/g, '')].filter(Boolean).flatMap(c => c.split(/\s+/)).filter(Boolean))].join(' ');
 
 // Styles
 const styles: Record<string, string> = {
@@ -299,8 +287,10 @@ const styles: Record<string, string> = {
   'justify-items': justifyItems ? 'center' : '',
   'text-align': textAlign,
   overflow: overflowHidden ? 'hidden' : 'visible',
-  height: hFull ? '100%' : 'auto',
-  width: wFull ? '100%' : 'auto',
+  height: hFull ? '100%' : (height || 'auto'),
+  width: wFull ? '100%' : (width || 'auto'),
+  'max-width': maxWidth || '',
+  'min-height': minHeight || '',
   'z-index': zIndex ? String(zIndex) : '',
   'transition-property': 'all',
   'transition-duration': transitionDuration,
@@ -342,6 +332,7 @@ const styleString = Object.entries(styles)
   .u-block { display: block; }
   .u-flex { display: flex; }
   .u-grid { display: grid; }
+  .u-inline-grid { display: inline-grid; }
   .u-inline-flex { display: inline-flex; }
 
   /* Variants — token-driven, respects dark/light tokens */
@@ -404,8 +395,30 @@ const styleString = Object.entries(styles)
   .u-cols-auto-fit { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
   .u-cols-auto-fill { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
 
-  /* Gaps */
-  .u-gap-0 { gap: 0rem; }
+  /* Gaps (token-named) */
+  .u-gap-none { gap: 0; }
+  .u-gap-xs { gap: var(--space-1); }
+  .u-gap-sm { gap: var(--space-2); }
+  .u-gap-md { gap: var(--space-4); }
+  .u-gap-lg { gap: var(--space-6); }
+  .u-gap-xl { gap: var(--space-8); }
+  .u-gap-xxl { gap: var(--space-10); }
+  .u-rowgap-none { row-gap: 0; }
+  .u-rowgap-xs { row-gap: var(--space-1); }
+  .u-rowgap-sm { row-gap: var(--space-2); }
+  .u-rowgap-md { row-gap: var(--space-4); }
+  .u-rowgap-lg { row-gap: var(--space-6); }
+  .u-rowgap-xl { row-gap: var(--space-8); }
+  .u-rowgap-xxl { row-gap: var(--space-10); }
+  .u-colgap-none { column-gap: 0; }
+  .u-colgap-xs { column-gap: var(--space-1); }
+  .u-colgap-sm { column-gap: var(--space-2); }
+  .u-colgap-md { column-gap: var(--space-4); }
+  .u-colgap-lg { column-gap: var(--space-6); }
+  .u-colgap-xl { column-gap: var(--space-8); }
+  .u-colgap-xxl { column-gap: var(--space-10); }
+  /* Gaps (numeric fallback) */
+  .u-gap-0 { gap: 0; }
   .u-gap-1 { gap: 1rem; }
   .u-gap-2 { gap: 2rem; }
   .u-gap-3 { gap: 3rem; }
@@ -444,30 +457,95 @@ const styleString = Object.entries(styles)
   .u-content-stretch { align-content: stretch; }
   .u-justify-items-center { justify-items: center; }
 
-  /* Spacing */
-  .u-p-0 { padding: 0rem; }
+  /* Spacing (token-named) */
+  .u-p-none { padding: 0; }
+  .u-p-xs { padding: var(--space-1); }
+  .u-p-sm { padding: var(--space-2); }
+  .u-p-md { padding: var(--space-4); }
+  .u-p-lg { padding: var(--space-6); }
+  .u-p-xl { padding: var(--space-8); }
+  .u-p-xxl { padding: var(--space-10); }
+  .u-pt-none { padding-top: 0; }
+  .u-pt-xs { padding-top: var(--space-1); }
+  .u-pt-sm { padding-top: var(--space-2); }
+  .u-pt-md { padding-top: var(--space-4); }
+  .u-pt-lg { padding-top: var(--space-6); }
+  .u-pt-xl { padding-top: var(--space-8); }
+  .u-pt-xxl { padding-top: var(--space-10); }
+  .u-pb-none { padding-bottom: 0; }
+  .u-pb-xs { padding-bottom: var(--space-1); }
+  .u-pb-sm { padding-bottom: var(--space-2); }
+  .u-pb-md { padding-bottom: var(--space-4); }
+  .u-pb-lg { padding-bottom: var(--space-6); }
+  .u-pb-xl { padding-bottom: var(--space-8); }
+  .u-pb-xxl { padding-bottom: var(--space-10); }
+  .u-pl-none { padding-left: 0; }
+  .u-pl-xs { padding-left: var(--space-1); }
+  .u-pl-sm { padding-left: var(--space-2); }
+  .u-pl-md { padding-left: var(--space-4); }
+  .u-pl-lg { padding-left: var(--space-6); }
+  .u-pl-xl { padding-left: var(--space-8); }
+  .u-pl-xxl { padding-left: var(--space-10); }
+  .u-pr-none { padding-right: 0; }
+  .u-pr-xs { padding-right: var(--space-1); }
+  .u-pr-sm { padding-right: var(--space-2); }
+  .u-pr-md { padding-right: var(--space-4); }
+  .u-pr-lg { padding-right: var(--space-6); }
+  .u-pr-xl { padding-right: var(--space-8); }
+  .u-pr-xxl { padding-right: var(--space-10); }
+  .u-m-none { margin: 0; }
+  .u-m-xs { margin: var(--space-1); }
+  .u-m-sm { margin: var(--space-2); }
+  .u-m-md { margin: var(--space-4); }
+  .u-m-lg { margin: var(--space-6); }
+  .u-m-xl { margin: var(--space-8); }
+  .u-m-xxl { margin: var(--space-10); }
+  .u-mt-none { margin-top: 0; }
+  .u-mt-xs { margin-top: var(--space-1); }
+  .u-mt-sm { margin-top: var(--space-2); }
+  .u-mt-md { margin-top: var(--space-4); }
+  .u-mt-lg { margin-top: var(--space-6); }
+  .u-mt-xl { margin-top: var(--space-8); }
+  .u-mt-xxl { margin-top: var(--space-10); }
+  .u-mb-none { margin-bottom: 0; }
+  .u-mb-xs { margin-bottom: var(--space-1); }
+  .u-mb-sm { margin-bottom: var(--space-2); }
+  .u-mb-md { margin-bottom: var(--space-4); }
+  .u-mb-lg { margin-bottom: var(--space-6); }
+  .u-mb-xl { margin-bottom: var(--space-8); }
+  .u-mb-xxl { margin-bottom: var(--space-10); }
+  .u-ml-none { margin-left: 0; }
+  .u-ml-xs { margin-left: var(--space-1); }
+  .u-ml-sm { margin-left: var(--space-2); }
+  .u-ml-md { margin-left: var(--space-4); }
+  .u-ml-lg { margin-left: var(--space-6); }
+  .u-ml-xl { margin-left: var(--space-8); }
+  .u-ml-xxl { margin-left: var(--space-10); }
+  .u-mr-none { margin-right: 0; }
+  .u-mr-xs { margin-right: var(--space-1); }
+  .u-mr-sm { margin-right: var(--space-2); }
+  .u-mr-md { margin-right: var(--space-4); }
+  .u-mr-lg { margin-right: var(--space-6); }
+  .u-mr-xl { margin-right: var(--space-8); }
+  .u-mr-xxl { margin-right: var(--space-10); }
+  /* Spacing (numeric fallback) */
+  .u-p-0 { padding: 0; }
   .u-p-1 { padding: 1rem; }
   .u-p-2 { padding: 2rem; }
-  .u-pt-0 { padding-top: 0rem; }
+  .u-pt-0 { padding-top: 0; }
   .u-pt-1 { padding-top: 1rem; }
   .u-pb-1 { padding-bottom: 1rem; }
-  .u-pl-0 { padding-left: 0rem; }
+  .u-pl-0 { padding-left: 0; }
   .u-pl-1 { padding-left: 1rem; }
   .u-pr-1 { padding-right: 1rem; }
-  .u-m-0 { margin: 0rem; }
+  .u-m-0 { margin: 0; }
   .u-m-1 { margin: 1rem; }
-  .u-mt-0 { margin-top: 0rem; }
+  .u-mt-0 { margin-top: 0; }
   .u-mt-1 { margin-top: 1rem; }
   .u-mb-1 { margin-bottom: 1rem; }
-  .u-ml-0 { margin-left: 0rem; }
+  .u-ml-0 { margin-left: 0; }
   .u-ml-1 { margin-left: 1rem; }
   .u-mr-1 { margin-right: 1rem; }
-
-  /* Sizes */
-  .u-w-100 { width: 100rem; }
-  .u-h-50 { height: 50rem; }
-  .u-maxw-1200 { max-width: 1200rem; }
-  .u-minh-200 { min-height: 200rem; }
 
   /* Animations */
   @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }

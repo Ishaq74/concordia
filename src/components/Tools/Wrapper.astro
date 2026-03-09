@@ -2,6 +2,8 @@
 interface Props {
 tag?: keyof HTMLElementTagNameMap;
 display?: 'block' | 'flex' | 'grid' | 'inline-flex' | 'inline-grid';
+id?: string;
+gap?: string;
 cols?: string | number;
 autoFit?: boolean;
 autoFill?: boolean;
@@ -62,7 +64,8 @@ style?: string;
 const {
 tag = 'section',
 display = 'block',
-tagId,
+id,
+gap,
 cols = '1fr',
 autoFit = false,
 autoFill = false,
@@ -121,7 +124,7 @@ style: inlineStyle = '',
 } = Astro.props as Props;
 
 // --- UTIL ---
-const spacingTokens = { none:'0', xsm:'var(--space-1)', sm:'var(--space-2)', md:'var(--space-4)', lg:'var(--space-6)', xl:'var(--space-8)', '2xl':'var(--space-10)' };
+const spacingTokens = { none:'0', xs:'var(--space-1)', sm:'var(--space-2)', md:'var(--space-4)', lg:'var(--space-6)', xl:'var(--space-8)', xxl:'var(--space-10)' };
 function getSpacing(val?: string){ return val ? spacingTokens[val as keyof typeof spacingTokens] ?? val : ''; }
 
 const Tag = tag;
@@ -132,12 +135,11 @@ if(autoFill) return 'repeat(auto-fill, minmax(250px, 1fr))';
 return typeof cols === 'number' ? `repeat(${cols}, 1fr)` : String(cols);
 }
 
-// RTL
-const isRTL = typeof document !== 'undefined' ? document.dir === 'rtl' : false;
-const paddingInlineStart = isRTL ? getSpacing(paddingRight) ?? getSpacing(padding) : getSpacing(paddingLeft) ?? getSpacing(padding);
-const paddingInlineEnd = isRTL ? getSpacing(paddingLeft) ?? getSpacing(padding) : getSpacing(paddingRight) ?? getSpacing(padding);
-const marginInlineStart = isRTL ? getSpacing(marginRight) ?? getSpacing(margin) : getSpacing(marginLeft) ?? getSpacing(margin);
-const marginInlineEnd = isRTL ? getSpacing(marginLeft) ?? getSpacing(margin) : getSpacing(marginRight) ?? getSpacing(margin);
+// RTL: CSS logical properties handle directionality automatically
+const paddingInlineStart = getSpacing(paddingLeft) || getSpacing(padding);
+const paddingInlineEnd = getSpacing(paddingRight) || getSpacing(padding);
+const marginInlineStart = getSpacing(marginLeft) || getSpacing(margin);
+const marginInlineEnd = getSpacing(marginRight) || getSpacing(margin);
 
 // Alignment maps
 const justifyMap = { left:'flex-start', center:'center', right:'flex-end', 'space-between':'space-between','space-around':'space-around','space-evenly':'space-evenly', normal:'normal' };
@@ -152,7 +154,9 @@ const textColor = getVariantToken('card-color');
 const borderColorFinal = borderColor ?? getVariantToken('card-border-color');
 const borderWidthFinal = borderWidth ?? ({border1:'1px',border2:'2px',border3:'4px'}[borderType] || '1px');
 const borderRadiusFinal = borderRadius ?? getVariantToken('border-radius') ?? '0';
+const knownShadows = ['none', 'sm', 'md', 'lg', 'xl'];
 const boxShadowFinal = boxShadow ?? getVariantToken('shadow') ?? 'none';
+const boxShadowClass = boxShadow && knownShadows.includes(boxShadow) ? `wrapper-shadow-${boxShadow}` : '';
 
 // Classes
 const classes = [
@@ -160,10 +164,10 @@ display==='grid'?'wrapper-grid':display==='flex'?'wrapper-flex':'wrapper-block',
 `wrapper-variant-${variant}`,
 `wrapper-color-${color}`,
 border ? `wrapper-border-${borderType}` : '',
-boxShadowFinal !== 'none' ? `wrapper-shadow-${boxShadowFinal}`:'',
+boxShadowClass,
 animate, hoverAnimate ? `hover-${hoverAnimate}`:'', focusAnimate ? `focus-${focusAnimate}`:'', activeAnimate ? `active-${activeAnimate}`:'',
 hidden ? 'hidden':'', disabled ? 'disabled':'',
-customClasses, className
+customClasses?.replace(/[^a-zA-Z0-9-_ ]/g, ''), className?.replace(/[^a-zA-Z0-9-_ ]/g, '')
 ].filter(Boolean).join(' ');
 
 // Styles
@@ -184,12 +188,13 @@ height,width,'max-width':maxWidth,'min-height':minHeight,
 border: border ? `${borderWidthFinal} ${borderStyle} ${borderColorFinal}`:'',
 'border-radius': borderRadiusFinal,
 'box-shadow': boxShadowFinal,
-'padding-block-start': getSpacing(paddingTop) ?? getSpacing(padding),
-'padding-block-end': getSpacing(paddingBottom) ?? getSpacing(padding),
+gap: gap ? getSpacing(gap) : '',
+'padding-block-start': getSpacing(paddingTop) || getSpacing(padding),
+'padding-block-end': getSpacing(paddingBottom) || getSpacing(padding),
 'padding-inline-start': paddingInlineStart,
 'padding-inline-end': paddingInlineEnd,
-'margin-block-start': getSpacing(marginTop) ?? getSpacing(margin),
-'margin-block-end': getSpacing(marginBottom) ?? getSpacing(margin),
+'margin-block-start': getSpacing(marginTop) || getSpacing(margin),
+'margin-block-end': getSpacing(marginBottom) || getSpacing(margin),
 'margin-inline-start': marginInlineStart,
 'margin-inline-end': marginInlineEnd,
 'clip-path': clipPathTop ?? clipPathBottom ?? '',
@@ -197,19 +202,18 @@ color: textColor,
 'transition-property':'all',
 'transition-duration':transitionDuration,
 'transition-timing-function':transitionTiming,
-...inlineStyle ? {[inlineStyle]: ''} : {}
 };
-const styleString = Object.entries(styles).filter(([,v])=>v!=='').map(([k,v])=>`${k}:${v}`).join(';');
+const styleString = Object.entries(styles).filter(([,v])=>v!=='').map(([k,v])=>`${k}:${v}`).join(';') + (inlineStyle ? `;${inlineStyle}` : '');
 ---
 
-<Tag id={tagId} class={classes} style={styleString} aria-label={ariaLabel} {...restProps}>
+<Tag id={id} class={classes} style={styleString} aria-label={ariaLabel} {...restProps}>
 {backgroundVideo && (
   <video autoplay muted loop playsinline class="wrapper-bg-video">
     <source src={backgroundVideo} type="video/mp4" />
   </video>
 )}
-{(overlayColor ?? getVariantToken('overlay-bg')) && (
-  <div class="wrapper-overlay" style={`background-color:${overlayColor ?? getVariantToken('overlay-bg')};opacity:${overlayOpacity};`}></div>
+{overlayColor && (
+  <div class="wrapper-overlay" style={`background-color:${overlayColor};opacity:${overlayOpacity};`}></div>
 )}
 <slot name="top-svg" />
 <slot name="divider-top" />

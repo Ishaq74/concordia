@@ -4,6 +4,7 @@ export const prerender = false;
 
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { getTranslations } from "@i18n/translations";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 import Grid from "@components/Tools/Grid.astro";
 import Flex from "@components/Tools/Flex.astro";
 import Tabs from "@components/ui/Tabs/Tabs.astro";
@@ -21,7 +22,8 @@ import { Icon } from "astro-icon/components";
 // DB
 import { getDrizzle } from "@database/drizzle";
 import { profile } from "@database/schemas";
-import { eq } from "drizzle-orm";
+import { member as memberTable, organization as orgTable, invitation as invitationTable } from "@database/schemas/auth-schema";
+import { eq, and } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 
 // Utils — shared types (no duplication)
@@ -73,16 +75,74 @@ const memberSince = user.createdAt
   : null;
 const emailVerified = (user as any).emailVerified ?? false;
 
-// --- Organizations (TODO: branch to real API when ready)
-const organizations: OrganizationRecord[] = [];
-const activeOrganizationId = null;
+// --- Organizations from DB via member + organization tables
+const userMemberships = await db
+  .select({
+    orgId: orgTable.id,
+    orgName: orgTable.name,
+    orgSlug: orgTable.slug,
+    orgLogo: orgTable.logo,
+    orgCreatedAt: orgTable.createdAt,
+    role: memberTable.role,
+  })
+  .from(memberTable)
+  .innerJoin(orgTable, eq(memberTable.organizationId, orgTable.id))
+  .where(eq(memberTable.userId, user.id));
+
+const organizations: OrganizationRecord[] = userMemberships.map((m) => ({
+  id: m.orgId,
+  name: m.orgName,
+  slug: m.orgSlug,
+  logo: m.orgLogo,
+  createdAt: m.orgCreatedAt?.toISOString() ?? null,
+  role: m.role,
+}));
+
+const activeOrganizationId = (session as any)?.activeOrganizationId ?? organizations[0]?.id ?? null;
+
+// Fetch members of the active org
 let members: OrganizationMember[] = [];
+if (activeOrganizationId) {
+  const orgMembers = await db
+    .select()
+    .from(memberTable)
+    .where(eq(memberTable.organizationId, activeOrganizationId));
+  members = orgMembers.map((m) => ({
+    id: m.id,
+    userId: m.userId,
+    role: m.role,
+    organizationId: m.organizationId,
+  }));
+}
 
 const memberRole = members.find((m) => m.userId === user.id)?.role ?? null;
 const canManageOrganization = memberRole === "owner" || memberRole === "admin";
 const isOwner = memberRole === "owner";
 
-let invitations: InvitationRecord[] = [];
+// --- Pending invitations for this user's email
+const pendingInvitations = await db
+  .select({
+    id: invitationTable.id,
+    email: invitationTable.email,
+    role: invitationTable.role,
+    status: invitationTable.status,
+    expiresAt: invitationTable.expiresAt,
+    orgId: orgTable.id,
+    orgName: orgTable.name,
+    orgSlug: orgTable.slug,
+  })
+  .from(invitationTable)
+  .innerJoin(orgTable, eq(invitationTable.organizationId, orgTable.id))
+  .where(and(eq(invitationTable.email, user.email), eq(invitationTable.status, "pending")));
+
+let invitations: InvitationRecord[] = pendingInvitations.map((inv) => ({
+  id: inv.id,
+  email: inv.email,
+  role: inv.role,
+  status: inv.status,
+  expiresAt: inv.expiresAt?.toISOString() ?? null,
+  organization: { name: inv.orgName, slug: inv.orgSlug },
+}));
 
 // --- Status message (query param)
 const statusParam = Astro.url.searchParams.get("status");

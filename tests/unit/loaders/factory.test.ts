@@ -15,7 +15,7 @@ describe('createTranslationLoader (unit)', () => {
       content: translation.articleBody,
     })
 
-    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as Record<string, unknown>)
+    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
 
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
@@ -34,7 +34,7 @@ describe('createTranslationLoader (unit)', () => {
   it('logs and continues when translations missing or empty', async () => {
     const fetcher = vi.fn(async () => [ { slug: 'no-trans', translations: [] } ])
     const transformer = vi.fn()
-    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as Record<string, unknown>)
+    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
 
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
@@ -52,7 +52,7 @@ describe('createTranslationLoader (unit)', () => {
       { slug: 'err-post', translations: [ { inLanguage: 'fr', headline: 'Titre', articleBody: 'Contenu' } ] }
     ])
     const transformer = vi.fn(() => { throw new Error('fail') })
-    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as Record<string, unknown>)
+    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
     // @ts-ignore
@@ -72,7 +72,7 @@ describe('createTranslationLoader (unit)', () => {
       }
     ])
     const transformer = (_entity: Record<string, unknown>, translation: Record<string, unknown>) => ({ title: translation.headline })
-    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as Record<string, unknown>)
+    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
     // @ts-ignore
@@ -88,7 +88,7 @@ describe('createTranslationLoader (unit)', () => {
       { slug: 'badlang', translations: [ { headline: 'NoLang', articleBody: '...' } ] }
     ])
     const transformer = (_entity: Record<string, unknown>, translation: Record<string, unknown>) => ({ title: translation.headline })
-    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as Record<string, unknown>)
+    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
     // @ts-ignore
@@ -108,7 +108,7 @@ describe('createTranslationLoader (unit)', () => {
       }
     ])
     const transformer = (_entity: Record<string, unknown>, translation: Record<string, unknown>) => ({ title: translation.headline })
-    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as Record<string, unknown>)
+    const loader = createTranslationLoader({ fetcher, transformer, langField: 'inLanguage' } as any)
     const store = { set: vi.fn() }
     const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() }
     // Patch store.set to throw on duplicate id

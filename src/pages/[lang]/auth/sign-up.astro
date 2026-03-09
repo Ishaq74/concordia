@@ -8,7 +8,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import SignUpCard from "@components/templates/auth/SignUpCard.astro";
 const lang = Astro.params.lang as string;
 const translationsRaw = getTranslations(lang);
-const translations = translationsRaw as any;
+const translations = translationsRaw;
 import { getAuth } from "@lib/auth/auth";
 
 const user = Astro.locals.user;

@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { json, guardAdmin, generateId, slugify } from "@lib/admin/api-helpers";
+import { json, guardAdmin, guardPermission, generateId, slugify } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import {
   blogAuthors,
@@ -104,6 +104,10 @@ export const GET: APIRoute = async ({ request, locals }) => {
 export const POST: APIRoute = async ({ request, locals }) => {
   const guard = guardAdmin(locals);
   if (guard) return guard;
+
+  // Article management permission check
+  const permGuard = guardPermission(locals, "article.create");
+  if (permGuard) return permGuard;
 
   let payload: Record<string, unknown>;
   try {

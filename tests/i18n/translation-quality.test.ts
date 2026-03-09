@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { SUPPORTED_LOCALES, type SupportedLocale } from '@i18n/slug-map';
+import { SUPPORTED_LOCALES } from '@i18n/slug-map';
 
 /**
  * Translation quality tests — go beyond key coverage to check:
