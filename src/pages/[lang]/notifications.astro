@@ -198,7 +198,7 @@ const categories = [
       loadMore.style.display = data.notifications.length >= 20 ? "" : "none";
     } catch (err) {
       loading.style.display = "none";
-      list.innerHTML = '<p class="notif-error">Erreur de chargement</p>';
+      list.innerHTML = lang === 'en' ? '<p class="notif-error">Loading error</p>' : '<p class="notif-error">Erreur de chargement</p>';
     }
   }
 

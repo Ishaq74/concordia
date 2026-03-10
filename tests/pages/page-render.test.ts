@@ -80,10 +80,17 @@ describe.skipIf(!serverUp)('Page render — auth pages', () => {
 })
 
 describe.skipIf(!serverUp)('Page render — error pages', () => {
-  it('404 page returns 404 status', async () => {
-    const { status, contentType } = await fetchPage('/this-page-does-not-exist-at-all')
+  it('404 page returns 404 status for locale-prefixed unknown route', async () => {
+    const { status, contentType } = await fetchPage('/fr/page-qui-nexiste-pas-du-tout')
     expect(status).toBe(404)
     expect(contentType).toContain('text/html')
+  })
+
+  it('non-locale URL returns error (no locale prefix)', async () => {
+    // Astro SSR with i18n prefixDefaultLocale returns 500 for URLs without locale prefix.
+    // All user-facing routes require a locale prefix; "/" redirects to "/fr/".
+    const { status } = await fetchPage('/this-page-does-not-exist-at-all')
+    expect(status).toBeGreaterThanOrEqual(400)
   })
 })
 

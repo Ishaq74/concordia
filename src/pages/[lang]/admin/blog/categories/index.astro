@@ -21,9 +21,16 @@ import { getDrizzle } from "@database/drizzle";
 import { blogCategories, blogPostCategories } from "@database/schemas";
 import { count, eq, desc, ilike, inArray, and, isNull } from "drizzle-orm";
 import { getTranslations } from "@i18n/translations";
+import { isAdminUser } from "@lib/admin/permissions";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
 const currentLocale = (Astro.params.lang as string);
 const t = getTranslations(currentLocale);
+
+// Auth guard — redirect non-admins BEFORE any DB queries
+const user = Astro.locals.user;
+if (!user) return Astro.redirect(getLocalizedUrl(currentLocale, "auth/sign-in"), 302);
+if (!isAdminUser(user)) return Astro.redirect(getLocalizedUrl(currentLocale, "/"), 302);
 
 const url = new URL(Astro.request.url);
 const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));

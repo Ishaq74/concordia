@@ -38,6 +38,7 @@ export async function getTestDb() {
       await dbClient!.connect()
 
       // Wrap query to strip unsupported options (pg-mem doesn't support rowMode or types/getTypeParser)
+      // Also rewrite SQL DEFAULT keyword for nullable columns (pg-mem doesn't support it)
       const origQuery = (dbClient as any).query.bind(dbClient!)
       ;(dbClient as any).query = (...args: any[]) => {
         // Strip rowMode and types from any object-style arg (defensive)
@@ -47,6 +48,22 @@ export async function getTestDb() {
             delete opts.rowMode
             delete opts.types
             args[i] = opts
+          }
+        }
+
+        // pg-mem doesn't support the DEFAULT keyword in INSERT VALUES.
+        // Better Auth uses DEFAULT for nullable plugin columns (active_organization_id, impersonated_by).
+        // Replace "default" placeholders with NULL so pg-mem can process the query.
+        for (let i = 0; i < args.length; i++) {
+          const arg = args[i]
+          const sql = typeof arg === 'string' ? arg : (arg?.text ?? null)
+          if (typeof sql === 'string' && /\bdefault\b/i.test(sql) && /\binsert\b/i.test(sql)) {
+            const fixed = sql.replace(/\bdefault\b/gi, 'null')
+            if (typeof arg === 'string') {
+              args[i] = fixed
+            } else if (arg?.text) {
+              args[i] = { ...arg, text: fixed }
+            }
           }
         }
 

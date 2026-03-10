@@ -9,7 +9,6 @@ import Card from "@components/ui/Card/Card.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
 import { Icon } from "astro-icon/components";
 import { getTranslations } from "@i18n/translations";
-// import { getLocalizedUrl } from "@lib/i18n/route-helpers"; // unused
 
 export const prerender = true;
 
@@ -254,7 +253,7 @@ const popularTags = Array.from(tagMap.entries())
               <Icon name="mdi:email-newsletter" /> {t.blog?.newsletterTitle ?? "Newsletter"}
             </h3>
             <p class="sidebar-text">{t.blog?.newsletterDescription ?? "Recevez les derniers articles dans votre boîte mail."}</p>
-            <form class="sidebar-newsletter" action="#" method="POST">
+            <form class="sidebar-newsletter" method="POST">
               <label for="sidebar-email" class="sr-only">{t.aria?.emailLabel ?? "Adresse e-mail"}</label>
               <input
                 type="email"

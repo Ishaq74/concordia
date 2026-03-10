@@ -73,6 +73,11 @@ const hasOrganizations = organizations.length > 0;
         <p class="profile-org__empty-hint">
           {translations.profile?.noOrgHint ?? "Vous n'êtes membre d'aucune organisation pour le moment. Rejoignez ou créez une organisation pour collaborer avec d'autres citoyens."}
         </p>
+        <a href={`/${Astro.currentLocale ?? 'fr'}/organizations/new`}>
+          <Button variant="modern" color="primary" icon={{ name: "mdi:plus-circle-outline", side: "left" }}>
+            {translations.profile?.createOrganization ?? "Créer une organisation"}
+          </Button>
+        </a>
       </div>
     ) : (
       <div class="profile-org__content">

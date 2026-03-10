@@ -247,7 +247,7 @@ const primaryAuthor = post.data.authors?.[0];
               <Icon name="mdi:email-newsletter" /> {t.blog?.newsletterTitle ?? "Newsletter"}
             </h3>
             <p class="sidebar-newsletter-text">{t.blog?.articleDontMiss ?? "Ne manquez aucun article, abonnez-vous !"}</p>
-            <form class="sidebar-newsletter-form" action="#" method="POST">
+            <form class="sidebar-newsletter-form" method="POST">
               <label for="article-sidebar-email" class="sr-only">{t.aria?.emailLabel ?? "Adresse e-mail"}</label>
               <input
                 type="email"

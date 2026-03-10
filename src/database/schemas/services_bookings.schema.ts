@@ -1,4 +1,4 @@
-import { pgTable, integer, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, integer, text, timestamp, foreignKey } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { servicesListings } from "./services_listings.schema";
 
@@ -19,7 +19,9 @@ export const servicesBookings = pgTable("services_bookings", {
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => [
+  foreignKey({ columns: [table.serviceId], foreignColumns: [servicesListings.id] }).onDelete("cascade"),
+]);
 
 export const servicesBookingsRelations = relations(servicesBookings, ({ one }) => ({
   service: one(servicesListings, {

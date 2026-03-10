@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { isAdminUser } from "@lib/admin/permissions";
+import { json, guardAdmin } from "@lib/admin/api-helpers";
 import {
   listUsers,
   setUserRole,
@@ -10,19 +10,6 @@ import {
   listUserSessions,
   revokeUserSessions,
 } from "@lib/admin/users";
-
-const json = (status: number, payload: unknown) =>
-  new Response(JSON.stringify(payload), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-const guardAdmin = (locals: App.Locals) => {
-  if (!isAdminUser(locals.user)) {
-    return json(403, { error: "forbidden" });
-  }
-  return null;
-};
 
 const resolveErrorStatus = (error: unknown) => {
   if (typeof error === "object" && error && "status" in error) {

@@ -5,6 +5,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import BannerPage from "@templates/BannerPage.astro";
 import ServiceGrid from "@components/modules/services/lists/ServiceGrid.astro";
 import ServiceCard from "@components/modules/services/cards/ServiceCard.astro";
+import Select from "@components/ui/Form/Select.astro";
 import { Icon } from "astro-icon/components";
 import { getTranslations } from "@i18n/translations";
 import Range from "@components/ui/Form/Range.astro";
@@ -155,13 +156,13 @@ const serviceData = services.map((s) => ({
         <div class="cat-toolbar">
           <span class="result-count" id="result-count">{services.length} {services.length > 1 ? (ts.services ?? "services") : (ts.service ?? "service")}</span>
           <div class="toolbar-actions">
-            <select id="sort-select" class="sort-select">
+            <Select id="sort-select" className="sort-select">
               <option value="relevance">{ts.sortRelevance ?? "Pertinence"}</option>
               <option value="price-asc">{ts.sortPriceAsc ?? "Prix ↑"}</option>
               <option value="price-desc">{ts.sortPriceDesc ?? "Prix ↓"}</option>
               <option value="rating">{ts.sortRating ?? "Note"}</option>
               <option value="recent">{ts.sortRecent ?? "Récent"}</option>
-            </select>
+            </Select>
             <div class="view-toggle">
               <button type="button" class="view-btn active" data-view="grid" aria-label="Grille">
                 <Icon name="mdi:view-grid-outline" />

@@ -10,6 +10,7 @@ import Button from "@components/ui/Button.astro";
 import Input from "@components/ui/Form/Input.astro";
 import Label from "@components/ui/Form/Label.astro";
 import Textarea from "@components/ui/Form/Textarea.astro";
+import Select from "@components/ui/Form/Select.astro";
 import Switch from "@components/ui/Form/Switch.astro";
 import MarkdownEditor from "@components/admin/MarkdownEditor.astro";
 import MediaPickerModal from "@components/admin/MediaPickerModal.astro";
@@ -18,9 +19,17 @@ import { getDrizzle } from "@database/drizzle";
 import { blogAuthors, blogOrganizations, blogPostAuthors } from "@database/schemas";
 import { eq, count } from "drizzle-orm";
 import { getTranslations } from "@i18n/translations";
+import { isAdminUser } from "@lib/admin/permissions";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
 const currentLocale = (Astro.params.lang as string);
 const t = getTranslations(currentLocale);
+
+// Auth guard — redirect non-admins BEFORE any DB queries
+const user = Astro.locals.user;
+if (!user) return Astro.redirect(getLocalizedUrl(currentLocale, "auth/sign-in"), 302);
+if (!isAdminUser(user)) return Astro.redirect(getLocalizedUrl(currentLocale, "/"), 302);
+
 const adminBase = `/${currentLocale}/admin/blog/authors`;
 
 const { id } = Astro.params;
@@ -267,12 +276,12 @@ const frontendUrl = `/${currentLocale}/blog/author/${author.slug}`;
             {allOrgs.length > 0 && (
               <div class="form-field">
                 <Label htmlFor="worksFor">{t.adminBlog?.form?.organization ?? "Organisation"}</Label>
-                <select id="worksFor" name="worksForId" class="select-native">
+                <Select id="worksFor" name="worksForId" className="select-native">
                   <option value="">{t.adminBlog?.form?.none ?? "Aucune"}</option>
                   {allOrgs.map((org) => (
                     <option value={org.id} selected={org.id === author.worksForId}>{extractLocalized(org.name)}</option>
                   ))}
-                </select>
+                </Select>
               </div>
             )}
 

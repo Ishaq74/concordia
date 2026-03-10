@@ -181,10 +181,10 @@ describe('RBAC — access control functions', () => {
       expect(result!.status).toBe(403);
     });
 
-    it('returns 403 Response for missing user', () => {
+    it('returns 401 Response for missing user', () => {
       const result = guardAdmin({} as any);
       expect(result).toBeInstanceOf(Response);
-      expect(result!.status).toBe(403);
+      expect(result!.status).toBe(401);
     });
   });
 });

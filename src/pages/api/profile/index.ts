@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { getAuth } from "@lib/auth/auth";
 import { getDrizzle } from "@database/drizzle";
 import { profile } from "@database/schemas";
+import { user as userTable } from "@database/schemas/auth-schema";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 
@@ -144,6 +145,11 @@ export const PATCH: APIRoute = async ({ request }) => {
       })
       .returning();
 
+    // Sync fullName to auth user table for consistency
+    if (typeof updates.fullName === "string") {
+      await db.update(userTable).set({ name: updates.fullName }).where(eq(userTable.id, session.user.id));
+    }
+
     return new Response(JSON.stringify(created[0]), {
       status: 200,
       headers: {
@@ -151,6 +157,11 @@ export const PATCH: APIRoute = async ({ request }) => {
         "X-Content-Type-Options": "nosniff",
       },
     });
+  }
+
+  // Sync fullName to auth user table for consistency
+  if (typeof updates.fullName === "string") {
+    await db.update(userTable).set({ name: updates.fullName }).where(eq(userTable.id, session.user.id));
   }
 
   return new Response(JSON.stringify(result[0]), {

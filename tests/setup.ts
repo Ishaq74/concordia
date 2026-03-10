@@ -1,7 +1,8 @@
 import 'dotenv/config'
-import { afterEach, beforeEach, vi, expect } from 'vitest'
+import { afterAll, afterEach, beforeEach, vi, expect } from 'vitest'
 import * as axeMatchers from 'vitest-axe/matchers';
 import { cleanupTestData } from './utils/cleanup'
+import { httpCleanupTestUsers, closeDevDb } from './helpers/http-auth'
 export { cleanupTestData };
 
 // add axe matchers globally
@@ -73,6 +74,12 @@ beforeEach(async () => {
 
 afterEach(() => {
   vi.clearAllMocks()
+})
+
+// Clean up HTTP-created test users from the dev DB after each test file completes.
+afterAll(async () => {
+  await httpCleanupTestUsers();
+  await closeDevDb();
 })
 
 // SMTP mock global for email tests

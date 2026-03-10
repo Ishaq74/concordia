@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, jsonb, foreignKey } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { servicesListings } from "./services_listings.schema";
 
@@ -15,7 +15,9 @@ export const servicesTranslations = pgTable("services_translations", {
   canonicalUrl: jsonb("canonical_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => [
+  foreignKey({ columns: [table.serviceId], foreignColumns: [servicesListings.id] }).onDelete("cascade"),
+]);
 
 export const servicesTranslationsRelations = relations(servicesTranslations, ({ one }) => ({
   service: one(servicesListings, {

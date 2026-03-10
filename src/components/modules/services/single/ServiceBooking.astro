@@ -2,6 +2,8 @@
 import Card from "@components/ui/Card/Card.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
 import Button from "@components/ui/Button.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
 import { Icon } from "astro-icon/components";
 import { getTranslations } from "@i18n/translations";
 
@@ -44,17 +46,18 @@ const t = getTranslations(lang);
     <form class="booking-form" data-service-id={serviceId} data-provider-id={providerId}>
       <label class="booking-field">
         <span>{t.servicesPage?.availability ?? "Disponibilité"}</span>
-        <input type="date" name="bookingDate" required min={new Date().toISOString().split("T")[0]} />
+        <Input type="date" id="booking-date" name="bookingDate" required />
       </label>
       <label class="booking-field">
         <span>{t.servicesPage?.dayMonday && "Heure"}</span>
-        <input type="time" name="bookingTime" required />
+        <Input type="time" id="booking-time" name="bookingTime" required />
       </label>
-      <textarea
+      <Textarea
+        id="booking-message"
         name="customerMessage"
-        rows="3"
+        rows={3}
         placeholder={t.servicesPage?.contactProvider ?? "Message au prestataire..."}
-      ></textarea>
+      />
       <Button type="submit" color="accent" class="booking-submit">
         <Icon name="mdi:send" width="16" height="16" />
         {t.servicesPage?.bookNow ?? "Réserver"}
@@ -196,7 +199,7 @@ const t = getTranslations(lang);
           try {
             const { showToast } = await import("@lib/admin/toast");
             showToast?.("Réservation créée avec succès", "success");
-          } catch {}
+          } catch { /* toast module not available on this page */ }
         } else if (res.status === 401) {
           // Not authenticated — redirect to login
           const lang = document.documentElement.lang || "fr";

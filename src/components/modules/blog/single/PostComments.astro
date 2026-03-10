@@ -3,9 +3,14 @@ import { actions } from "astro:actions";
 import { getDrizzle } from "@database/drizzle";
 import { blogComments } from "@database/schemas";
 import { eq, and, desc } from "drizzle-orm";
+import { getTranslations } from "@i18n/translations";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
 import Card from "@components/ui/Card/Card.astro";
 import Button from "@components/ui/Button.astro";
+import Alert from "@components/ui/Alert.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
+import Label from "@components/ui/Form/Label.astro";
 
 import Tabs from '@components/ui/Tabs/Tabs.astro';
 import Tab from '@components/ui/Tabs/Tab.astro';
@@ -19,6 +24,8 @@ interface Props {
 const { postId, postType } = Astro.props;
 const user = Astro.locals.user;
 const lang = Astro.currentLocale ?? "fr";
+const t = getTranslations(lang);
+const signInUrl = getLocalizedUrl(lang, "auth/sign-in");
 
 let allComments: any[] = [];
 let rootComments: any[] = [];
@@ -41,10 +48,10 @@ try {
 
 <section id="comments-section" class="comments-section">
 
-<Tabs name="comments-tabs" variant="retro" label="Commentaires et avis">
-  <Tab name="comments-tabs" label={`Commentaires (${allComments.length})`} open>
+<Tabs name="comments-tabs" variant="retro" label={t.blog?.comments ?? "Commentaires"}>
+  <Tab name="comments-tabs" label={`${t.blog?.comments ?? "Commentaires"} (${allComments.length})`} open>
     {rootComments.length === 0 ? (
-      <div>Aucun commentaire pour le moment.</div>
+      <div>{t.blog?.noComments ?? "Aucun commentaire pour le moment."}</div>
     ) : (
       rootComments.map((comment) => (
         <CommentItem
@@ -59,56 +66,55 @@ try {
     )}
   </Tab>
 
-  <Tab name="comments-tabs" label="Laisser un avis" icon="mdi:pencil">
+  <Tab name="comments-tabs" label={t.blog?.writeComment ?? "Laisser un avis"} icon="mdi:pencil">
     <Card>
-      <form method="POST" action={actions.createComment}>
-        <input type="hidden" name="postId" value={postId} />
-        <input type="hidden" name="postType" value={postType} />
-
-        {!user && (
-          <div class="anon-info">
-            <p>Vous pouvez laisser un avis sans vous connecter. Indiquez votre nom et votre email (optionnel).</p>
-            <div>
-              <label>Nom</label>
-              <input type="text" name="authorName" placeholder="Votre nom" />
-            </div>
-            <div>
-              <label>Email</label>
-              <input type="email" name="authorEmail" placeholder="votre@email.com" />
-            </div>
-          </div>
-        )}
-
-        <fieldset class="rating-fieldset">
-          <legend class="rating-legend">Note</legend>
-          <div class="rating-selector">
-            {[5, 4, 3, 2, 1].map((n) => (
-              <>
-                <input
-                  type="radio"
-                  id={`r-${n}`}
-                  name="rating"
-                  value={n}
-                  required
-                  class="rating-radio"
-                />
-                <label for={`r-${n}`} class="rating-star" title={`${n} étoile${n > 1 ? 's' : ''}`}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
-                </label>
-              </>
-            ))}
-          </div>
-        </fieldset>
-
-        <div>
-          <label>Message</label>
-          <textarea name="content" required minlength="3" placeholder="Partagez votre avis..." />
+      {!user ? (
+        <div class="comment-login-required">
+          <Alert status="info">
+            <p>{t.blog?.loginToComment ?? "Connectez-vous pour laisser un commentaire."}</p>
+          </Alert>
+          <a href={signInUrl}>
+            <Button variant="retro" color="primary">
+              {t.auth?.signIn ?? "Se connecter"}
+            </Button>
+          </a>
         </div>
+      ) : (
+        <form method="POST" action={actions.createComment}>
+          <input type="hidden" name="postId" value={postId} />
+          <input type="hidden" name="postType" value={postType} />
 
-        <Button type="submit">Publier le commentaire</Button>
-      </form>
+          <fieldset class="rating-fieldset">
+            <legend class="rating-legend">{t.blog?.ratingLabel ?? "Note"}</legend>
+            <div class="rating-selector">
+              {[5, 4, 3, 2, 1].map((n) => (
+                <>
+                  <input
+                    type="radio"
+                    id={`r-${n}`}
+                    name="rating"
+                    value={n}
+                    required
+                    class="rating-radio"
+                  />
+                  <label for={`r-${n}`} class="rating-star" title={`${n} ${lang === 'en' ? (n > 1 ? 'stars' : 'star') : `étoile${n > 1 ? 's' : ''}`}`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </label>
+                </>
+              ))}
+            </div>
+          </fieldset>
+
+          <div class="comment-form-field">
+            <Label htmlFor="comment-content">{t.blog?.messageLabel ?? "Message"}</Label>
+            <Textarea id="comment-content" name="content" required rows={4} placeholder={t.blog?.commentPlaceholder ?? "Partagez votre avis..."} variant="retro" />
+          </div>
+
+          <Button type="submit" variant="retro" color="primary">{t.blog?.publishComment ?? "Publier le commentaire"}</Button>
+        </form>
+      )}
     </Card>
   </Tab>
 </Tabs>

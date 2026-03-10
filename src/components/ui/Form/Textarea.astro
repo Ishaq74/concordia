@@ -25,6 +25,7 @@ const {
   variant = "initial",
   error,
   className = "",
+  ...rest
 } = Astro.props;
 
 const variantClass = variant !== 'initial' ? variant : '';
@@ -49,6 +50,7 @@ const textareaClasses = [
     aria-invalid={error ? "true" : undefined}
     aria-describedby={error ? `${id}-error` : undefined}
     class={textareaClasses}
+    {...rest}
   >{value}</textarea>
   
   {error && (

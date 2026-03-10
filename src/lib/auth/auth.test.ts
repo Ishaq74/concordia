@@ -189,7 +189,7 @@ describe('Auth - Security & Functionality', () => {
           const { auth: authMod } = await import('@lib/auth/auth');
           const ctx = await authMod.$context;
           await ctx.test.login({ userId: 'fake-id' }).catch(() => {});
-        } catch {}
+        } catch { /* expected failure in timing test */ }
         times.push(Date.now() - start);
       }
       const variance = Math.max(...times) - Math.min(...times);

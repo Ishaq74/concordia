@@ -27,8 +27,11 @@ export async function apiCall(
   const timeoutHandle = setTimeout(() => controller.abort(), timeout)
 
   try {
+    const base = getApiBase();
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      Origin: new URL(base).origin,
+      Host: new URL(base).host,
       ...opts.headers,
     }
 

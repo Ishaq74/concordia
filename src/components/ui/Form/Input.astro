@@ -33,6 +33,7 @@ const {
   variant = "initial",
   error,
   className = "",
+  ...rest
 } = Astro.props;
 
 const hasIcon = !!icon;
@@ -75,6 +76,7 @@ const wrapperClasses = [
     aria-invalid={error ? "true" : undefined}
     aria-describedby={error ? `${id}-error` : undefined}
     class={inputClasses}
+    {...rest}
   />
   
   {hasIcon && iconPosition === "right" && (

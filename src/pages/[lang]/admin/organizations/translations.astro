@@ -4,8 +4,13 @@ export const prerender = false;
 
 import AdminLayout from "@layouts/AdminLayout.astro";
 import Button from "@components/ui/Button.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
+import Select from "@components/ui/Form/Select.astro";
 import { Icon } from "astro-icon/components";
 import { getTranslations } from "@i18n/translations";
+import { isAdminUser } from "@lib/admin/permissions";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 import { getDrizzle } from "@database/drizzle";
 import { blogPosts, blogTranslations, servicesListings, servicesTranslations } from "@database/schemas";
 import { eq, and } from "drizzle-orm";
@@ -13,6 +18,11 @@ import { eq, and } from "drizzle-orm";
 const lang = Astro.params.lang as string;
 const t = getTranslations(lang);
 const to = t.adminTranslations ?? ({} as Record<string, string>);
+
+// Auth guard — redirect non-admins BEFORE any DB queries
+const authUser = Astro.locals.user;
+if (!authUser) return Astro.redirect(getLocalizedUrl(lang, "auth/sign-in"), 302);
+if (!isAdminUser(authUser)) return Astro.redirect(getLocalizedUrl(lang, "/"), 302);
 
 const db = await getDrizzle();
 const orgId = Astro.url.searchParams.get("org") || "";
@@ -27,6 +37,16 @@ const locales = [
   { code: "ar", label: "العربية", flag: "🇸🇦" },
   { code: "es", label: "Español", flag: "🇪🇸" },
 ];
+
+/** Extract a locale string from a JSONB {fr:"...", en:"..."} object, or return plain strings as-is */
+const extractL = (v: unknown, locale: string = sourceLang): string => {
+  if (typeof v === "string") return v;
+  if (v && typeof v === "object") {
+    const obj = v as Record<string, string>;
+    return obj[locale] || Object.values(obj)[0] || "";
+  }
+  return "";
+};
 
 // Fetch translatable content list for the sidebar
 let contentItems: Array<{ id: string; title: string; type: string; translatedLocales: string[] }> = [];
@@ -50,7 +70,7 @@ try {
 
     contentItems.push({
       id: post.id,
-      title: String(translations.find(tr => tr.lang === "fr")?.headline ?? "") || post.slug || post.id,
+      title: extractL(translations.find(tr => tr.lang === "fr")?.headline, "fr") || post.slug || post.id,
       type: "blog",
       translatedLocales: translations.map(tr => tr.lang),
     });
@@ -70,7 +90,7 @@ try {
 
     contentItems.push({
       id: svc.id,
-      title: String(translations.find(tr => tr.lang === "fr")?.title ?? "") || svc.slug || svc.id,
+      title: extractL(translations.find(tr => tr.lang === "fr")?.title, "fr") || svc.slug || svc.id,
       type: "service",
       translatedLocales: translations.map(tr => tr.lang),
     });
@@ -83,10 +103,10 @@ try {
       db.select().from(blogTranslations).where(and(eq(blogTranslations.postId, contentId), eq(blogTranslations.inLanguage, targetLang))),
     ]);
     if (sourceRows[0]) {
-      sourceData = { title: String(sourceRows[0].headline ?? ""), excerpt: String(sourceRows[0].excerpt ?? ""), content: String(sourceRows[0].articleBody ?? "") };
+      sourceData = { title: extractL(sourceRows[0].headline, sourceLang), excerpt: extractL(sourceRows[0].excerpt, sourceLang), content: extractL(sourceRows[0].articleBody, sourceLang) };
     }
     if (targetRows[0]) {
-      targetData = { title: String(targetRows[0].headline ?? ""), excerpt: String(targetRows[0].excerpt ?? ""), content: String(targetRows[0].articleBody ?? "") };
+      targetData = { title: extractL(targetRows[0].headline, targetLang), excerpt: extractL(targetRows[0].excerpt, targetLang), content: extractL(targetRows[0].articleBody, targetLang) };
     }
     totalFields = Object.keys(sourceData).length;
     translatedFields = Object.values(targetData).filter(v => v && v.trim()).length;
@@ -97,10 +117,10 @@ try {
       db.select().from(servicesTranslations).where(and(eq(servicesTranslations.serviceId, contentId), eq(servicesTranslations.inLanguage, targetLang))),
     ]);
     if (sourceRows[0]) {
-      sourceData = { title: String(sourceRows[0].title ?? ""), description: String(sourceRows[0].description ?? "") };
+      sourceData = { title: extractL(sourceRows[0].title, sourceLang), description: extractL(sourceRows[0].description, sourceLang) };
     }
     if (targetRows[0]) {
-      targetData = { title: String(targetRows[0].title ?? ""), description: String(targetRows[0].description ?? "") };
+      targetData = { title: extractL(targetRows[0].title, targetLang), description: extractL(targetRows[0].description, targetLang) };
     }
     totalFields = Object.keys(sourceData).length;
     translatedFields = Object.values(targetData).filter(v => v && v.trim()).length;
@@ -198,11 +218,11 @@ const fieldLabels: Record<string, string> = {
                 <Icon name="mdi:lock-outline" />
               </span>
               <Icon name="mdi:arrow-right" class="trans-arrow" />
-              <select id="targetLangSelect" class="trans-lang-select">
+              <Select id="targetLangSelect" className="trans-lang-select">
                 {locales.filter(l => l.code !== sourceLang).map(loc => (
                   <option value={loc.code} selected={loc.code === targetLang}>{loc.flag} {loc.label}</option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div class="trans-toolbar__actions">
               <Button id="saveTranslation" variant="modern" color="primary" size="sm">
@@ -241,9 +261,9 @@ const fieldLabels: Record<string, string> = {
                 <div class="trans-field">
                   <label class="trans-field__label" for={`target-${key}`}>{fieldLabels[key] || key}</label>
                   {key === "content" || key === "description" ? (
-                    <textarea id={`target-${key}`} class="trans-field__input trans-field__input--tall" data-field={key}>{targetData[key] || ""}</textarea>
+                    <Textarea id={`target-${key}`} className="trans-field__input trans-field__input--tall" name={`target-${key}`} value={targetData[key] || ""} />
                   ) : (
-                    <input type="text" id={`target-${key}`} class="trans-field__input" data-field={key} value={targetData[key] || ""} />
+                    <Input id={`target-${key}`} className="trans-field__input" name={`target-${key}`} value={targetData[key] || ""} />
                   )}
                 </div>
               ))}
@@ -272,8 +292,9 @@ const fieldLabels: Record<string, string> = {
   if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
       const fields = {};
-      document.querySelectorAll("[data-field]").forEach(el => {
-        fields[el.dataset.field] = el.value || el.textContent || "";
+      document.querySelectorAll('[id^="target-"]').forEach(el => {
+        const key = el.id.replace("target-", "");
+        fields[key] = el.value || el.textContent || "";
       });
 
       try {

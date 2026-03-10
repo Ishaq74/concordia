@@ -1,6 +1,8 @@
 ---
 // src/pages/[lang]/search.astro — Global search page with tabs, filters, and results
 import BaseLayout from "@layouts/BaseLayout.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Input from "@components/ui/Form/Input.astro";
 import { Icon } from "astro-icon/components";
 import { getTranslations } from "@i18n/translations";
 
@@ -24,10 +26,10 @@ const activeTab = Astro.url.searchParams.get("type") || "all";
         <div class="search-bar-wrapper">
           <div class="search-bar">
             <Icon name="mdi:magnify" class="search-bar__icon" />
-            <input
+            <Input
               type="search"
               id="searchInput"
-              class="search-bar__input"
+              className="search-bar__input"
               placeholder={t.search?.placeholder ?? "Rechercher services, articles, organisations, citoyens..."}
               value={q}
               autocomplete="off"
@@ -117,11 +119,11 @@ const activeTab = Astro.url.searchParams.get("type") || "all";
             <!-- Sort -->
             <div class="filter-group">
               <h3 class="filter-label">{t.search?.sortBy ?? "Trier par"}</h3>
-              <select id="sortSelect" class="filter-select">
+              <Select id="sortSelect" className="filter-select">
                 <option value="relevance">{t.search?.sortRelevance ?? "Pertinence"}</option>
                 <option value="recent">{t.search?.sortRecent ?? "Plus récent"}</option>
                 <option value="rating">{t.search?.sortRating ?? "Mieux notés"}</option>
-              </select>
+              </Select>
             </div>
 
             <button id="resetFilters" class="filter-reset">
@@ -247,16 +249,21 @@ const activeTab = Astro.url.searchParams.get("type") || "all";
 
       if (!data.results || data.results.length === 0) {
         container.innerHTML = "";
-        countEl.textContent = "0 résultat";
+        countEl.textContent = lang === 'en' ? '0 results' : '0 résultat';
         emptyEl.style.display = "";
         return;
       }
 
-      countEl.textContent = data.results.length + " résultat" + (data.results.length > 1 ? "s" : "") + " trouvé" + (data.results.length > 1 ? "s" : "");
+      const n = data.results.length;
+      countEl.textContent = lang === 'en'
+        ? `${n} result${n > 1 ? 's' : ''} found`
+        : `${n} résultat${n > 1 ? 's' : ''} trouvé${n > 1 ? 's' : ''}`;
       container.innerHTML = data.results.map(renderResult).join("");
     } catch (err) {
       loadingEl.style.display = "none";
-      container.innerHTML = '<p class="search-error">Erreur lors de la recherche. Veuillez réessayer.</p>';
+      container.innerHTML = lang === 'en'
+        ? '<p class="search-error">Search error. Please try again.</p>'
+        : '<p class="search-error">Erreur lors de la recherche. Veuillez réessayer.</p>';
     }
   }
 
@@ -278,7 +285,7 @@ const activeTab = Astro.url.searchParams.get("type") || "all";
     if (r.meta?.location) meta.push(`<span class="result-location">${r.meta.location}</span>`);
     if (r.meta?.publishedAt) {
       const d = new Date(r.meta.publishedAt);
-      meta.push(`<span class="result-date">${d.toLocaleDateString("fr-FR")}</span>`);
+      meta.push(`<span class="result-date">${d.toLocaleDateString(lang || 'fr')}</span>`);
     }
 
     return `

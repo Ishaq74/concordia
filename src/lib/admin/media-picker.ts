@@ -208,7 +208,8 @@ async function loadLibrary() {
   const grid = getEl("mp-grid");
   if (!grid) return;
 
-  grid.innerHTML = '<div class="mp-loading">Chargement…</div>';
+  const pickerLang = document.documentElement.lang || 'fr';
+  grid.innerHTML = `<div class="mp-loading">${pickerLang === 'en' ? 'Loading…' : 'Chargement…'}</div>`;
 
   try {
     const params = new URLSearchParams({
@@ -222,7 +223,7 @@ async function loadLibrary() {
     const data: MediaListResponse = await res.json();
 
     if (data.media.length === 0) {
-      grid.innerHTML = '<div class="mp-empty">Aucun média trouvé.</div>';
+      grid.innerHTML = `<div class="mp-empty">${pickerLang === 'en' ? 'No media found.' : 'Aucun média trouvé.'}</div>`;
       renderPagination(data);
       return;
     }
@@ -248,7 +249,7 @@ async function loadLibrary() {
 
     renderPagination(data);
   } catch {
-    grid.innerHTML = '<div class="mp-empty">Erreur de chargement.</div>';
+    grid.innerHTML = `<div class="mp-empty">${pickerLang === 'en' ? 'Loading error.' : 'Erreur de chargement.'}</div>`;
   }
 }
 

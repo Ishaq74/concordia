@@ -177,7 +177,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
 
       // Insert translations
-      const translations = payload.translations as any[] | undefined;
+      const translations = Array.isArray(payload.translations) ? payload.translations : undefined;
       if (translations && Array.isArray(translations)) {
         for (const tr of translations) {
           await db.insert(servicesTranslations).values({
@@ -194,7 +194,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
 
       // Insert media links (cover + gallery)
-      const media = payload.media as any[] | undefined;
+      const media = Array.isArray(payload.media) ? payload.media : undefined;
       if (media && Array.isArray(media)) {
         for (const m of media) {
           if (m.mediaId) {
@@ -249,7 +249,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       await db.update(servicesListings).set(updates).where(eq(servicesListings.id, id));
 
       // Update translations if provided
-      const translations = payload.translations as any[] | undefined;
+      const translations = Array.isArray(payload.translations) ? payload.translations : undefined;
       if (translations && Array.isArray(translations)) {
         for (const tr of translations) {
           if (tr.id) {
@@ -277,7 +277,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
 
       // Update media links if provided (replace all)
-      const media = payload.media as any[] | undefined;
+      const media = Array.isArray(payload.media) ? payload.media : undefined;
       if (media && Array.isArray(media)) {
         // Delete existing links
         await db.delete(servicesMediaLinks).where(eq(servicesMediaLinks.serviceId, id));

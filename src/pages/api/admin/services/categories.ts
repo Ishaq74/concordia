@@ -128,8 +128,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       await db.insert(servicesCategories).values({
         id,
         slug,
-        name: (payload.name as any) ?? {},
-        description: (payload.description as any) || null,
+        name: (payload.name as Record<string, string>) ?? {},
+        description: (payload.description as Record<string, string>) || null,
         icon: (payload.icon as string) || null,
         featuredImageId: (payload.featuredImageId as string) || null,
         parentId: (payload.parentId as string) || null,
@@ -138,8 +138,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
         displayInMenu: payload.displayInMenu !== false,
         isActive: payload.isActive !== false,
         isFeatured: Boolean(payload.isFeatured),
-        seoTitle: (payload.seoTitle as any) || null,
-        seoDescription: (payload.seoDescription as any) || null,
+        seoTitle: (payload.seoTitle as Record<string, string>) || null,
+        seoDescription: (payload.seoDescription as Record<string, string>) || null,
       });
 
       await db.insert(auditLog).values({

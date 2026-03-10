@@ -1,0 +1,831 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/Utilisateur/Documents/concordia[39m
+
+[90mstdout[2m | src/lib/auth/auth.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild
+
+[90mstdout[2m | src/lib/auth/auth.test.ts[2m > [22m[2mAuth - Security & Functionality
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[2m07:48:33[22m [34m[astro-icon][39m Loaded icons from src/icons, circle-flags, mdi, openmoji
+ [32mÔ£ô[39m tests/pages/page-render.test.ts [2m([22m[2m44 tests[22m[2m)[22m[33m 12069[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m GET /fr/ renders without error [33m 496[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m GET /fr/contact/ renders without error [33m 348[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m GET /fr/blog/ renders without error [33m 1047[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m GET /en/blog/ renders without error [33m 309[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m GET /fr/services/ renders without error [33m 451[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m GET /fr/organisations/ renders without error [33m 1315[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m GET /en/organizations/ renders without error [33m 857[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m GET /fr/charter/ renders without error [33m 357[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m GET /fr/citizens/ renders without error [33m 904[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m GET /en/auth/verify-email/ renders without error [33m 358[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m GET /fr/admin/organizations/services/ should not return 500 for unauthenticated user [33m 302[2mms[22m[39m
+ [32mÔ£ô[39m src/lib/auth/auth.test.ts [2m([22m[2m61 tests[22m[2m)[22m[33m 15829[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m hash password diff├®rent pour m├¬me password [33m 1582[2mms[22m[39m
+[90mstdout[2m | tests/integration/auth-flow.test.ts[2m > [22m[2mAuth ÔÇö critical integration tests[2m > [22m[2msign-up creates user and audit log
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' }
+
+[90mstdout[2m | tests/integration/auth-flow.test.ts[2m > [22m[2mAuth ÔÇö critical integration tests[2m > [22m[2msign-up creates user and audit log
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+stderr | tests/integration/auth-flow.test.ts > Auth ÔÇö critical integration tests > sign-in with invalid password is rejected
+2026-03-10T06:48:47.365Z ERROR [Better Auth]: Credential account not found { email: 'test-xfe9rk1w@example.com' }
+
+ [32mÔ£ô[39m tests/integration/auth-flow.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 4408[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m sign-up creates user and audit log [33m 3169[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m sign-in with invalid password is rejected [33m 497[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m duplicate sign-up is rejected or returns error [33m 582[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Tools/Grid.test.ts [2m([22m[2m125 tests[22m[2m)[22m[33m 9487[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render a default div with block display [33m 333[2mms[22m[39m
+[90mstdout[2m | tests/integration/org-switch.test.ts[2m > [22m[2mOrg switching API[2m > [22m[2mallows a user to switch active organization
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit
+
+[90mstdout[2m | tests/integration/org-switch.test.ts[2m > [22m[2mOrg switching API[2m > [22m[2mallows a user to switch active organization
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/org-switch.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 2960[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m allows a user to switch active organization [33m 2957[2mms[22m[39m
+[90mstdout[2m | tests/integration/services-admin.test.ts[2m > [22m[2mServices Admin tests
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  suppress all logs with { quiet: true }
+
+[90mstdout[2m | tests/integration/services-admin.test.ts[2m > [22m[2mServices Admin tests
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/services-admin.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 4755[2mms[22m[39m
+[90mstdout[2m | tests/integration/org-admin.test.ts[2m > [22m[2mOrg Admin tests
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild
+
+[90mstdout[2m | tests/integration/org-admin.test.ts[2m > [22m[2mOrg Admin tests
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/org-admin.test.ts [2m([22m[2m17 tests[22m[2m)[22m[33m 9220[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m blogOrganizations can be queried by id [33m 591[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m blogOrganizations can be listed [33m 719[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m blogOrganizations can be updated [33m 1076[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m blogOrganizations can be toggled active/inactive [33m 492[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m blogOrganizations can be deleted [33m 408[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m org + owner membership can be created and queried [33m 507[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m isAdminUser accepts admin role [33m 657[2mms[22m[39m
+[90mstdout[2m | tests/integration/auth-emails.test.ts[2m > [22m[2mBetterAuth Email Functions[2m > [22m[2mEmail Verification[2m > [22m[2mshould have email verification config
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒøí´©Å auth for agents: https://vestauth.com
+
+[90mstdout[2m | tests/integration/auth-emails.test.ts[2m > [22m[2mBetterAuth Email Functions[2m > [22m[2mEmail Verification[2m > [22m[2mshould have email verification config
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/auth-emails.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 4468[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m should have email verification config [33m 3938[2mms[22m[39m
+[90mstdout[2m | tests/integration/comments.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject }
+
+[90mstdout[2m | tests/integration/comments.test.ts[2m > [22m[2mComments actions (createComment)
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/comments.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 2870[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Tools/Wrapper.test.ts [2m([22m[2m72 tests[22m[2m)[22m[33m 5938[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should render a default section with block display [33m 305[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/validation.test.ts [2m([22m[2m96 tests[22m[2m)[22m[33m 7077[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Button/Button.test.ts [2m([22m[2m137 tests[22m[2m)[22m[33m 71420[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m unit: renders a <button> with its children by default [33m 697[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m axe-core: accessible with default content [33m 1060[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m axe-core: accessible with icon [33m 578[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: renders text, is clickable, respects disabled [33m 415[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: icon rendered and positioned correctly [33m 4589[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m pa11y: accessible default button [33m 2461[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m lighthouse: default button [33m 7163[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m stress: renders 1000 buttons without performance degradation [33m 885[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: button click events work with Playwright [33m 349[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: disabled button is not clickable [33m 1871[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m focus: button is focusable [33m 481[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m focus: disabled button is not focusable [33m 582[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m focus: tab order is correct with multiple buttons [33m 425[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m keyboard: Enter key activates button [33m 610[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m keyboard: Space key activates button [33m 820[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m keyboard: Escape key does not affect button [33m 1169[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m performance: renders 1000 buttons sequentially with acceptable time [33m 726[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m integration-pw: full button workflow with Playwright [33m 1243[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m integration-pw: button with icon workflow [33m 10634[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/admin/AdminComponents.test.ts [2m([22m[2m27 tests[22m[2m)[22m[33m 3081[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders container with correct id [33m 515[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/auth/validate-user.test.ts [2m([22m[2m72 tests[22m[2m)[22m[33m 5622[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m detects: <script>alert(1)</script> [33m 370[2mms[22m[39m
+[90mstdout[2m | tests/security/security.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/security/security.test.ts [2m([22m[2m78 tests[22m[2m)[22m[33m 6110[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m blocks XSS payload: <script>alert(1)</script> [33m 373[2mms[22m[39m
+[90mstdout[2m | tests/unit/smtp.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBasic Email Sending[2m > [22m[2mshould send valid email
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBasic Email Sending[2m > [22m[2mshould send email with HTML
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBasic Email Sending[2m > [22m[2mshould send email with custom from
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBasic Email Sending[2m > [22m[2mshould send email with replyTo
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid recipient email
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid sender email
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould require subject
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould require content (text or html)
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject subject longer than 998 chars
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: not-an-email
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: @example.com
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: user@
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: user@@example.com
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: user @example.com
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: user@example
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould reject invalid email: 
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mEmail Validation[2m > [22m[2mshould accept valid email: user@example.com
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <script>alert(1)</script>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: "<script>alert(1)</script>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: '-alert(1)-'
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <img src=x onerror=alert(1)>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: javascript:alert(1)
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: ${alert(1)}
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: {{constructor.constructor("alert(1)")()}}
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <iframe src="javascript:alert(1)"></iframe>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <body onload=alert(1)>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <input onfocus=alert(1) autofocus>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <select onfocus=alert(1) autofocus>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <textarea onfocus=alert(1) autofocus>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <marquee onstart=alert(1)>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/unit/components/Accordion/AccordionItem.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 3210[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m HTML validity [33m 488[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m Stress: 1000 items [33m 1210[2mms[22m[39m
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in subject: <div style="background:url(javascript:alert(1))">
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <script>alert(1)</script>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: "<script>alert(1)</script>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: '-alert(1)-'
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <img src=x onerror=alert(1)>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: javascript:alert(1)
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: ${alert(1)}
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: {{constructor.constructor("alert(1)")()}}
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <iframe src="javascript:alert(1)"></iframe>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <body onload=alert(1)>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <input onfocus=alert(1) autofocus>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <select onfocus=alert(1) autofocus>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <textarea onfocus=alert(1) autofocus>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <marquee onstart=alert(1)>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - XSS Protection[2m > [22m[2mshould handle XSS payload in body: <div style="background:url(javascript:alert(1))">
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: '; DROP TABLE user; --
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: ' OR '1'='1
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: '; DELETE FROM user WHERE '1'='1'; --
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: 1'; UPDATE user SET role='admin' WHERE '1'='1
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: ' UNION SELECT * FROM pg_authid --
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: '; COPY (SELECT '') TO PROGRAM 'id'; --
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: admin'--
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: ' or 1=1--
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - SQL Injection[2m > [22m[2mshould reject SQL injection in email: ') OR ('1'='1
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - Null Bytes[2m > [22m[2mshould reject null bytes: test <script>alert(1)</script>
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - Null Bytes[2m > [22m[2mshould reject null bytes: admin .php
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mSecurity - Null Bytes[2m > [22m[2mshould accept valid email without null byte: user@example.com
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBatch Operations[2m > [22m[2mshould send batch emails
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBatch Operations[2m > [22m[2mshould batch with custom concurrency
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mBatch Operations[2m > [22m[2mshould handle mixed valid and invalid emails in batch
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mConnection Management[2m > [22m[2mshould verify connection
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mConnection Management[2m > [22m[2mshould close connection
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mConnection Management[2m > [22m[2mshould return config
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mError Handling[2m > [22m[2mshould handle timeout gracefully
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/unit/smtp.test.ts[2m > [22m[2mSmtpService Unit Tests[2m > [22m[2mError Handling[2m > [22m[2mshould classify auth errors
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/unit/smtp.test.ts [2m([22m[2m65 tests[22m[2m)[22m[33m 5250[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/avatar/Avatar.test.ts [2m([22m[2m26 tests[22m[2m)[22m[33m 2667[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m HTML validity: always div.avatar [33m 400[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Alert/Alert.test.ts [2m([22m[2m164 tests[22m[2m)[22m[33m 103990[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m unit: renders a <div> with alert role by default [33m 813[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m axe-core: alert with info status is accessible [33m 996[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m axe-core: alert with success status is accessible [33m 428[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m axe-core: dismissible alert is accessible [33m 465[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m axe-core: alert with title is accessible [33m 344[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: renders alert and verifies text content [33m 1455[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: close button removes alert when clicked [33m 10463[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: icon is rendered correctly [33m 4395[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m playwright: data-status attribute is correctly set [33m 347[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m pa11y: accessible default alert [33m 13954[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m lighthouse: default alert [33m 11892[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m stress: renders 1000 alerts without performance degradation [33m 1075[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: close button has proper aria-label [33m 509[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: alert role is present and correct [33m 1356[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: multiple alerts can coexist [33m 4254[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m interactive: icon is rendered inside alert [33m 669[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m performance: renders 1000 alerts sequentially [33m 907[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m integration-pw: full alert workflow [33m 942[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m integration-pw: alert with all variants [33m 972[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m integration-pw: dismissible alert removes on close [33m 671[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m final: accessibility audit passes [33m 589[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m final: no memory leaks during batch rendering [33m 552[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/permissions.test.ts [2m([22m[2m51 tests[22m[2m)[22m[33m 4196[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns true for role = "admin" [33m 338[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/ProgressBar/ProgressBar.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 2139[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders with correct percentage [33m 611[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/modules/blog/StarRating.test.ts [2m([22m[2m19 tests[22m[2m)[22m[33m 2615[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders 5 stars [33m 503[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/toast.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 1971[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m creates a toast element in the container [33m 465[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Gallery/Gallery.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 1716[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders gallery container [33m 467[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Video/Video.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1847[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders video container [33m 484[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/modules/blog/ImageWithFallback.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 2018[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders img element [33m 491[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Tabs/Tabs.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1593[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders container with correct class [33m 484[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Form/Form.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 2015[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders with form-group class [33m 533[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/users.test.ts [2m([22m[2m18 tests[22m[2m)[22m[33m 1842[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m calls api.listUsers with headers and query [33m 311[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/link/Link.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 2160[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m HTML validity [33m 318[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Dropdown/Dropdown.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 1951[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders dropdown container [33m 633[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/SearchBar/SearchBar.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 1663[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders form with role="search" [33m 497[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Sheet/Sheet.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1211[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders root sheet element [33m 319[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/modules/services/PriceBadge.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 2028[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m returns "Gratuit" for null basePrice (fr) [33m 378[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Pagination/Pagination.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1517[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders navigation element with aria-label [33m 437[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Table/Table.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 1280[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders table container with default classes [33m 475[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/api-helpers.test.ts [2m([22m[2m31 tests[22m[2m)[22m[33m 2764[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns a Response with correct status [33m 336[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/breadcrumb/Breadcrumb.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 1954[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders variant retro [33m 334[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/kbd/Kbd.test.ts [2m([22m[2m20 tests[22m[2m)[22m[33m 2021[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m HTML validity [33m 310[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Skeleton/Skeleton.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1668[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders skeleton element [33m 517[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Accordion/Accordion.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1700[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m HTML validity [33m 573[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/media-picker.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1078[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m opens the modal overlay [33m 317[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/modules/blog/ShareButtons.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1876[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m generates 4 share links [33m 541[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/i18n/route-helpers.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 1382[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/auth/profile-utils.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 1960[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/modules/services/ServiceMeta.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1692[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m shows duration when durationMinutes provided [33m 618[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/notifications/notifications.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 1455[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/actions/blog.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 1449[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m throws Unauthorized if user is not admin [33m 320[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Tooltip/Tooltip.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1432[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders tooltip wrapper [33m 592[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Card/Card.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1520[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders as article element [33m 438[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/i18n/locale-url.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 838[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Slider/Slider.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 823[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/api/notifications-api.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 1481[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/auth/roles.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1107[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns ["citizen"] when no user row found [33m 334[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/database/migration-integrity.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 1495[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/policy-store.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 1369[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns policies ordered by roleKey [33m 407[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/database/loaders.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1391[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m creates a loader with correct name [33m 327[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/organizations.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 965[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Dialog/Dialog.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1425[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders with required id prop [33m 454[2mms[22m[39m
+stderr | tests/unit/api/search-api.test.ts > GET /api/search > handles database errors gracefully
+[search] Error: Error: DB error
+    at Object.<anonymous> (C:/Users/Utilisateur/Documents/concordia/tests/unit/api/search-api.test.ts:219:13)
+    at Object.Mock [as select] (file:///C:/Users/Utilisateur/Documents/concordia/node_modules/.pnpm/@vitest+spy@4.0.18/node_modules/@vitest/spy/dist/index.js:285:34)
+    at Module.GET (C:/Users/Utilisateur/Documents/concordia/src/pages/api/search.ts:31:10)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at C:/Users/Utilisateur/Documents/concordia/tests/unit/api/search-api.test.ts:223:17
+    at file:///C:/Users/Utilisateur/Documents/concordia/node_modules/.pnpm/@vitest+runner@4.0.18/node_modules/@vitest/runner/dist/index.js:915:20
+
+ [32mÔ£ô[39m tests/unit/api/search-api.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1425[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m returns empty results for empty query [33m 311[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Cards/Cards.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 1509[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders with required props [32m 300[2mms[22m[39m
+stderr | tests/unit/api/translations-api.test.ts > POST /api/admin/translations > handles database errors gracefully
+[translations] Error: Error: DB error
+    at Object.<anonymous> (C:/Users/Utilisateur/Documents/concordia/tests/unit/api/translations-api.test.ts:213:49)
+    at Object.Mock [as select] (file:///C:/Users/Utilisateur/Documents/concordia/node_modules/.pnpm/@vitest+spy@4.0.18/node_modules/@vitest/spy/dist/index.js:285:34)
+    at Module.POST (C:/Users/Utilisateur/Documents/concordia/src/pages/api/admin/translations.ts:37:33)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at C:/Users/Utilisateur/Documents/concordia/tests/unit/api/translations-api.test.ts:219:17
+    at file:///C:/Users/Utilisateur/Documents/concordia/node_modules/.pnpm/@vitest+runner@4.0.18/node_modules/@vitest/runner/dist/index.js:915:20
+
+ [32mÔ£ô[39m tests/unit/api/translations-api.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1073[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m returns 401 when not authenticated [33m 311[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/config.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 920[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/auth/auth-client.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1091[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m sends POST to /api/auth-client/verification [33m 333[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/database/schema-validation.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 998[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/history.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 862[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m returns empty array when no sessions exist [33m 333[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/actions/comments.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 903[2mms[22m[39m
+[90mstdout[2m | tests/integration/loaders/blog-loader.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' }
+
+ [32mÔ£ô[39m tests/integration/loaders/blog-loader.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 762[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Badge/Badge.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 1282[2mms[22m[39m
+ [32mÔ£ô[39m tests/pages/admin-pages.test.ts [2m([22m[2m26 tests[22m[2m)[22m[33m 2345[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m prefers query param org over session [33m 308[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/markdown-editor.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 957[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m initializes editors for [data-md-editor] wrappers [33m 304[2mms[22m[39m
+ [32mÔ£ô[39m tests/i18n/translation-coverage.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 548[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m all locales have the same top-level sections as FR [33m 308[2mms[22m[39m
+ [32mÔ£ô[39m tests/pages/public-pages.test.ts [2m([22m[2m62 tests[22m[2m)[22m[33m 4898[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/Cards/SpecialCards.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 824[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders with required props [33m 318[2mms[22m[39m
+ [32mÔ£ô[39m tests/i18n/translation-quality.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 1469[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/auth/admin-access-control.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 788[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns an object with statements and roles [33m 353[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/admin/loaders.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 871[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m returns paginated data with total [33m 323[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/loaders/factory.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 887[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m stores translated entries with id "slug-lang" and includes slug/lang in data [33m 339[2mms[22m[39m
+ [32mÔ£ô[39m tests/i18n/routing.test.ts [2m([22m[2m18 tests[22m[2m)[22m[33m 1774[2mms[22m[39m
+ [32mÔ£ô[39m tests/pages/citizens.test.ts [2m([22m[2m23 tests[22m[2m)[22m[33m 2201[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m roleLabel returns correct labels for known roles [33m 359[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/theme.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 855[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m getTheme prefers stored value over media [33m 314[2mms[22m[39m
+ [32mÔ£ô[39m tests/i18n/rtl.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 915[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m /fr/ should have dir="ltr" and lang="fr" [33m 387[2mms[22m[39m
+ [32mÔ£ô[39m tests/i18n/slug-map.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 1290[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m exports 20 canonical entries (12 original + 7 navigation + 1 legal) [33m 366[2mms[22m[39m
+[90mstdout[2m | tests/integration/notifications.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒøá´©Å  run anywhere with `dotenvx run -- yourcommand`
+
+ [32mÔ£ô[39m tests/integration/notifications.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 713[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should create a notification [33m 474[2mms[22m[39m
+ [32mÔ£ô[39m tests/pages/charter.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 1556[2mms[22m[39m
+[90mstdout[2m | tests/integration/blog-crud.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject }
+
+ [32mÔ£ô[39m tests/sanity.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 403[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/blog-crud.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 661[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m should create a blog article [33m 312[2mms[22m[39m
+[90mstdout[2m | src/lib/auth/permissions.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜí´©Å secrets for agents: https://dotenvx.com/as2
+
+[90mstdout[2m | src/lib/auth/permissions.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/unit/utils/transaction.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 666[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m throws meaningful error when raw client is unavailable (pg-mem) [33m 557[2mms[22m[39m
+ [32mÔ£ô[39m src/lib/auth/permissions.test.ts [2m([22m[2m26 tests[22m[2m)[22m[33m 2285[2mms[22m[39m
+[90mstdout[2m | tests/integration/concurrency.test.ts[2m > [22m[2mConcurrency tests
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜí´©Å secrets for agents: https://dotenvx.com/as2
+
+[90mstdout[2m | tests/integration/concurrency.test.ts[2m > [22m[2mConcurrency tests
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/integration/multi-tenant-isolation.test.ts[2m > [22m[2mMulti-tenant isolation
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ encrypt with Dotenvx: https://dotenvx.com
+
+[90mstdout[2m | tests/integration/multi-tenant-isolation.test.ts[2m > [22m[2mMulti-tenant isolation
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/integration/performance-api.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ prevent building .env in docker: https://dotenvx.com/prebuild
+
+ [32mÔ£ô[39m tests/integration/concurrency.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 6751[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m concurrent booking requests for same slot should not both succeed [33m 331[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m 5 concurrent blog post creations should not produce duplicates [33m 571[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m 10 concurrent session reads should all succeed [33m 561[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m concurrent session reads with different tokens should be isolated [33m 339[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m parallel reads and writes should not cause deadlocks [33m 1442[2mms[22m[39m
+[90mstdout[2m | tests/integration/performance-api.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/multi-tenant-isolation.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 5983[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m org profile endpoint scopes data to active org only [33m 753[2mms[22m[39m
+ [32mÔ£ô[39m tests/security/csrf-protection.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 4585[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects request without Origin header [33m 621[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m GET requests bypass CSRF check [33m 1074[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m auth API routes bypass CSRF check (Better Auth manages its own) [33m 386[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/performance-api.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 6643[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m POST /api/auth/sign-in/email responds within threshold [33m 522[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m GET /fr/blog responds within threshold [33m 329[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m page 1 vs page 10 should have similar response times [33m 479[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m small vs large page size should be bounded [33m 1453[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m handles 10 concurrent public page requests without errors [33m 1118[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m handles 10 concurrent API requests without errors [33m 786[2mms[22m[39m
+ [32mÔ£ô[39m tests/security/middleware-headers.test.ts [2m([22m[2m26 tests[22m[2m)[22m[33m 6970[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m sets Content-Security-Policy header [33m 1048[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m sets X-Content-Type-Options to nosniff [33m 473[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m sets Referrer-Policy [33m 1484[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m sets Permissions-Policy [33m 453[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m CSP connect-src restricts to self [33m 591[2mms[22m[39m
+[90mstdout[2m | tests/security/upload-validation.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' }
+
+[90mstdout[2m | tests/security/upload-validation.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [2m[90mÔåô[39m[22m tests/security/upload-validation.test.ts [2m([22m[2m17 tests[22m[2m | [22m[33m17 skipped[39m[2m)[22m
+[90mstdout[2m | tests/security/xss-injection.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒñû agentic secret storage: https://dotenvx.com/as2
+
+[90mstdout[2m | tests/security/xss-injection.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/security/rate-limiting.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 20582[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m multiple rapid login attempts do not crash the server [33m 9783[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rapid signup attempts do not crash the server [33m 6159[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rapid password reset attempts do not crash the server [33m 1627[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rapid API calls to admin endpoints remain stable [33m 1273[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rapid API calls to blog endpoint remain stable [33m 1444[2mms[22m[39m
+ [32mÔ£ô[39m tests/security/middleware-integration.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 21749[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m root / redirects to /fr/ [33m 497[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m unauthenticated access to /en/admin/blog/ redirects to sign-in [33m 1350[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m unauthenticated access to /en/admin/services/ redirects to sign-in [33m 13299[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m public routes are accessible without auth [33m 4432[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m security headers are set even on 404 pages [33m 360[2mms[22m[39m
+[90mstdout[2m | tests/integration/api/admin-blog-articles.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒñû agentic secret storage: https://dotenvx.com/as2
+
+[90mstdout[2m | tests/integration/api/admin-blog-articles.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/integration/api/admin-blog-authors.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒøá´©Å  run anywhere with `dotenvx run -- yourcommand`
+
+[90mstdout[2m | tests/integration/api/admin-blog-authors.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/security/xss-injection.test.ts [2m([22m[2m61 tests[22m[2m)[22m[33m 22069[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects XSS payload #1: <script>alert(1)</script>... [33m 4439[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m SQL injection in query parameters does not crash [33m 904[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m command injection #6 does not execute [33m 428[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m buffer overflow #2 (100000 chars) does not crash [33m 325[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m weak password #2 "password" is rejected at signup [33m 2951[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m weak password #3 "12345678" is rejected at signup [33m 2647[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m weak password #4 "abc123" is rejected at signup [33m 734[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m invalid email #1 "not-an-email" is rejected [33m 378[2mms[22m[39m
+[90mstdout[2m | tests/integration/api/admin-blog-categories.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  override existing env vars with { override: true }
+
+[90mstdout[2m | tests/integration/api/admin-blog-categories.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/api/admin-blog-authors.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 24236[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user [33m 3957[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns authors list for admin [33m 3962[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports mode=all for flat list [33m 4450[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects unauthenticated POST [33m 443[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin POST [33m 3129[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects create without required fields [33m 4416[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects delete without id [33m 3650[2mms[22m[39m
+[90mstdout[2m | tests/integration/api/admin-blog-comments.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit
+
+[90mstdout[2m | tests/integration/api/admin-blog-comments.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/api/admin-blog-articles.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 37337[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user [33m 4420[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns articles list for admin [33m 4390[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports search filter [33m 3940[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports status filter [33m 5138[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns 404 for nonexistent article id [33m 4291[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin POST [33m 3533[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m accepts create without explicit fields (server generates defaults) [33m 3259[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects delete without id [33m 4349[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects unknown action [33m 3607[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/api/admin-blog-categories.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 26028[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user [33m 4206[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns categories list for admin [33m 4460[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports mode=all for flat list [33m 3641[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns 404 for nonexistent category id [33m 2974[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin POST [33m 3783[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects create without required fields [33m 3448[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects delete without id [33m 3144[2mms[22m[39m
+[90mstdout[2m | tests/integration/api/admin-blog-media.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  override existing env vars with { override: true }
+
+[90mstdout[2m | tests/integration/api/admin-blog-media.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/integration/api/admin-moderate.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  enable debug logging with { debug: true }
+
+[90mstdout[2m | tests/integration/api/admin-moderate.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/api/admin-blog-comments.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 27062[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user [33m 4381[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns comments list for admin [33m 3553[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports status filter [33m 2945[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports search filter [33m 4245[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin POST [33m 3454[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects approve without id [33m 3842[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects unknown action [33m 4229[2mms[22m[39m
+[90mstdout[2m | tests/integration/api/admin-org-members.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒñû agentic secret storage: https://dotenvx.com/as2
+
+[90mstdout[2m | tests/integration/api/admin-org-members.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/api/admin-moderate.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 19499[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects user without moderation permission [33m 3688[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects missing fields [33m 3751[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects invalid postType [33m 4367[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects reason too short [33m 3812[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m returns 404 for non-existent entity [33m 3586[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/api/admin-blog-media.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 22683[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user [33m 4497[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns media list for admin [33m 3468[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports type filter [33m 4135[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports search filter [33m 3314[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin POST [33m 4037[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects delete without id [33m 2825[2mms[22m[39m
+[90mstdout[2m | tests/integration/api/admin-org-profile.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒøí´©Å auth for agents: https://vestauth.com
+
+[90mstdout[2m | tests/integration/api/admin-organizations.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜí´©Å secrets for agents: https://dotenvx.com/as2
+
+[90mstdout[2m | tests/integration/api/admin-org-profile.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/integration/api/admin-organizations.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/api/admin-org-members.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 28492[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin [33m 3356[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m requires organizationId [33m 2934[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects missing action [33m 3940[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects missing organizationId [33m 3588[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects invite without email [33m 3200[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects unknown action [33m 4033[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects remove-member without memberId [33m 3801[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects cancel-invitation without invitationId [33m 3577[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/api/admin-organizations.test.ts [2m([22m[2m7 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[33m 22592[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user [33m 4262[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects missing action [33m 3493[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects create without name/slug [33m 3272[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects unknown action [33m 4478[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects add-member without userId or role [33m 3681[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects action requiring organizationId when missing [33m 3354[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/api/admin-org-profile.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 25700[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects non-admin GET [33m 4557[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m returns all org profiles for admin [33m 3567[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m returns 404 for non-existent org [33m 3294[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m creates an org profile [33m 4064[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects create missing name/slug [33m 3744[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects update without organizationId [33m 3580[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects unknown action [33m 2841[2mms[22m[39m
+[90mstdout[2m | tests/integration/api/admin-roles.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  load multiple .env files with { path: ['.env.local', '.env'] }
+
+[90mstdout[2m | tests/integration/api/admin-roles.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/integration/api/admin-services-availability.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  suppress all logs with { quiet: true }
+
+[90mstdout[2m | tests/integration/api/admin-services-availability.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/integration/api/admin-services-bookings.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  suppress all logs with { quiet: true }
+
+[90mstdout[2m | tests/integration/api/admin-services-bookings.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/api/admin-services-availability.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 22593[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user [33m 3728[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m requires serviceId query param [33m 3298[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports serviceId filter [33m 4167[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin POST [33m 3427[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects create without required fields [33m 3329[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects delete without id [33m 4268[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/api/admin-services-bookings.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 22182[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user [33m 3547[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns bookings list for admin [33m 4044[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports status filter [33m 3326[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports date range filter [33m 3267[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin PATCH [33m 3460[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects PATCH without booking id [33m 4185[2mms[22m[39m
+[90mstdout[2m | tests/integration/api/admin-services-categories.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  suppress all logs with { quiet: true }
+
+[90mstdout[2m | tests/integration/api/admin-services-categories.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+[90mstdout[2m | tests/integration/api/admin-services-media.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ­ƒøí´©Å auth for agents: https://vestauth.com
+
+[90mstdout[2m | tests/integration/api/admin-services-media.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/api/admin-roles.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 33962[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects user without change_role permission [33m 4074[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects missing fields [33m 3290[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects invalid action enum [33m 4196[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects invalid role enum [33m 4000[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m prevents self-assignment [33m 3374[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m prevents revoking citizen role [33m 3597[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m assigns a valid role [33m 4154[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m detects already-assigned role [33m 2936[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m revokes a role [33m 4010[2mms[22m[39m
+[90mstdout[2m | tests/integration/api/admin-services.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  specify custom .env file path with { path: '/custom/path/.env' }
+
+[90mstdout[2m | tests/integration/api/admin-services.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/api/admin-services-media.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 18272[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user [33m 4064[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns media list for admin [33m 3577[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports type filter [33m 3107[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin POST [33m 3752[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects delete without id [33m 3451[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/api/admin-services-categories.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 22380[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects unauthenticated request [33m 435[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user [33m 3788[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns categories for admin [33m 3771[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports mode=all for flat list [33m 3531[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin POST [33m 3548[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m accepts create without explicit fields (server generates defaults) [33m 3768[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects delete without id [33m 3351[2mms[22m[39m
+[90mstdout[2m | tests/integration/api/admin-users.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜí´©Å secrets for agents: https://dotenvx.com/as2
+
+[90mstdout[2m | tests/integration/api/admin-users.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/api/auth-proxy.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 3538[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m responds with security headers on auth endpoints [33m 519[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m maps rate limit errors to 429 [33m 2175[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects invalid content type gracefully [33m 668[2mms[22m[39m
+[90mstdout[2m | tests/integration/api/profile.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject }
+
+[90mstdout[2m | tests/integration/api/profile.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/api/admin-services.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 34306[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user [33m 4093[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns services list for admin [33m 4151[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports search filter [33m 3478[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m supports status filter [33m 4262[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns 404 for nonexistent service id [33m 3497[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin POST [33m 3493[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects create without required fields [33m 3459[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects delete without id [33m 4488[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects unknown action [33m 3045[2mms[22m[39m
+[90mstdout[2m | tests/integration/api/public-bookings.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (0) from .env -- tip: ÔÜÖ´©Å  override existing env vars with { override: true }
+
+[90mstdout[2m | tests/integration/api/public-bookings.test.ts
+[22m[39m[SMTP] Mode MOCK activ├® - pas de vrais emails envoy├®s
+
+ [32mÔ£ô[39m tests/integration/api/admin-users.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 27095[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects unauthenticated request [33m 513[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user [33m 4157[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns users list for admin [33m 3236[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects missing action [33m 3527[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects missing userId [33m 3687[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects unknown action [33m 4323[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects set-role without role [33m 3522[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects non-admin user for POST [33m 3813[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/api/public-bookings.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 7773[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m rejects missing required fields [33m 4423[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m returns 404 for non-existent service [33m 3155[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/api/profile.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 25751[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns (or auto-creates) profile for authenticated user [33m 3473[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects unauthenticated request [33m 354[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects empty update body [33m 3966[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects bio over 500 chars [33m 4384[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects invalid preferredLanguage [33m 2867[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m rejects website over 255 chars [33m 3722[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m updates valid fields [33m 3893[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m ignores non-whitelisted fields [33m 2787[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m116 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (117)[39m
+[2m      Tests [22m [1m[32m2196 passed[39m[22m[2m | [22m[33m18 skipped[39m[90m (2214)[39m
+[2m   Start at [22m 07:48:19
+[2m   Duration [22m 496.99s[2m (transform 26.84s, setup 132.16s, import 304.07s, tests 933.58s, environment 14.55s)[22m
+

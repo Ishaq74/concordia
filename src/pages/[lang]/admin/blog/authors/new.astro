@@ -9,6 +9,7 @@ import Button from "@components/ui/Button.astro";
 import Input from "@components/ui/Form/Input.astro";
 import Label from "@components/ui/Form/Label.astro";
 import Textarea from "@components/ui/Form/Textarea.astro";
+import Select from "@components/ui/Form/Select.astro";
 import Switch from "@components/ui/Form/Switch.astro";
 import MarkdownEditor from "@components/admin/MarkdownEditor.astro";
 import MediaPickerModal from "@components/admin/MediaPickerModal.astro";
@@ -215,12 +216,12 @@ const supportedLocales = [
             {allOrgs.length > 0 && (
               <div class="form-field">
                 <Label htmlFor="worksFor">{t.adminBlog?.form?.organization ?? "Organisation"}</Label>
-                <select id="worksFor" name="worksForId" class="select-native">
+                <Select id="worksFor" name="worksForId" className="select-native">
                   <option value="">{t.adminBlog?.form?.none ?? "Aucune"}</option>
                   {allOrgs.map((org) => (
                     <option value={org.id}>{extractLocalized(org.name)}</option>
                   ))}
-                </select>
+                </Select>
               </div>
             )}
 

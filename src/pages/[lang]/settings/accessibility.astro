@@ -15,6 +15,7 @@ export function getStaticPaths() {
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Card from "@components/ui/Card/Card.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
+import Select from "@components/ui/Form/Select.astro";
 import Badge from "@components/ui/Badge.astro";
 import Button from "@components/ui/Button.astro";
 import { Icon } from "astro-icon/components";
@@ -136,23 +137,23 @@ const t = getTranslations(lang);
               <div class="a11y-option__info">
                 <strong>{t.a11y?.language ?? "Langue d'affichage"}</strong>
               </div>
-              <select id="select-language" class="a11y-select">
+              <Select id="select-language" className="a11y-select">
                 <option value="fr" selected={lang === "fr"}>Français</option>
                 <option value="en" selected={lang === "en"}>English</option>
                 <option value="ar" selected={lang === "ar"}>العربية</option>
                 <option value="es" selected={lang === "es"}>Español</option>
-              </select>
+              </Select>
             </div>
 
             <div class="a11y-option">
               <div class="a11y-option__info">
                 <strong>{t.a11y?.dateFormat ?? "Format de date"}</strong>
               </div>
-              <select id="select-dateformat" class="a11y-select">
+              <Select id="select-dateformat" className="a11y-select">
                 <option value="dd/mm/yyyy">JJ/MM/AAAA</option>
                 <option value="mm/dd/yyyy">MM/JJ/AAAA</option>
                 <option value="yyyy-mm-dd">AAAA-MM-JJ</option>
-              </select>
+              </Select>
             </div>
           </CardContent>
         </Card>

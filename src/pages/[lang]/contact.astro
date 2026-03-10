@@ -5,6 +5,10 @@ import BannerPage from "@templates/BannerPage.astro";
 import Card from "@components/ui/Card/Card.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
 import Button from "@components/ui/Button.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
+import Label from "@components/ui/Form/Label.astro";
 import { Icon } from "astro-icon/components";
 import { getTranslations } from "@i18n/translations";
 import { getLocalizedUrl } from "@lib/i18n/route-helpers";
@@ -37,31 +41,31 @@ const contactMethods = [
           <h2 class="contact-form-title">
             <Icon name="mdi:send-outline" /> {t.contactPage?.sendMessage ?? "Envoyez-nous un message"}
           </h2>
-          <form class="contact-form" action="#" method="POST">
+          <form class="contact-form" method="POST">
             <div class="contact-form__row">
               <div class="contact-form__field">
-                <label for="contact-name">{t.contactPage?.fullName ?? "Nom complet"}</label>
-                <input type="text" id="contact-name" name="name" placeholder={t.contactPage?.namePlaceholder ?? "Votre nom"} required autocomplete="name" />
+                <Label htmlFor="contact-name">{t.contactPage?.fullName ?? "Nom complet"}</Label>
+                <Input type="text" id="contact-name" name="name" placeholder={t.contactPage?.namePlaceholder ?? "Votre nom"} required autocomplete="name" variant="retro" />
               </div>
               <div class="contact-form__field">
-                <label for="contact-email">{t.contactPage?.email ?? "Email"}</label>
-                <input type="email" id="contact-email" name="email" placeholder={t.contactPage?.emailPlaceholder ?? "votre@email.com"} required autocomplete="email" />
+                <Label htmlFor="contact-email">{t.contactPage?.email ?? "Email"}</Label>
+                <Input type="email" id="contact-email" name="email" placeholder={t.contactPage?.emailPlaceholder ?? "votre@email.com"} required autocomplete="email" variant="retro" />
               </div>
             </div>
             <div class="contact-form__field">
-              <label for="contact-subject">{t.contactPage?.subject ?? "Sujet"}</label>
-              <select id="contact-subject" name="subject" required>
+              <Label htmlFor="contact-subject">{t.contactPage?.subject ?? "Sujet"}</Label>
+              <Select id="contact-subject" name="subject" required variant="retro">
                 <option value="">{t.contactPage?.subjectPlaceholder ?? "Choisissez un sujet"}</option>
                 <option value="question">{t.contactPage?.subjectQuestion ?? "Question générale"}</option>
                 <option value="bug">{t.contactPage?.subjectBug ?? "Signaler un bug"}</option>
                 <option value="partnership">{t.contactPage?.subjectPartnership ?? "Partenariat"}</option>
                 <option value="press">{t.contactPage?.subjectPress ?? "Presse"}</option>
                 <option value="other">{t.contactPage?.subjectOther ?? "Autre"}</option>
-              </select>
+              </Select>
             </div>
             <div class="contact-form__field">
-              <label for="contact-message">{t.contactPage?.message ?? "Message"}</label>
-              <textarea id="contact-message" name="message" rows="6" placeholder={t.contactPage?.messagePlaceholder ?? "Décrivez votre demande…"} required></textarea>
+              <Label htmlFor="contact-message">{t.contactPage?.message ?? "Message"}</Label>
+              <Textarea id="contact-message" name="message" rows={6} placeholder={t.contactPage?.messagePlaceholder ?? "Décrivez votre demande…"} required variant="retro" />
             </div>
             <Button type="submit" variant="retro" color="primary" icon={{ name: "mdi:send", side: "right" }}>
               {t.contactPage?.send ?? "Envoyer le message"}

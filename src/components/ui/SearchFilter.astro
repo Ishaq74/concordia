@@ -1,5 +1,8 @@
 ---
 // SearchFilter molecule for search and filter UI
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+
 export interface Filter {
   id: string;
   label: string;
@@ -28,11 +31,11 @@ const {
 <div class={`search-filter ${className}`}>
   {showSearch && (
     <div class="search-filter-search">
-      <input
+      <Input
         type="text"
-        placeholder={searchPlaceholder}
-        class="search-input"
         id="search-filter-query"
+        placeholder={searchPlaceholder}
+        className="search-input"
       />
       <button type="button" class="search-btn" id="search-filter-submit">
         <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
@@ -51,20 +54,20 @@ const {
           </label>
 
           {filter.type === 'text' && (
-            <input
+            <Input
               type="text"
               id={`filter-${filter.id}`}
               placeholder={filter.placeholder}
               value={filter.value || ''}
-              class="filter-input"
+              className="filter-input"
               data-filter-id={filter.id}
             />
           )}
 
           {filter.type === 'select' && filter.options && (
-            <select
+            <Select
               id={`filter-${filter.id}`}
-              class="filter-select"
+              className="filter-select"
               data-filter-id={filter.id}
             >
               <option value="">Tous</option>
@@ -76,7 +79,7 @@ const {
                   {option.label}
                 </option>
               ))}
-            </select>
+            </Select>
           )}
 
           {filter.type === 'checkbox' && filter.options && (

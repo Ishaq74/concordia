@@ -84,6 +84,10 @@ const authSession = defineMiddleware(async (context, next) => {
     });
 
     if (sessionResult) {
+      // DEBUG: log user object to diagnose missing role field
+      if (pathname.startsWith("/api/admin/")) {
+        console.log("[AUTH DEBUG] user:", JSON.stringify(sessionResult.user));
+      }
       context.locals.user = sessionResult.user;
       context.locals.session = sessionResult.session;
       // Extract active organization ID from session for org-scoping

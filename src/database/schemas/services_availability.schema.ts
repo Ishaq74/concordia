@@ -1,4 +1,4 @@
-import { pgTable, integer, text, timestamp, boolean, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, integer, text, timestamp, boolean, uniqueIndex, foreignKey } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { servicesListings } from "./services_listings.schema";
 
@@ -16,6 +16,7 @@ export const servicesAvailability = pgTable("services_availability", {
     table.dayOfWeek,
     table.startTime,
   ),
+  foreignKey({ columns: [table.serviceId], foreignColumns: [servicesListings.id] }).onDelete("cascade"),
 ]);
 
 export const servicesAvailabilityRelations = relations(servicesAvailability, ({ one }) => ({

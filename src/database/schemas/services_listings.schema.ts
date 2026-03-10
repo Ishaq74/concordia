@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, integer, primaryKey, foreignKey } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { servicesCategories } from "./services_categories.schema";
 import { servicesMedia } from "./services_media.schema";
@@ -38,7 +38,11 @@ export const servicesMediaLinks = pgTable("services_media_links", {
   mediaId: text("media_id").notNull(),
   type: text("type").notNull(), // "cover", "gallery"
   position: text("position"),
-});
+}, (table) => [
+  primaryKey({ columns: [table.serviceId, table.mediaId, table.type] }),
+  foreignKey({ columns: [table.serviceId], foreignColumns: [servicesListings.id] }).onDelete("cascade"),
+  foreignKey({ columns: [table.mediaId], foreignColumns: [servicesMedia.id] }).onDelete("cascade"),
+]);
 
 // --- Relations ---
 

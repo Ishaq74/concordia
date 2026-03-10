@@ -20,10 +20,13 @@ export function json(status: number, payload: unknown): Response {
 }
 
 /**
- * Gate-check: returns a 403 Response if the current user is not an admin,
+ * Gate-check: returns a 401 if unauthenticated, 403 if not admin,
  * or `null` if the user IS an admin (caller should continue).
  */
 export function guardAdmin(locals: App.Locals): Response | null {
+  if (!locals.user) {
+    return json(401, { error: "unauthorized" });
+  }
   if (!isAdminUser(locals.user)) {
     return json(403, { error: "forbidden" });
   }

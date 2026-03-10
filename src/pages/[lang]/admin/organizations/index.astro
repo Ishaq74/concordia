@@ -23,10 +23,17 @@ import { blogOrganizations } from "@database/schemas";
 import { member } from "@database/schemas/auth-schema";
 import { count, eq, desc, ilike, and, sql } from "drizzle-orm";
 import { getTranslations } from "@i18n/translations";
+import { isAdminUser } from "@lib/admin/permissions";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
 const lang = Astro.params.lang as string;
 const t = getTranslations(lang);
 const to = t.adminOrganizations ?? ({} as Record<string, string>);
+
+// Auth guard — redirect non-admins BEFORE any DB queries
+const user = Astro.locals.user;
+if (!user) return Astro.redirect(getLocalizedUrl(lang, "auth/sign-in"), 302);
+if (!isAdminUser(user)) return Astro.redirect(getLocalizedUrl(lang, "/"), 302);
 
 const url = new URL(Astro.request.url);
 const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));

@@ -2,21 +2,10 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { isAdminUser } from "@lib/admin/permissions";
+import { json, guardAdmin } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import { blogOrganizations } from "@database/schemas";
 import { eq } from "drizzle-orm";
-
-const json = (status: number, payload: unknown) =>
-  new Response(JSON.stringify(payload), {
-    status,
-    headers: { "Content-Type": "application/json" },
-  });
-
-const guardAdmin = (locals: App.Locals) => {
-  if (!isAdminUser(locals.user)) return json(403, { error: "forbidden" });
-  return null;
-};
 
 export const GET: APIRoute = async ({ request, locals }) => {
   const guard = guardAdmin(locals);

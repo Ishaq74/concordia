@@ -41,6 +41,13 @@
       "when": 1772543861570,
       "tag": "0005_harsh_metal_master",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1773102685172,
+      "tag": "0006_faulty_giant_girl",
+      "breakpoints": true
     }
   ]
 }

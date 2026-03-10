@@ -11,9 +11,16 @@ import Label from "@components/ui/Form/Label.astro";
 import Textarea from "@components/ui/Form/Textarea.astro";
 import { Icon } from "astro-icon/components";
 import { getTranslations } from "@i18n/translations";
+import { isAdminUser } from "@lib/admin/permissions";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
 const lang = Astro.params.lang as string;
 const t = getTranslations(lang);
+
+// Auth guard — redirect unauthenticated users BEFORE layout rendering
+const user = Astro.locals.user;
+if (!user) return Astro.redirect(getLocalizedUrl(lang, "auth/sign-in"), 302);
+
 const to = t.adminOrganizations ?? ({} as Record<string, string>);
 const adminBase = `/${lang}/admin`;
 ---

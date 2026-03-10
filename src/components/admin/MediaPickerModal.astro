@@ -7,6 +7,8 @@
  *   import { openMediaPicker } from "@lib/admin/media-picker";
  *   const result = await openMediaPicker(); // { id, url } | null
  */
+import Input from "@components/ui/Form/Input.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
 ---
 
 <!-- Media Picker Modal (hidden by default) -->
@@ -33,7 +35,7 @@
     <!-- Library panel -->
     <div class="mp-panel active" id="mp-panel-library">
       <div class="mp-toolbar">
-        <input type="search" class="mp-search" id="mp-search" placeholder="Rechercher par nom…" />
+        <Input type="search" id="mp-search" className="mp-search" placeholder="Rechercher par nom…" />
       </div>
       <div class="mp-grid" id="mp-grid">
         <div class="mp-loading">Chargement…</div>
@@ -62,22 +64,22 @@
           <div class="mp-meta-field">
             <label for="mp-meta-filename">Nom du fichier</label>
             <div class="mp-filename-row">
-              <input type="text" id="mp-meta-filename" placeholder="mon-image" />
+              <Input type="text" id="mp-meta-filename" placeholder="mon-image" />
               <span class="mp-filename-ext" id="mp-meta-ext">.jpg</span>
             </div>
             <span class="mp-meta-hint">Le nom sera utilisé dans l'URL. Caractères autorisés : lettres, chiffres, tirets.</span>
           </div>
           <div class="mp-meta-field">
             <label for="mp-meta-alt">Texte alternatif (alt)</label>
-            <input type="text" id="mp-meta-alt" placeholder="Description de l'image pour l'accessibilité…" />
+            <Input type="text" id="mp-meta-alt" placeholder="Description de l'image pour l'accessibilité…" />
           </div>
           <div class="mp-meta-field">
             <label for="mp-meta-caption">Légende</label>
-            <input type="text" id="mp-meta-caption" placeholder="Légende optionnelle…" />
+            <Input type="text" id="mp-meta-caption" placeholder="Légende optionnelle…" />
           </div>
           <div class="mp-meta-field">
             <label for="mp-meta-description">Description</label>
-            <textarea id="mp-meta-description" rows="2" placeholder="Description détaillée…"></textarea>
+            <Textarea id="mp-meta-description" rows={2} placeholder="Description détaillée…" />
           </div>
           <div class="mp-meta-actions">
             <button type="button" class="mp-btn-skip" id="mp-btn-skip-meta">Uploader sans métadonnées</button>

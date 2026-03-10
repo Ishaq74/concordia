@@ -4,6 +4,7 @@ import { getDrizzle } from "@database/drizzle";
 import { username } from "better-auth/plugins/username";
 import { organization } from "better-auth/plugins";
 import { admin } from "better-auth/plugins";
+import { bearer } from "better-auth/plugins";
 import { testUtils } from "better-auth/plugins";
 import { ac, roles, checkPermission } from "./permissions";
 import { validateUserInput } from "./validate-user";
@@ -11,9 +12,6 @@ import { smtp } from "@lib/smtp/smtp";
 import { auditLog } from "@database/schemas";
 import { randomUUID } from "crypto";
 import { eq } from "drizzle-orm";
-
-// we need user schema occasionally for validation hooks
-// import type { user as UserSchema } from "@database/schemas/auth-schema"; // unused type
 
 // ==================== HELPERS ====================
 
@@ -70,7 +68,8 @@ async function sendInvitationEmail(data: any) {
 function buildPlugins() {
   return [
     username(),
-    testUtils({ captureOTP: true }),
+    bearer(),
+    ...(process.env.NODE_ENV !== 'production' ? [testUtils({ captureOTP: true })] : []),
     organization({
       ac,
       roles,

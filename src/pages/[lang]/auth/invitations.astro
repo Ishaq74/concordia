@@ -69,14 +69,12 @@ if (request.method === "POST") {
         if (!intent || !invitationId) throw new Error("ACTION_INCOMPLETE");
 
         if (intent === "accept") {
-            // const auth = await getAuth();
             await auth.api.acceptInvitation({
                 headers: request.headers,
                 body: { invitationId },
             });
             status = { type: "success", message: translations.auth?.invitationAccepted ?? "Invitation acceptée." };
         } else if (intent === "reject") {
-            // const auth = await getAuth();
             await auth.api.rejectInvitation({
                 headers: request.headers,
                 body: { invitationId },

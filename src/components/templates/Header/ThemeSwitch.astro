@@ -44,7 +44,7 @@ const buttonClass = [
       html.setAttribute('data-theme', theme);
       try {
         localStorage.setItem('theme', theme);
-      } catch (e) {}
+      } catch { /* localStorage unavailable (private browsing) */ }
       button?.setAttribute('data-theme', theme);
     }
 

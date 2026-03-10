@@ -4,6 +4,19 @@ import { serverAvailable } from '@tests/helpers/server-guard';
 
 const serverUp = await serverAvailable();
 
+/** Fetch with retry on ECONNRESET (dev server may be overloaded under parallel tests). */
+async function fetchWithRetry(url: string, init?: RequestInit, maxRetries = 3): Promise<Response> {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fetch(url, init);
+    } catch (err: any) {
+      if (attempt === maxRetries - 1) throw err;
+      await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+    }
+  }
+  throw new Error('unreachable');
+}
+
 describe.skipIf(!serverUp)('Middleware Integration', { timeout: 120_000 }, () => {
 
 // ─── Locale Redirect ──────────────────────────────────────────
@@ -11,7 +24,7 @@ describe.skipIf(!serverUp)('Middleware Integration', { timeout: 120_000 }, () =>
 describe('Middleware — Locale redirect', () => {
   it('root / redirects to /fr/', async () => {
     const base = getApiBase();
-    const res = await fetch(`${base}/`, { redirect: 'manual' });
+    const res = await fetchWithRetry(`${base}/`, { redirect: 'manual' });
     // Accept either a 302 redirect or a 200 from /fr/
     if (res.status === 302) {
       const location = res.headers.get('location');
@@ -23,7 +36,7 @@ describe('Middleware — Locale redirect', () => {
 
   it('valid locale prefix passes through', async () => {
     const base = getApiBase();
-    const res = await fetch(`${base}/fr/`, { redirect: 'manual' });
+    const res = await fetchWithRetry(`${base}/fr/`, { redirect: 'manual' });
     expect(res.status).toBeLessThan(500);
   });
 
@@ -34,7 +47,7 @@ describe('Middleware — Locale redirect', () => {
 
   it('static assets bypass locale redirect', async () => {
     const base = getApiBase();
-    const res = await fetch(`${base}/_astro/test.css`);
+    const res = await fetchWithRetry(`${base}/_astro/test.css`);
     // Even if the file doesn't exist, we should not get redirected to /fr/
     expect(res.status).toBeLessThan(500);
   });
@@ -56,7 +69,7 @@ describe('Middleware — Auth session', () => {
   it('static asset paths skip session resolution', async () => {
     const base = getApiBase();
     // Request to a font path — should not trigger DB lookups
-    const res = await fetch(`${base}/fonts/test.woff2`);
+    const res = await fetchWithRetry(`${base}/fonts/test.woff2`);
     expect(res.status).toBeLessThan(500);
   });
 });
@@ -76,7 +89,7 @@ describe('Middleware — Protected routes', () => {
   for (const path of protectedPaths) {
     it(`unauthenticated access to ${path} redirects to sign-in`, async () => {
       const base = getApiBase();
-      const res = await fetch(`${base}${path}`, { redirect: 'manual' });
+      const res = await fetchWithRetry(`${base}${path}`, { redirect: 'manual' });
       // Should redirect (302) to sign-in page, or serve the login page (200)
       if (res.status === 302) {
         const location = res.headers.get('location');
@@ -92,7 +105,7 @@ describe('Middleware — Protected routes', () => {
     const base = getApiBase();
     const publicPaths = ['/fr/', '/en/', '/fr/blog/', '/fr/services/'];
     for (const path of publicPaths) {
-      const res = await fetch(`${base}${path}`, { redirect: 'follow' });
+      const res = await fetchWithRetry(`${base}${path}`, { redirect: 'follow' });
       expect(res.status).toBeLessThan(500);
     }
   });
@@ -103,14 +116,14 @@ describe('Middleware — Protected routes', () => {
 describe('Middleware — Sequence correctness', () => {
   it('security headers are set even on 404 pages', async () => {
     const base = getApiBase();
-    const res = await fetch(`${base}/fr/this-page-does-not-exist`);
+    const res = await fetchWithRetry(`${base}/fr/this-page-does-not-exist`);
     expect(res.headers.get('x-content-type-options')).toBe('nosniff');
   });
 
   it('CSRF protection is applied before auth on API routes', async () => {
     const base = getApiBase();
     // POST to API with mismatched origin — should get CSRF 403 before auth check
-    const res = await fetch(`${base}/api/admin/organizations`, {
+    const res = await fetchWithRetry(`${base}/api/admin/organizations`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

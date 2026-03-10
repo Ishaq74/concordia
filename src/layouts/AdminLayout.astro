@@ -4,6 +4,7 @@ export const prerender = false;
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Link from "@components/ui/Link.astro";
 import Badge from "@components/ui/Badge.astro";
+import Select from "@components/ui/Form/Select.astro";
 import { Icon } from "astro-icon/components";
 import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 import { isAdminUser } from "@lib/admin/permissions";
@@ -54,7 +55,6 @@ if (orgIds.length > 0) {
   userOrgs.push(...orgs);
 }
 const activeOrgId = Astro.locals.organizationId ?? null;
-// const activeOrg = activeOrgId ? userOrgs.find((o) => o.id === activeOrgId) : null; // unused
 
 interface AdminNavGroup {
   label: string;
@@ -239,12 +239,12 @@ const navGroups: AdminNavGroup[] = [
 
       {userOrgs.length > 0 && (
         <div class="org-selector">
-          <select id="org-selector" class="org-select" aria-label={t.adminPanel?.orgSelector ?? "Organisation"}>
+          <Select id="org-selector" className="org-select" aria-label={t.adminPanel?.orgSelector ?? "Organisation"}>
             <option value="">{t.adminPanel?.allOrgs ?? "Toutes les organisations"}</option>
             {userOrgs.map((org) => (
               <option value={org.id} selected={org.id === activeOrgId}>{org.name}</option>
             ))}
-          </select>
+          </Select>
         </div>
       )}
 

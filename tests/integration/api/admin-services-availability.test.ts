@@ -27,11 +27,12 @@ describe.skipIf(!serverUp)('API /api/admin/services/availability', () => {
       expect(res.status).toBe(403)
     })
 
-    it('returns availability for admin', async () => {
+    it('requires serviceId query param', async () => {
       const { token } = await createAdminWithToken()
       const headers = buildApiHeaders(token)
       const res = await apiCall('GET', '/admin/services/availability', undefined, { headers })
-      expect(res.status).toBe(200)
+      expect(res.status).toBe(400)
+      expect(res.data.error).toBe('missing_serviceId')
     })
 
     it('supports serviceId filter', async () => {

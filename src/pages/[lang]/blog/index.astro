@@ -204,7 +204,7 @@ const remainingPosts = posts.filter((p) => p.data.id !== hero?.data.id);
                 <p class="blog-newsletter__desc">{t.blog?.newsletterDescription ?? "Recevez nos meilleurs articles et les dernières nouvelles de la communauté directement dans votre boîte mail."}</p>
               </div>
             </div>
-            <form class="blog-newsletter__form" action="#" method="POST">
+            <form class="blog-newsletter__form" method="POST">
               <label for="newsletter-email" class="sr-only">{t.blog?.newsletterEmail ?? "Adresse email"}</label>
               <input
                 type="email"

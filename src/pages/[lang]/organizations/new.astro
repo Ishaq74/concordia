@@ -1,0 +1,248 @@
+---
+// src/pages/[lang]/organizations/new.astro — Citizen-facing organization creation
+export const prerender = false;
+
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Button from "@components/ui/Button.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Label from "@components/ui/Form/Label.astro";
+import FormGroup from "@components/ui/Form/FormGroup.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect(getLocalizedUrl(lang, "auth/sign-in"), 302);
+
+const to = t.organizations ?? ({} as Record<string, string>);
+---
+
+<BaseLayout title={to.createTitle ?? "Créer une organisation"}>
+  <div class="org-create-page">
+    <div class="org-create-page__header">
+      <a href={getLocalizedUrl(lang, "auth/profile")} class="org-create-page__back">
+        <Icon name="mdi:arrow-left" /> {to.backToProfile ?? "Retour au profil"}
+      </a>
+      <h1 class="org-create-page__title">
+        <Icon name="mdi:office-building-plus-outline" />
+        {to.createTitle ?? "Créer une organisation"}
+      </h1>
+      <p class="org-create-page__description">
+        {to.createDesc ?? "Créez votre organisation pour collaborer avec d'autres citoyens sur la plateforme Concordia."}
+      </p>
+    </div>
+
+    <div id="org-create-alert" hidden></div>
+
+    <Card variant="modern" elevation="sm">
+      <CardContent>
+        <form id="org-create-form" class="org-create-form">
+          <FormGroup>
+            <Label htmlFor="org-name">{to.name ?? "Nom de l'organisation"} *</Label>
+            <Input
+              type="text"
+              id="org-name"
+              name="name"
+              required
+              placeholder={to.namePlaceholder ?? "Ex: Mon Association"}
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label htmlFor="org-slug">{to.slug ?? "Identifiant (slug)"} *</Label>
+            <Input
+              type="text"
+              id="org-slug"
+              name="slug"
+              required
+              placeholder={to.slugPlaceholder ?? "mon-association"}
+            />
+            <p class="org-create-form__hint">
+              {to.slugHint ?? "Identifiant unique utilisé dans les URLs. Lettres minuscules, chiffres et tirets uniquement."}
+            </p>
+          </FormGroup>
+
+          <div class="org-create-form__actions">
+            <a href={getLocalizedUrl(lang, "auth/profile")}>
+              <Button type="button" variant="modern" color="secondary">
+                {to.cancel ?? "Annuler"}
+              </Button>
+            </a>
+            <Button type="submit" variant="modern" color="primary" icon={{ name: "mdi:plus-circle", side: "left" }}>
+              {to.createButton ?? "Créer l'organisation"}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  </div>
+</BaseLayout>
+
+<div id="org-i18n" hidden
+  data-success={to.createSuccess ?? "Organisation créée avec succès !"}
+  data-error={to.createError ?? "Erreur lors de la création."}
+  data-server-error={to.serverError ?? "Impossible de contacter le serveur."}
+  data-required={to.requiredFields ?? "Le nom et le slug sont requis."}
+  data-profile-url={getLocalizedUrl(lang, "auth/profile")}
+></div>
+
+<script>
+  const form = document.getElementById("org-create-form") as HTMLFormElement | null;
+  const alertBox = document.getElementById("org-create-alert");
+  const i18nEl = document.getElementById("org-i18n");
+  const nameInput = document.getElementById("org-name") as HTMLInputElement | null;
+  const slugInput = document.getElementById("org-slug") as HTMLInputElement | null;
+
+  const MSG_SUCCESS = i18nEl?.dataset.success ?? "Organisation créée avec succès !";
+  const MSG_ERROR = i18nEl?.dataset.error ?? "Erreur lors de la création.";
+  const MSG_SERVER = i18nEl?.dataset.serverError ?? "Impossible de contacter le serveur.";
+  const MSG_REQUIRED = i18nEl?.dataset.required ?? "Le nom et le slug sont requis.";
+  const PROFILE_URL = i18nEl?.dataset.profileUrl ?? "/";
+
+  function showAlert(type: "success" | "error", message: string) {
+    if (!alertBox) return;
+    alertBox.hidden = false;
+    alertBox.className = `org-create-alert org-create-alert--${type}`;
+    alertBox.textContent = message;
+    alertBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // Auto-generate slug from name
+  let slugManuallyEdited = false;
+  slugInput?.addEventListener("input", () => { slugManuallyEdited = true; });
+  nameInput?.addEventListener("input", () => {
+    if (!slugManuallyEdited && slugInput) {
+      slugInput.value = nameInput.value
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+    }
+  });
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = nameInput?.value.trim() ?? "";
+    const slug = slugInput?.value.trim() ?? "";
+
+    if (!name || !slug) {
+      showAlert("error", MSG_REQUIRED);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/auth/organization/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, slug }),
+      });
+
+      if (res.ok) {
+        showAlert("success", MSG_SUCCESS);
+        setTimeout(() => { window.location.href = PROFILE_URL; }, 1000);
+      } else {
+        const body = await res.json().catch(() => ({}));
+        const msg = body.message ?? body.error ?? MSG_ERROR;
+        showAlert("error", msg);
+      }
+    } catch {
+      showAlert("error", MSG_SERVER);
+    }
+  });
+</script>
+
+<style>
+  .org-create-page {
+    max-width: 640px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .org-create-page__header {
+    margin-bottom: 1.5rem;
+  }
+
+  .org-create-page__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted, #64748b);
+    text-decoration: none;
+    margin-bottom: 0.75rem;
+  }
+
+  .org-create-page__back:hover {
+    color: var(--color-primary, #1978e5);
+  }
+
+  .org-create-page__back :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .org-create-page__title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .org-create-page__title :global(svg) {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--color-primary, #1978e5);
+  }
+
+  .org-create-page__description {
+    font-size: 0.9375rem;
+    color: var(--text-muted, #64748b);
+    margin: 0.5rem 0 0;
+  }
+
+  .org-create-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .org-create-form__hint {
+    font-size: 0.8125rem;
+    color: var(--text-muted, #64748b);
+    margin: 0.25rem 0 0;
+  }
+
+  .org-create-form__actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+  }
+
+  .org-create-alert {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius, 0.5rem);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+
+  .org-create-alert--success {
+    background: var(--color-success-bg, #dcfce7);
+    color: var(--color-success-text, #166534);
+    border: 1px solid var(--color-success-border, #86efac);
+  }
+
+  .org-create-alert--error {
+    background: var(--color-error-bg, #fef2f2);
+    color: var(--color-error-text, #991b1b);
+    border: 1px solid var(--color-error-border, #fca5a5);
+  }
+</style>

@@ -4,6 +4,9 @@ export const prerender = false;
 import AdminLayout from "@layouts/AdminLayout.astro";
 import Card from "@components/ui/Card/Card.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Select from "@components/ui/Form/Select.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
 import { Icon } from "astro-icon/components";
 import { getTranslations } from "@i18n/translations";
 const lang = Astro.params.lang as string;
@@ -32,15 +35,15 @@ const t = getTranslations(lang);
       <div class="media-toolbar">
         <div class="toolbar-search">
           <Icon name="mdi:magnify" class="search-icon" />
-          <input type="search" id="search-input" class="search-input" placeholder={t.adminBlog?.media?.searchPlaceholder ?? "Search by filename…"} />
+          <Input type="search" id="search-input" className="search-input" placeholder={t.adminBlog?.media?.searchPlaceholder ?? "Search by filename…"} />
         </div>
         <div class="toolbar-filters">
-          <select id="filter-type" class="filter-select">
+          <Select id="filter-type" className="filter-select">
             <option value="">{t.adminBlog?.allTypes ?? "All types"}</option>
             <option value="image">{t.adminBlog?.images ?? "Images"}</option>
             <option value="video">{t.adminBlog?.videos ?? "Videos"}</option>
             <option value="audio">{t.adminBlog?.audio ?? "Audio"}</option>
-          </select>
+          </Select>
         </div>
       </div>
     </CardContent>
@@ -65,22 +68,22 @@ const t = getTranslations(lang);
             <div class="meta-form-field">
               <label for="meta-filename">{t.adminBlog?.media?.fileName ?? "File name"}</label>
               <div class="meta-filename-row">
-                <input type="text" id="meta-filename" placeholder="mon-image" />
+                <Input type="text" id="meta-filename" placeholder="mon-image" />
                 <span class="meta-filename-ext" id="meta-ext">.jpg</span>
               </div>
               <span class="meta-form-hint">{t.adminBlog?.media?.slugHint ?? "Caractères autorisés : lettres, chiffres, tirets."}</span>
             </div>
             <div class="meta-form-field">
               <label for="meta-alt">{t.adminBlog?.form?.altText ?? "Alt text"}</label>
-              <input type="text" id="meta-alt" placeholder={t.adminBlog?.media?.altPlaceholder ?? "Description de l'image…"} />
+              <Input type="text" id="meta-alt" placeholder={t.adminBlog?.media?.altPlaceholder ?? "Description de l'image…"} />
             </div>
             <div class="meta-form-field">
               <label for="meta-caption">{t.adminBlog?.form?.caption ?? "Caption"}</label>
-              <input type="text" id="meta-caption" placeholder={t.adminBlog?.media?.captionPlaceholder ?? "Légende optionnelle…"} />
+              <Input type="text" id="meta-caption" placeholder={t.adminBlog?.media?.captionPlaceholder ?? "Légende optionnelle…"} />
             </div>
             <div class="meta-form-field">
               <label for="meta-description">{t.adminBlog?.form?.description ?? "Description"}</label>
-              <textarea id="meta-description" rows="2" placeholder={t.adminBlog?.media?.descriptionPlaceholder ?? "Description détaillée…"}></textarea>
+              <Textarea id="meta-description" rows={2} placeholder={t.adminBlog?.media?.descriptionPlaceholder ?? "Description détaillée…"} />
             </div>
             <div class="meta-form-actions">
               <button type="button" class="meta-btn-cancel" id="meta-btn-cancel">{t.adminBlog?.common?.cancel ?? "Cancel"}</button>
@@ -134,7 +137,7 @@ const t = getTranslations(lang);
           </div>
           <div class="meta-row">
             <span class="meta-label">URL</span>
-            <input type="text" id="detail-url" class="meta-url-input" readonly />
+            <Input type="text" id="detail-url" className="meta-url-input" readonly />
             <button type="button" class="copy-btn" id="copy-url" title={t.adminBlog?.media?.copyUrl ?? "Copier l'URL"}>
               <Icon name="mdi:content-copy" class="copy-icon" />
             </button>
@@ -144,15 +147,15 @@ const t = getTranslations(lang);
         <div class="detail-fields">
           <div class="detail-field">
             <label for="detail-alt">{t.adminBlog?.media?.altLabel ?? "Texte alternatif"}</label>
-            <input type="text" id="detail-alt" class="detail-input" placeholder={t.adminBlog?.media?.altPlaceholder ?? "Description de l'image…"} />
+            <Input type="text" id="detail-alt" className="detail-input" placeholder={t.adminBlog?.media?.altPlaceholder ?? "Description de l'image…"} />
           </div>
           <div class="detail-field">
             <label for="detail-caption">{t.adminBlog?.media?.captionLabel ?? "Légende"}</label>
-            <input type="text" id="detail-caption" class="detail-input" placeholder={t.adminBlog?.media?.captionPlaceholder ?? "Légende optionnelle…"} />
+            <Input type="text" id="detail-caption" className="detail-input" placeholder={t.adminBlog?.media?.captionPlaceholder ?? "Légende optionnelle…"} />
           </div>
           <div class="detail-field">
             <label for="detail-description">{t.adminBlog?.media?.descriptionLabel ?? "Description"}</label>
-            <textarea id="detail-description" class="detail-input" rows="2" placeholder={t.adminBlog?.media?.descriptionPlaceholder ?? "Description détaillée…"}></textarea>
+            <Textarea id="detail-description" className="detail-input" rows={2} placeholder={t.adminBlog?.media?.descriptionPlaceholder ?? "Description détaillée…"} />
           </div>
         </div>
       </div>

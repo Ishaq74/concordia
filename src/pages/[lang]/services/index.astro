@@ -4,6 +4,7 @@ import { getCollection } from "astro:content";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import ServiceGrid from "@components/modules/services/lists/ServiceGrid.astro";
 import ServiceCard from "@components/modules/services/cards/ServiceCard.astro";
+import Input from "@components/ui/Form/Input.astro";
 import { Icon } from "astro-icon/components";
 import { getTranslations } from "@i18n/translations";
 
@@ -52,7 +53,7 @@ const howItWorks = [
       <form class="search-bar" id="search-form" action={`/${lang}/services`} method="get">
         <div class="search-bar__field">
           <Icon name="mdi:magnify" class="search-bar__icon" />
-          <input type="search" name="q" placeholder={ts.searchPlaceholder ?? "Que cherchez-vous ?"} class="search-bar__input" id="search-input" />
+          <Input type="search" id="search-input" name="q" placeholder={ts.searchPlaceholder ?? "Que cherchez-vous ?"} className="search-bar__input" />
         </div>
         <button type="submit" class="search-bar__btn">{ts.searchBtn ?? "Rechercher"}</button>
       </form>

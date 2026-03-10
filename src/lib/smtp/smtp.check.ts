@@ -73,6 +73,6 @@ check().catch(async (err) => {
   console.error('💥 Erreur fatale:', err.message);
   try {
     await smtp.close();
-  } catch {}
+  } catch { /* ignore close errors during fatal exit */ }
   process.exit(1);
 });

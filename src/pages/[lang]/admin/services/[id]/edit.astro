@@ -25,9 +25,17 @@ import {
 } from "@database/schemas";
 import { eq } from "drizzle-orm";
 import { getTranslations } from "@i18n/translations";
+import { isAdminUser } from "@lib/admin/permissions";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
 const lang = Astro.params.lang as string;
 const t = getTranslations(lang);
+
+// Auth guard — redirect non-admins BEFORE any DB queries
+const user = Astro.locals.user;
+if (!user) return Astro.redirect(getLocalizedUrl(lang, "auth/sign-in"), 302);
+if (!isAdminUser(user)) return Astro.redirect(getLocalizedUrl(lang, "/"), 302);
+
 const ts = t.adminServices;
 const adminBase = `/${lang}/admin/services`;
 
@@ -474,11 +482,20 @@ const dayNames = [
 
     function setCoverPreview(id: string, url: string) {
       coverId = id;
-      preview.innerHTML = `<img src="${url}" alt="Preview" /><button type="button" class="remove-preview" title="Supprimer">&times;</button>`;
+      preview.textContent = "";
+      const img = document.createElement("img");
+      img.src = url;
+      img.alt = "Preview";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "remove-preview";
+      btn.title = "Supprimer";
+      btn.textContent = "\u00d7";
+      preview.append(img, btn);
       preview.classList.remove("hidden");
-      preview.querySelector(".remove-preview")?.addEventListener("click", () => {
+      btn.addEventListener("click", () => {
         coverId = null;
-        preview.innerHTML = "";
+        preview.textContent = "";
         preview.classList.add("hidden");
         coverInput.value = "";
       });
@@ -521,17 +538,24 @@ const dayNames = [
     const galleryGrid = document.getElementById("gallery-grid") as HTMLElement;
 
     function renderGallery() {
-      galleryGrid.innerHTML = galleryItems.map((item, idx) =>
-        `<div class="gallery-item" data-media-id="${item.id}" data-position="${idx}">
-          <img src="${item.url}" alt="Gallery ${idx + 1}" class="gallery-thumb" />
-          <button type="button" class="gallery-remove" title="Retirer">&times;</button>
-        </div>`
-      ).join("");
-      galleryGrid.querySelectorAll(".gallery-remove").forEach((btn, idx) => {
-        btn.addEventListener("click", () => {
-          galleryItems.splice(idx, 1);
-          renderGallery();
-        });
+      galleryGrid.textContent = "";
+      galleryItems.forEach((item, idx) => {
+        const div = document.createElement("div");
+        div.className = "gallery-item";
+        div.dataset.mediaId = item.id;
+        div.dataset.position = String(idx);
+        const img = document.createElement("img");
+        img.src = item.url;
+        img.alt = `Gallery ${idx + 1}`;
+        img.className = "gallery-thumb";
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "gallery-remove";
+        btn.title = "Retirer";
+        btn.textContent = "\u00d7";
+        btn.addEventListener("click", () => { galleryItems.splice(idx, 1); renderGallery(); });
+        div.append(img, btn);
+        galleryGrid.appendChild(div);
       });
     }
 

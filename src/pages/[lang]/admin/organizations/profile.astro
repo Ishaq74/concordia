@@ -16,11 +16,18 @@ import { getDrizzle } from "@database/drizzle";
 import { blogOrganizations } from "@database/schemas";
 import { eq } from "drizzle-orm";
 import { getTranslations } from "@i18n/translations";
+import { isAdminUser } from "@lib/admin/permissions";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
 const lang = Astro.params.lang as string;
 const t = getTranslations(lang);
 const to = t.adminOrganizations ?? ({} as Record<string, string>);
 const adminBase = `/${lang}/admin`;
+
+// Auth guard — redirect non-admins BEFORE any DB queries
+const authUser = Astro.locals.user;
+if (!authUser) return Astro.redirect(getLocalizedUrl(lang, "auth/sign-in"), 302);
+if (!isAdminUser(authUser)) return Astro.redirect(getLocalizedUrl(lang, "/"), 302);
 
 const db = await getDrizzle();
 
@@ -50,7 +57,6 @@ const loc = (val: any, fallback = "") => {
 };
 
 const address = (org.address ?? {}) as Record<string, string>;
-// const contactPoints = (org.contactPoint ?? []) as { contactType: string; telephone?: string; email?: string; hoursAvailable?: string }[]; // unused
 const sameAs = (org.sameAs ?? []) as string[];
 const knowsAbout = (org.knowsAbout ?? []) as string[];
 const knowsLanguage = (org.knowsLanguage ?? []) as string[];
@@ -250,9 +256,9 @@ const i18nLabels: Record<string, string> = { fr: "Français", en: "English", ar:
                     <span>{dayLabels[day] ?? day}</span>
                   </label>
                   <div class="hours-times">
-                    <input type="time" class="hours-open" data-day={day} value={h?.opens ?? "09:00"} disabled={!h} />
+                    <Input type="time" id={`hours-open-${day}`} className="hours-open" data-day={day} value={h?.opens ?? "09:00"} disabled={!h} />
                     <span class="hours-sep">—</span>
-                    <input type="time" class="hours-close" data-day={day} value={h?.closes ?? "18:00"} disabled={!h} />
+                    <Input type="time" id={`hours-close-${day}`} className="hours-close" data-day={day} value={h?.closes ?? "18:00"} disabled={!h} />
                   </div>
                 </div>
               );

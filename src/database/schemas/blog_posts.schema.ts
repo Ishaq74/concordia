@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, primaryKey, foreignKey } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { blogTranslations } from "./blog_translations.schema";
 import { blogAuthors } from "./blog_authors.schema";
@@ -32,19 +32,31 @@ export const blogPosts = pgTable("blog_posts", {
 export const blogPostAuthors = pgTable("blog_post_authors", {
   postId: text("post_id").notNull(),
   authorId: text("author_id").notNull(),
-});
+}, (table) => [
+  primaryKey({ columns: [table.postId, table.authorId] }),
+  foreignKey({ columns: [table.postId], foreignColumns: [blogPosts.id] }).onDelete("cascade"),
+  foreignKey({ columns: [table.authorId], foreignColumns: [blogAuthors.id] }).onDelete("cascade"),
+]);
 
 export const blogPostCategories = pgTable("blog_post_categories", {
   postId: text("post_id").notNull(),
   categoryId: text("category_id").notNull(),
-});
+}, (table) => [
+  primaryKey({ columns: [table.postId, table.categoryId] }),
+  foreignKey({ columns: [table.postId], foreignColumns: [blogPosts.id] }).onDelete("cascade"),
+  foreignKey({ columns: [table.categoryId], foreignColumns: [blogCategories.id] }).onDelete("cascade"),
+]);
 
 export const blogPostMedia = pgTable("blog_post_media", {
   postId: text("post_id").notNull(),
   mediaId: text("media_id").notNull(),
   type: text("type").notNull(),
   position: text("position"),
-});
+}, (table) => [
+  primaryKey({ columns: [table.postId, table.mediaId, table.type] }),
+  foreignKey({ columns: [table.postId], foreignColumns: [blogPosts.id] }).onDelete("cascade"),
+  foreignKey({ columns: [table.mediaId], foreignColumns: [blogMedia.id] }).onDelete("cascade"),
+]);
 
 export const blogPostsRelations = relations(blogPosts, ({ one, many }) => ({
   organization: one(blogOrganizations, { fields: [blogPosts.organizationId], references: [blogOrganizations.id] }),

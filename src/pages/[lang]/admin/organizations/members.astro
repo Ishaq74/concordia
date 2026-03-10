@@ -21,11 +21,18 @@ import { getDrizzle } from "@database/drizzle";
 import { member, user as userTable, invitation } from "@database/schemas/auth-schema";
 import { eq } from "drizzle-orm";
 import { getTranslations } from "@i18n/translations";
+import { isAdminUser } from "@lib/admin/permissions";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 
 const lang = Astro.params.lang as string;
 const t = getTranslations(lang);
 const to = t.adminOrganizations ?? ({} as Record<string, string>);
 const adminBase = `/${lang}/admin`;
+
+// Auth guard — redirect non-admins BEFORE any DB queries
+const authUser = Astro.locals.user;
+if (!authUser) return Astro.redirect(getLocalizedUrl(lang, "auth/sign-in"), 302);
+if (!isAdminUser(authUser)) return Astro.redirect(getLocalizedUrl(lang, "/"), 302);
 
 const db = await getDrizzle();
 
@@ -199,11 +206,11 @@ const roleBadgeColor: Record<string, BadgeColor> = {
                   </TableCell>
                   <TableCell>
                     <div class="role-selector" data-member-id={m.id}>
-                      <select class="role-select" data-current={m.role}>
+                      <Select id={`role-${m.id}`} className="role-select" data-current={m.role}>
                         {Object.entries(roleLabels).map(([val, label]) => (
                           <option value={val} selected={val === m.role}>{label}</option>
                         ))}
-                      </select>
+                      </Select>
                     </div>
                   </TableCell>
                   <TableCell className="date-cell">{m.createdAt.toLocaleDateString(lang, { day: "numeric", month: "short", year: "numeric" })}</TableCell>

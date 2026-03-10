@@ -44,7 +44,10 @@ export function validateUserInput({ email, username, name, password }: { email?:
       if (typeof parsed === 'object' && parsed !== null) {
         throw new Error(`Validation error: dangerous NoSQL input in ${label}`);
       }
-    } catch {}
+    } catch (e) {
+      if (e instanceof Error && e.message.startsWith('Validation error:')) throw e;
+      /* JSON.parse failed — value is not JSON, continue */
+    }
     // Block if value is only or starts/ends with shell metacharacters or sequences
     if (/^(;|&&|\||`|\$|\(|\)|\{|\}|\[|\]|<|>|\$\(|\$\{|\$\w+)/.test(val.trim()) || /(;|&&|\||`|\$|\(|\)|\{|\}|\[|\]|<|>|\$\(|\$\{|\$\w+)$/.test(val.trim())) {
       throw new Error(`Validation error: dangerous command injection in ${label}`);
@@ -102,7 +105,10 @@ export function validateUserInput({ email, username, name, password }: { email?:
       if (typeof parsed === 'object' && parsed !== null) {
         throw new Error(`Validation error: dangerous NoSQL input in ${key}`);
       }
-    } catch {}
+    } catch (e) {
+      if (e instanceof Error && e.message.startsWith('Validation error:')) throw e;
+      /* JSON.parse failed — value is not JSON, continue */
+    }
     // Block NoSQL keywords
     if (/\$ne|\$gt|\$lt|\$in|\$nin|\$or|\$and|db\.|\$where/.test(val)) {
       throw new Error(`Validation error: dangerous NoSQL input in ${key}`);

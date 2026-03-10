@@ -66,7 +66,7 @@ if (profileRows.length === 0) {
 const userProfile = profileRows[0] ?? null;
 
 // --- Consolidated profile data
-const displayName = user.name ?? user.email;
+const displayName = userProfile?.fullName ?? user.name ?? user.email;
 const bio = userProfile?.bio ?? null;
 const location = userProfile?.location ?? null;
 const avatarUrl = typeof user.image === "string" ? user.image : userProfile?.avatarUrl ?? undefined;
@@ -337,7 +337,7 @@ const statusMessage = statusParam === "updated"
             <Icon name="mdi:newspaper-variant-outline" />
             <p class="profile-empty-state__text">{translations.auth?.noArticles ?? "Aucun article publié"}</p>
             <p class="profile-empty-state__hint">{translations.auth?.noArticlesHint ?? "Vos articles de blog seront listés ici."}</p>
-            <a href={`/${lang}/admin/blog/articles/new`} class="profile-cta-link">
+            <a href={`/${lang}/admin/organizations/blog?action=new`} class="profile-cta-link">
               <Button variant="modern" color="primary" icon={{ name: "mdi:pencil-plus-outline", side: "left" }}>
                 {translations.auth?.writeArticle ?? "Écrire un article"}
               </Button>

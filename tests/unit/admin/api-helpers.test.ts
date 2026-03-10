@@ -74,17 +74,19 @@ describe('admin/api-helpers', () => {
       expect(body).toEqual({ error: 'forbidden' });
     });
 
-    it('returns 403 when user is null', async () => {
+    it('returns 401 when user is null', async () => {
       const locals = { user: null } as unknown as App.Locals;
       const res = guardAdmin(locals);
       expect(res).toBeInstanceOf(Response);
-      expect(res!.status).toBe(403);
+      expect(res!.status).toBe(401);
+      const body = await res!.json();
+      expect(body).toEqual({ error: 'unauthorized' });
     });
 
-    it('returns 403 when user is undefined', async () => {
+    it('returns 401 when user is undefined', async () => {
       const locals = { user: undefined } as unknown as App.Locals;
       const res = guardAdmin(locals);
-      expect(res!.status).toBe(403);
+      expect(res!.status).toBe(401);
     });
   });
 
