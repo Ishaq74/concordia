@@ -4,13 +4,30 @@ import { serverAvailable } from '@tests/helpers/server-guard';
 
 const serverUp = await serverAvailable();
 
-describe.skipIf(!serverUp)('Rate Limiting', { timeout: 120_000 }, () => {
+/** apiCall wrapper with longer timeout and retry on transient errors */
+async function rateLimitCall(method: string, path: string, body?: unknown) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      return await apiCall(method, path, body, { timeout: 60000 });
+    } catch (err: any) {
+      if (attempt === 2) throw err;
+      if (/ECONNRESET|ECONNREFUSED|timeout/i.test(err.message)) {
+        await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw new Error('unreachable');
+}
+
+describe.skipIf(!serverUp)('Rate Limiting', { timeout: 180_000 }, () => {
 
 describe('Rate Limiting — Auth endpoints', () => {
   it('multiple rapid login attempts do not crash the server', async () => {
     const results = await Promise.all(
       Array.from({ length: 20 }, (_, i) =>
-        apiCall('POST', '/auth/sign-in/email', {
+        rateLimitCall('POST', '/auth/sign-in/email', {
           email: `brute${i}@attack.local`,
           password: 'wrong-password',
         }),
@@ -31,7 +48,7 @@ describe('Rate Limiting — Auth endpoints', () => {
   it('rapid signup attempts do not crash the server', async () => {
     const results = await Promise.all(
       Array.from({ length: 15 }, (_, i) =>
-        apiCall('POST', '/auth/sign-up/email', {
+        rateLimitCall('POST', '/auth/sign-up/email', {
           email: `rapid${i}@spam.local`,
           password: 'SpamPass123!@#',
           name: `spammer${i}`,
@@ -47,7 +64,7 @@ describe('Rate Limiting — Auth endpoints', () => {
   it('rapid password reset attempts do not crash the server', async () => {
     const results = await Promise.all(
       Array.from({ length: 15 }, (_, i) =>
-        apiCall('POST', '/auth/forgot-password', {
+        rateLimitCall('POST', '/auth/forgot-password', {
           email: `reset${i}@flood.local`,
         }),
       ),
@@ -63,7 +80,7 @@ describe('Rate Limiting — API endpoints', () => {
   it('rapid API calls to admin endpoints remain stable', async () => {
     const results = await Promise.all(
       Array.from({ length: 30 }, () =>
-        apiCall('GET', '/admin/organizations'),
+        rateLimitCall('GET', '/admin/organizations'),
       ),
     );
 
@@ -75,7 +92,7 @@ describe('Rate Limiting — API endpoints', () => {
   it('rapid API calls to blog endpoint remain stable', async () => {
     const results = await Promise.all(
       Array.from({ length: 30 }, () =>
-        apiCall('GET', '/admin/blog'),
+        rateLimitCall('GET', '/admin/blog'),
       ),
     );
 

@@ -66,6 +66,7 @@ Ce projet démontre une application web full-stack utilisant des technologies mo
 ```bash
 npm install
 - `npm run dev`: astro dev
+- `npm run dev:test`: node scripts/dev-test.cjs
 - `npm run build`: astro build
 - `npm run preview`: astro preview
 - `npm run build:node`: astro build --node
@@ -84,8 +85,8 @@ npm install
 - `npm run smtp:check`: tsx src/lib/smtp/smtp.check.ts
 - `npm run test`: vitest
 - `npm run test:unit`: vitest run tests/unit/**/*.test.ts src/lib/**/*.test.ts
-- `npm run test:integration`: vitest run --include tests/integration/**/*.test.ts
-- `npm run test:components`: vitest run --include src/components/**/*.test.ts
+- `npm run test:integration`: vitest run tests/integration/**/*.test.ts
+- `npm run test:components`: vitest run src/components/**/*.test.ts
 - `npm run test:e2e`: playwright test
 - `npm run test:e2e:ui`: playwright test --ui
 - `npm run test:e2e:debug`: playwright test --debug
@@ -158,6 +159,7 @@ npm install
     - db.migrate.ts
     - db.seed.ts
     - db.sync.ts
+  - dev-test.cjs
   - **readme**
     - generateDatabase.ts
     - generateDeps.ts
@@ -389,7 +391,7 @@ npm install
       - 05-blog_media.data.ts
       - 06-blog_organization.data.ts
       - 07-blog_posts.data.ts
-      - 07-blog_post_authors.data.ts
+      - 08-blog_post_authors.data.ts
       - 10-blog_translations.data.ts
       - 11-blog_comments.data.ts
       - 11-notification.data.ts
@@ -402,6 +404,7 @@ npm install
       - 26-services_reviews.data.ts
       - 27-services_bookings.data.ts
     - drizzle.ts
+    - env.ts
     - **loaders**
       - blog.ts
       - factory.ts
@@ -411,11 +414,13 @@ npm install
       - 0003_calm_chat.sql
       - 0004_tricky_captain_flint.sql
       - 0005_harsh_metal_master.sql
+      - 0006_faulty_giant_girl.sql
       - **meta**
         - 0002_snapshot.json
         - 0003_snapshot.json
         - 0004_snapshot.json
         - 0005_snapshot.json
+        - 0006_snapshot.json
         - _journal.json
     - **schemas**
       - audit-log.schema.ts
@@ -516,7 +521,7 @@ npm install
         - translations.ts
         - users.ts
       - **auth**
-        - [...all].ts
+        - [...path].ts
       - **auth-client**
         - forgot-password.ts
         - verification.ts
@@ -586,7 +591,6 @@ npm install
         - invitations.astro
         - legal.astro
         - profile.astro
-        - profile.astro.bak
         - reset-password.astro
         - sign-in.astro
         - sign-up.astro
@@ -655,6 +659,7 @@ npm install
       - notifications.astro
       - **organizations**
         - index.astro
+        - new.astro
         - **[slug]**
           - services.astro
         - [slug].astro
@@ -683,11 +688,7 @@ npm install
       - spacing.css
       - typography.css
 - **test-results**
-  - audit-run.txt
-  - full-run.txt
-  - json-out.json
-  - run.txt
-  - unit-run.txt
+  - suite6.txt
 - **tests**
   - **a11y**
     - a11y-performance.test.ts
@@ -713,7 +714,9 @@ npm install
     - test-factory.ts
   - **helpers**
     - astroComponentTestHelpers.ts
+    - auth-out.txt
     - component-test-context.ts
+    - http-auth.ts
     - server-guard.ts
     - uiTestHelpers.ts
   - **i18n**
@@ -1714,7 +1717,9 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
   - test-factory.ts
 - **helpers**
   - astroComponentTestHelpers.ts
+  - auth-out.txt
   - component-test-context.ts
+  - http-auth.ts
   - server-guard.ts
   - uiTestHelpers.ts
 - **i18n**
@@ -1963,7 +1968,7 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
   - 05-blog_media.data.ts
   - 06-blog_organization.data.ts
   - 07-blog_posts.data.ts
-  - 07-blog_post_authors.data.ts
+  - 08-blog_post_authors.data.ts
   - 10-blog_translations.data.ts
   - 11-blog_comments.data.ts
   - 11-notification.data.ts
@@ -1976,6 +1981,7 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
   - 26-services_reviews.data.ts
   - 27-services_bookings.data.ts
 - drizzle.ts
+- env.ts
 - **loaders**
   - blog.ts
   - factory.ts
@@ -1985,11 +1991,13 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
   - 0003_calm_chat.sql
   - 0004_tricky_captain_flint.sql
   - 0005_harsh_metal_master.sql
+  - 0006_faulty_giant_girl.sql
   - **meta**
     - 0002_snapshot.json
     - 0003_snapshot.json
     - 0004_snapshot.json
     - 0005_snapshot.json
+    - 0006_snapshot.json
     - _journal.json
 - **schemas**
   - audit-log.schema.ts
@@ -2035,7 +2043,7 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
   - translations.ts
   - users.ts
 - **auth**
-  - [...all].ts
+  - [...path].ts
 - **auth-client**
   - forgot-password.ts
   - verification.ts
@@ -2234,7 +2242,7 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
   - **POST — article actions**
     - rejects unauthenticated POST
     - rejects non-admin POST
-    - rejects create without required fields
+    - accepts create without explicit fields (server generates defaults)
     - rejects delete without id
     - rejects unknown action
 
@@ -2322,7 +2330,6 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
 - `tests\integration\api\admin-organizations.test.ts`
   - **GET**
     - rejects non-admin user
-    - returns organizations list for admin
   - **POST**
     - rejects missing action
     - rejects create without name/slug
@@ -2347,7 +2354,7 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
   - **GET — list availability**
     - rejects unauthenticated request
     - rejects non-admin user
-    - returns availability for admin
+    - requires serviceId query param
     - supports serviceId filter
   - **POST — availability actions**
     - rejects unauthenticated POST
@@ -2376,7 +2383,7 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
   - **POST — category actions**
     - rejects unauthenticated POST
     - rejects non-admin POST
-    - rejects create without required fields
+    - accepts create without explicit fields (server generates defaults)
     - rejects delete without id
 
 - `tests\integration\api\admin-services-media.test.ts`
@@ -2659,7 +2666,8 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
   - **Tests**
     - GET ${path} renders without error
     - GET ${path} renders without error
-    - 404 page returns 404 status
+    - 404 page returns 404 status for locale-prefixed unknown route
+    - non-locale URL returns error (no locale prefix)
     - GET ${path} should not return 500 for unauthenticated user
 
 - `tests\pages\public-pages.test.ts`
@@ -2750,7 +2758,7 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
   - **guardAdmin()**
     - returns null (pass) for admin user
     - returns 403 Response for non-admin
-    - returns 403 Response for missing user
+    - returns 401 Response for missing user
   - **Comment handler — XSS rejection**
     - rejects XSS in comment content
     - rejects javascript: URI in comment content
@@ -2827,8 +2835,8 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
     - returns null for an admin user (caller continues)
     - returns null for superadmin user
     - returns 403 Response for a regular user
-    - returns 403 when user is null
-    - returns 403 when user is undefined
+    - returns 401 when user is null
+    - returns 401 when user is undefined
   - **generateId()**
     - returns a valid UUID v4 string
     - generates unique IDs on successive calls
@@ -4324,7 +4332,7 @@ Les tests sont configurés avec Vitest (unitaires/intégration) et Playwright (E
 
 - `tests\unit\utils\transaction.test.ts`
   - **withTestTransaction**
-    - throws meaningful error when raw client is unavailable (pg-mem)
+    - throws meaningful error when raw client is unavailable
     - error message guides developer to use real PostgreSQL
 
 - `tests\unit\validation.test.ts`

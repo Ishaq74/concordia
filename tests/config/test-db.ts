@@ -1,111 +1,24 @@
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Client } from 'pg'
 import * as schema from '@database/schemas'
-import { newDb } from 'pg-mem'
-import fs from 'fs'
-import path from 'path'
+import { getDbUrl } from '@database/env'
 
 let dbClient: Client | null = null
 let db: any = null
 
 export async function getTestDb() {
   if (!db) {
-    const connectionString = process.env.DATABASE_URL_TEST || ''
-
+    const connectionString = getDbUrl('TEST')
     if (!connectionString) {
-      // Fallback to pg‑mem in-memory DB when no TEST URL provided
-      const mem = newDb()
-      // register minimal pg functions used by migrations or triggers
-      const pgm: any = mem.public;
-      if (pgm && typeof pgm.registerFunction === 'function') {
-        pgm.registerFunction({
-          name: 'replace',
-          returns: 'text',
-          args: ['text','text','text'],
-          implementation: (str: string, search: string, repl: string) => {
-            return str.split(search).join(repl);
-          },
-        });
-        pgm.registerFunction({
-          name: 'lower',
-          returns: 'text',
-          args: ['text'],
-          implementation: (s: string) => s.toLowerCase(),
-        });
-      }
-      const adapter = mem.adapters.createPg()
-      dbClient = new adapter.Client() as unknown as Client;
-      await dbClient!.connect()
-
-      // Wrap query to strip unsupported options (pg-mem doesn't support rowMode or types/getTypeParser)
-      // Also rewrite SQL DEFAULT keyword for nullable columns (pg-mem doesn't support it)
-      const origQuery = (dbClient as any).query.bind(dbClient!)
-      ;(dbClient as any).query = (...args: any[]) => {
-        // Strip rowMode and types from any object-style arg (defensive)
-        for (let i = 0; i < args.length; i++) {
-          if (typeof args[i] === 'object' && args[i] && ('rowMode' in args[i] || 'types' in args[i])) {
-            const opts = { ...args[i] }
-            delete opts.rowMode
-            delete opts.types
-            args[i] = opts
-          }
-        }
-
-        // pg-mem doesn't support the DEFAULT keyword in INSERT VALUES.
-        // Better Auth uses DEFAULT for nullable plugin columns (active_organization_id, impersonated_by).
-        // Replace "default" placeholders with NULL so pg-mem can process the query.
-        for (let i = 0; i < args.length; i++) {
-          const arg = args[i]
-          const sql = typeof arg === 'string' ? arg : (arg?.text ?? null)
-          if (typeof sql === 'string' && /\bdefault\b/i.test(sql) && /\binsert\b/i.test(sql)) {
-            const fixed = sql.replace(/\bdefault\b/gi, 'null')
-            if (typeof arg === 'string') {
-              args[i] = fixed
-            } else if (arg?.text) {
-              args[i] = { ...arg, text: fixed }
-            }
-          }
-        }
-
-        try {
-          return origQuery(...args)
-        } catch (err: any) {
-          // Some driver paths still forward unsupported options in nested structures —
-          // retry after removing them if error indicates that.
-          if (err && /rowMode|getTypeParser|not supported/i.test(String(err.message || err))) {
-            for (let i = 0; i < args.length; i++) {
-              if (typeof args[i] === 'object' && args[i] && ('rowMode' in args[i] || 'types' in args[i])) {
-                const opts = { ...args[i] }
-                delete opts.rowMode
-                delete opts.types
-                args[i] = opts
-              }
-            }
-            return origQuery(...args)
-          }
-          throw err
-        }
-      }
-
-      db = drizzle(dbClient!, { schema })
-
-      // Apply SQL migrations from src/database/migrations for parity
-      const migrationsDir = path.resolve(process.cwd(), 'src', 'database', 'migrations')
-      if (fs.existsSync(migrationsDir)) {
-        const files = fs.readdirSync(migrationsDir).filter((f) => f.endsWith('.sql')).sort()
-        for (const file of files) {
-          const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8')
-          if (sql.trim()) {
-            // pg-mem supports multiple statements
-            await dbClient!.query(sql)
-          }
-        }
-      }
-    } else {
-      dbClient = new Client({ connectionString })
-      await dbClient.connect()
-      db = drizzle(dbClient!, { schema })
+      throw new Error(
+        'DATABASE_URL_TEST is not set. All tests require a real PostgreSQL test database.\n' +
+        'Set DATABASE_URL_TEST in your .env file (e.g. postgresql://postgres:password@localhost:5432/concordia_db_test)'
+      )
     }
+
+    dbClient = new Client({ connectionString })
+    await dbClient.connect()
+    db = drizzle(dbClient!, { schema })
   }
   return db
 }

@@ -30,7 +30,6 @@ export default getViteConfig(
         NODE_ENV: 'test',
         SMTP_MOCK: '1',
         BETTER_AUTH_URL: 'http://localhost:4321',
-        DATABASE_URL: 'postgresql://test:test@localhost/test_db',
       },
       exclude: [
         'node_modules/**',

@@ -4,29 +4,19 @@
  * DB manipulation for email verification and role assignment.
  *
  * These helpers are used when `serverAvailable()` is true, because the
- * Better Auth testUtils write to the in-memory test DB (pg-mem), but
- * API calls go to the dev server which uses the real dev DB.
+ * Better Auth testUtils write to the test DB directly, but API calls go
+ * to the dev server which also uses the test DB (when USE_DB_TEST=true).
  */
 import { Client } from 'pg';
 import { getApiBase } from '@tests/utils/api-helpers';
-
-/** Resolve the DB URL that the dev server actually uses (respects USE_DB_TEST). */
-function getDevDbUrl(): string {
-  if (process.env.USE_DB_TEST === 'true' && process.env.DATABASE_URL_TEST) {
-    return process.env.DATABASE_URL_TEST;
-  }
-  if (process.env.USE_PROD_DB === 'true' && process.env.DATABASE_URL_PROD) {
-    return process.env.DATABASE_URL_PROD;
-  }
-  return process.env.DATABASE_URL_LOCAL || '';
-}
+import { getDbUrl } from '@database/env';
 
 let _sharedClient: Client | null = null;
 
 /** Get or create a shared PG client for the dev DB. */
 async function getDevDbClient(): Promise<Client> {
   if (_sharedClient) return _sharedClient;
-  const url = getDevDbUrl();
+  const url = getDbUrl();
   if (!url) throw new Error('No dev DB URL available for integration tests');
   _sharedClient = new Client({ connectionString: url });
   await _sharedClient.connect();

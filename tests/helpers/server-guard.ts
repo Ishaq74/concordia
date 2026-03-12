@@ -29,8 +29,8 @@ export async function serverAvailable(force = false): Promise<boolean> {
   _checked = true;
   try {
     const base = getApiBase();
-    const res = await fetch(`${base}/`, { signal: AbortSignal.timeout(3000) });
-    _available = res.ok || res.status === 404;
+    const res = await fetch(`${base}/`, { signal: AbortSignal.timeout(3000), redirect: 'manual' });
+    _available = res.ok || res.status === 302 || res.status === 301 || res.status === 404;
   } catch {
     _available = false;
   }

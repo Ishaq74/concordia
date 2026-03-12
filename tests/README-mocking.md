@@ -37,7 +37,7 @@ les tests E2E). Cette page n'existe en prod que si `NODE_ENV==='test'`.
 | Variable | Usage                       | Valeur recommandée en test   |
 |----------|-----------------------------|------------------------------|
 | `SMTP_MOCK` | Force l'utilisation du mode mock | `1` (actif par défaut en test) |
-| `DATABASE_URL_TEST` | URL PG pour la BD de test | Vide pour utiliser pg‑mem |
+| `DATABASE_URL_TEST` | URL PG pour la BD de test | **Requis** — doit pointer vers une vraie base PostgreSQL |
 | `NODE_ENV` | Détermine `isMocked` dans SMTP | `test` (défini automatiquement) |
 | `BETTER_AUTH_URL` | Base URL de l'API auth dans les tests | `http://localhost:4321` |
 

@@ -6,8 +6,11 @@ import { getPgClient } from "../../src/database/drizzle";
 type MigrationRecord = { id: string; sql: string };
 
 const MIGRATIONS_DIR = path.resolve(process.cwd(), "src/database/migrations");
-const USE_PROD_DB = process.env.USE_PROD_DB === "true";
-const CONNECTION_LABEL = USE_PROD_DB ? "production" : "local/dev";
+import { getDbEnv, getDbUrl } from '../../src/database/env';
+
+const dbEnv = getDbEnv();
+const USE_PROD_DB = dbEnv === 'PROD';
+const CONNECTION_LABEL = USE_PROD_DB ? 'production' : dbEnv === 'TEST' ? 'test' : 'local/dev';
 
 config({ path: path.resolve(process.cwd(), ".env") });
 
@@ -27,7 +30,7 @@ async function main() {
     console.log(`${cyan}${bold}═══════════════════════════════════════════════════════${reset}\n`);
 
         // Affiche la DB cible (masquée) et avertissement PROD si nécessaire
-        const targetDbUrl = USE_PROD_DB ? (process.env.DATABASE_URL_PROD || process.env.DATABASE_URL) : (process.env.DATABASE_URL_LOCAL || process.env.DATABASE_URL);
+        const targetDbUrl = getDbUrl();
         const maskUrl = (u?: string) => u ? u.replace(/:\/\/[^@]+@/, '://***@') : 'N/A';
         const dbNameFromUrl = (u?: string) => {
           try { return u ? new URL(u).pathname.replace(/^\//, '') : 'unknown'; } catch { return (u || '').split('/').pop() || 'unknown'; }

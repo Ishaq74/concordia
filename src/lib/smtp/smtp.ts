@@ -231,6 +231,7 @@ export class SmtpService {
     }
 
     try {
+      let timer: ReturnType<typeof setTimeout> | undefined;
       const result = await Promise.race([
         this.transporter.sendMail({
           from: payload.from || process.env.SMTP_FROM || this.config.auth.user,
@@ -240,10 +241,10 @@ export class SmtpService {
           html: payload.html,
           replyTo: payload.replyTo
         }),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('TIMEOUT')), timeoutMs)
-        )
-      ]);
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => reject(new Error('TIMEOUT')), timeoutMs);
+        })
+      ]).finally(() => { if (timer) clearTimeout(timer); });
 
       // if mock mode is active also append the record to the shared store
       if (this.isMocked) {
@@ -329,5 +330,17 @@ export class SmtpService {
 
 // ==================== EXPORT ====================
 
-export const smtp = new SmtpService(loadConfig());
+let _smtp: SmtpService | null = null;
+export function getSmtp(): SmtpService {
+  if (!_smtp) _smtp = new SmtpService(loadConfig());
+  return _smtp;
+}
+// Lazy proxy: behaves like SmtpService but only connects on first use
+export const smtp = new Proxy({} as SmtpService, {
+  get(_, prop) {
+    const instance = getSmtp();
+    const val = (instance as any)[prop];
+    return typeof val === 'function' ? val.bind(instance) : val;
+  },
+});
 export { PROVIDERS };

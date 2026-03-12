@@ -3,8 +3,7 @@ import { withTestTransaction } from '@tests/utils/transaction';
 
 /**
  * Tests for the withTestTransaction utility.
- * pg-mem doesn't expose a raw `client.query()` method, so the utility
- * correctly throws when no real PostgreSQL connection is available.
+ * The utility throws when no raw PostgreSQL connection is available.
  * These tests verify the guard behaviour in a test environment.
  */
 
@@ -17,7 +16,7 @@ vi.mock('astro:schema', () => ({
 }));
 
 describe('withTestTransaction', () => {
-  it('throws meaningful error when raw client is unavailable (pg-mem)', async () => {
+  it('throws meaningful error when raw client is unavailable', async () => {
     await expect(
       withTestTransaction(async () => 42),
     ).rejects.toThrow('Unable to obtain raw client for transactions');

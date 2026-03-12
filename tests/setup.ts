@@ -35,7 +35,7 @@ vi.mock('better-auth/plugins', async () => {
 })
 
 // Ensure all imports of getDrizzle() inside app code used during tests
-// resolve to the same in-memory DB instance created by getTestDb().
+// resolve to the same test DB instance created by getTestDb().
 vi.mock('@database/drizzle', async () => {
   const actual = await vi.importActual<any>('@database/drizzle')
   const testDb = await import('./config/test-db')
@@ -65,7 +65,8 @@ vi.mock('@lib/auth/auth', async () => {
 
 // Server-dependent tests (page-render, security, etc.) use the
 // serverAvailable() guard and skip automatically when no dev server is running.
-// To run those tests, start the server manually:  pnpm dev
+// To run those tests, start the server with:  pnpm dev:test
+// (this sets SMTP_MOCK=1 so integration tests never send real emails)
 // The guard in tests/helpers/server-guard.ts handles detection.
 
 beforeEach(async () => {

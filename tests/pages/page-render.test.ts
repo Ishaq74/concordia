@@ -11,7 +11,7 @@ const serverUp = await serverAvailable()
 
 async function fetchPage(path: string): Promise<{ status: number; contentType: string | null }> {
   const base = getApiBase().replace(/\/api$/, '')
-  const res = await fetch(`${base}${path}`, { signal: AbortSignal.timeout(10000) })
+  const res = await fetch(`${base}${path}`, { signal: AbortSignal.timeout(30000) })
   return { status: res.status, contentType: res.headers.get('content-type') }
 }
 

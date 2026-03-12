@@ -1,22 +1,14 @@
 import { config } from 'dotenv';
 import { Client } from 'pg';
+import { getDbEnv, getDbUrl } from '../../src/database/env';
 
 config();
 
 (async () => {
   // --- Vérification des variables d'environnement ---
-  const useProd = process.env.USE_PROD_DB === 'true';
-  const useTest = process.env.USE_DB_TEST === 'true';
-
-  let dbUrl: string | undefined;
-
-  if (useProd) {
-    dbUrl = process.env.DATABASE_URL_PROD;
-  } else if (useTest) {
-    dbUrl = process.env.DATABASE_URL_TEST;
-  } else {
-    dbUrl = process.env.DATABASE_URL || process.env.DATABASE_URL_LOCAL;
-  }
+  const env = getDbEnv();
+  const useProd = env === 'PROD';
+  const dbUrl = getDbUrl();
 
   console.log('🔍 Configuration détectée:');
   console.log('  - USE_PROD_DB:', process.env.USE_PROD_DB || '(non défini)');
@@ -59,9 +51,9 @@ config();
     await client.connect();
 
     const res = await client.query('SELECT current_database(), current_user, inet_server_addr() as host');
-    const env = useProd ? 'production (Neon)' : useTest ? 'test' : 'local/dev';
+    const envLabel = useProd ? 'production (Neon)' : env === 'TEST' ? 'test' : 'local/dev';
     console.log('✅ Connexion OK !');
-    console.log('ENV détecté :', env);
+    console.log('ENV détecté :', envLabel);
     console.table(res.rows);
 
     // --- Vérifie les tables existantes ---

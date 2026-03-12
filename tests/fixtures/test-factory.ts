@@ -4,7 +4,7 @@
  *
  * When a real server is running, uses HTTP-based auth (sign-up/sign-in
  * against the dev server). Otherwise falls back to Better Auth testUtils
- * with the in-memory test DB.
+ * with the test DB directly.
  */
 
 import { auth } from '@lib/auth/auth';
@@ -26,8 +26,8 @@ async function isServerUp(): Promise<boolean> {
   if (_serverUp !== null) return _serverUp;
   try {
     const base = getApiBase();
-    const res = await fetch(`${base}/`, { signal: AbortSignal.timeout(3000) });
-    _serverUp = res.ok || res.status === 404;
+    const res = await fetch(`${base}/`, { signal: AbortSignal.timeout(3000), redirect: 'manual' });
+    _serverUp = res.ok || res.status === 302 || res.status === 301 || res.status === 404;
   } catch {
     _serverUp = false;
   }

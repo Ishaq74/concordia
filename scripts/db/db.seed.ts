@@ -7,12 +7,11 @@ import * as path from 'path';
 import { pathToFileURL } from 'url';
 // Schema helper used to insert derived junction rows from blog_posts.categoryId
 import { blogPostCategories } from '../../src/database/schemas';
+import { getDbEnv, getDbUrl } from '../../src/database/env';
 
 config();
 
-// Utilise USE_PROD_DB du .env pour choisir la base
-const isProd = process.env.USE_PROD_DB === 'true';
-process.env.DATABASE_URL = isProd ? process.env.DATABASE_URL_PROD : process.env.DATABASE_URL_LOCAL;
+const isProd = getDbEnv() === 'PROD';
 
 
 async function seed() {
@@ -21,7 +20,7 @@ async function seed() {
 
   // Safety: show target DB and require confirmation when running against production
   if (isProd) {
-    const prodUrl = process.env.DATABASE_URL_PROD || process.env.DATABASE_URL;
+    const prodUrl = getDbUrl('PROD');
     const mask = (u?: string) => u ? u.replace(/:\/\/[^@]+@/, '://***@') : 'N/A';
     const dbName = (() => { try { return new URL(prodUrl!).pathname.replace(/^\//, '') } catch { return (prodUrl || '').split('/').pop() || 'unknown' } })();
     console.log(`\x1b[41m\x1b[97m PROD ATTENTION !! Vous ciblez la base de production : ${dbName} (${mask(prodUrl)}) \x1b[0m`);

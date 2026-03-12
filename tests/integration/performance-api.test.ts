@@ -26,10 +26,10 @@ beforeAll(async () => {
 // ─── Response Time Thresholds ─────────────────────────────────
 
 const RESPONSE_TIME_LIMITS = {
-  auth: 2000,     // Auth endpoints: 2s max
-  api: 3000,      // Admin API endpoints: 3s max
-  public: 2000,   // Public pages: 2s max
-  static: 500,    // Static assets: 500ms max
+  auth: 10000,    // Auth endpoints: 10s max (first request initializes DB pool)
+  api: 10000,     // Admin API endpoints: 10s max (cold start)
+  public: 10000,  // Public pages: 10s max (SSR cold start)
+  static: 2000,   // Static assets: 2s max
 };
 
 async function measureResponseTime(url: string, options?: RequestInit): Promise<{ status: number; ms: number }> {

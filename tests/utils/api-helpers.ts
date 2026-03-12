@@ -39,8 +39,10 @@ export async function apiCall(
       headers['Authorization'] = `Bearer ${opts.token}`
     }
 
-    // ensure path is under /api so tests can use short names like '/admin'.
-    const prefix = path.startsWith('/api') ? '' : '/api';
+    // Add /api prefix for short API paths (e.g. '/admin/blog/articles').
+    // Skip prefix for paths that already start with /api or look like page routes.
+    const isAbsolutePath = path.startsWith('/api') || path.startsWith('/fr') || path.startsWith('/en') || path.startsWith('/ar') || path.startsWith('/es') || path === '/';
+    const prefix = isAbsolutePath ? '' : '/api';
     const finalUrl = `${getApiBase()}${prefix}${path}`;
     const response = await fetch(finalUrl, {
       method,

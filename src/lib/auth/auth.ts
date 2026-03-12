@@ -196,7 +196,7 @@ const sharedConfig = {
         html: `<p>Cliquez sur le lien suivant pour réinitialiser votre mot de passe :</p><p><a href="${url}">${url}</a></p>`,
       };
       try {
-        if (process.env.NODE_ENV === 'test' || process.env.SMTP_MOCK === '1') {
+        if (process.env.SMTP_MOCK === '1' || process.env.NODE_ENV === 'test') {
           const mock = (globalThis as any).__sendMailMock;
           if (mock) mock.mock.calls.push(payload);
         } else {
@@ -216,7 +216,7 @@ const sharedConfig = {
         html: `<p>Cliquez sur le lien suivant pour vérifier votre adresse email :</p><p><a href="${url}">${url}</a></p>`,
       };
       try {
-        if (process.env.NODE_ENV === 'test' || process.env.SMTP_MOCK === '1') {
+        if (process.env.SMTP_MOCK === '1' || process.env.NODE_ENV === 'test') {
           const mock = (globalThis as any).__sendMailMock;
           if (mock) mock.mock.calls.push(payload);
         } else {
@@ -284,7 +284,14 @@ const sharedConfig = {
 const invalidatedTokens = new Set<string>();
 const emailFailureMap: Map<string, { count: number; first: number }> = new Map();
 
+let cachedAuthInstance: any = null;
+let cachedAuthPromise: Promise<any> | null = null;
+
 export async function getAuth() {
+  if (cachedAuthInstance) return cachedAuthInstance;
+  if (cachedAuthPromise) return cachedAuthPromise;
+
+  cachedAuthPromise = (async () => {
   const db = await getDrizzle();
 
   const instance = betterAuth({
@@ -317,38 +324,6 @@ export async function getAuth() {
       },
       session: {
         create: {
-          before: async (sessionObj: any) => {
-            // In test environments, pg-mem join bug may supply account.id
-            // instead of user.id. Resolve the correct userId to satisfy FK.
-            if (process.env.NODE_ENV !== 'test') return sessionObj;
-
-            const { user } = await import('@database/schemas/auth-schema');
-            const { account } = await import('@database/schemas/auth-schema');
-            let userId = sessionObj.userId;
-            let existing = await db.select().from(user).where(eq(user.id, userId));
-            if (existing.length === 0) {
-              // attempt to resolve via account table
-              const acc = await db.select().from(account).where(eq(account.id, userId));
-              if (acc.length === 1) {
-                userId = acc[0].userId;
-                sessionObj.userId = userId;
-                existing = await db.select().from(user).where(eq(user.id, userId));
-              }
-            }
-            // If user still does not exist in test DB, insert a minimal row
-            if (existing.length === 0 && userId) {
-              await db.insert(user).values({
-                id: userId,
-                name: 'Test User',
-                email: `${userId}@test.local`,
-                emailVerified: true,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                username: userId,
-              });
-            }
-            return sessionObj;
-          },
           after: async (session: any, ctx: any) => {
             try {
               const ip = extractIP(ctx);
@@ -500,7 +475,16 @@ export async function getAuth() {
     }
   };
 
+  cachedAuthInstance = instance;
   return instance;
+  })();
+
+  try {
+    return await cachedAuthPromise;
+  } catch (e) {
+    cachedAuthPromise = null;
+    throw e;
+  }
 }
 
 // ==================== CLI INSTANCE (SYNC) ====================
@@ -509,12 +493,9 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Client } from "pg";
 import * as schema from "@database/schemas";
 import { drizzleAdapter as drizzleAdapterSync } from "better-auth/adapters/drizzle";
+import { getDbUrl } from "@database/env";
 
-const DATABASE_URL =
-  process.env.DATABASE_URL ||
-  (process.env.USE_PROD_DB === "true"
-    ? process.env.DATABASE_URL_PROD
-    : process.env.DATABASE_URL_LOCAL);
+const DATABASE_URL = getDbUrl();
 
 function createCliAuth() {
   if (!DATABASE_URL) return null;
@@ -562,7 +543,22 @@ function createCliAuth() {
   return instance;
 }
 
-const auth = createCliAuth();
+let _cliAuth: any = null;
+function getCliAuth() {
+  if (!_cliAuth) _cliAuth = createCliAuth();
+  return _cliAuth;
+}
+
+// Lazy proxy: behaves like the auth object but only creates DB client on first use
+const auth = new Proxy({} as any, {
+  get(_, prop) {
+    const instance = getCliAuth();
+    if (!instance) return undefined;
+    const val = instance[prop];
+    return typeof val === 'function' ? val.bind(instance) : val;
+  },
+});
+
 export { auth };
-export type AuthInstance = NonNullable<typeof auth>;
+export type AuthInstance = NonNullable<ReturnType<typeof createCliAuth>>;
 export default auth;

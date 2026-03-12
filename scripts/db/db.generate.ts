@@ -147,7 +147,8 @@ function run(cmd: string, args: string[]): Promise<void> {
     : path.resolve(process.cwd(), 'drizzle-dev.config.ts');
   console.log(`${cyan}${bold}[génération] Fichier de config utilisé :${reset} ${configPath} (USE_PROD_DB=${process.env.USE_PROD_DB})`);
   if (useProd) {
-    const dbUrl = process.env.DATABASE_URL_PROD || process.env.DATABASE_URL;
+    const { getDbUrl } = await import('../../src/database/env');
+    const dbUrl = getDbUrl('PROD');
     const dbName = (() => { try { return new URL(dbUrl!).pathname.replace(/^\//, '') } catch { return (dbUrl || '').split('/').pop() || 'unknown' } })();
     console.log(`\x1b[41m\x1b[97m PROD ATTENTION !! Configuration PROD détectée — ${dbName} (${dbUrl ? dbUrl.replace(/:\/\/[^@]+@/, '://***@') : 'N/A'}) \x1b[0m`);
   }
