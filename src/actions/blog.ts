@@ -4,8 +4,7 @@ import { getDrizzle } from "@database/drizzle";
 import { blogPosts, blogTranslations } from "@database/schemas";
 import { eq, and } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { storeImageUpload } from "@lib/media/upload";
 
 const LANGUAGES = ['fr', 'en', 'es', 'ar'];
 
@@ -17,16 +16,18 @@ export const blogActions = {
       const actingUser = context.locals.user;
       if (!actingUser || actingUser.role !== 'admin') throw new Error("Unauthorized");
       const db = await getDrizzle();
-      const id = (formData.get("id") as string) || nanoid();
+      const submittedId = String(formData.get("id") ?? "").trim();
+      if (submittedId && !/^[A-Za-z0-9_-]{1,128}$/.test(submittedId)) {
+        throw new Error("INVALID_POST_ID");
+      }
+      const id = submittedId || nanoid();
       const slug = formData.get("slug") as string;
       
       // GESTION IMAGE (Upload local dans public/uploads)
       const imageFile = formData.get("coverImage") as File;
       
       if (imageFile && imageFile.size > 0) {
-        const buffer = Buffer.from(await imageFile.arrayBuffer());
-        const fileName = `${id}-${imageFile.name}`;
-        await fs.writeFile(path.join(process.cwd(), "public/uploads", fileName), buffer);
+        await storeImageUpload(imageFile, "blog");
       }
 
       return await db.transaction(async (tx) => {
@@ -65,7 +66,7 @@ export const blogActions = {
       const db = await getDrizzle();
       const user = context.locals.user;
       if (!user) throw new Error("UNAUTHORIZED");
-      // only admins are allowed (ownerId not tracked in schema)
+      // Publishing status remains an administrator moderation action.
       const post = await db.query.blogPosts.findFirst({ where: eq(blogPosts.id, id) });
       if (!post) throw new Error("POST_NOT_FOUND");
       if (user.role !== 'admin') {
