@@ -3,7 +3,6 @@ import { getTestDb } from '@tests/config/test-db'
 import { TEST_ENV } from '@tests/config/test-env'
 import {
   createTestUser,
-  createTestOrganization,
   generateUniqueEmail,
   generateUniqueUsername,
 } from '@tests/utils/auth-test-utils'
@@ -14,8 +13,6 @@ import {
   servicesMedia,
   servicesTranslations,
 } from '@database/schemas'
-import { blogOrganizations } from '@database/schemas'
-import { member } from '@database/schemas/auth-schema'
 import { eq, and } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
 
@@ -24,18 +21,6 @@ beforeEach(() => {
 })
 
 // ─── Helpers ────────────────────────────────────────────────────
-
-async function createBlogOrg(db: any, overrides: Record<string, any> = {}) {
-  const id = overrides.id ?? randomUUID()
-  await db.insert(blogOrganizations).values({
-    id,
-    name: overrides.name ?? `Org-${id.slice(0, 6)}`,
-    slug: overrides.slug ?? `org-${id.slice(0, 8)}`,
-    isActive: true,
-    ...overrides,
-  }).onConflictDoNothing()
-  return id
-}
 
 async function createCategory(db: any, overrides: Record<string, any> = {}) {
   const id = overrides.id ?? randomUUID()
@@ -49,13 +34,12 @@ async function createCategory(db: any, overrides: Record<string, any> = {}) {
   return id
 }
 
-async function createService(db: any, providerId: string, orgId: string, catId?: string, overrides: Record<string, any> = {}) {
+async function createService(db: any, providerId: string, catId?: string, overrides: Record<string, any> = {}) {
   const id = overrides.id ?? randomUUID()
   await db.insert(servicesListings).values({
     id,
     slug: overrides.slug ?? `svc-${id.slice(0, 8)}`,
     providerId,
-    organizationId: orgId,
     categoryId: catId ?? null,
     status: 'active',
     basePrice: '50.00',
@@ -85,16 +69,15 @@ async function createBooking(db: any, serviceId: string, customerId: string, pro
 // ─── Service Listings ───────────────────────────────────────
 
 describe('Services — Listings CRUD', () => {
-  it('service listing can be created with org', async () => {
+  it('service listing can be created with direct provider ownership', async () => {
     const db = await getTestDb()
-    const orgId = await createBlogOrg(db)
     const user = await createTestUser({
       email: generateUniqueEmail('svcprov1'),
       username: generateUniqueUsername(),
       emailVerified: true,
     })
     const providerId = (user as any).user.id
-    const svcId = await createService(db, providerId, orgId)
+    const svcId = await createService(db, providerId)
 
     const [found] = await db
       .select()
@@ -103,49 +86,51 @@ describe('Services — Listings CRUD', () => {
       .limit(1)
 
     expect(found).toBeDefined()
-    expect(found.organizationId).toBe(orgId)
     expect(found.providerId).toBe(providerId)
     expect(found.status).toBe('active')
   })
 
-  it('service listing can be filtered by org', async () => {
+  it('service listings can be filtered by provider', async () => {
     const db = await getTestDb()
-    const orgA = await createBlogOrg(db, { name: 'Org A' })
-    const orgB = await createBlogOrg(db, { name: 'Org B' })
-    const provider = await createTestUser({
-      email: generateUniqueEmail('svcofilter'),
+    const providerA = await createTestUser({
+      email: generateUniqueEmail('svcfiltera'),
       username: generateUniqueUsername(),
       emailVerified: true,
     })
-    const provId = (provider as any).user.id
+    const providerB = await createTestUser({
+      email: generateUniqueEmail('svcfilterb'),
+      username: generateUniqueUsername(),
+      emailVerified: true,
+    })
+    const providerAId = (providerA as any).user.id
+    const providerBId = (providerB as any).user.id
 
-    await createService(db, provId, orgA)
-    await createService(db, provId, orgA)
-    await createService(db, provId, orgB)
+    await createService(db, providerAId)
+    await createService(db, providerAId)
+    await createService(db, providerBId)
 
-    const orgAServices = await db
+    const providerAServices = await db
       .select()
       .from(servicesListings)
-      .where(eq(servicesListings.organizationId, orgA))
+      .where(eq(servicesListings.providerId, providerAId))
 
-    const orgBServices = await db
+    const providerBServices = await db
       .select()
       .from(servicesListings)
-      .where(eq(servicesListings.organizationId, orgB))
+      .where(eq(servicesListings.providerId, providerBId))
 
-    expect(orgAServices.length).toBe(2)
-    expect(orgBServices.length).toBe(1)
+    expect(providerAServices.length).toBe(2)
+    expect(providerBServices.length).toBe(1)
   })
 
   it('service listing can be updated', async () => {
     const db = await getTestDb()
-    const orgId = await createBlogOrg(db)
     const provider = await createTestUser({
       email: generateUniqueEmail('svcup'),
       username: generateUniqueUsername(),
       emailVerified: true,
     })
-    const svcId = await createService(db, (provider as any).user.id, orgId, undefined, {
+    const svcId = await createService(db, (provider as any).user.id, undefined, {
       basePrice: '25.00',
     })
 
@@ -165,13 +150,12 @@ describe('Services — Listings CRUD', () => {
 
   it('service listing can be deleted', async () => {
     const db = await getTestDb()
-    const orgId = await createBlogOrg(db)
     const provider = await createTestUser({
       email: generateUniqueEmail('svcdel'),
       username: generateUniqueUsername(),
       emailVerified: true,
     })
-    const svcId = await createService(db, (provider as any).user.id, orgId)
+    const svcId = await createService(db, (provider as any).user.id)
 
     await db.delete(servicesListings).where(eq(servicesListings.id, svcId))
 
@@ -220,7 +204,6 @@ describe('Services — Categories CRUD', () => {
 describe('Services — Bookings CRUD', () => {
   it('booking can be created', async () => {
     const db = await getTestDb()
-    const orgId = await createBlogOrg(db)
     const provider = await createTestUser({
       email: generateUniqueEmail('bkprov'),
       username: generateUniqueUsername(),
@@ -233,7 +216,7 @@ describe('Services — Bookings CRUD', () => {
     })
     const provId = (provider as any).user.id
     const custId = (customer as any).user.id
-    const svcId = await createService(db, provId, orgId)
+    const svcId = await createService(db, provId)
     const bkId = await createBooking(db, svcId, custId, provId)
 
     const [found] = await db
@@ -249,7 +232,6 @@ describe('Services — Bookings CRUD', () => {
 
   it('booking status can be updated (confirm → completed)', async () => {
     const db = await getTestDb()
-    const orgId = await createBlogOrg(db)
     const provider = await createTestUser({
       email: generateUniqueEmail('bkconf'),
       username: generateUniqueUsername(),
@@ -260,7 +242,7 @@ describe('Services — Bookings CRUD', () => {
       username: generateUniqueUsername(),
       emailVerified: true,
     })
-    const svcId = await createService(db, (provider as any).user.id, orgId)
+    const svcId = await createService(db, (provider as any).user.id)
     const bkId = await createBooking(db, svcId, (customer as any).user.id, (provider as any).user.id)
 
     // Confirm
@@ -285,7 +267,6 @@ describe('Services — Bookings CRUD', () => {
 
   it('booking provider response can be set', async () => {
     const db = await getTestDb()
-    const orgId = await createBlogOrg(db)
     const provider = await createTestUser({
       email: generateUniqueEmail('bkresp'),
       username: generateUniqueUsername(),
@@ -296,7 +277,7 @@ describe('Services — Bookings CRUD', () => {
       username: generateUniqueUsername(),
       emailVerified: true,
     })
-    const svcId = await createService(db, (provider as any).user.id, orgId)
+    const svcId = await createService(db, (provider as any).user.id)
     const bkId = await createBooking(db, svcId, (customer as any).user.id, (provider as any).user.id, {
       customerMessage: 'Bonjour, je voudrais réserver',
     })
@@ -313,7 +294,6 @@ describe('Services — Bookings CRUD', () => {
 
   it('booking can be cancelled', async () => {
     const db = await getTestDb()
-    const orgId = await createBlogOrg(db)
     const provider = await createTestUser({
       email: generateUniqueEmail('bkcan'),
       username: generateUniqueUsername(),
@@ -324,7 +304,7 @@ describe('Services — Bookings CRUD', () => {
       username: generateUniqueUsername(),
       emailVerified: true,
     })
-    const svcId = await createService(db, (provider as any).user.id, orgId)
+    const svcId = await createService(db, (provider as any).user.id)
     const bkId = await createBooking(db, svcId, (customer as any).user.id, (provider as any).user.id)
 
     await db
@@ -365,26 +345,30 @@ describe('Services — Media CRUD', () => {
   })
 })
 
-// ─── Org scoping — services isolation ──────────────────────────
+// ─── Provider ownership isolation ──────────────────────────────
 
-describe('Services — Org scoping isolation', () => {
-  it('services from different orgs are properly isolated', async () => {
+describe('Services — Provider ownership isolation', () => {
+  it('services from different providers are properly isolated', async () => {
     const db = await getTestDb()
-    const orgA = await createBlogOrg(db, { name: 'Isolated A' })
-    const orgB = await createBlogOrg(db, { name: 'Isolated B' })
-    const provider = await createTestUser({
-      email: generateUniqueEmail('isoprov'),
+    const providerA = await createTestUser({
+      email: generateUniqueEmail('isoprova'),
       username: generateUniqueUsername(),
       emailVerified: true,
     })
-    const provId = (provider as any).user.id
+    const providerB = await createTestUser({
+      email: generateUniqueEmail('isoprovb'),
+      username: generateUniqueUsername(),
+      emailVerified: true,
+    })
+    const providerAId = (providerA as any).user.id
+    const providerBId = (providerB as any).user.id
 
-    const svcA1 = await createService(db, provId, orgA)
-    const svcA2 = await createService(db, provId, orgA)
-    const svcB1 = await createService(db, provId, orgB)
+    const svcA1 = await createService(db, providerAId)
+    await createService(db, providerAId)
+    const svcB1 = await createService(db, providerBId)
 
-    const allA = await db.select().from(servicesListings).where(eq(servicesListings.organizationId, orgA))
-    const allB = await db.select().from(servicesListings).where(eq(servicesListings.organizationId, orgB))
+    const allA = await db.select().from(servicesListings).where(eq(servicesListings.providerId, providerAId))
+    const allB = await db.select().from(servicesListings).where(eq(servicesListings.providerId, providerBId))
 
     expect(allA.length).toBe(2)
     expect(allB.length).toBe(1)

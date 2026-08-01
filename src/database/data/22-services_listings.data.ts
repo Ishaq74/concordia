@@ -1,6 +1,5 @@
 // 22 - Services Listings (8 services — tous cas de figure)
 // Providers : user-camille-dupont, user-lucas-martin
-// Organization : org-salut-annecy (seul lien externe)
 export const servicesListingsSeed = [
   // ═══════════════════════════════════════════
   // 1. Plomberie — hourly, mobile, org, featured
@@ -10,7 +9,6 @@ export const servicesListingsSeed = [
     slug: "plomberie-depannage-annecy",
     categoryId: "svc-cat-artisanat",
     providerId: "user-camille-dupont",
-    organizationId: "org-salut-annecy",
     status: "active",
     basePrice: "55.00",
     priceType: "hourly",
@@ -36,7 +34,6 @@ export const servicesListingsSeed = [
     slug: "electricite-installation-annecy",
     categoryId: "svc-cat-artisanat",
     providerId: "user-lucas-martin",
-    organizationId: "org-salut-annecy",
     status: "active",
     basePrice: "60.00",
     priceType: "hourly",
@@ -62,7 +59,6 @@ export const servicesListingsSeed = [
     slug: "cours-guitare-annecy",
     categoryId: "svc-cat-cours",
     providerId: "user-camille-dupont",
-    organizationId: null,
     status: "active",
     basePrice: "35.00",
     priceType: "hourly",
@@ -88,7 +84,6 @@ export const servicesListingsSeed = [
     slug: "yoga-lac-annecy",
     categoryId: "svc-cat-bien-etre",
     providerId: "user-lucas-martin",
-    organizationId: null,
     status: "active",
     basePrice: "15.00",
     priceType: "fixed",
@@ -114,7 +109,6 @@ export const servicesListingsSeed = [
     slug: "photographe-annecy",
     categoryId: "svc-cat-photo-video",
     providerId: "user-camille-dupont",
-    organizationId: null,
     status: "active",
     basePrice: "120.00",
     priceType: "fixed",
@@ -140,7 +134,6 @@ export const servicesListingsSeed = [
     slug: "coaching-sportif-annecy",
     categoryId: "svc-cat-bien-etre",
     providerId: "user-lucas-martin",
-    organizationId: "org-salut-annecy",
     status: "active",
     basePrice: "45.00",
     priceType: "hourly",
@@ -166,7 +159,6 @@ export const servicesListingsSeed = [
     slug: "aide-menagere-annecy",
     categoryId: "svc-cat-aide-domicile",
     providerId: "user-camille-dupont",
-    organizationId: null,
     status: "active",
     basePrice: null,
     priceType: "free",
@@ -192,7 +184,6 @@ export const servicesListingsSeed = [
     slug: "jardinage-entretien-annecy",
     categoryId: "svc-cat-jardinage",
     providerId: "user-lucas-martin",
-    organizationId: null,
     status: "pending_review",
     basePrice: "40.00",
     priceType: "negotiable",

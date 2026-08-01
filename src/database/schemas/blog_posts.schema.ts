@@ -5,13 +5,13 @@ import { blogAuthors } from "./blog_authors.schema";
 import { blogCategories } from "./blog_categories.schema";
 import { blogMedia } from "./blog_media.schema";
 import { blogComments } from "./blog_comments.schema";
-import { blogOrganizations } from "./blog_organization.schema";
+import { user } from "./auth-schema";
 
 export const blogPosts = pgTable("blog_posts", {
   id: text("id").primaryKey(),
   slug: text("slug").notNull().unique(),
   status: text("status").notNull(),
-  organizationId: text("organization_id"),
+  ownerId: text("owner_id").references(() => user.id, { onDelete: "set null" }),
   publishedAt: timestamp("published_at"),
   displayInHome: boolean("display_in_home").notNull().default(false),
   displayInBlog: boolean("display_in_blog").notNull().default(true),
@@ -47,7 +47,7 @@ export const blogPostMedia = pgTable("blog_post_media", {
 });
 
 export const blogPostsRelations = relations(blogPosts, ({ one, many }) => ({
-  organization: one(blogOrganizations, { fields: [blogPosts.organizationId], references: [blogOrganizations.id] }),
+  owner: one(user, { fields: [blogPosts.ownerId], references: [user.id] }),
   authors: many(blogPostAuthors),
   categories: many(blogPostCategories),
   media: many(blogPostMedia),
@@ -94,6 +94,7 @@ CREATE INDEX idx_blog_posts_status ON blog_posts(status);
 CREATE INDEX idx_blog_posts_published_at ON blog_posts(published_at);
 CREATE INDEX idx_blog_posts_home ON blog_posts(display_in_home);
 CREATE INDEX idx_blog_posts_featured ON blog_posts(is_featured);
+CREATE INDEX idx_blog_posts_owner ON blog_posts(owner_id);
 
 CREATE INDEX idx_blog_post_authors_post ON blog_post_authors(post_id);
 CREATE INDEX idx_blog_post_authors_author ON blog_post_authors(author_id);

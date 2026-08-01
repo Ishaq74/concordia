@@ -2,6 +2,7 @@
 // src/pages/[lang]/blog/[category]/[slug].astro
 import { getEntry, getCollection } from "astro:content";
 import MarkdownIt from "markdown-it";
+import { sanitizeHtml } from "@lib/security/sanitize";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Card from "@components/ui/Card/Card.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
@@ -31,7 +32,7 @@ const md = new MarkdownIt({
   linkify: true,
   typographer: true,
 });
-const renderedHtml = md.render(String(post.data.content ?? ""));
+const renderedHtml = sanitizeHtml(md.render(String(post.data.content ?? "")));
 
 // Extract headings for TOC
 const headingRegex = /<h([2-3])[^>]*>([^<]+)<\/h\1>/gi;

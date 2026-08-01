@@ -2,6 +2,7 @@
 // src/pages/[lang]/services/[category]/[slug].astro — Service detail (wireframe refonte)
 import { getEntry, getCollection } from "astro:content";
 import MarkdownIt from "markdown-it";
+import { sanitizeHtml } from "@lib/security/sanitize";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import Card from "@components/ui/Card/Card.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
@@ -29,7 +30,7 @@ const service = await getEntry("services", `${slug}-${lang}`);
 if (!service) return Astro.redirect(`/${lang}/404`);
 
 const md = new MarkdownIt({ html: true, linkify: true, typographer: true });
-const renderedHtml = md.render(String(service.data.description ?? ""));
+const renderedHtml = sanitizeHtml(md.render(String(service.data.description ?? "")));
 
 const db = await getDrizzle();
 

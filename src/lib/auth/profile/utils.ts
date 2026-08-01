@@ -4,35 +4,6 @@ export type Status = {
   message: string;
 };
 
-export type OrganizationRecord = {
-  id: string;
-  name?: string | null;
-  slug?: string | null;
-  logo?: string | null;
-  createdAt?: string | null;
-  metadata?: Record<string, unknown> | null;
-  role?: string | null;
-};
-
-export type OrganizationMember = {
-  id: string;
-  userId: string;
-  role: string;
-  organizationId?: string;
-  email?: string | null;
-  user?: { name?: string | null; email?: string | null } | null;
-};
-
-export type InvitationRecord = {
-  id: string;
-  email: string;
-  role?: string | null;
-  status?: string | null;
-  expiresAt?: string | null;
-  organization?: { name?: string | null; slug?: string | null } | null;
-  inviter?: { user?: { name?: string | null; email?: string | null } | null } | null;
-};
-
 // Helpers
 export const slugify = (value: string) =>
   value

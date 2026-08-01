@@ -156,18 +156,6 @@ async function seed() {
         });
       }
 
-      if (baseName === 'blog_organizations' || baseName === 'blog_organization') {
-        // Schema now matches seed data — no field stripping needed.
-        // Only normalize legalName → name if data still uses old format
-        rows = rows.map(r => {
-          if (!r.name && r.legalName) {
-            const ln = r.legalName;
-            r.name = (typeof ln === 'string') ? ln : (ln.fr || ln.en || Object.values(ln)[0] || r.slug || r.id);
-          }
-          return r;
-        });
-      }
-
       if (rows.length === 0) {
         console.log(`[INFO] Dataset vide pour ${baseName}`);
         continue;

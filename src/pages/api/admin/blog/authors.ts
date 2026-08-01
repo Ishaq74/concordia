@@ -141,7 +141,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
         avatarUrl: payload.avatarUrl ? String(payload.avatarUrl) : null,
         website: payload.website ? String(payload.website) : null,
         sameAs: (payload.sameAs as any) || null,
-        worksForId: payload.worksForId ? String(payload.worksForId) : null,
         displayInHome: Boolean(payload.displayInHome),
         displayInBlog: payload.displayInBlog !== false,
         isFeatured: Boolean(payload.isFeatured),
@@ -186,7 +185,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       if (payload.avatarUrl !== undefined) updateData.avatarUrl = payload.avatarUrl || null;
       if (payload.website !== undefined) updateData.website = payload.website || null;
       if (payload.sameAs !== undefined) updateData.sameAs = payload.sameAs;
-      if (payload.worksForId !== undefined) updateData.worksForId = payload.worksForId || null;
       if (payload.displayInHome !== undefined) updateData.displayInHome = Boolean(payload.displayInHome);
       if (payload.displayInBlog !== undefined) updateData.displayInBlog = Boolean(payload.displayInBlog);
       if (payload.isFeatured !== undefined) updateData.isFeatured = Boolean(payload.isFeatured);

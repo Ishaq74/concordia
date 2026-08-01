@@ -6,14 +6,13 @@ import { servicesTranslations } from "./services_translations.schema";
 import { servicesReviews } from "./services_reviews.schema";
 import { servicesAvailability } from "./services_availability.schema";
 import { servicesBookings } from "./services_bookings.schema";
-import { blogOrganizations } from "./blog_organization.schema";
+import { user } from "./auth-schema";
 
 export const servicesListings = pgTable("services_listings", {
   id: text("id").primaryKey(),
   slug: text("slug").notNull().unique(),
   categoryId: text("category_id"),
-  providerId: text("provider_id").notNull(),
-  organizationId: text("organization_id"),
+  providerId: text("provider_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   status: text("status").notNull().default("pending_review"),
   basePrice: text("base_price"),
   priceType: text("price_type"),
@@ -47,9 +46,9 @@ export const servicesListingsRelations = relations(servicesListings, ({ one, man
     fields: [servicesListings.categoryId],
     references: [servicesCategories.id],
   }),
-  organization: one(blogOrganizations, {
-    fields: [servicesListings.organizationId],
-    references: [blogOrganizations.id],
+  provider: one(user, {
+    fields: [servicesListings.providerId],
+    references: [user.id],
   }),
   translations: many(servicesTranslations),
   media: many(servicesMediaLinks),
@@ -74,7 +73,6 @@ CREATE UNIQUE INDEX idx_services_listings_slug ON services_listings(slug);
 CREATE INDEX idx_services_listings_status ON services_listings(status);
 CREATE INDEX idx_services_listings_category ON services_listings(category_id);
 CREATE INDEX idx_services_listings_provider ON services_listings(provider_id);
-CREATE INDEX idx_services_listings_org ON services_listings(organization_id);
 CREATE INDEX idx_services_listings_featured ON services_listings(is_featured);
 CREATE INDEX idx_services_listings_home ON services_listings(display_in_home);
 CREATE INDEX idx_services_listings_active ON services_listings(is_active);

@@ -3,6 +3,8 @@
 > **Document de spécification technique** — Fusion du PRD Concordia (restaurer l'humanité) et de la conception Ville Numérique Vivante.
 > Stack cible : Astro 5.x SSR, Better Auth, Drizzle ORM, PostgreSQL. Voir `.github/copilot-instructions.md` pour les conventions.
 
+> **Décision d'architecture (2026-08)** — Concordia conserve son système Astro et CSS natif (tokens, variantes et composants), sans Tailwind ni Starwind UI. Le modèle multi-organisation est supprimé : aucune organisation, adhésion ou invitation n'est prise en charge. Les articles et services sont rattachés directement à un utilisateur propriétaire. Cette décision prévaut sur toute mention historique d'organisations plus bas dans ce document.
+
 ## Table of Contents
 
 - [1. MODÈLE DE DOMAINE & DICTIONNAIRE DE DONNÉES]<(#1-modèle-de-domaine--dictionnaire-de-données)>
@@ -37,7 +39,7 @@ Concepteur IA
 - **PRD Concordia** — Vision : restaurer l'humanité. Marketplace solidaire, médiation, cartographie participative, éducation, micro-financement, bénévolat, transparence.
 - **PRD Ville Numérique Vivante** — Annuaire de lieux, blog d'articles, forum, messagerie, portefeuille numérique, réservations.
 - **Schema Supabase existant** (`schema.txt`) — 35 tables implémentées dans un projet Supabase antérieur, servant de référence pour certains modèles de données.
-- **Infrastructure Concordia existante** — 9 tables Better Auth/audit, 30+ composants UI, système auth complet, 4 variantes CSS, i18n 4 locales.
+- **Infrastructure Concordia existante** — 6 tables Better Auth/audit, 30+ composants UI, système auth complet, 4 variantes CSS, i18n 4 locales.
 
 ### Portée
 
@@ -52,7 +54,7 @@ Concepteur IA
 
 #### Livrables
 
-- Annuaire de lieux et d'organisations avec soumission propriétaire, attributs dynamiques, équipe, sa propre administrations, ses auteurs, ses membres, son blog, ses services etc... traductions multilingues.
+- Annuaire de lieux et ressources avec propriété utilisateur directe, attributs dynamiques et traductions multilingues.
 - Blog d'articles (CMS) avec intégration lieux et catégories.
 - ballades (CMS) avec intégration lieux et catégories.
 - Services (CMS) avec intégration lieux et catégories.
@@ -127,9 +129,6 @@ Concepteur IA
 | 2 | `session` **[EXISTANT]** | Session active | `id` (text) | Système | Auth |
 | 3 | `account` **[EXISTANT]** | Liaison fournisseur OAuth/credentials | `id` (text) | Système | Auth |
 | 4 | `verification` **[EXISTANT]** | Tokens de vérification email/reset | `id` (text) | Système | Auth |
-| 5 | `organization` **[EXISTANT]** | Structure organisationnelle | `id` (text) | Admin | Auth |
-| 6 | `member` **[EXISTANT]** | Appartenance utilisateur ↔ organisation | `id` (text) | Organisation | Auth |
-| 7 | `invitation` **[EXISTANT]** | Invitation à rejoindre une organisation | `id` (text) | Organisation | Auth |
 | 8 | `rate_limit` **[EXISTANT]** | Compteurs de rate limiting | `id` (text) | Système | Auth |
 | 9 | `audit_log` **[EXISTANT]** | Journal d'audit (à étendre) | `id` (text) | Système | Auth |
 | 10 | `profile` | Profil public d'un utilisateur | `id` (uuid) | Utilisateur | Utilisateurs |
@@ -197,7 +196,7 @@ Concepteur IA
 
 ### 1.2 Spécification détaillée par entité
 
-> Les 9 entités **[EXISTANT]** (user, session, account, verification, organization, member, invitation, rate_limit, audit_log) sont documentées dans `.github/copilot-instructions.md` et les schemas Drizzle dans `src/database/schemas/`. Seules les extensions nécessaires sont notées ici. Les entités suivantes couvrent tout ce qui est à construire.
+> Les 6 entités **[EXISTANT]** (user, session, account, verification, rate_limit, audit_log) sont définies dans les schémas Drizzle de `src/database/schemas/`. Seules les extensions nécessaires sont notées ici.
 
 ---
 
@@ -1216,7 +1215,6 @@ user 1──N session
 user 1──N account
 user 1──1 profile
 user 1──N user_role
-user 1──N member ──N organization
 user 1──N invitation
 user 1──N place (as owner)
 user 1──N article (as author)
@@ -1329,11 +1327,10 @@ booking 0──1 transaction (payment)
 
 ### Système existant (Better Auth)
 
-Better Auth gère déjà `admin`, `user`, `owner`, `member` au niveau `organization`. Les rôles Concordia sont complémentaires et stockés dans `user_role`. La correspondance :
+Better Auth gère les rôles globaux `admin` et `user`. Les rôles Concordia sont complémentaires et stockés dans `user_role`. La correspondance :
 
 - Better Auth `user` = Concordia `citizen`
 - Better Auth `admin` = Concordia `admin`
-- Les rôles Better Auth `organization` (`owner`, `member`, `admin`) sont utilisés pour la gestion des organisations ; les rôles Concordia s'appliquent aux fonctionnalités métier.
 
 ## 2.2 Matrice d'autorisations CRUD+
 

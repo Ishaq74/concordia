@@ -1,34 +1,3 @@
-import { createAccessControl } from "better-auth/plugins/access";
-
-const statement = {
-  organization: ["update", "delete"],
-  member: ["create", "update", "delete"],
-  invitation: ["create", "cancel"],
-} as const;
-
-export const ac = createAccessControl(statement);
-
-export const member = ac.newRole({
-  organization: [],
-  member: [],
-  invitation: [],
-});
-
-export const admin = ac.newRole({
-  organization: ["update"],
-  member: ["create", "update", "delete"],
-  invitation: ["create", "cancel"],
-});
-
-export const owner = ac.newRole({
-  organization: ["update", "delete"],
-  member: ["create", "update", "delete"],
-  invitation: ["create", "cancel"],
-});
-
-
-export const roles = { owner, admin, member };
-
 // ==================== CONCORDIA EXTENDED RBAC/ABAC ====================
 
 export type AppRole =
@@ -44,20 +13,12 @@ export type AppPermission =
   // Auth (existing)
   | "create_user"
   | "delete_user"
-  | "delete_organization"
   | "impersonate_user"
   | "read_profile"
   | "update_own_profile"
   | "admin_access"
-  | "create_organization"
-  | "manage_organization"
-  | "invite_member"
-  | "remove_member"
-  | "read_organization"
-  | "create_project"
   | "update_resource"
   | "read_resource"
-  | "read_project"
   | "change_role"
   // Places
   | "place.create"
@@ -178,7 +139,6 @@ const appRbacMatrix: Record<AppRole, Set<AppPermission>> = {
   citizen: new Set([
     "read_profile",
     "update_own_profile",
-    "create_organization",
     "place.read",
     "article.read",
     "review.create",
@@ -229,11 +189,6 @@ const appRbacMatrix: Record<AppRole, Set<AppPermission>> = {
     "transparency.read",
     "notification.read_own",
     "favorite.toggle",
-    // Align with legacy 'member'/'user' expectations used in tests
-    "read_organization",
-    "create_project",
-    // Project-level permissions used by tests
-    "read_project",
   ]),
   owner: new Set([
     "place.create",
@@ -241,11 +196,6 @@ const appRbacMatrix: Record<AppRole, Set<AppPermission>> = {
     "place.update_own",
     "place.delete_own",
     "booking.manage_own_service",
-    // Organization-level permissions for owners
-    "manage_organization",
-    "delete_organization",
-    "invite_member",
-    "remove_member",
     // Resource-level permissions
     "update_resource",
     "read_resource",
@@ -281,13 +231,8 @@ const appRbacMatrix: Record<AppRole, Set<AppPermission>> = {
   admin: new Set([
     "create_user",
     "delete_user",
-    "delete_organization",
     "impersonate_user",
     "admin_access",
-    "manage_organization",
-    "invite_member",
-    "remove_member",
-    "read_organization",
     "read_profile",
     "update_own_profile",
     "change_role",
@@ -325,7 +270,6 @@ const appRbacMatrix: Record<AppRole, Set<AppPermission>> = {
     "admin.config",
     // Admin-level resource operation
     "update_resource",
-    "read_project",
   ]),
 };
 
@@ -424,12 +368,6 @@ export async function checkPermission(
     return true;
   }
 
-  // READ_PROJECT scoped to same organization
-  if (permission === 'read_project') {
-    if (!context) throw new Error('context required for read_project');
-    return context?.orgId && context?.resourceOrgId ? context.orgId === context.resourceOrgId : false;
-  }
-
   // UPDATE_RESOURCE: owner only
   if (permission === 'update_resource') {
     if (!context) throw new Error('context required for update_resource');
@@ -442,18 +380,6 @@ export async function checkPermission(
     return true;
   }
 
-  // manage_organization, delete_organization, invite_member: require context
-  if ([
-    'manage_organization',
-    'delete_organization',
-    'invite_member'
-  ].includes(permission)) {
-    // RBAC alone is sufficient for these organisation-level actions in the
-    // current test matrix; context may be supplied by callers but it is not
-    // mandatory. Simply return true if the role check already granted access.
-    return true;
-  }
-
   // Self-action prevention for certain creates
   if (permission === 'review.create' || permission === 'booking.create') {
     if (context?.targetOwnerId && context?.userId && context.targetOwnerId === context.userId) return false;
@@ -462,11 +388,6 @@ export async function checkPermission(
   // Privilege escalation prevention — explicit rejection
   if (permission === 'change_role') {
     if (context?.targetRole === 'admin') throw new Error('Privilege escalation attempt');
-  }
-
-  // Remove member: cannot remove owner
-  if (permission === 'remove_member') {
-    if (context?.targetUserRole === 'owner') return false;
   }
 
   return true;

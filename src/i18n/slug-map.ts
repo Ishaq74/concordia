@@ -39,14 +39,6 @@ export const slugMap: Record<string, Record<SupportedLocale, string>> = {
     ar: "contact",
   },
 
-  // ─── Organizations ─────────────────────────────────────
-  organizations: {
-    fr: "organisations",
-    en: "organizations",
-    es: "organizaciones",
-    ar: "organizations",
-  },
-
   // ─── Navigation sections (pages may not exist yet) ────
   trails: {
     fr: "sentiers",
@@ -127,12 +119,6 @@ export const slugMap: Record<string, Record<SupportedLocale, string>> = {
     en: "auth/forgot-password",
     es: "auth/olvido-contrasena",
     ar: "auth/forgot-password",
-  },
-  "auth/invitations": {
-    fr: "auth/invitations",
-    en: "auth/invitations",
-    es: "auth/invitaciones",
-    ar: "auth/invitations",
   },
   "auth/legal": {
     fr: "auth/mentions-legales",

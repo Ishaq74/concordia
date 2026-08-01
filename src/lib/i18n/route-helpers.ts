@@ -37,7 +37,7 @@ export function getSupportedLocales(): readonly SupportedLocale[] {
  *                        Examples: `"about"`, `"auth/sign-in"`, `"blog/author/john"`
  * @returns The public URL, e.g. `/fr/a-propos`, `/es/auth/iniciar-sesion`
  *
- * For paths that include a dynamic tail (e.g. `organizations/my-org`), only the
+ * For paths that include a dynamic tail (e.g. `blog/author/jane`), only the
  * static prefix is localised; the dynamic portion passes through unchanged.
  */
 export function getLocalizedUrl(lang: string, canonicalPath: string): string {
@@ -54,7 +54,7 @@ export function getLocalizedUrl(lang: string, canonicalPath: string): string {
     return `/${locale}/${exactEntry[locale]}`;
   }
 
-  // Try matching longest prefix (handles dynamic segments like organizations/[slug])
+  // Try matching longest prefix (handles dynamic segments)
   // Sort by key length descending so we match the most specific prefix first
   const sortedKeys = Object.keys(slugMap).sort((a, b) => b.length - a.length);
   for (const key of sortedKeys) {
@@ -93,7 +93,7 @@ export function getCanonicalPath(
     return exactCanonical;
   }
 
-  // Prefix match for dynamic segments (e.g. "organisations/my-org" → "organizations/my-org")
+  // Prefix match for dynamic segments
   for (const [localized, canonical] of reverseMap.entries()) {
     if (normalized.startsWith(localized + "/")) {
       const tail = normalized.slice(localized.length); // includes leading /

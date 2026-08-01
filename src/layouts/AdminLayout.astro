@@ -8,9 +8,6 @@ import { Icon } from "astro-icon/components";
 import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 import { isAdminUser } from "@lib/admin/permissions";
 import AdminToast from "@components/admin/AdminToast.astro";
-import { getDrizzle } from "@database/drizzle";
-import { organization, member } from "@database/schemas/auth-schema";
-import { eq, inArray } from "drizzle-orm";
 
 interface Props {
   title: string;
@@ -38,23 +35,6 @@ if (!isAdminUser(user)) {
 }
 
 const adminBase = `/${currentLocale}/admin`;
-
-// Fetch user's organizations for the org selector
-const db = await getDrizzle();
-const userMemberships = user
-  ? await db.select({ organizationId: member.organizationId, role: member.role }).from(member).where(eq(member.userId, user.id))
-  : [];
-const orgIds = userMemberships.map((m) => m.organizationId);
-const userOrgs: { id: string; name: string; slug: string; logo: string | null }[] = [];
-if (orgIds.length > 0) {
-  const orgs = await db
-    .select({ id: organization.id, name: organization.name, slug: organization.slug, logo: organization.logo })
-    .from(organization)
-    .where(inArray(organization.id, orgIds));
-  userOrgs.push(...orgs);
-}
-const activeOrgId = Astro.locals.organizationId ?? null;
-const activeOrg = activeOrgId ? userOrgs.find((o) => o.id === activeOrgId) : null;
 
 interface AdminNavGroup {
   label: string;
@@ -162,53 +142,6 @@ const navGroups: AdminNavGroup[] = [
       },
     ],
   },
-  {
-    label: t.adminPanel?.organizations ?? "Organisations",
-    items: [
-      {
-        key: "organizations",
-        label: t.adminPanel?.orgList ?? "Toutes les orgs",
-        href: `${adminBase}/organizations`,
-        icon: "mdi:domain",
-      },
-      {
-        key: "org-dashboard",
-        label: t.adminPanel?.orgDashboard ?? "Tableau de bord org",
-        href: `${adminBase}/organizations/dashboard`,
-        icon: "mdi:view-dashboard-variant",
-      },
-      {
-        key: "org-profile",
-        label: t.adminPanel?.orgProfile ?? "Profil & Config",
-        href: `${adminBase}/organizations/profile`,
-        icon: "mdi:badge-account-horizontal",
-      },
-      {
-        key: "org-members",
-        label: t.adminPanel?.orgMembers ?? "Membres & Rôles",
-        href: `${adminBase}/organizations/members`,
-        icon: "mdi:account-multiple-check",
-      },
-      {
-        key: "org-blog",
-        label: t.adminPanel?.orgBlog ?? "Blog org",
-        href: `${adminBase}/organizations/blog`,
-        icon: "mdi:post-outline",
-      },
-      {
-        key: "org-services",
-        label: t.adminPanel?.orgServices ?? "Services org",
-        href: `${adminBase}/organizations/services`,
-        icon: "mdi:room-service-outline",
-      },
-      {
-        key: "org-bookings",
-        label: t.adminPanel?.orgBookings ?? "Réservations org",
-        href: `${adminBase}/organizations/bookings`,
-        icon: "mdi:calendar-account",
-      },
-    ],
-  },
 ];
 ---
 
@@ -236,17 +169,6 @@ const navGroups: AdminNavGroup[] = [
           <Icon name="mdi:close" />
         </button>
       </div>
-
-      {userOrgs.length > 0 && (
-        <div class="org-selector">
-          <select id="org-selector" class="org-select" aria-label={t.adminPanel?.orgSelector ?? "Organisation"}>
-            <option value="">{t.adminPanel?.allOrgs ?? "Toutes les organisations"}</option>
-            {userOrgs.map((org) => (
-              <option value={org.id} selected={org.id === activeOrgId}>{org.name}</option>
-            ))}
-          </select>
-        </div>
-      )}
 
       {navGroups.map((group) => (
         <div class="admin-nav-group">
@@ -311,21 +233,6 @@ const navGroups: AdminNavGroup[] = [
     closeBtn?.addEventListener("click", closeSidebar);
     backdrop?.addEventListener("click", closeSidebar);
 
-    // Org selector: switch active organization via Better Auth API
-    const orgSelector = document.getElementById("org-selector") as HTMLSelectElement | null;
-    orgSelector?.addEventListener("change", async () => {
-      const orgId = orgSelector.value;
-      try {
-        await fetch("/api/auth/organization/set-active", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ organizationId: orgId || null }),
-        });
-        window.location.reload();
-      } catch {
-        console.error("Failed to switch organization");
-      }
-    });
   });
 </script>
 
@@ -436,21 +343,6 @@ const navGroups: AdminNavGroup[] = [
     padding: var(--space-4, 1rem);
     border-bottom: 1px solid var(--border-default, #e2e8f0);
   }
-
-  /* Org selector */
-  .org-selector {
-    padding: 0 var(--space-4, 1rem) var(--space-3, 0.75rem);
-    border-bottom: 1px solid var(--border-default, #e2e8f0);
-  }
-  .org-select {
-    width: 100%; padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
-    border: 1px solid var(--border-default, #e2e8f0);
-    border-radius: var(--border-radius-md, 0.375rem);
-    background: var(--bg-surface, white); color: var(--text-default, #0f172a);
-    font-size: 0.8125rem; font-weight: 500; cursor: pointer;
-    transition: border-color 0.15s;
-  }
-  .org-select:hover, .org-select:focus { border-color: var(--color-primary, #eab308); outline: none; }
 
   .admin-sidebar-title {
     font-family: var(--font-family-display, "Space Grotesk", sans-serif);

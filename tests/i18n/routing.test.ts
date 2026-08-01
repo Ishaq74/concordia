@@ -47,11 +47,6 @@ describe("route-helpers", () => {
       expect(getLocalizedUrl("es", "auth/sign-up")).toBe("/es/auth/registro");
     });
 
-    it("localizes organizations with dynamic slug", () => {
-      expect(getLocalizedUrl("fr", "organizations")).toBe("/fr/organisations");
-      expect(getLocalizedUrl("fr", "organizations/my-org")).toBe("/fr/organisations/my-org");
-      expect(getLocalizedUrl("es", "organizations/my-org")).toBe("/es/organizaciones/my-org");
-    });
 
     it("localizes blog/author with dynamic slug", () => {
       expect(getLocalizedUrl("fr", "blog/author/john-doe")).toBe("/fr/blog/auteur/john-doe");
@@ -86,14 +81,12 @@ describe("route-helpers", () => {
       expect(getCanonicalPath("fr", "a-propos")).toBe("about");
       expect(getCanonicalPath("fr", "auth/connexion")).toBe("auth/sign-in");
       expect(getCanonicalPath("fr", "auth/inscription")).toBe("auth/sign-up");
-      expect(getCanonicalPath("fr", "organisations")).toBe("organizations");
       expect(getCanonicalPath("fr", "blog/auteur")).toBe("blog/author");
     });
 
     it("resolves ES localized slugs to canonical paths", () => {
       expect(getCanonicalPath("es", "acerca-de")).toBe("about");
       expect(getCanonicalPath("es", "auth/iniciar-sesion")).toBe("auth/sign-in");
-      expect(getCanonicalPath("es", "organizaciones")).toBe("organizations");
     });
 
     it("returns null for EN (already canonical)", () => {
@@ -113,9 +106,7 @@ describe("route-helpers", () => {
     });
 
     it("handles dynamic segments after a mapped prefix", () => {
-      expect(getCanonicalPath("fr", "organisations/my-org")).toBe("organizations/my-org");
       expect(getCanonicalPath("fr", "blog/auteur/john-doe")).toBe("blog/author/john-doe");
-      expect(getCanonicalPath("es", "organizaciones/some-org")).toBe("organizations/some-org");
     });
 
     it("strips leading/trailing slashes", () => {

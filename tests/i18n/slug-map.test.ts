@@ -7,8 +7,8 @@ import {
 } from "@i18n/slug-map";
 
 describe("slug-map", () => {
-  it("exports 20 canonical entries (12 original + 7 navigation + 1 legal)", () => {
-    expect(Object.keys(slugMap)).toHaveLength(20);
+  it("exports 18 canonical entries", () => {
+    expect(Object.keys(slugMap)).toHaveLength(18);
   });
 
   it("every entry has all 4 locales defined", () => {
@@ -54,7 +54,6 @@ describe("slug-map", () => {
       expect(frMap.get("a-propos")).toBe("about");
       expect(frMap.get("auth/connexion")).toBe("auth/sign-in");
       expect(frMap.get("auth/inscription")).toBe("auth/sign-up");
-      expect(frMap.get("organisations")).toBe("organizations");
       expect(frMap.get("blog/auteur")).toBe("blog/author");
     });
 
@@ -63,7 +62,6 @@ describe("slug-map", () => {
       expect(esMap.get("acerca-de")).toBe("about");
       expect(esMap.get("auth/iniciar-sesion")).toBe("auth/sign-in");
       expect(esMap.get("auth/registro")).toBe("auth/sign-up");
-      expect(esMap.get("organizaciones")).toBe("organizations");
       expect(esMap.get("blog/autor")).toBe("blog/author");
     });
 

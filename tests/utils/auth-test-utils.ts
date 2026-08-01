@@ -3,8 +3,6 @@ import { getAuth } from '@/lib/auth/auth'
 import { getTestDb } from '../config/test-db'
 import {
   user,
-  organization,
-  member,
 } from '@database/schemas'
 import { eq } from 'drizzle-orm'
 
@@ -67,7 +65,6 @@ export async function createTestUser(options: {
   name?: string
   emailVerified?: boolean
   role?: string
-  organizationId?: string
 }) {
   const email = options.email || generateUniqueEmail()
   let password = options.password || generateSecurePassword()
@@ -81,7 +78,7 @@ export async function createTestUser(options: {
     // them to the username so server-side validation (and local validation)
     // will detect too. Also run local validation to reject dangerous inputs
     // before calling the API (tests expect rejection).
-    const { email: _e, password: _p, username: _u, name: _n, emailVerified, organizationId, role: _r, ...rest } = options
+    const { email: _e, password: _p, username: _u, name: _n, emailVerified, role: _r, ...rest } = options
 
     const finalUsername = (username || generateUniqueUsername()) + (Object.keys(rest).length ? ' ' + JSON.stringify(rest) : '')
     const finalName = options.name || finalUsername
@@ -128,16 +125,6 @@ export async function createTestUser(options: {
         .where(eq(user.id, result.user.id))
     }
 
-    if (options.organizationId) {
-      await db.insert(member).values({
-        id: randomUUID(),
-        userId: result.user.id,
-        organizationId: options.organizationId,
-        role: options.role || 'member',
-        createdAt: new Date(),
-      })
-    }
-
     return {
       ...result,
       credentials: { email, password, username: finalUsername },
@@ -171,33 +158,6 @@ export async function loginTestUser(email: string, password: string) {
     }
   } catch (error) {
     console.error('loginTestUser error:', error)
-    throw error
-  }
-}
-
-export async function createTestOrganization(ownerId: string, name?: string) {
-  try {
-    const db = await getTestDb()
-    const orgId = randomUUID()
-
-    await db.insert(organization).values({
-      id: orgId,
-      name: name || `Org-${randomUUID().slice(0, 8)}`,
-      slug: `org-${randomUUID().slice(0, 8)}`,
-      createdAt: new Date(),
-    })
-
-    await db.insert(member).values({
-      id: randomUUID(),
-      userId: ownerId,
-      organizationId: orgId,
-      role: 'owner',
-      createdAt: new Date(),
-    })
-
-    return orgId
-  } catch (error) {
-    console.error('createTestOrganization error:', error)
     throw error
   }
 }

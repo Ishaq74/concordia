@@ -31,7 +31,7 @@ export const blogActions = {
 
       return await db.transaction(async (tx) => {
         // 1. Racine
-        await tx.insert(blogPosts).values({ id, slug, status: "published", inLanguage: "fr" })
+        await tx.insert(blogPosts).values({ id, slug, ownerId: actingUser.id, status: "published", inLanguage: "fr" })
           .onConflictDoUpdate({ target: blogPosts.id, set: { slug, updatedAt: new Date() } });
 
         // 2. Boucle Langues

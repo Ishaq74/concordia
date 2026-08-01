@@ -44,12 +44,8 @@ const categoryFilter = url.searchParams.get("category")?.trim() ?? "";
 
 const db = await getDrizzle();
 
-// ---------- Org scoping ----------
-const activeOrgId = Astro.locals.organizationId ?? null;
-
 // ---------- Build filter conditions ----------
 const conditions: any[] = [];
-if (activeOrgId) conditions.push(eq(servicesListings.organizationId, activeOrgId));
 if (search) conditions.push(ilike(servicesListings.slug, `%${search}%`));
 if (statusFilter) conditions.push(eq(servicesListings.status, statusFilter));
 if (featuredFilter === "true") conditions.push(eq(servicesListings.isFeatured, true));

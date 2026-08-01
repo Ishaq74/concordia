@@ -23,7 +23,6 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   const db = await getDrizzle();
   const url = new URL(request.url);
-  const orgId = locals.organizationId ?? url.searchParams.get("orgId")?.trim() ?? "";
   const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));
   const perPage = Math.min(100, Math.max(1, parseInt(url.searchParams.get("perPage") ?? "20")));
   const search = url.searchParams.get("q")?.trim() ?? "";
@@ -53,7 +52,6 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   // Build conditions
   const conditions: ReturnType<typeof eq>[] = [];
-  if (orgId) conditions.push(eq(servicesListings.organizationId, orgId));
   if (search) conditions.push(ilike(servicesListings.slug, `%${search}%`));
   if (statusFilter) conditions.push(eq(servicesListings.status, statusFilter));
   if (featured === "true") conditions.push(eq(servicesListings.isFeatured, true));
@@ -144,8 +142,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         id,
         slug,
         categoryId: (payload.categoryId as string) || null,
-        providerId: String(payload.providerId || userId),
-        organizationId: (payload.organizationId as string) || null,
+        providerId: userId,
         status,
         basePrice: (payload.basePrice as string) || null,
         priceType: (payload.priceType as string) || null,

@@ -20,6 +20,9 @@ const siteUrl = process.env.SITE || undefined;
 export default defineConfig({
   integrations: [Icon(), Sonda({server: true}), mdx()],
   output: 'server',
+  security: {
+    checkOrigin: true
+  },
   site: siteUrl,
   base: '/',
   adapter,
