@@ -130,31 +130,38 @@ async function main() {
 
     for (const migration of pending) {
       console.log(`\n${green}${bold}[migrate] → ${migration.id}${reset}`);
-      // Découpe le SQL en commandes individuelles (attention aux points-virgules dans les fonctions !)
-      const statements = migration.sql.split(/;\s*\n/).map(s => s.trim()).filter(Boolean);
-      let allOk = true;
-      for (const stmt of statements) {
-        if (!stmt) continue;
-        try {
-          await client.query('BEGIN');
-          await client.query(stmt);
-          await client.query('COMMIT');
-        } catch (error: any) {
-          await client.query('ROLLBACK');
-          if (error?.code === '42P07' || error?.code === '42710' || error?.code === '42701') {
-            console.warn(`${yellow}[migrate] ⚠️  Ignoré : ${error.message}${reset}`);
-          } else {
-            allOk = false;
-            console.error(`${yellow}[migrate] ❌ Erreur : ${error.message}${reset}`);
+      const statements = migration.sql
+        .split(/\s*-->\s*statement-breakpoint\s*/)
+        .map(statement => statement.trim())
+        .filter(Boolean);
+
+      await client.query('BEGIN');
+      try {
+        for (const [index, stmt] of statements.entries()) {
+          const savepoint = `migration_statement_${index}`;
+          await client.query(`SAVEPOINT ${savepoint}`);
+          try {
+            await client.query(stmt);
+            await client.query(`RELEASE SAVEPOINT ${savepoint}`);
+          } catch (error: any) {
+            await client.query(`ROLLBACK TO SAVEPOINT ${savepoint}`);
+            if (error?.code === '42P07' || error?.code === '42710' || error?.code === '42701') {
+              console.warn(`${yellow}[migrate] ⚠️  Ignoré : ${error.message}${reset}`);
+              continue;
+            }
             throw error;
           }
         }
-      }
-      if (allOk) {
+
         await client.query(
           "INSERT INTO __drizzle_migrations (id, hash, created_at) VALUES ($1, '', NOW()) ON CONFLICT (id) DO NOTHING",
           [migration.id],
         );
+        await client.query('COMMIT');
+      } catch (error: any) {
+        await client.query('ROLLBACK');
+        console.error(`${yellow}[migrate] ❌ Erreur : ${error.message}${reset}`);
+        throw error;
       }
     }
     console.log(`\n${green}${bold}✔️  Toutes les migrations ont été appliquées (en ignorant les objets déjà existants).${reset}\n`);
