@@ -87,14 +87,20 @@ const authSession = defineMiddleware(async (context, next) => {
   }
 
   try {
-    const sessionResult = await Promise.race([
-      getAuth().then((auth) => auth.api.getSession({
-        headers: context.request.headers,
-      })),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("AUTH_SESSION_TIMEOUT")), 5000),
-      ),
-    ]);
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let sessionResult;
+    try {
+      sessionResult = await Promise.race([
+        getAuth().then((auth) => auth.api.getSession({
+          headers: context.request.headers,
+        })),
+        new Promise<never>((_, reject) => {
+          timeout = setTimeout(() => reject(new Error("AUTH_SESSION_TIMEOUT")), 5000);
+        }),
+      ]);
+    } finally {
+      if (timeout) clearTimeout(timeout);
+    }
 
     if (sessionResult) {
       context.locals.user = sessionResult.user;

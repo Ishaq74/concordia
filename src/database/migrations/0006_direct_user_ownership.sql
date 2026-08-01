@@ -14,10 +14,62 @@ FROM (
 WHERE post."id" = matched_user."post_id"
   AND post."owner_id" IS NULL;
 --> statement-breakpoint
+UPDATE "blog_posts" AS post
+SET "owner_id" = matched_user."id"
+FROM (
+  SELECT DISTINCT ON (post_author."post_id")
+    post_author."post_id",
+    app_user."id"
+  FROM "blog_post_authors" AS post_author
+  JOIN "blog_authors" AS author ON author."id" = post_author."author_id"
+  JOIN "user" AS app_user
+    ON split_part(lower(app_user."email"), '@', 1) = split_part(lower(author."email"), '@', 1)
+  ORDER BY post_author."post_id", app_user."created_at"
+) AS matched_user
+WHERE post."id" = matched_user."post_id"
+  AND post."owner_id" IS NULL;
+--> statement-breakpoint
+UPDATE "blog_posts" AS post
+SET "owner_id" = owner_member."user_id"
+FROM (
+  SELECT DISTINCT ON (membership."organization_id")
+    membership."organization_id",
+    membership."user_id"
+  FROM "member" AS membership
+  JOIN "user" AS app_user ON app_user."id" = membership."user_id"
+  WHERE membership."role" IN ('owner', 'admin')
+  ORDER BY membership."organization_id",
+    CASE membership."role" WHEN 'owner' THEN 0 ELSE 1 END,
+    membership."created_at"
+) AS owner_member
+WHERE post."organization_id" = owner_member."organization_id"
+  AND post."owner_id" IS NULL;
+--> statement-breakpoint
+UPDATE "blog_posts" AS post
+SET "owner_id" = fallback_owner."id"
+FROM (
+  SELECT app_user."id"
+  FROM "user" AS app_user
+  ORDER BY
+    CASE WHEN app_user."role" = 'admin' THEN 0 ELSE 1 END,
+    app_user."created_at"
+  LIMIT 1
+) AS fallback_owner
+WHERE post."owner_id" IS NULL;
+--> statement-breakpoint
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM "blog_posts" WHERE "owner_id" IS NULL) THEN
+    RAISE EXCEPTION 'Cannot migrate blog posts: no direct user owner is available';
+  END IF;
+END $$;
+--> statement-breakpoint
+ALTER TABLE "blog_posts" ALTER COLUMN "owner_id" SET NOT NULL;
+--> statement-breakpoint
 ALTER TABLE "blog_posts"
   ADD CONSTRAINT "blog_posts_owner_id_user_id_fk"
   FOREIGN KEY ("owner_id") REFERENCES "public"."user"("id")
-  ON DELETE SET NULL ON UPDATE NO ACTION;
+  ON DELETE CASCADE ON UPDATE NO ACTION;
 --> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "idx_blog_posts_owner" ON "blog_posts" ("owner_id");
 --> statement-breakpoint
@@ -40,11 +92,19 @@ WHERE service."organization_id" = owner_member."organization_id"
     WHERE current_provider."id" = service."provider_id"
   );
 --> statement-breakpoint
-DELETE FROM "services_listings" AS service
-WHERE NOT EXISTS (
-  SELECT 1 FROM "user" AS app_user
-  WHERE app_user."id" = service."provider_id"
-);
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM "services_listings" AS service
+    WHERE NOT EXISTS (
+      SELECT 1 FROM "user" AS app_user
+      WHERE app_user."id" = service."provider_id"
+    )
+  ) THEN
+    RAISE EXCEPTION 'Cannot migrate services: one or more listings have no direct user provider';
+  END IF;
+END $$;
 --> statement-breakpoint
 ALTER TABLE "services_listings"
   ADD CONSTRAINT "services_listings_provider_id_user_id_fk"

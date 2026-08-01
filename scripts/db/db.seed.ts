@@ -140,6 +140,18 @@ async function seed() {
       let rows = (dataset as any[]).map(transformRow);
 
       // Normalize / map known data key mismatches so schema insertions succeed
+      if (baseName === 'blog_posts') {
+        const authorOwners: Record<string, string> = {
+          'author-camille-dupont': 'user-camille-dupont',
+          'author-lucas-martin': 'user-lucas-martin',
+          'author-sarah-leroy': 'user-sarah-leroy',
+        };
+        rows = rows.map(row => ({
+          ...row,
+          ownerId: row.ownerId ?? authorOwners[row.authorId] ?? 'admin-user',
+        }));
+      }
+
       if (baseName === 'blog_media') {
         rows = rows.map(r => {
           // schema expects `alt` (jsonb); some seed data used `altText`

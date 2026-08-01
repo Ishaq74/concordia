@@ -41,7 +41,10 @@ export async function getDrizzle(): Promise<DrizzleDB> {
       connectionString: url,
       ssl: url.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
       max: 5,
+      connectionTimeoutMillis: 5000,
       idleTimeoutMillis: 10000,
+      query_timeout: 5000,
+      statement_timeout: 5000,
     });
 
     try {
@@ -56,6 +59,7 @@ export async function getDrizzle(): Promise<DrizzleDB> {
       cachedDrizzle = drizzle(pool, { schema }) as DrizzleDB;
       return cachedDrizzle;
     } catch (e) {
+      await pool.end().catch(() => undefined);
       connecting = null;
       throw e;
     }

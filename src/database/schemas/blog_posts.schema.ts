@@ -11,7 +11,7 @@ export const blogPosts = pgTable("blog_posts", {
   id: text("id").primaryKey(),
   slug: text("slug").notNull().unique(),
   status: text("status").notNull(),
-  ownerId: text("owner_id").references(() => user.id, { onDelete: "set null" }),
+  ownerId: text("owner_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   publishedAt: timestamp("published_at"),
   displayInHome: boolean("display_in_home").notNull().default(false),
   displayInBlog: boolean("display_in_blog").notNull().default(true),
