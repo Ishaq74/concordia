@@ -11,6 +11,15 @@ import {
 const securityHeaders = defineMiddleware(async (_context, next) => {
   const response = await next();
 
+  const lowerPath = _context.url.pathname.toLowerCase();
+  if (
+    lowerPath.startsWith("/uploads/") &&
+    (lowerPath.endsWith(".svg") || lowerPath.endsWith(".svgz"))
+  ) {
+    response.headers.set("Content-Disposition", "attachment");
+    response.headers.set("Content-Type", "image/svg+xml");
+  }
+
   // CSP — restrictif mais permet les polices auto-hébergées et les inline scripts Astro
   // Exception in dev/localhost so VS Code Simple Browser and other dev tools can embed pages
   const isLocalDev = (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') ||
@@ -78,10 +87,20 @@ const authSession = defineMiddleware(async (context, next) => {
   }
 
   try {
-    const auth = await getAuth();
-    const sessionResult = await auth.api.getSession({
-      headers: context.request.headers,
-    });
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let sessionResult;
+    try {
+      sessionResult = await Promise.race([
+        getAuth().then((auth) => auth.api.getSession({
+          headers: context.request.headers,
+        })),
+        new Promise<never>((_, reject) => {
+          timeout = setTimeout(() => reject(new Error("AUTH_SESSION_TIMEOUT")), 5000);
+        }),
+      ]);
+    } finally {
+      if (timeout) clearTimeout(timeout);
+    }
 
     if (sessionResult) {
       context.locals.user = sessionResult.user;
@@ -130,7 +149,16 @@ const authSession = defineMiddleware(async (context, next) => {
 
       context.locals.organizationId = orgId;
     }
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === "AUTH_SESSION_TIMEOUT") {
+      return new Response(JSON.stringify({ error: "Service temporarily unavailable" }), {
+        status: 503,
+        headers: {
+          "Content-Type": "application/json",
+          "Retry-After": "5",
+        },
+      });
+    }
     // Échec silencieux — l'utilisateur reste null
     // Le auth catch-all gère ses propres erreurs
   }

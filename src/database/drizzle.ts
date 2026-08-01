@@ -6,25 +6,22 @@ import * as schema from './schemas';
 
 config();
 
-// ✅ Choix dynamique de la DB
-let _url: string | undefined;
-if (process.env.USE_PROD_DB === 'true') {
-  _url = process.env.DATABASE_URL_PROD;
-} else if (process.env.USE_DB_TEST === 'true') {
-  _url = process.env.DATABASE_URL_TEST;
-} else {
-  _url = process.env.DATABASE_URL_LOCAL;
+function getDatabaseUrl(): string {
+  const url = process.env.USE_PROD_DB === 'true'
+    ? process.env.DATABASE_URL_PROD
+    : process.env.USE_DB_TEST === 'true'
+      ? process.env.DATABASE_URL_TEST
+      : process.env.DATABASE_URL_LOCAL;
+
+  if (!url) throw new Error('DATABASE_URL manquant pour l’environnement courant');
+  return url;
 }
-
-if (!_url) throw new Error('DATABASE_URL manquant pour l’environnement courant');
-
-// ✅ Forcer TypeScript à comprendre que url est défini
-const url: string = _url;
 
 type DrizzleDB = NodePgDatabase<typeof schema>;
 
 // 👇 fonction indispensable pour tes scripts
 export function getPgClient() {
+  const url = getDatabaseUrl();
   return new Client({
     connectionString: url,
     ssl: url.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
@@ -39,11 +36,15 @@ export async function getDrizzle(): Promise<DrizzleDB> {
   if (connecting) return connecting;
 
   connecting = (async () => {
+    const url = getDatabaseUrl();
     const pool = new Pool({
       connectionString: url,
       ssl: url.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
       max: 5,
+      connectionTimeoutMillis: 5000,
       idleTimeoutMillis: 10000,
+      query_timeout: 5000,
+      statement_timeout: 5000,
     });
 
     try {
@@ -58,6 +59,7 @@ export async function getDrizzle(): Promise<DrizzleDB> {
       cachedDrizzle = drizzle(pool, { schema }) as DrizzleDB;
       return cachedDrizzle;
     } catch (e) {
+      await pool.end().catch(() => undefined);
       connecting = null;
       throw e;
     }

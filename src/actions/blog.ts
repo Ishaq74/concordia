@@ -1,11 +1,10 @@
 import { defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { getDrizzle } from "@database/drizzle";
-import { blogPosts, blogTranslations } from "@database/schemas";
+import { blogMedia, blogPostMedia, blogPosts, blogTranslations } from "@database/schemas";
 import { eq, and } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { deleteStoredUpload, storeImageUpload } from "@lib/media/upload";
 
 const LANGUAGES = ['fr', 'en', 'es', 'ar'];
 
@@ -17,44 +16,98 @@ export const blogActions = {
       const actingUser = context.locals.user;
       if (!actingUser || actingUser.role !== 'admin') throw new Error("Unauthorized");
       const db = await getDrizzle();
-      const id = (formData.get("id") as string) || nanoid();
+      const submittedId = String(formData.get("id") ?? "").trim();
+      if (submittedId && !/^[A-Za-z0-9_-]{1,128}$/.test(submittedId)) {
+        throw new Error("INVALID_POST_ID");
+      }
+      const id = submittedId || nanoid();
       const slug = formData.get("slug") as string;
       
       // GESTION IMAGE (Upload local dans public/uploads)
       const imageFile = formData.get("coverImage") as File;
-      
+      let uploadedCover: Awaited<ReturnType<typeof storeImageUpload>> | undefined;
+
       if (imageFile && imageFile.size > 0) {
-        const buffer = Buffer.from(await imageFile.arrayBuffer());
-        const fileName = `${id}-${imageFile.name}`;
-        await fs.writeFile(path.join(process.cwd(), "public/uploads", fileName), buffer);
+        uploadedCover = await storeImageUpload(imageFile, "blog");
       }
 
-      return await db.transaction(async (tx) => {
-        // 1. Racine
-        await tx.insert(blogPosts).values({ id, slug, status: "published", inLanguage: "fr" })
-          .onConflictDoUpdate({ target: blogPosts.id, set: { slug, updatedAt: new Date() } });
+      const staleCoverUrls: string[] = [];
+      try {
+        const result = await db.transaction(async (tx) => {
+          // 1. Racine
+          await tx.insert(blogPosts).values({ id, slug, status: "published", inLanguage: "fr" })
+            .onConflictDoUpdate({ target: blogPosts.id, set: { slug, updatedAt: new Date() } });
 
-        // 2. Boucle Langues
-        for (const l of LANGUAGES) {
-          const headline = formData.get(`headline_${l}`);
-          if (!headline) continue;
+          if (uploadedCover) {
+            const existingCovers = await tx
+              .select({ mediaId: blogPostMedia.mediaId, url: blogMedia.url })
+              .from(blogPostMedia)
+              .innerJoin(blogMedia, eq(blogMedia.id, blogPostMedia.mediaId))
+              .where(and(eq(blogPostMedia.postId, id), eq(blogPostMedia.type, "cover")));
+
+            await tx.delete(blogPostMedia).where(
+              and(eq(blogPostMedia.postId, id), eq(blogPostMedia.type, "cover")),
+            );
+
+            for (const existingCover of existingCovers) {
+              const [remainingLink] = await tx
+                .select({ mediaId: blogPostMedia.mediaId })
+                .from(blogPostMedia)
+                .where(eq(blogPostMedia.mediaId, existingCover.mediaId))
+                .limit(1);
+              if (!remainingLink) {
+                await tx.delete(blogMedia).where(eq(blogMedia.id, existingCover.mediaId));
+                staleCoverUrls.push(existingCover.url);
+              }
+            }
+
+            const mediaId = nanoid();
+            await tx.insert(blogMedia).values({
+              id: mediaId,
+              url: uploadedCover.url,
+              type: "image",
+              encodingFormat: imageFile.type,
+            });
+            await tx.insert(blogPostMedia).values({
+              postId: id,
+              mediaId,
+              type: "cover",
+              position: "0",
+            });
+          }
+
+          // 2. Boucle Langues
+          for (const l of LANGUAGES) {
+            const headline = formData.get(`headline_${l}`);
+            if (!headline) continue;
           
-          const data: any = {
-            headline: { [l]: headline },
-            articleBody: { [l]: formData.get(`content_${l}`) },
-            excerpt: { [l]: formData.get(`excerpt_${l}`) || "" },
-            updatedAt: new Date()
-          }; // excerpt is required by schema
+            const data: any = {
+              headline: { [l]: headline },
+              articleBody: { [l]: formData.get(`content_${l}`) },
+              excerpt: { [l]: formData.get(`excerpt_${l}`) || "" },
+              updatedAt: new Date()
+            }; // excerpt is required by schema
 
-          const exist = await tx.query.blogTranslations.findFirst({
-            where: and(eq(blogTranslations.postId, id), eq(blogTranslations.inLanguage, l))
-          });
+            const exist = await tx.query.blogTranslations.findFirst({
+              where: and(eq(blogTranslations.postId, id), eq(blogTranslations.inLanguage, l))
+            });
 
-          if (exist) await tx.update(blogTranslations).set(data).where(eq(blogTranslations.id, exist.id));
-          else await tx.insert(blogTranslations).values({ id: nanoid(), postId: id, inLanguage: l, ...data });
+            if (exist) await tx.update(blogTranslations).set(data).where(eq(blogTranslations.id, exist.id));
+            else await tx.insert(blogTranslations).values({ id: nanoid(), postId: id, inLanguage: l, ...data });
+          }
+          return { success: true };
+        });
+
+        await Promise.all(
+          staleCoverUrls.map(url => deleteStoredUpload(url, "blog").catch(() => false)),
+        );
+        return result;
+      } catch (error) {
+        if (uploadedCover) {
+          await deleteStoredUpload(uploadedCover.url, "blog").catch(() => undefined);
         }
-        return { success: true };
-      });
+        throw error;
+      }
     }
   }),
 
@@ -65,7 +118,7 @@ export const blogActions = {
       const db = await getDrizzle();
       const user = context.locals.user;
       if (!user) throw new Error("UNAUTHORIZED");
-      // only admins are allowed (ownerId not tracked in schema)
+      // Publishing status remains an administrator moderation action.
       const post = await db.query.blogPosts.findFirst({ where: eq(blogPosts.id, id) });
       if (!post) throw new Error("POST_NOT_FOUND");
       if (user.role !== 'admin') {

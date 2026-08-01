@@ -5,13 +5,8 @@ import { json, guardAdmin, generateId } from "@lib/admin/api-helpers";
 import { getDrizzle } from "@database/drizzle";
 import { blogMedia, auditLog } from "@database/schemas";
 import { eq, desc, count, ilike } from "drizzle-orm";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { deleteStoredUpload, storeImageUpload, UploadError } from "@lib/media/upload";
 
-const UPLOAD_DIR = "public/uploads/blog";
-const UPLOAD_URL_PREFIX = "/uploads/blog";
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif", "image/svg+xml"];
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 /**
  * GET /api/admin/blog/media
@@ -79,11 +74,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
       const [existing] = await db.select().from(blogMedia).where(eq(blogMedia.id, id));
       if (existing) {
-        // Try to delete file on disk
-        try {
-          const filePath = path.join(process.cwd(), "public", existing.url);
-          await fs.unlink(filePath);
-        } catch { /* file may not exist */ }
+        await deleteStoredUpload(existing.url, "blog");
 
         await db.delete(blogMedia).where(eq(blogMedia.id, id));
 
@@ -126,53 +117,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return json(400, { error: "no_file" });
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-      return json(400, { error: "file_too_large", max: MAX_FILE_SIZE });
-    }
-
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return json(400, { error: "unsupported_type", allowed: ALLOWED_TYPES });
-    }
-
     const id = generateId();
-    const ext = file.name.split(".").pop() ?? "bin";
-
-    // Accept optional custom filename from the client
-    const customName = (formData.get("customName") as string | null)?.trim();
-    let baseName: string;
-    if (customName) {
-      // Sanitize: keep only safe URL chars, collapse multiple dashes
-      baseName = customName
-        .toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9-]/g, "-")
-        .replace(/-+/g, "-")
-        .replace(/^-|-$/g, "") || id;
-    } else {
-      baseName = id;
-    }
-
-    // Ensure uniqueness: check if file exists and append suffix if needed
-    let filename = `${baseName}.${ext}`;
-    const uploadPath = path.join(process.cwd(), UPLOAD_DIR);
-    await fs.mkdir(uploadPath, { recursive: true });
-    let counter = 1;
-    while (true) {
-      try {
-        await fs.access(path.join(uploadPath, filename));
-        // File exists, try next suffix
-        filename = `${baseName}-${counter}.${ext}`;
-        counter++;
-      } catch {
-        break; // File doesn't exist, we can use this name
-      }
-    }
-
-    // Write file
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(path.join(uploadPath, filename), buffer);
-
-    const fileUrl = `${UPLOAD_URL_PREFIX}/${filename}`;
+    const { filename, url: fileUrl } = await storeImageUpload(file, "blog");
 
     // Metadata from form data
     const alt = formData.get("alt") as string | null;
@@ -205,6 +151,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return json(201, { ok: true, id, url: fileUrl });
   } catch (error) {
     console.error("[admin/blog/media]", error);
+    if (error instanceof UploadError) return json(400, { error: error.code });
     return json(500, { error: error instanceof Error ? error.message : "upload_failed" });
   }
 };
