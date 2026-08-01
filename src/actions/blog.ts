@@ -1,10 +1,10 @@
 import { defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { getDrizzle } from "@database/drizzle";
-import { blogPosts, blogTranslations } from "@database/schemas";
+import { blogMedia, blogPostMedia, blogPosts, blogTranslations } from "@database/schemas";
 import { eq, and } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { storeImageUpload } from "@lib/media/upload";
+import { deleteStoredUpload, storeImageUpload } from "@lib/media/upload";
 
 const LANGUAGES = ['fr', 'en', 'es', 'ar'];
 
@@ -25,37 +25,61 @@ export const blogActions = {
       
       // GESTION IMAGE (Upload local dans public/uploads)
       const imageFile = formData.get("coverImage") as File;
-      
+      let uploadedCover: Awaited<ReturnType<typeof storeImageUpload>> | undefined;
+
       if (imageFile && imageFile.size > 0) {
-        await storeImageUpload(imageFile, "blog");
+        uploadedCover = await storeImageUpload(imageFile, "blog");
       }
 
-      return await db.transaction(async (tx) => {
-        // 1. Racine
-        await tx.insert(blogPosts).values({ id, slug, ownerId: actingUser.id, status: "published", inLanguage: "fr" })
-          .onConflictDoUpdate({ target: blogPosts.id, set: { slug, updatedAt: new Date() } });
+      try {
+        return await db.transaction(async (tx) => {
+          // 1. Racine
+          await tx.insert(blogPosts).values({ id, slug, ownerId: actingUser.id, status: "published", inLanguage: "fr" })
+            .onConflictDoUpdate({ target: blogPosts.id, set: { slug, updatedAt: new Date() } });
 
-        // 2. Boucle Langues
-        for (const l of LANGUAGES) {
-          const headline = formData.get(`headline_${l}`);
-          if (!headline) continue;
+          if (uploadedCover) {
+            const mediaId = nanoid();
+            await tx.insert(blogMedia).values({
+              id: mediaId,
+              url: uploadedCover.url,
+              type: "image",
+              encodingFormat: imageFile.type,
+            });
+            await tx.insert(blogPostMedia).values({
+              postId: id,
+              mediaId,
+              type: "cover",
+              position: "0",
+            });
+          }
+
+          // 2. Boucle Langues
+          for (const l of LANGUAGES) {
+            const headline = formData.get(`headline_${l}`);
+            if (!headline) continue;
           
-          const data: any = {
-            headline: { [l]: headline },
-            articleBody: { [l]: formData.get(`content_${l}`) },
-            excerpt: { [l]: formData.get(`excerpt_${l}`) || "" },
-            updatedAt: new Date()
-          }; // excerpt is required by schema
+            const data: any = {
+              headline: { [l]: headline },
+              articleBody: { [l]: formData.get(`content_${l}`) },
+              excerpt: { [l]: formData.get(`excerpt_${l}`) || "" },
+              updatedAt: new Date()
+            }; // excerpt is required by schema
 
-          const exist = await tx.query.blogTranslations.findFirst({
-            where: and(eq(blogTranslations.postId, id), eq(blogTranslations.inLanguage, l))
-          });
+            const exist = await tx.query.blogTranslations.findFirst({
+              where: and(eq(blogTranslations.postId, id), eq(blogTranslations.inLanguage, l))
+            });
 
-          if (exist) await tx.update(blogTranslations).set(data).where(eq(blogTranslations.id, exist.id));
-          else await tx.insert(blogTranslations).values({ id: nanoid(), postId: id, inLanguage: l, ...data });
+            if (exist) await tx.update(blogTranslations).set(data).where(eq(blogTranslations.id, exist.id));
+            else await tx.insert(blogTranslations).values({ id: nanoid(), postId: id, inLanguage: l, ...data });
+          }
+          return { success: true };
+        });
+      } catch (error) {
+        if (uploadedCover) {
+          await deleteStoredUpload(uploadedCover.url, "blog").catch(() => undefined);
         }
-        return { success: true };
-      });
+        throw error;
+      }
     }
   }),
 
