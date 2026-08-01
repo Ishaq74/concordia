@@ -31,13 +31,36 @@ export const blogActions = {
         uploadedCover = await storeImageUpload(imageFile, "blog");
       }
 
+      const staleCoverUrls: string[] = [];
       try {
-        return await db.transaction(async (tx) => {
+        const result = await db.transaction(async (tx) => {
           // 1. Racine
           await tx.insert(blogPosts).values({ id, slug, ownerId: actingUser.id, status: "published", inLanguage: "fr" })
             .onConflictDoUpdate({ target: blogPosts.id, set: { slug, updatedAt: new Date() } });
 
           if (uploadedCover) {
+            const existingCovers = await tx
+              .select({ mediaId: blogPostMedia.mediaId, url: blogMedia.url })
+              .from(blogPostMedia)
+              .innerJoin(blogMedia, eq(blogMedia.id, blogPostMedia.mediaId))
+              .where(and(eq(blogPostMedia.postId, id), eq(blogPostMedia.type, "cover")));
+
+            await tx.delete(blogPostMedia).where(
+              and(eq(blogPostMedia.postId, id), eq(blogPostMedia.type, "cover")),
+            );
+
+            for (const existingCover of existingCovers) {
+              const [remainingLink] = await tx
+                .select({ mediaId: blogPostMedia.mediaId })
+                .from(blogPostMedia)
+                .where(eq(blogPostMedia.mediaId, existingCover.mediaId))
+                .limit(1);
+              if (!remainingLink) {
+                await tx.delete(blogMedia).where(eq(blogMedia.id, existingCover.mediaId));
+                staleCoverUrls.push(existingCover.url);
+              }
+            }
+
             const mediaId = nanoid();
             await tx.insert(blogMedia).values({
               id: mediaId,
@@ -74,6 +97,11 @@ export const blogActions = {
           }
           return { success: true };
         });
+
+        await Promise.all(
+          staleCoverUrls.map(url => deleteStoredUpload(url, "blog").catch(() => false)),
+        );
+        return result;
       } catch (error) {
         if (uploadedCover) {
           await deleteStoredUpload(uploadedCover.url, "blog").catch(() => undefined);
