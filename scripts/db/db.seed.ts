@@ -140,18 +140,6 @@ async function seed() {
       let rows = (dataset as any[]).map(transformRow);
 
       // Normalize / map known data key mismatches so schema insertions succeed
-      if (baseName === 'blog_posts') {
-        const authorOwners: Record<string, string> = {
-          'author-camille-dupont': 'user-camille-dupont',
-          'author-lucas-martin': 'user-lucas-martin',
-          'author-sarah-leroy': 'user-sarah-leroy',
-        };
-        rows = rows.map(row => ({
-          ...row,
-          ownerId: row.ownerId ?? authorOwners[row.authorId] ?? 'admin-user',
-        }));
-      }
-
       if (baseName === 'blog_media') {
         rows = rows.map(r => {
           // schema expects `alt` (jsonb); some seed data used `altText`
@@ -164,6 +152,18 @@ async function seed() {
           if (r.height !== undefined) r.height = String(r.height);
           // remove uploadDate if present (not in schema)
           if (r.uploadDate) delete r.uploadDate;
+          return r;
+        });
+      }
+
+      if (baseName === 'blog_organizations' || baseName === 'blog_organization') {
+        // Schema now matches seed data — no field stripping needed.
+        // Only normalize legalName → name if data still uses old format
+        rows = rows.map(r => {
+          if (!r.name && r.legalName) {
+            const ln = r.legalName;
+            r.name = (typeof ln === 'string') ? ln : (ln.fr || ln.en || Object.values(ln)[0] || r.slug || r.id);
+          }
           return r;
         });
       }

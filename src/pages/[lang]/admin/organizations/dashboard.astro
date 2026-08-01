@@ -1,0 +1,363 @@
+---
+// src/pages/[lang]/admin/organizations/dashboard.astro — Org owner dashboard
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import { blogOrganizations, blogPosts, blogAuthors } from "@database/schemas";
+import { servicesListings, servicesBookings } from "@database/schemas";
+import { member, user as userTable, invitation } from "@database/schemas/auth-schema";
+import { eq, and, count, sql, inArray, desc } from "drizzle-orm";
+import { getTranslations } from "@i18n/translations";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const to = t.adminOrganizations ?? ({} as Record<string, string>);
+const adminBase = `/${lang}/admin`;
+
+const db = await getDrizzle();
+
+// Resolve active org: query param > session > member lookup > blogOrganizations fallback
+let activeOrgId = (Astro.url.searchParams.get("org")) || Astro.locals.organizationId;
+if (!activeOrgId) {
+  const userId = Astro.locals.user?.id;
+  if (userId) {
+    const [m] = await db.select({ organizationId: member.organizationId }).from(member).where(eq(member.userId, userId)).limit(1);
+    if (m) activeOrgId = m.organizationId;
+  }
+  // Admin fallback: use first blogOrganizations entry if member table is empty
+  if (!activeOrgId) {
+    const [firstOrg] = await db.select({ id: blogOrganizations.id }).from(blogOrganizations).limit(1);
+    if (firstOrg) activeOrgId = firstOrg.id;
+  }
+}
+if (!activeOrgId) return Astro.redirect(`${adminBase}/organizations`);
+
+// Fetch org info (from blogOrganizations via a lookup by shared ID or slug)
+const [org] = await db.select().from(blogOrganizations).where(eq(blogOrganizations.id, activeOrgId)).limit(1);
+const orgName = org?.name ?? "Organisation";
+const orgSlug = org?.slug ?? "";
+
+// Stats
+const [memberCount] = await db.select({ value: count() }).from(member).where(eq(member.organizationId, activeOrgId));
+const [serviceCount] = await db.select({ value: count() }).from(servicesListings).where(eq(servicesListings.organizationId, activeOrgId));
+const [bookingCount] = await db.select({ value: count() }).from(servicesBookings)
+  .where(
+    sql`${servicesBookings.providerId} IN (
+      SELECT ${member.userId} FROM ${member} WHERE ${member.organizationId} = ${activeOrgId}
+    )`
+  );
+const [articleCount] = await db.select({ value: count() }).from(blogPosts).where(eq(blogPosts.organizationId, activeOrgId));
+
+// Recent members
+const recentMembers = await db
+  .select({ id: member.id, userId: member.userId, role: member.role, createdAt: member.createdAt })
+  .from(member)
+  .where(eq(member.organizationId, activeOrgId))
+  .orderBy(desc(member.createdAt))
+  .limit(5);
+
+const memberUserIds = recentMembers.map((m) => m.userId);
+const usersMap = new Map<string, { name: string; email: string; image: string | null }>();
+if (memberUserIds.length > 0) {
+  const users = await db.select({ id: userTable.id, name: userTable.name, email: userTable.email, image: userTable.image }).from(userTable).where(inArray(userTable.id, memberUserIds));
+  for (const u of users) usersMap.set(u.id, { name: u.name, email: u.email, image: u.image });
+}
+
+// Pending invitations
+const pendingInvites = await db
+  .select()
+  .from(invitation)
+  .where(and(eq(invitation.organizationId, activeOrgId), eq(invitation.status, "pending")))
+  .orderBy(desc(invitation.createdAt))
+  .limit(5);
+
+// Recent bookings
+const orgMemberIds = recentMembers.map((m) => m.userId);
+const recentBookings = orgMemberIds.length > 0
+  ? await db.select().from(servicesBookings)
+      .where(inArray(servicesBookings.providerId, orgMemberIds))
+      .orderBy(desc(servicesBookings.createdAt))
+      .limit(5)
+  : [];
+
+const loc = (val: any, fallback = "") => {
+  if (!val) return fallback;
+  if (typeof val === "string") return val;
+  return val[lang] ?? val.en ?? val.fr ?? Object.values(val)[0] ?? fallback;
+};
+---
+
+<AdminLayout title={`${orgName} — ${to.dashboard ?? "Tableau de bord"}`} activeSection="org-dashboard">
+  <div class="admin-page-header">
+    <div>
+      <h1 class="admin-page-title">{orgName}</h1>
+      <p class="admin-page-description">{to.dashboardDesc ?? "Vue d'ensemble de votre organisation"}</p>
+    </div>
+    <div class="header-actions">
+      {orgSlug && (
+        <a href={`/${lang}/organizations/${orgSlug}`} target="_blank">
+          <Button variant="modern" color="secondary" icon={{ name: "mdi:open-in-new", side: "left" }}>
+            {to.viewPublic ?? "Page publique"}
+          </Button>
+        </a>
+      )}
+      <a href={`${adminBase}/organizations/profile`}>
+        <Button variant="modern" color="primary" icon={{ name: "mdi:cog", side: "left" }}>
+          {to.editProfile ?? "Configurer"}
+        </Button>
+      </a>
+    </div>
+  </div>
+
+  <!-- Org hero card -->
+  {org && (
+    <Card variant="modern" elevation="sm" class="org-hero-card">
+      <CardContent>
+        <div class="org-hero">
+          {org.logo ? (
+            <img src={org.logo} alt={orgName} class="org-hero__logo" />
+          ) : (
+            <div class="org-hero__logo org-hero__logo--placeholder">{orgName.charAt(0)}</div>
+          )}
+          <div class="org-hero__info">
+            <h2 class="org-hero__name">{orgName}</h2>
+            {org.isActive && <Badge variant="modern" color="success">{to.verified ?? "Collectif vérifié"}</Badge>}
+            {loc(org.description) && <p class="org-hero__desc">{loc(org.description)}</p>}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )}
+
+  <!-- Stats grid -->
+  <div class="dashboard-stats">
+    <Card variant="modern" elevation="sm" class="stat-card">
+      <CardContent>
+        <div class="stat-icon"><Icon name="mdi:account-group" /></div>
+        <div class="stat-content">
+          <span class="stat-value">{memberCount.value}</span>
+          <span class="stat-label">{to.members ?? "Membres"}</span>
+        </div>
+      </CardContent>
+    </Card>
+    <Card variant="modern" elevation="sm" class="stat-card">
+      <CardContent>
+        <div class="stat-icon stat-icon--blue"><Icon name="mdi:briefcase-outline" /></div>
+        <div class="stat-content">
+          <span class="stat-value">{serviceCount.value}</span>
+          <span class="stat-label">{t.adminServices?.listings?.title ?? "Services"}</span>
+        </div>
+      </CardContent>
+    </Card>
+    <Card variant="modern" elevation="sm" class="stat-card">
+      <CardContent>
+        <div class="stat-icon stat-icon--green"><Icon name="mdi:calendar-check" /></div>
+        <div class="stat-content">
+          <span class="stat-value">{bookingCount.value}</span>
+          <span class="stat-label">{t.adminServices?.bookings?.title ?? "Réservations"}</span>
+        </div>
+      </CardContent>
+    </Card>
+    <Card variant="modern" elevation="sm" class="stat-card">
+      <CardContent>
+        <div class="stat-icon stat-icon--purple"><Icon name="mdi:newspaper-variant-outline" /></div>
+        <div class="stat-content">
+          <span class="stat-value">{articleCount.value}</span>
+          <span class="stat-label">{t.nav?.blog ?? "Articles"}</span>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Members -->
+    <Card variant="modern" elevation="sm">
+      <CardContent>
+        <div class="section-header">
+          <h2 class="section-title"><Icon name="mdi:account-multiple" /> {to.recentMembers ?? "Membres récents"}</h2>
+          <a href={`${adminBase}/organizations/members`} class="section-link">{to.viewAll ?? "Voir tout"} →</a>
+        </div>
+        <div class="members-list">
+          {recentMembers.map((m) => {
+            const u = usersMap.get(m.userId);
+            return (
+              <div class="member-row">
+                {u?.image ? (
+                  <img src={u.image} alt={u.name} class="member-avatar" />
+                ) : (
+                  <div class="member-avatar member-avatar--ph">{(u?.name ?? "?").charAt(0)}</div>
+                )}
+                <div class="member-info">
+                  <span class="member-name">{u?.name ?? m.userId.slice(0, 8)}</span>
+                  <span class="member-email">{u?.email ?? ""}</span>
+                </div>
+                <Badge variant="modern" color={m.role === "owner" ? "error" : m.role === "admin" ? "warning" : "secondary"}>{m.role}</Badge>
+              </div>
+            );
+          })}
+          {recentMembers.length === 0 && <p class="empty-text">{to.noMembers ?? "Aucun membre"}</p>}
+        </div>
+      </CardContent>
+    </Card>
+
+    <!-- Pending invites -->
+    <Card variant="modern" elevation="sm">
+      <CardContent>
+        <div class="section-header">
+          <h2 class="section-title"><Icon name="mdi:email-outline" /> {to.pendingInvites ?? "Invitations en attente"}</h2>
+          <a href={`${adminBase}/organizations/members`} class="section-link">{to.manage ?? "Gérer"} →</a>
+        </div>
+        <div class="invites-list">
+          {pendingInvites.map((inv) => (
+            <div class="invite-row">
+              <div class="invite-email">{inv.email}</div>
+              <Badge variant="modern" color="warning">{inv.role ?? "member"}</Badge>
+              <time class="invite-date">{inv.createdAt ? new Date(inv.createdAt).toLocaleDateString(lang, { day: "numeric", month: "short" }) : "—"}</time>
+            </div>
+          ))}
+          {pendingInvites.length === 0 && <p class="empty-text">{to.noInvites ?? "Aucune invitation en attente"}</p>}
+        </div>
+      </CardContent>
+    </Card>
+
+    <!-- Recent bookings -->
+    <Card variant="modern" elevation="sm" class="span-full">
+      <CardContent>
+        <div class="section-header">
+          <h2 class="section-title"><Icon name="mdi:calendar-clock" /> {to.recentBookings ?? "Réservations récentes"}</h2>
+          <a href={`${adminBase}/organizations/bookings`} class="section-link">{to.viewAll ?? "Voir tout"} →</a>
+        </div>
+        <div class="bookings-list">
+          {recentBookings.map((b) => (
+            <div class="booking-row">
+              <div class="booking-info">
+                <span class="booking-id">#{b.id.slice(0, 8)}</span>
+                <span class="booking-date">{b.bookingDate} {b.bookingTime ?? ""}</span>
+              </div>
+              <Badge variant="modern" color={
+                b.status === "confirmed" ? "success" :
+                b.status === "pending" ? "warning" :
+                b.status === "cancelled" ? "error" : "secondary"
+              }>{b.status}</Badge>
+              <span class="booking-price">{b.totalPrice ? `${b.totalPrice} ${b.currency ?? "EUR"}` : "—"}</span>
+            </div>
+          ))}
+          {recentBookings.length === 0 && <p class="empty-text">{to.noBookings ?? "Aucune réservation"}</p>}
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+
+  <!-- Quick actions -->
+  <Card variant="modern" elevation="sm" class="quick-actions">
+    <CardContent>
+      <h2 class="section-title"><Icon name="mdi:lightning-bolt" /> {to.quickActions ?? "Actions rapides"}</h2>
+      <div class="actions-grid">
+        <a href={`${adminBase}/organizations/members`} class="action-card">
+          <Icon name="mdi:account-plus" />
+          <span>{to.inviteMember ?? "Inviter un membre"}</span>
+        </a>
+        <a href={`${adminBase}/services/new`} class="action-card">
+          <Icon name="mdi:briefcase-plus" />
+          <span>{to.addService ?? "Ajouter un service"}</span>
+        </a>
+        <a href={`${adminBase}/blog/articles/new?orgId=${activeOrgId}`} class="action-card">
+          <Icon name="mdi:pencil-plus" />
+          <span>{to.writeArticle ?? "Rédiger un article"}</span>
+        </a>
+        <a href={`${adminBase}/organizations/profile`} class="action-card">
+          <Icon name="mdi:cog" />
+          <span>{to.editProfile ?? "Configurer le profil"}</span>
+        </a>
+      </div>
+    </CardContent>
+  </Card>
+</AdminLayout>
+
+<style>
+  .admin-page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .admin-page-title { font-size: 1.75rem; font-weight: 800; margin: 0; }
+  .admin-page-description { font-size: 0.9375rem; color: var(--text-muted, #64748b); margin: 0.25rem 0 0; }
+  .header-actions { display: flex; gap: 0.5rem; }
+
+  /* Hero */
+  .org-hero-card { margin-bottom: 1.5rem; }
+  .org-hero { display: flex; align-items: center; gap: 1rem; }
+  .org-hero__logo { width: 64px; height: 64px; border-radius: 0.75rem; object-fit: cover; flex-shrink: 0; }
+  .org-hero__logo--placeholder { background: var(--color-primary-light, #fef3c7); color: var(--color-primary, #eab308); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 800; }
+  .org-hero__name { font-size: 1.25rem; font-weight: 700; margin: 0 0 0.25rem; }
+  .org-hero__desc { font-size: 0.875rem; color: var(--text-muted, #64748b); margin: 0.25rem 0 0; max-width: 600px; }
+
+  /* Stats */
+  .dashboard-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-card :global(.card-content) { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; }
+  .stat-icon { width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; background: var(--color-primary-light, #fef3c7); color: var(--color-primary, #eab308); display: flex; align-items: center; justify-content: center; }
+  .stat-icon--blue { background: #dbeafe; color: #2563eb; }
+  .stat-icon--green { background: #dcfce7; color: #16a34a; }
+  .stat-icon--purple { background: #ede9fe; color: #7c3aed; }
+  .stat-icon :global(svg) { width: 1.375rem; height: 1.375rem; }
+  .stat-value { font-size: 1.75rem; font-weight: 800; display: block; line-height: 1; }
+  .stat-label { font-size: 0.8125rem; color: var(--text-muted, #64748b); }
+
+  /* Grid */
+  .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .span-full { grid-column: 1 / -1; }
+
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+  .section-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+  .section-title :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary, #eab308); }
+  .section-link { font-size: 0.8125rem; color: var(--color-primary, #eab308); text-decoration: none; font-weight: 600; }
+  .section-link:hover { text-decoration: underline; }
+
+  /* Members */
+  .members-list, .invites-list, .bookings-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .member-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0; }
+  .member-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  .member-avatar--ph { background: var(--bg-muted, #f1f5f9); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.875rem; color: var(--text-muted, #64748b); }
+  .member-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+  .member-name { font-weight: 600; font-size: 0.8125rem; }
+  .member-email { font-size: 0.6875rem; color: var(--text-muted, #64748b); }
+
+  /* Invites */
+  .invite-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.375rem 0; }
+  .invite-email { flex: 1; font-size: 0.875rem; font-weight: 500; }
+  .invite-date { font-size: 0.75rem; color: var(--text-muted, #64748b); }
+
+  /* Bookings */
+  .booking-row { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border-default, #e2e8f0); }
+  .booking-row:last-child { border-bottom: none; }
+  .booking-info { flex: 1; display: flex; flex-direction: column; gap: 0.125rem; }
+  .booking-id { font-weight: 600; font-size: 0.8125rem; }
+  .booking-date { font-size: 0.75rem; color: var(--text-muted, #64748b); }
+  .booking-price { font-weight: 600; font-size: 0.875rem; }
+
+  .empty-text { font-size: 0.8125rem; color: var(--text-muted, #64748b); text-align: center; padding: 1rem 0; margin: 0; }
+
+  /* Quick actions */
+  .quick-actions { margin-bottom: 1.5rem; }
+  .actions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+  .action-card {
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    padding: 1.25rem 1rem; border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: 0.75rem; text-decoration: none; color: var(--text-default, #0f172a);
+    transition: all 0.15s; text-align: center;
+  }
+  .action-card:hover { border-color: var(--color-primary, #eab308); background: var(--bg-muted, #fefce8); }
+  .action-card :global(svg) { width: 1.5rem; height: 1.5rem; color: var(--color-primary, #eab308); }
+  .action-card span { font-size: 0.8125rem; font-weight: 600; }
+
+  @media (max-width: 1024px) {
+    .dashboard-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .dashboard-stats { grid-template-columns: 1fr; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .header-actions { flex-direction: column; }
+  }
+</style>

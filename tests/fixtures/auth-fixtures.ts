@@ -5,4 +5,14 @@ export const authFixtures = {
     username: 'validuser',
     name: 'Valid User',
   },
+  validOrganization: {
+    name: 'Test Organization',
+    slug: 'test-organization',
+  },
+  validMember: {
+    role: 'member',
+  },
+  validOwner: {
+    role: 'owner',
+  },
 }

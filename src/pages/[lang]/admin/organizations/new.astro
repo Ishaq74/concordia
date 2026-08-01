@@ -1,0 +1,233 @@
+---
+// src/pages/[lang]/admin/organizations/new.astro — Create a new organization
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Button from "@components/ui/Button.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
+import { Icon } from "astro-icon/components";
+import { getTranslations } from "@i18n/translations";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const to = t.adminOrganizations ?? ({} as Record<string, string>);
+const adminBase = `/${lang}/admin`;
+---
+
+<AdminLayout title={to.newOrganization ?? "Nouvelle organisation"} activeSection="organizations">
+  <div class="admin-page-header">
+    <div>
+      <a href={`${adminBase}/organizations`} class="back-link">
+        <Icon name="mdi:arrow-left" /> {to.backToList ?? "Retour à la liste"}
+      </a>
+      <h1 class="admin-page-title">{to.newOrganization ?? "Nouvelle organisation"}</h1>
+      <p class="admin-page-description">{to.newOrgDesc ?? "Créez une nouvelle organisation sur la plateforme"}</p>
+    </div>
+  </div>
+
+  <div class="form-layout">
+    <main class="form-main">
+      <!-- Identity -->
+      <Card variant="modern" elevation="sm" class="form-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:domain" /> {to.identity ?? "Identité"}</h2>
+          <div class="form-grid">
+            <div class="form-field">
+              <Label htmlFor="org-name">{to.name ?? "Nom"} *</Label>
+              <Input type="text" id="org-name" required placeholder="Ex: Mon Organisation" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="org-slug">{to.slug ?? "Slug"} *</Label>
+              <Input type="text" id="org-slug" required placeholder="mon-organisation" />
+            </div>
+            <div class="form-field form-field--full">
+              <Label htmlFor="org-desc">{to.descriptionLabel ?? "Description"}</Label>
+              <Textarea id="org-desc" rows={3} />
+            </div>
+            <div class="form-field form-field--full">
+              <Label htmlFor="org-slogan">{to.slogan ?? "Slogan"}</Label>
+              <Input type="text" id="org-slogan" placeholder="Notre mission en une phrase" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Contact -->
+      <Card variant="modern" elevation="sm" class="form-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:card-account-phone" /> {to.contact ?? "Contact"}</h2>
+          <div class="form-grid">
+            <div class="form-field">
+              <Label htmlFor="org-email">{to.email ?? "Email"}</Label>
+              <Input type="email" id="org-email" placeholder="contact@example.com" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="org-phone">{to.phone ?? "Téléphone"}</Label>
+              <Input type="tel" id="org-phone" placeholder="+33 4 50 00 00 00" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="org-url">{to.website ?? "Site web"}</Label>
+              <Input type="url" id="org-url" placeholder="https://example.com" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="org-legal">{to.legalName ?? "Raison sociale"}</Label>
+              <Input type="text" id="org-legal" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Address -->
+      <Card variant="modern" elevation="sm" class="form-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:map-marker" /> {to.addressLabel ?? "Adresse"}</h2>
+          <div class="form-grid">
+            <div class="form-field form-field--full">
+              <Label htmlFor="org-address">{to.streetAddress ?? "Rue"}</Label>
+              <Input type="text" id="org-address" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="org-city">{to.city ?? "Ville"}</Label>
+              <Input type="text" id="org-city" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="org-zip">{to.postalCode ?? "Code postal"}</Label>
+              <Input type="text" id="org-zip" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="org-country">{to.country ?? "Pays"}</Label>
+              <Input type="text" id="org-country" value="FR" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Branding -->
+      <Card variant="modern" elevation="sm" class="form-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:palette" /> {to.branding ?? "Identité visuelle"}</h2>
+          <div class="form-grid">
+            <div class="form-field">
+              <Label htmlFor="org-logo">{to.logoUrl ?? "URL du logo"}</Label>
+              <Input type="url" id="org-logo" placeholder="https://..." />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="org-image">{to.coverUrl ?? "URL de couverture"}</Label>
+              <Input type="url" id="org-image" placeholder="https://..." />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </main>
+
+    <aside class="form-sidebar">
+      <Card variant="modern" elevation="sm" class="sticky-card">
+        <CardContent>
+          <h3 class="sidebar-title"><Icon name="mdi:content-save" /> {to.actions ?? "Actions"}</h3>
+          <Button id="create-org-btn" variant="modern" color="primary" className="btn-full">
+            <Icon name="mdi:plus-circle" /> {to.createOrganization ?? "Créer l'organisation"}
+          </Button>
+          <a href={`${adminBase}/organizations`} class="btn-cancel">{to.cancel ?? "Annuler"}</a>
+        </CardContent>
+      </Card>
+    </aside>
+  </div>
+</AdminLayout>
+
+<script>
+  import { showToast } from "@lib/admin/toast";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const nameEl = document.getElementById("org-name") as HTMLInputElement;
+    const slugEl = document.getElementById("org-slug") as HTMLInputElement;
+
+    // Auto-generate slug from name
+    let slugManuallyEdited = false;
+    slugEl?.addEventListener("input", () => { slugManuallyEdited = true; });
+    nameEl?.addEventListener("input", () => {
+      if (!slugManuallyEdited) {
+        slugEl.value = nameEl.value
+          .toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "");
+      }
+    });
+
+    const val = (id: string) => (document.getElementById(id) as HTMLInputElement)?.value?.trim() ?? "";
+
+    document.getElementById("create-org-btn")?.addEventListener("click", async () => {
+      const name = val("org-name");
+      const slug = val("org-slug");
+      if (!name || !slug) { showToast("Nom et slug requis", "error"); return; }
+
+      const body = {
+        action: "create",
+        name,
+        slug,
+        description: val("org-desc") ? { fr: val("org-desc") } : null,
+        slogan: val("org-slogan") ? { fr: val("org-slogan") } : null,
+        email: val("org-email") || null,
+        telephone: val("org-phone") || null,
+        url: val("org-url") || null,
+        legalName: val("org-legal") ? { fr: val("org-legal") } : null,
+        address: {
+          streetAddress: val("org-address"),
+          addressLocality: val("org-city"),
+          postalCode: val("org-zip"),
+          addressCountry: val("org-country"),
+        },
+        logo: val("org-logo") || null,
+        image: val("org-image") || null,
+      };
+
+      try {
+        const res = await fetch("/api/admin/organizations/profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error ?? "Failed");
+        showToast("Organisation créée !", "success");
+        setTimeout(() => {
+          window.location.href = window.location.pathname.replace(/\/new$/, `/${data.organization.id}`);
+        }, 600);
+      } catch (e: any) {
+        showToast(e.message, "error");
+      }
+    });
+  });
+</script>
+
+<style>
+  .admin-page-header { margin-bottom: 1.5rem; }
+  .back-link { display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.8125rem; color: var(--text-muted, #64748b); text-decoration: none; margin-bottom: 0.5rem; }
+  .back-link:hover { color: var(--color-primary, #eab308); }
+  .back-link :global(svg) { width: 1rem; height: 1rem; }
+  .admin-page-title { font-size: 1.75rem; font-weight: 800; margin: 0; }
+  .admin-page-description { font-size: 0.9375rem; color: var(--text-muted, #64748b); margin: 0.25rem 0 0; }
+
+  .form-layout { display: grid; grid-template-columns: 1fr 280px; gap: 1.5rem; align-items: start; }
+  .form-main { display: flex; flex-direction: column; gap: 1.5rem; }
+  .section-title { font-size: 1.125rem; font-weight: 700; margin: 0 0 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .section-title :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary, #eab308); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-field { display: flex; flex-direction: column; gap: 0.375rem; }
+  .form-field--full { grid-column: 1 / -1; }
+
+  .sticky-card { position: sticky; top: 1rem; }
+  .sidebar-title { font-size: 1rem; font-weight: 700; margin: 0 0 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .sidebar-title :global(svg) { width: 1.125rem; height: 1.125rem; color: var(--color-primary, #eab308); }
+  .btn-full { width: 100%; justify-content: center; }
+  .btn-cancel { display: block; text-align: center; margin-top: 0.75rem; font-size: 0.875rem; color: var(--text-muted, #64748b); text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    .form-layout { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>

@@ -50,6 +50,7 @@ const services = defineCollection({
     slug: z.string(),
     lang: z.string(),
     providerId: z.string(),
+    organizationId: z.string().nullable().optional(),
     status: z.string(),
     basePrice: z.string().nullable().optional(),
     priceType: z.string().nullable().optional(),

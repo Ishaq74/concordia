@@ -1,6 +1,7 @@
 import { pgTable, text, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { blogMedia } from "./blog_media.schema";
+import { blogOrganizations } from "./blog_organization.schema";
 
 export const blogAuthors = pgTable("blog_authors", {
   id: text("id").primaryKey(),
@@ -15,6 +16,7 @@ export const blogAuthors = pgTable("blog_authors", {
   avatarUrl: text("avatar_url"),
   website: text("website"),
   sameAs: jsonb("same_as"),
+  worksForId: text("works_for_id"),
   displayInHome: boolean("display_in_home").notNull().default(false),
   displayInBlog: boolean("display_in_blog").notNull().default(true),
   isFeatured: boolean("is_featured").notNull().default(false),
@@ -28,6 +30,7 @@ export const blogAuthors = pgTable("blog_authors", {
 
 export const blogAuthorsRelations = relations(blogAuthors, ({ one }) => ({
   avatar: one(blogMedia, { fields: [blogAuthors.avatarId], references: [blogMedia.id] }),
+  organization: one(blogOrganizations, { fields: [blogAuthors.worksForId], references: [blogOrganizations.id] }),
 }));
 
 export const blogAuthorsIndexes = `

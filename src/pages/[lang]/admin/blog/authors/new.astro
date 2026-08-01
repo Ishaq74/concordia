@@ -13,12 +13,23 @@ import Switch from "@components/ui/Form/Switch.astro";
 import MarkdownEditor from "@components/admin/MarkdownEditor.astro";
 import MediaPickerModal from "@components/admin/MediaPickerModal.astro";
 import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import { blogOrganizations } from "@database/schemas";
 import { getTranslations } from "@i18n/translations";
 const lang = Astro.params.lang as string;
 const t = getTranslations(lang);
 
 const currentLocale = lang;
 const adminBase = `/${currentLocale}/admin/blog/authors`;
+
+const db = await getDrizzle();
+const allOrgs = await db.select({ id: blogOrganizations.id, name: blogOrganizations.name }).from(blogOrganizations).orderBy(blogOrganizations.name);
+
+const extractLocalized = (value: unknown, locale: string = currentLocale): string => {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") { const obj = value as Record<string, string>; return obj[locale] || Object.values(obj)[0] || ""; }
+  return "";
+};
 
 const supportedLocales = [
   { code: "fr", label: "Français", flag: "🇫🇷" },
@@ -201,6 +212,18 @@ const supportedLocales = [
               <span class="field-hint">{t.adminBlog?.form?.authorSlugHint ?? "URL : /blog/author/…"}</span>
             </div>
 
+            {allOrgs.length > 0 && (
+              <div class="form-field">
+                <Label htmlFor="worksFor">{t.adminBlog?.form?.organization ?? "Organisation"}</Label>
+                <select id="worksFor" name="worksForId" class="select-native">
+                  <option value="">{t.adminBlog?.form?.none ?? "Aucune"}</option>
+                  {allOrgs.map((org) => (
+                    <option value={org.id}>{extractLocalized(org.name)}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div class="switch-group">
               <div class="switch-item">
                 <Switch id="is-featured" name="isFeatured" />
@@ -377,6 +400,7 @@ const supportedLocales = [
         sameAs,
         avatarId: (document.getElementById("avatar-id") as HTMLInputElement).value || null,
         avatarUrl: (document.getElementById("avatar-url") as HTMLInputElement).value || null,
+        worksForId: (document.getElementById("worksFor") as HTMLSelectElement)?.value || null,
         isFeatured: (document.getElementById("is-featured") as HTMLInputElement).checked,
         displayInHome: (document.getElementById("display-home") as HTMLInputElement).checked,
         displayInBlog: (document.getElementById("display-blog") as HTMLInputElement).checked,

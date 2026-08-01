@@ -1,0 +1,72 @@
+---
+// src/components/templates/auth/profile/ProfileDetails.astro
+
+import Grid from "@components/Tools/Grid.astro";
+import Flex from "@components/Tools/Flex.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Button from "@/components/ui/Button.astro";
+import Card from "@components/ui/Card/Card.astro";
+import { getLocalizedUrl } from "@lib/i18n/route-helpers";
+import { getTranslations } from "@i18n/translations";
+
+interface Props {
+  user: { id: string; name?: string | null; email: string };
+  memberRole?: string | null;
+  lastSignIn?: string | null;
+  organizations: Array<{ id: string; name?: string | null; slug?: string | null }>;
+  activeOrganizationId: string | null;
+  invitationCount: number;
+  lang?: string;
+}
+
+const { user, memberRole = null, lastSignIn = null, organizations, activeOrganizationId, invitationCount } = Astro.props as Props;
+const lang = (Astro.props as Props).lang ?? Astro.currentLocale ?? "fr";
+const t = getTranslations(lang);
+
+// Récupère le nom de l'organisation active
+const activeOrgName =
+  organizations.find((o) => o.id === activeOrganizationId)?.name ?? activeOrganizationId ?? "Aucune organisation";
+---
+
+<Card variant="modern" elevation="sm" className="profile-details">
+  <Grid cols="repeat(2, 1fr)" gap="md">
+  <Flex direction="column">
+    <Label htmlFor="name">{t.profile?.fullName ?? "Nom complet"}</Label>
+    <Input id="name" readonly value={user.name ?? "Utilisateur"} />
+  </Flex>
+
+  <Flex direction="column">
+    <Label htmlFor="email">{t.profile?.email ?? "Email"}</Label>
+    <Input id="email" readonly value={user.email} />
+  </Flex>
+
+  <Flex direction="column">
+    <Label htmlFor="role">{t.profile?.role ?? "Rôle"}</Label>
+    <Input id="role" readonly value={memberRole ?? "Utilisateur"} />
+  </Flex>
+
+  <Flex direction="column">
+    <Label htmlFor="active-organization">{t.profile?.activeOrg ?? "Organisation active"}</Label>
+    <Input id="active-organization" readonly value={activeOrgName} />
+  </Flex>
+
+  <Flex direction="column">
+    <Label htmlFor="last-activity">{t.profile?.lastActivity ?? "Dernière activité"}</Label>
+    <Input id="last-activity" readonly value={lastSignIn ?? "Non disponible"} />
+  </Flex>
+
+  <Flex direction="column">
+    <Label htmlFor="invitations">{t.profile?.invitations ?? "Invitations"}</Label>
+    <Button id="invitations"
+      variant="modern"
+      color={invitationCount > 0 ? "accent" : "secondary"}
+      value={invitationCount > 0 ? `${invitationCount} ${t.profile?.pending ?? "en attente"}` : (t.profile?.none ?? "Aucune")}
+      type="submit"
+      onClick={() => window.location.href = getLocalizedUrl(lang, "auth/invitations")}
+    >
+      {invitationCount > 0 ? `${invitationCount} ${t.profile?.pending ?? "en attente"}` : (t.profile?.none ?? "Aucune")}
+    </Button>
+  </Flex>
+</Grid>
+</Card>

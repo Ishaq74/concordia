@@ -1,0 +1,440 @@
+---
+// src/pages/[lang]/admin/organizations/profile.astro — Org owner: profile & config
+export const prerender = false;
+
+import AdminLayout from "@layouts/AdminLayout.astro";
+import Card from "@components/ui/Card/Card.astro";
+import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
+import Button from "@components/ui/Button.astro";
+import Input from "@components/ui/Form/Input.astro";
+import Label from "@components/ui/Form/Label.astro";
+import Textarea from "@components/ui/Form/Textarea.astro";
+import Switch from "@components/ui/Form/Switch.astro";
+import { Icon } from "astro-icon/components";
+import { getDrizzle } from "@database/drizzle";
+import { blogOrganizations } from "@database/schemas";
+import { eq } from "drizzle-orm";
+import { getTranslations } from "@i18n/translations";
+
+const lang = Astro.params.lang as string;
+const t = getTranslations(lang);
+const to = t.adminOrganizations ?? ({} as Record<string, string>);
+const adminBase = `/${lang}/admin`;
+
+const db = await getDrizzle();
+
+// Resolve active org: query param > session > member lookup > blogOrganizations fallback
+let activeOrgId = (Astro.url.searchParams.get("org")) || Astro.locals.organizationId;
+if (!activeOrgId) {
+  const userId = Astro.locals.user?.id;
+  if (userId) {
+    const { member: memberT } = await import("@database/schemas/auth-schema");
+    const [m] = await db.select({ organizationId: memberT.organizationId }).from(memberT).where(eq(memberT.userId, userId)).limit(1);
+    if (m) activeOrgId = m.organizationId;
+  }
+  if (!activeOrgId) {
+    const [firstOrg] = await db.select({ id: blogOrganizations.id }).from(blogOrganizations).limit(1);
+    if (firstOrg) activeOrgId = firstOrg.id;
+  }
+}
+if (!activeOrgId) return Astro.redirect(`${adminBase}/organizations`);
+
+const [org] = await db.select().from(blogOrganizations).where(eq(blogOrganizations.id, activeOrgId)).limit(1);
+if (!org) return Astro.redirect(`${adminBase}/organizations/dashboard`);
+
+const loc = (val: any, fallback = "") => {
+  if (!val) return fallback;
+  if (typeof val === "string") return val;
+  return val[lang] ?? val.en ?? val.fr ?? Object.values(val)[0] ?? fallback;
+};
+
+const address = (org.address ?? {}) as Record<string, string>;
+const contactPoints = (org.contactPoint ?? []) as { contactType: string; telephone?: string; email?: string; hoursAvailable?: string }[];
+const sameAs = (org.sameAs ?? []) as string[];
+const knowsAbout = (org.knowsAbout ?? []) as string[];
+const knowsLanguage = (org.knowsLanguage ?? []) as string[];
+const areaServed = (org.areaServed ?? []) as string[];
+const makesOffer = (org.makesOffer ?? []) as string[];
+---
+
+<AdminLayout title={`${org.name} — ${to.profileConfig ?? "Profil & Configuration"}`} activeSection="org-profile">
+  <div class="admin-page-header">
+    <div>
+      <h1 class="admin-page-title">{to.profileConfig ?? "Profil & Configuration"}</h1>
+      <p class="admin-page-description">{to.profileDesc ?? "Personnalisez l'identité et les informations de votre organisation"}</p>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+    <!-- Main form -->
+    <div class="profile-main">
+
+      <!-- Branding / Image de marque -->
+      <Card variant="modern" elevation="sm" class="profile-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:palette" /> {to.branding ?? "Image de marque"}</h2>
+          <div class="branding-zone">
+            <div class="cover-preview" id="cover-zone">
+              {org.image ? (
+                <img src={org.image} alt="Cover" class="cover-img" />
+              ) : (
+                <div class="cover-placeholder">
+                  <Icon name="mdi:image-plus" />
+                  <span>{to.addCover ?? "Ajouter une image de couverture"}</span>
+                </div>
+              )}
+              <div class="cover-overlay">
+                <Icon name="mdi:camera" />
+              </div>
+            </div>
+            <div class="logo-zone">
+              {org.logo ? (
+                <img src={org.logo} alt="Logo" class="logo-preview" id="logo-preview" />
+              ) : (
+                <div class="logo-placeholder" id="logo-preview">
+                  <span>{org.name.charAt(0)}</span>
+                </div>
+              )}
+            </div>
+            <div class="branding-fields">
+              <div class="form-field">
+                <Label htmlFor="p-logo">{to.logoUrl ?? "URL du logo"}</Label>
+                <Input type="text" id="p-logo" value={org.logo ?? ""} />
+              </div>
+              <div class="form-field">
+                <Label htmlFor="p-cover">{to.coverUrl ?? "URL de la couverture"}</Label>
+                <Input type="text" id="p-cover" value={org.image ?? ""} />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Identity -->
+      <Card variant="modern" elevation="sm" class="profile-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:card-account-details" /> {to.entityInfo ?? "Informations de l'entité"}</h2>
+          <div class="form-grid">
+            <div class="form-field">
+              <Label htmlFor="p-name">{to.name ?? "Nom"} *</Label>
+              <Input type="text" id="p-name" value={org.name} required />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="p-slug">{to.slug ?? "Slug URL"}</Label>
+              <div class="slug-preview">
+                <span class="slug-prefix">concordia.app/</span>
+                <Input type="text" id="p-slug" value={org.slug} />
+              </div>
+            </div>
+            <div class="form-field">
+              <Label htmlFor="p-tax">{to.registrationNumber ?? "N° d'immatriculation (SIRET/RNA)"}</Label>
+              <Input type="text" id="p-tax" value={org.taxID ?? ""} />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="p-legal">{to.legalName ?? "Raison sociale"}</Label>
+              <Input type="text" id="p-legal" value={loc(org.legalName)} />
+            </div>
+            <div class="form-field form-field--full">
+              <Label htmlFor="p-desc">{to.shortDescription ?? "Description courte"}</Label>
+              <Textarea id="p-desc" rows={3}>{loc(org.description)}</Textarea>
+              <span class="char-counter" id="desc-counter">0/250</span>
+            </div>
+            <div class="form-field form-field--full">
+              <Label htmlFor="p-slogan">{to.slogan ?? "Slogan"}</Label>
+              <Input type="text" id="p-slogan" value={loc(org.slogan)} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Contact & Localisation -->
+      <Card variant="modern" elevation="sm" class="profile-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:map-marker" /> {to.contactLocation ?? "Contact & Localisation"}</h2>
+          <div class="form-grid">
+            <div class="form-field form-field--full">
+              <Label htmlFor="p-address">{to.physicalAddress ?? "Adresse physique"}</Label>
+              <Input type="text" id="p-address" value={address.streetAddress ?? ""} placeholder="123 Rue Example" />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="p-city">{to.city ?? "Ville"}</Label>
+              <Input type="text" id="p-city" value={address.addressLocality ?? ""} />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="p-zip">{to.postalCode ?? "Code postal"}</Label>
+              <Input type="text" id="p-zip" value={address.postalCode ?? ""} />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="p-country">{to.country ?? "Pays"}</Label>
+              <Input type="text" id="p-country" value={address.addressCountry ?? ""} />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="p-phone">{to.phone ?? "Téléphone"}</Label>
+              <Input type="tel" id="p-phone" value={org.telephone ?? ""} />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="p-email">{to.publicEmail ?? "Email public"}</Label>
+              <Input type="email" id="p-email" value={org.email ?? ""} />
+            </div>
+            <div class="form-field">
+              <Label htmlFor="p-web">{to.website ?? "Site web"}</Label>
+              <Input type="url" id="p-web" value={org.url ?? ""} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Social Links -->
+      <Card variant="modern" elevation="sm" class="profile-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:share-variant" /> {to.socialLinks ?? "Liens sociaux"}</h2>
+          <div class="form-field">
+            <Label htmlFor="p-socials">{to.socialLinksHelp ?? "Un lien par ligne (Facebook, Twitter, Instagram...)"}</Label>
+            <Textarea id="p-socials" rows={4}>{sameAs.join("\n")}</Textarea>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Expertise & Area -->
+      <Card variant="modern" elevation="sm" class="profile-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:brain" /> {to.expertiseArea ?? "Expertise & Zones"}</h2>
+          <div class="form-grid">
+            <div class="form-field form-field--full">
+              <Label htmlFor="p-expertise">{to.expertise ?? "Domaines d'expertise"} <small>(virgules)</small></Label>
+              <Input type="text" id="p-expertise" value={knowsAbout.join(", ")} />
+            </div>
+            <div class="form-field form-field--full">
+              <Label htmlFor="p-services-offered">{to.servicesOffered ?? "Services proposés"} <small>(virgules)</small></Label>
+              <Input type="text" id="p-services-offered" value={makesOffer.join(", ")} />
+            </div>
+            <div class="form-field form-field--full">
+              <Label htmlFor="p-areas">{to.areasServed ?? "Zones desservies"} <small>(virgules)</small></Label>
+              <Input type="text" id="p-areas" value={areaServed.join(", ")} />
+            </div>
+            <div class="form-field form-field--full">
+              <Label htmlFor="p-languages">{to.languages ?? "Langues"} <small>(virgules)</small></Label>
+              <Input type="text" id="p-languages" value={knowsLanguage.join(", ")} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="profile-sidebar">
+      <!-- Publish card -->
+      <Card variant="modern" elevation="sm" class="profile-section sidebar-sticky">
+        <CardContent>
+          <div class="publish-status">
+            {org.isActive ? (
+              <Badge variant="modern" color="success">{to.published ?? "En ligne"}</Badge>
+            ) : (
+              <Badge variant="modern" color="secondary">{to.draft ?? "Hors ligne"}</Badge>
+            )}
+          </div>
+          <p class="publish-meta">{to.lastModified ?? "Dernière modification"}: {org.updatedAt.toLocaleDateString(lang, { day: "numeric", month: "short", year: "numeric" })}</p>
+          <div class="publish-actions">
+            <Button variant="modern" color="primary" id="save-profile-btn" icon={{ name: "mdi:content-save", side: "left" }}>
+              {to.save ?? "Enregistrer les modifications"}
+            </Button>
+            {org.slug && (
+              <a href={`/${lang}/organizations/${org.slug}`} target="_blank" style="width: 100%;">
+                <Button variant="modern" color="secondary" icon={{ name: "mdi:open-in-new", side: "left" }} class="full-width">
+                  {to.viewPublicPage ?? "Voir la page publique"}
+                </Button>
+              </a>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Display flags -->
+      <Card variant="modern" elevation="sm" class="profile-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:toggle-switch" /> {to.displayOptions ?? "Affichage"}</h2>
+          <div class="switch-list">
+            <div class="switch-row">
+              <Switch id="p-active" name="isActive" checked={org.isActive} />
+              <div>
+                <Label htmlFor="p-active">{to.active ?? "Active"}</Label>
+                <p class="switch-desc">{to.activeDesc ?? "Visible sur la plateforme"}</p>
+              </div>
+            </div>
+            <div class="switch-row">
+              <Switch id="p-featured" name="isFeatured" checked={org.isFeatured} />
+              <div>
+                <Label htmlFor="p-featured">{to.featured ?? "En vedette"}</Label>
+                <p class="switch-desc">{to.featuredDesc ?? "Mise en avant sur la page d'accueil"}</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- Navigation -->
+      <Card variant="modern" elevation="sm" class="profile-section">
+        <CardContent>
+          <h2 class="section-title"><Icon name="mdi:navigation" /> {to.navigation ?? "Navigation rapide"}</h2>
+          <nav class="sidebar-nav">
+            <a href={`${adminBase}/organizations/dashboard`} class="sidebar-nav-link">
+              <Icon name="mdi:view-dashboard" /> {to.dashboard ?? "Tableau de bord"}
+            </a>
+            <a href={`${adminBase}/organizations/members`} class="sidebar-nav-link">
+              <Icon name="mdi:account-multiple" /> {to.members ?? "Membres & Rôles"}
+            </a>
+            <a href={`${adminBase}/organizations/blog`} class="sidebar-nav-link">
+              <Icon name="mdi:post-outline" /> {to.orgBlog ?? "Blog"}
+            </a>
+            <a href={`${adminBase}/organizations/bookings`} class="sidebar-nav-link">
+              <Icon name="mdi:calendar-check" /> {to.bookings ?? "Réservations"}
+            </a>
+          </nav>
+        </CardContent>
+      </Card>
+    </aside>
+  </div>
+</AdminLayout>
+
+<script define:vars={{ orgId: activeOrgId }}>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Char counter for description
+    const descEl = document.getElementById("p-desc");
+    const counter = document.getElementById("desc-counter");
+    if (descEl && counter) {
+      const update = () => { counter.textContent = `${descEl.value.length}/250`; };
+      update();
+      descEl.addEventListener("input", update);
+    }
+
+    // Save
+    const saveBtn = document.getElementById("save-profile-btn");
+    function val(id) { return document.getElementById(id)?.value?.trim() ?? ""; }
+    function checked(id) { return document.getElementById(id)?.checked ?? false; }
+    function csvToArr(id) { return val(id).split(",").map(s => s.trim()).filter(Boolean); }
+    function linesToArr(id) { return val(id).split("\n").map(s => s.trim()).filter(Boolean); }
+
+    saveBtn?.addEventListener("click", async () => {
+      const body = {
+        action: "update",
+        organizationId: orgId,
+        name: val("p-name"),
+        slug: val("p-slug"),
+        description: { fr: val("p-desc"), en: val("p-desc") },
+        slogan: { fr: val("p-slogan"), en: val("p-slogan") },
+        legalName: { fr: val("p-legal"), en: val("p-legal") },
+        taxID: val("p-tax") || null,
+        email: val("p-email") || null,
+        telephone: val("p-phone") || null,
+        url: val("p-web") || null,
+        address: {
+          streetAddress: val("p-address"),
+          addressLocality: val("p-city"),
+          postalCode: val("p-zip"),
+          addressCountry: val("p-country"),
+        },
+        logo: val("p-logo") || null,
+        image: val("p-cover") || null,
+        knowsAbout: csvToArr("p-expertise"),
+        makesOffer: csvToArr("p-services-offered"),
+        areaServed: csvToArr("p-areas"),
+        knowsLanguage: csvToArr("p-languages"),
+        sameAs: linesToArr("p-socials"),
+        isActive: checked("p-active"),
+        isFeatured: checked("p-featured"),
+      };
+
+      try {
+        const res = await fetch("/api/admin/organizations/profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error((await res.json()).error || "Failed");
+        if (window.showToast) window.showToast("Profil enregistré !", "success");
+        setTimeout(() => location.reload(), 600);
+      } catch (e) {
+        if (window.showToast) window.showToast(e.message, "error");
+        else alert("Erreur: " + e.message);
+      }
+    });
+  });
+</script>
+
+<style>
+  .admin-page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+  .admin-page-title { font-size: 1.75rem; font-weight: 800; margin: 0; }
+  .admin-page-description { font-size: 0.9375rem; color: var(--text-muted, #64748b); margin: 0.25rem 0 0; }
+
+  .profile-grid { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start; }
+  .profile-main { display: flex; flex-direction: column; gap: 1.5rem; }
+  .profile-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+  .sidebar-sticky { position: sticky; top: 1.5rem; }
+
+  .profile-section { margin: 0; }
+  .section-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; margin: 0 0 1rem; }
+  .section-title :global(svg) { width: 1.25rem; height: 1.25rem; color: var(--color-primary, #eab308); }
+
+  /* Branding */
+  .branding-zone { display: flex; flex-direction: column; gap: 1rem; }
+  .cover-preview {
+    position: relative; width: 100%; height: 180px; border-radius: 0.75rem; overflow: hidden;
+    background: var(--bg-muted, #f1f5f9); cursor: pointer;
+  }
+  .cover-img { width: 100%; height: 100%; object-fit: cover; }
+  .cover-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted, #94a3b8); gap: 0.5rem; }
+  .cover-placeholder :global(svg) { width: 2rem; height: 2rem; }
+  .cover-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s; color: white;
+  }
+  .cover-preview:hover .cover-overlay { opacity: 1; }
+  .cover-overlay :global(svg) { width: 2rem; height: 2rem; }
+  .logo-zone { margin-top: -2.5rem; margin-left: 1.5rem; }
+  .logo-preview { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .logo-placeholder {
+    width: 72px; height: 72px; border-radius: 50%; background: var(--color-primary, #eab308); color: white;
+    display: flex; align-items: center; justify-content: center; font-size: 1.75rem; font-weight: 800;
+    border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .branding-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  /* Forms */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-field { display: flex; flex-direction: column; gap: 0.25rem; }
+  .form-field--full { grid-column: 1 / -1; }
+  .slug-preview { display: flex; align-items: center; gap: 0; }
+  .slug-prefix { font-size: 0.8125rem; color: var(--text-muted, #64748b); padding: 0.5rem; background: var(--bg-muted, #f1f5f9); border: 1px solid var(--border-default, #e2e8f0); border-right: none; border-radius: 0.375rem 0 0 0.375rem; white-space: nowrap; }
+  .slug-preview :global(input) { border-radius: 0 0.375rem 0.375rem 0; }
+  .char-counter { font-size: 0.75rem; color: var(--text-muted, #94a3b8); text-align: right; }
+
+  /* Switches */
+  .switch-list { display: flex; flex-direction: column; gap: 1rem; }
+  .switch-row { display: flex; align-items: flex-start; gap: 0.75rem; }
+  .switch-desc { font-size: 0.75rem; color: var(--text-muted, #94a3b8); margin: 0; }
+
+  /* Publish */
+  .publish-status { margin-bottom: 0.5rem; }
+  .publish-meta { font-size: 0.75rem; color: var(--text-muted, #94a3b8); margin: 0 0 1rem; }
+  .publish-actions { display: flex; flex-direction: column; gap: 0.5rem; }
+  .full-width { width: 100%; }
+
+  /* Sidebar nav */
+  .sidebar-nav { display: flex; flex-direction: column; gap: 0.25rem; }
+  .sidebar-nav-link {
+    display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem; text-decoration: none; color: var(--text-default, #0f172a);
+    font-size: 0.875rem; transition: background 0.15s;
+  }
+  .sidebar-nav-link:hover { background: var(--bg-muted, #f1f5f9); color: var(--color-primary, #eab308); }
+  .sidebar-nav-link :global(svg) { width: 1.125rem; height: 1.125rem; }
+
+  @media (max-width: 1024px) {
+    .profile-grid { grid-template-columns: 1fr; }
+    .sidebar-sticky { position: static; }
+  }
+  @media (max-width: 768px) {
+    .form-grid, .branding-fields { grid-template-columns: 1fr; }
+  }
+</style>

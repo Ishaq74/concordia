@@ -15,7 +15,7 @@ import MarkdownEditor from "@components/admin/MarkdownEditor.astro";
 import MediaPickerModal from "@components/admin/MediaPickerModal.astro";
 import { Icon } from "astro-icon/components";
 import { getDrizzle } from "@database/drizzle";
-import { blogAuthors, blogPostAuthors } from "@database/schemas";
+import { blogAuthors, blogOrganizations, blogPostAuthors } from "@database/schemas";
 import { eq, count } from "drizzle-orm";
 import { getTranslations } from "@i18n/translations";
 
@@ -31,6 +31,8 @@ const [author] = await db.select().from(blogAuthors).where(eq(blogAuthors.id, id
 if (!author) return Astro.redirect(adminBase);
 
 const [articleCount] = await db.select({ value: count() }).from(blogPostAuthors).where(eq(blogPostAuthors.authorId, id));
+const allOrgs = await db.select({ id: blogOrganizations.id, name: blogOrganizations.name }).from(blogOrganizations).orderBy(blogOrganizations.name);
+
 const extractLocalized = (value: unknown, locale: string = currentLocale): string => {
   if (typeof value === "string") return value;
   if (value && typeof value === "object") { const obj = value as Record<string, string>; return obj[locale] || Object.values(obj)[0] || ""; }
@@ -262,6 +264,18 @@ const frontendUrl = `/${currentLocale}/blog/author/${author.slug}`;
               <span class="field-hint">{t.adminBlog?.form?.authorSlugHint ?? "URL : /blog/author/…"}</span>
             </div>
 
+            {allOrgs.length > 0 && (
+              <div class="form-field">
+                <Label htmlFor="worksFor">{t.adminBlog?.form?.organization ?? "Organisation"}</Label>
+                <select id="worksFor" name="worksForId" class="select-native">
+                  <option value="">{t.adminBlog?.form?.none ?? "Aucune"}</option>
+                  {allOrgs.map((org) => (
+                    <option value={org.id} selected={org.id === author.worksForId}>{extractLocalized(org.name)}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div class="switch-group">
               <div class="switch-item">
                 <Switch id="is-featured" name="isFeatured" checked={author.isFeatured ?? false} />
@@ -441,6 +455,7 @@ const frontendUrl = `/${currentLocale}/blog/author/${author.slug}`;
         sameAs,
         avatarId: avatarIdEl.value || null,
         avatarUrl: avatarUrlEl.value || null,
+        worksForId: (document.getElementById("worksFor") as HTMLSelectElement)?.value || null,
         isFeatured: (document.getElementById("is-featured") as HTMLInputElement).checked,
         displayInHome: (document.getElementById("display-home") as HTMLInputElement).checked,
         displayInBlog: (document.getElementById("display-blog") as HTMLInputElement).checked,

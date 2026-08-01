@@ -435,12 +435,16 @@ const supportedLocales = [
         media.push({ mediaId: coverId, type: "cover", position: "0" });
       }
 
+      // Organization context (from org admin links)
+      const urlOrgId = new URLSearchParams(window.location.search).get("orgId") || undefined;
+
       return {
         action: "create",
         slug: slug || undefined,
         title: (document.getElementById("headline-fr") as HTMLInputElement)?.value.trim(),
         status,
         inLanguage,
+        organizationId: urlOrgId,
         isFeatured,
         displayInHome,
         displayInBlog,
@@ -492,7 +496,10 @@ const supportedLocales = [
         const result = await res.json();
         if (result.ok || result.id) {
           showToast(i18n.articleCreated ?? "", "success");
-          const backUrl = document.querySelector<HTMLAnchorElement>(".back-link")?.href || window.location.pathname.replace("/new", "");
+          const orgParam = new URLSearchParams(window.location.search).get("orgId");
+          const backUrl = orgParam
+            ? window.location.pathname.replace(/\/blog\/articles\/new.*/, `/organizations/blog?org=${orgParam}`)
+            : document.querySelector<HTMLAnchorElement>(".back-link")?.href || window.location.pathname.replace("/new", "");
           setTimeout(() => {
             window.location.href = backUrl;
           }, 800);

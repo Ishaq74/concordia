@@ -41,13 +41,6 @@
       "when": 1772543861570,
       "tag": "0005_harsh_metal_master",
       "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1785606000000,
-      "tag": "0006_direct_user_ownership",
-      "breakpoints": true
     }
   ]
 }

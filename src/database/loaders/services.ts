@@ -77,6 +77,7 @@ export const loadServices = createTranslationLoader({
     return {
       id: service.id,
       providerId: service.providerId,
+      organizationId: service.organizationId,
       status: service.status,
       basePrice: service.basePrice,
       priceType: service.priceType,

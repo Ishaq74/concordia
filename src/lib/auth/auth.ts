@@ -2,8 +2,9 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { getDrizzle } from "@database/drizzle";
 import { username } from "better-auth/plugins/username";
+import { organization } from "better-auth/plugins";
 import { admin } from "better-auth/plugins";
-import { checkPermission } from "./permissions";
+import { ac, roles, checkPermission } from "./permissions";
 import { validateUserInput } from "./validate-user";
 import { smtp } from "@lib/smtp/smtp";
 import { auditLog } from "@database/schemas";
@@ -151,7 +152,27 @@ export async function getAuth() {
 
     plugins: [
       username(),
-      ...(process.env.NODE_ENV === 'test' ? [] : [admin()]),
+      ...(process.env.NODE_ENV === 'test'
+        ? []
+        : [
+            organization({
+              ac,
+              roles,
+              allowUserToCreateOrganization: async () => true,
+              async sendInvitationEmail(data: any) {
+                if (process.env.SMTP_MOCK === '1' || process.env.NODE_ENV === 'test') {
+                  console.log('[MOCK SMTP] Invite', { to: data.email, orgId: data.organization.id });
+                  return;
+                }
+                await smtp.send({
+                  to: data.email,
+                  subject: `Invitation à rejoindre ${data.organization.name}`,
+                  text: `Cliquez ici pour rejoindre : ${process.env.BETTER_AUTH_URL}/invite/${data.id}`,
+                });
+              },
+            }),
+            admin(),
+          ]),
     ],
 
     advanced: {
@@ -288,6 +309,30 @@ export async function getAuth() {
     },
   });
 
+  // helper object that exposes a simpler helper API on the auth instance.
+  // the underlying Better Auth library does not use the same names that we
+  // originally assumed when writing this wrapper. the server-side methods are
+  // available directly on `instance.api` (e.g. `listOrganizations`) rather than
+  // as strings like "organization/list". failing to map correctly produced the
+  // runtime error the user reported in the browser logs.
+  (instance as any).organizationApi = {
+    create: (payload: any) => (instance.api as any).createOrganization(payload),
+    setActive: (payload: any) => (instance.api as any).setActiveOrganization(payload),
+    update: (payload: any) => (instance.api as any).updateOrganization(payload),
+    delete: (payload: any) => (instance.api as any).deleteOrganization(payload),
+    // the organization plugin exposes invitations via `createInvitation` on the
+    // server; the client wrapper calls it `inviteMember` so we keep that name
+    // here for consistency with the page logic.
+    inviteMember: (payload: any) => (instance.api as any).createInvitation(payload),
+    updateMemberRole: (payload: any) => (instance.api as any).updateMemberRole(payload),
+    removeMember: (payload: any) => (instance.api as any).removeMember(payload),
+    leave: (payload: any) => (instance.api as any).leaveOrganization(payload),
+    list: (payload: any) => (instance.api as any).listOrganizations(payload),
+    getFull: (payload: any) => (instance.api as any).getFullOrganization(payload),
+    listMembers: (payload: any) => (instance.api as any).listMembers(payload),
+    listUserInvitations: (payload: any) => (instance.api as any).listUserInvitations(payload),
+  };
+
   (instance as any).checkPermission = checkPermission;
 
   // wrap signOut + getSession to support logout invalidation for bearer tokens
@@ -419,7 +464,27 @@ if (DATABASE_URL) {
 
     plugins: [
       username(),
-      ...(process.env.NODE_ENV === 'test' ? [] : [admin()]),
+      ...(process.env.NODE_ENV === 'test'
+        ? []
+        : [
+            organization({
+              ac,
+              roles,
+              allowUserToCreateOrganization: async () => true,
+              async sendInvitationEmail(data: any) {
+                if (process.env.SMTP_MOCK === '1' || process.env.NODE_ENV === 'test') {
+                  console.log('[MOCK SMTP] Invite', { to: data.email, orgId: data.organization.id });
+                  return;
+                }
+                await smtp.send({
+                  to: data.email,
+                  subject: `Invitation à rejoindre ${data.organization.name}`,
+                  text: `Cliquez ici pour rejoindre : ${process.env.BETTER_AUTH_URL}/invite/${data.id}`,
+                });
+              },
+            }),
+            admin(),
+          ]),
     ],
 
     advanced: {

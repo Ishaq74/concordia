@@ -6,6 +6,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 import { getTranslations } from "@i18n/translations";
 import { getLocalizedUrl } from "@lib/i18n/route-helpers";
 import Grid from "@components/Tools/Grid.astro";
+import Flex from "@components/Tools/Flex.astro";
 import Tabs from "@components/ui/Tabs/Tabs.astro";
 import Tab from "@components/ui/Tabs/Tab.astro";
 import Avatar from "@components/ui/Avatar/Avatar.astro";
@@ -14,6 +15,8 @@ import Button from "@components/ui/Button.astro";
 import Card from "@components/ui/Card/Card.astro";
 import Alert from "@components/ui/Alert.astro";
 import ProfileForm from "@components/templates/auth/profile/ProfileForm.astro";
+import ProfileOrganization from "@components/templates/auth/profile/ProfileOrganization.astro";
+import ProfileInvitations from "@components/templates/auth/profile/ProfileInvitations.astro";
 import { Icon } from "astro-icon/components";
 
 // DB
@@ -22,13 +25,20 @@ import { profile } from "@database/schemas";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 
+// Utils — shared types (no duplication)
+import {
+  type OrganizationRecord,
+  type OrganizationMember,
+  type InvitationRecord,
+} from "@lib/auth/profile/utils";
+
 const lang = Astro.params.lang as string;
 const translations = getTranslations(lang);
 
 const LOCALE_DATE_MAP: Record<string, string> = { fr: "fr-FR", en: "en-US", es: "es-ES", ar: "ar-SA" };
 const dateLocale = LOCALE_DATE_MAP[lang] ?? "fr-FR";
 
-const { user } = Astro.locals;
+const { user, session } = Astro.locals;
 
 if (!user) return Astro.redirect(getLocalizedUrl(lang, "auth/sign-in"));
 
@@ -63,6 +73,17 @@ const memberSince = user.createdAt
   ? new Date(user.createdAt).toLocaleDateString(dateLocale, { year: "numeric", month: "long" })
   : null;
 const emailVerified = (user as any).emailVerified ?? false;
+
+// --- Organizations (TODO: branch to real API when ready)
+const organizations: OrganizationRecord[] = [];
+const activeOrganizationId = null;
+let members: OrganizationMember[] = [];
+
+const memberRole = members.find((m) => m.userId === user.id)?.role ?? null;
+const canManageOrganization = memberRole === "owner" || memberRole === "admin";
+const isOwner = memberRole === "owner";
+
+let invitations: InvitationRecord[] = [];
 
 // --- Status message (query param)
 const statusParam = Astro.url.searchParams.get("status");
@@ -203,6 +224,35 @@ const statusMessage = statusParam === "updated"
               </div>
             </Card>
 
+            {/* Organizations */}
+            <Card variant="modern" elevation="sm">
+              <div class="profile-section">
+                <h3 class="profile-section__subtitle">{translations.auth?.organizations ?? "Organisations"}</h3>
+                {organizations.length > 0 ? (
+                  <Flex direction="column" gap="sm">
+                    {organizations.map((org) => (
+                      <div class="profile-org-item">
+                        <div class="profile-org-item__avatar">
+                          {org.name?.charAt(0)?.toUpperCase() ?? "O"}
+                        </div>
+                        <div class="profile-org-item__info">
+                          <span class="profile-org-item__name">{org.name}</span>
+                          {org.role && <span class="profile-org-item__role">{org.role}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </Flex>
+                ) : (
+                  <div class="profile-empty-state profile-empty-state--compact">
+                    <Icon name="mdi:account-group-outline" />
+                    <p class="profile-empty-state__text">{translations.auth?.noOrganizations ?? "Aucune organisation"}</p>
+                  </div>
+                )}
+              </div>
+            </Card>
+
+            {/* Invitations */}
+            <ProfileInvitations count={invitations.length} translations={translations} lang={lang} />
           </div>
         </div>
       </Tab>
@@ -241,6 +291,16 @@ const statusMessage = statusParam === "updated"
       <Tab name="profil-tabs" label={translations.auth?.editTab ?? "Éditer mon profil"} icon="mdi:pencil">
         <Grid cols="1" gap="xl">
           <ProfileForm user={user} profile={userProfile} />
+          <ProfileOrganization
+            organizations={organizations}
+            activeOrganizationId={activeOrganizationId}
+            members={members}
+            canManageOrganization={canManageOrganization}
+            isOwner={isOwner}
+            session={session}
+            translations={translations}
+          />
+          <ProfileInvitations count={invitations.length} translations={translations} lang={lang} />
         </Grid>
       </Tab>
 

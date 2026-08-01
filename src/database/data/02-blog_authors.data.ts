@@ -23,6 +23,7 @@ export const blogAuthorsSeed = [
             "https://twitter.com/camilledupont",
             "https://linkedin.com/in/camilledupont"
         ],
+        worksForId: "org-salut-annecy",
         displayInHome: true,
         displayInBlog: true,
         isFeatured: true,
@@ -56,6 +57,7 @@ export const blogAuthorsSeed = [
             "https://instagram.com/lucasmartin",
             "https://facebook.com/lucasmartin"
         ],
+        worksForId: "org-salut-annecy",
         displayInHome: true,
         displayInBlog: true,
         isFeatured: true,
@@ -89,6 +91,7 @@ export const blogAuthorsSeed = [
             "https://instagram.com/sarahleroy",
             "https://twitter.com/sarahleroy"
         ],
+        worksForId: "org-salut-annecy",
         displayInHome: true,
         displayInBlog: true,
         isFeatured: true,

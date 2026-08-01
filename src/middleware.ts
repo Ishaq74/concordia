@@ -105,6 +105,49 @@ const authSession = defineMiddleware(async (context, next) => {
     if (sessionResult) {
       context.locals.user = sessionResult.user;
       context.locals.session = sessionResult.session;
+      // Extract active organization ID from session for org-scoping
+      let orgId = (sessionResult.session as any)?.activeOrganizationId ?? null;
+
+      // Auto-resolve: if no active org is set, try multiple fallbacks
+      if (!orgId && sessionResult.user?.id) {
+        try {
+          const { getDrizzle } = await import("@database/drizzle");
+          const { member } = await import("@database/schemas/auth-schema");
+          const { eq } = await import("drizzle-orm");
+          const db = await getDrizzle();
+
+          // Fallback 1: user's first membership in the auth member table
+          const [firstMembership] = await db
+            .select({ organizationId: member.organizationId })
+            .from(member)
+            .where(eq(member.userId, sessionResult.user.id))
+            .limit(1);
+          if (firstMembership) {
+            orgId = firstMembership.organizationId;
+          }
+
+          // Fallback 2: for admin users, use first blogOrganizations entry
+          // (covers case where auth org/member tables are empty but blogOrganizations has data)
+          if (!orgId) {
+            const userRole = (sessionResult.user as any)?.role ?? "";
+            const isAdmin = typeof userRole === "string" && userRole.toLowerCase().includes("admin");
+            if (isAdmin) {
+              const { blogOrganizations } = await import("@database/schemas");
+              const [firstOrg] = await db
+                .select({ id: blogOrganizations.id })
+                .from(blogOrganizations)
+                .limit(1);
+              if (firstOrg) {
+                orgId = firstOrg.id;
+              }
+            }
+          }
+        } catch {
+          // Fallback silently — orgId stays null
+        }
+      }
+
+      context.locals.organizationId = orgId;
     }
   } catch (error) {
     if (error instanceof Error && error.message === "AUTH_SESSION_TIMEOUT") {

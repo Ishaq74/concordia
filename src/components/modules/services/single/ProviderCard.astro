@@ -1,15 +1,17 @@
 ---
 import Card from "@components/ui/Card/Card.astro";
 import CardContent from "@components/ui/Card/CardContent.astro";
+import Badge from "@components/ui/Badge.astro";
 import { Icon } from "astro-icon/components";
 import { getTranslations } from "@i18n/translations";
 
 interface Props {
   providerId: string;
+  organizationName?: string | null;
   lang: string;
 }
 
-const { providerId, lang } = Astro.props;
+const { providerId, organizationName, lang } = Astro.props;
 const t = getTranslations(lang);
 ---
 
@@ -26,6 +28,12 @@ const t = getTranslations(lang);
       </div>
       <div class="provider-details">
         <p class="provider-id">{t.servicesPage?.provider ?? "Prestataire"}: {providerId}</p>
+        {organizationName && (
+          <Badge variant="retro" color="secondary">
+            <Icon name="mdi:office-building-outline" width="14" height="14" />
+            {organizationName}
+          </Badge>
+        )}
       </div>
     </div>
   </CardContent>

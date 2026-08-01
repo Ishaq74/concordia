@@ -98,9 +98,9 @@ describe('loadBlogPosts (integration via mocked DB)', () => {
       _: {
         schema: undefined,
         fullSchema: {
-          user: {}, session: {}, account: {}, verification: {}, rateLimit: {}, auditLog: {}, blogPosts: {}, blogAuthors: {}, blogCategories: {}, blogComments: {}, blogMedia: {}, blogTranslations: {}, comments: {},
-          userRelations: {}, sessionRelations: {}, accountRelations: {},
-          blogAuthorsRelations: {}, blogAuthorsIndexes: {}, blogCategoriesRelations: {}, blogCategoriesIndexes: {}, blogCommentsRelations: {}, blogCommentsIndexes: {}, blogMediaIndexes: {}, blogTranslationsRelations: {}, blogTranslationsIndexes: {}, commentsRelations: {}
+          user: {}, session: {}, account: {}, verification: {}, organization: {}, member: {}, invitation: {}, rateLimit: {}, auditLog: {}, blogPosts: {}, blogAuthors: {}, blogCategories: {}, blogComments: {}, blogMedia: {}, blogOrganizations: {}, blogTranslations: {}, comments: {},
+          userRelations: {}, sessionRelations: {}, accountRelations: {}, organizationRelations: {}, memberRelations: {}, invitationRelations: {},
+          blogAuthorsRelations: {}, blogAuthorsIndexes: {}, blogCategoriesRelations: {}, blogCategoriesIndexes: {}, blogCommentsRelations: {}, blogCommentsIndexes: {}, blogMediaIndexes: {}, blogOrganizationsIndexes: {}, blogTranslationsRelations: {}, blogTranslationsIndexes: {}, commentsRelations: {}
         },
         tableNamesMap: {},
         session: {} as any,
@@ -142,9 +142,9 @@ describe('loadBlogPosts (integration via mocked DB)', () => {
       _: {
         schema: undefined,
         fullSchema: {
-          user: {}, session: {}, account: {}, verification: {}, rateLimit: {}, auditLog: {}, blogPosts: {}, blogAuthors: {}, blogCategories: {}, blogComments: {}, blogMedia: {}, blogTranslations: {}, comments: {},
-          userRelations: {}, sessionRelations: {}, accountRelations: {},
-          blogAuthorsRelations: {}, blogAuthorsIndexes: {}, blogCategoriesRelations: {}, blogCategoriesIndexes: {}, blogCommentsRelations: {}, blogCommentsIndexes: {}, blogMediaIndexes: {}, blogTranslationsRelations: {}, blogTranslationsIndexes: {}, commentsRelations: {}
+          user: {}, session: {}, account: {}, verification: {}, organization: {}, member: {}, invitation: {}, rateLimit: {}, auditLog: {}, blogPosts: {}, blogAuthors: {}, blogCategories: {}, blogComments: {}, blogMedia: {}, blogOrganizations: {}, blogTranslations: {}, comments: {},
+          userRelations: {}, sessionRelations: {}, accountRelations: {}, organizationRelations: {}, memberRelations: {}, invitationRelations: {},
+          blogAuthorsRelations: {}, blogAuthorsIndexes: {}, blogCategoriesRelations: {}, blogCategoriesIndexes: {}, blogCommentsRelations: {}, blogCommentsIndexes: {}, blogMediaIndexes: {}, blogOrganizationsIndexes: {}, blogTranslationsRelations: {}, blogTranslationsIndexes: {}, commentsRelations: {}
         },
         tableNamesMap: {},
         session: {} as any,
@@ -191,6 +191,9 @@ describe('loadBlogPosts (integration via mocked DB)', () => {
           session: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
           account: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
           verification: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
+          organization: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
+          member: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
+          invitation: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
           rateLimit: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
           auditLog: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
           blogPosts: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
@@ -198,13 +201,14 @@ describe('loadBlogPosts (integration via mocked DB)', () => {
           blogCategories: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
           blogComments: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
           blogMedia: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
+          blogOrganizations: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
           blogTranslations: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
           comments: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
           blogPostAuthors: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
           blogPostCategories: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
           blogPostMedia: { _: {}, $inferSelect: {}, $inferInsert: {}, getSQL: () => '' },
-          userRelations: {}, sessionRelations: {}, accountRelations: {},
-          blogAuthorsRelations: {}, blogAuthorsIndexes: {}, blogCategoriesRelations: {}, blogCategoriesIndexes: {}, blogCommentsRelations: {}, blogCommentsIndexes: {}, blogMediaIndexes: {}, blogTranslationsRelations: {}, blogTranslationsIndexes: {}, commentsRelations: {},
+          userRelations: {}, sessionRelations: {}, accountRelations: {}, organizationRelations: {}, memberRelations: {}, invitationRelations: {},
+          blogAuthorsRelations: {}, blogAuthorsIndexes: {}, blogCategoriesRelations: {}, blogCategoriesIndexes: {}, blogCommentsRelations: {}, blogCommentsIndexes: {}, blogMediaIndexes: {}, blogOrganizationsIndexes: {}, blogTranslationsRelations: {}, blogTranslationsIndexes: {}, commentsRelations: {},
           blogPostsRelations: {}, blogPostAuthorsRelations: {}, blogPostCategoriesRelations: {}, blogPostMediaRelations: {},
           blogPostsIndexes: {}, blogPostAuthorsIndexes: {}, blogPostCategoriesIndexes: {}, blogPostMediaIndexes: {}
         },

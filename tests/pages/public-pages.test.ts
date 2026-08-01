@@ -16,10 +16,12 @@ const mappedPages = [
   { canonical: "about", expected: { fr: "a-propos", en: "about", es: "acerca-de", ar: "about" } },
   { canonical: "contact", expected: { fr: "contact", en: "contact", es: "contacto", ar: "contact" } },
   { canonical: "profile", expected: { fr: "profil", en: "profile", es: "perfil", ar: "profile" } },
+  { canonical: "organizations", expected: { fr: "organisations", en: "organizations", es: "organizaciones", ar: "organizations" } },
   { canonical: "auth/sign-in", expected: { fr: "auth/connexion", en: "auth/sign-in", es: "auth/iniciar-sesion", ar: "auth/sign-in" } },
   { canonical: "auth/sign-up", expected: { fr: "auth/inscription", en: "auth/sign-up", es: "auth/registro", ar: "auth/sign-up" } },
   { canonical: "auth/forgot-password", expected: { fr: "auth/mot-de-passe-oublie", en: "auth/forgot-password", es: "auth/olvido-contrasena", ar: "auth/forgot-password" } },
   { canonical: "auth/verify-email", expected: { fr: "auth/verifier-email", en: "auth/verify-email", es: "auth/verificar-email", ar: "auth/verify-email" } },
+  { canonical: "auth/invitations", expected: { fr: "auth/invitations", en: "auth/invitations", es: "auth/invitaciones", ar: "auth/invitations" } },
 ];
 
 // Pages that pass through unchanged (no slug-map entry)
@@ -59,6 +61,10 @@ describe("Home page URL", () => {
 });
 
 describe("Dynamic segment pages", () => {
+  it("organizations/my-org resolves to localized prefix", () => {
+    expect(getLocalizedUrl("fr", "organizations/my-org")).toBe("/fr/organisations/my-org");
+    expect(getLocalizedUrl("es", "organizations/my-org")).toBe("/es/organizaciones/my-org");
+  });
 
   it("blog/author/john-doe resolves to localized prefix", () => {
     expect(getLocalizedUrl("fr", "blog/author/john-doe")).toBe("/fr/blog/auteur/john-doe");
